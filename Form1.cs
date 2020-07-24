@@ -27,8 +27,8 @@ namespace UAssetGUI
             // Enable double buffering to look nicer
             if (!SystemInformation.TerminalServerSession)
             {
-                Type dgvType = dataGridView1.GetType();
-                PropertyInfo pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+                Type ourGridType = dataGridView1.GetType();
+                PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
                 pi.SetValue(dataGridView1, true, null);
             }
 
@@ -45,11 +45,6 @@ namespace UAssetGUI
             Controls.Add(byteView1);
 
             frm_sizeChanged(null, null);
-        }
-
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
         }
 
         public bool existsUnsavedChanges = false;

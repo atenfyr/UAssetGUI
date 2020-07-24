@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.StructureSerializers;
@@ -89,6 +91,11 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode);
                         }
                     }
+                }
+                else if (baseUs is StringTableCategory us2)
+                {
+                    var parentNode = new PointingTreeNode(us2.Data.Name + " (" + us2.Data.Count + ")", baseUs);
+                    categoryNode.Nodes.Add(parentNode);
                 }
             }
             listView1.EndUpdate();
@@ -203,6 +210,19 @@ namespace UAssetGUI
                         row.Cells[2].Value = string.Empty;
                         row.Cells[3].Value = enumData.GetEnumBase();
                         row.Cells[3].Value = enumData.GetEnumFull();
+                        break;
+                    case "ByteProperty":
+                        var byteData = (BytePropertyData)thisPD;
+                        row.Cells[2].Value = string.Empty;
+                        row.Cells[3].Value = byteData.GetEnumBase();
+                        if (row.Cells[3].Value.Equals("None"))
+                        {
+                            row.Cells[4].Value = byteData.GetEnumFull();
+                        }
+                        else
+                        {
+                            row.Cells[4].Value = byteData.FullEnum;
+                        }
                         break;
                     case "StructProperty":
                         row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
@@ -567,7 +587,7 @@ namespace UAssetGUI
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Transform", "Value", "Value 2", "Value 3", "Value 4", "Other", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Other", "" });
 
                         dataGridView1.AllowUserToAddRows = true;
 
@@ -579,6 +599,23 @@ namespace UAssetGUI
                             if (usCategory is NormalCategory normalUs)
                             {
                                 renderingArr = normalUs.Data.ToArray();
+                            }
+                            else if (usCategory is StringTableCategory strUs)
+                            {
+                                List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                                for (int i = 0; i < strUs.Data.Count; i++)
+                                {
+                                    DataGridViewRow row = new DataGridViewRow();
+                                    row.CreateCells(dataGridView1);
+                                    row.Cells[0].Value = strUs.Data.Name;
+                                    row.Cells[1].Value = "StringTableEntry";
+                                    row.Cells[2].Value = strUs.Data[i].Encoding.HeaderName;
+                                    row.Cells[3].Value = strUs.Data[i].Value;
+                                    row.HeaderCell.Value = Convert.ToString(i);
+                                    rows.Add(row);
+                                }
+                                dataGridView1.Rows.AddRange(rows.ToArray());
+                                standardRendering = false;
                             }
                         }
                         else if (pointerNode.Pointer is StructPropertyData usStruct)
@@ -745,6 +782,22 @@ namespace UAssetGUI
                                 if (val != null) newData.Add(val);
                             }
                             usCat.Data = newData;
+                        }
+                        else if (pointerNode.Pointer is StringTableCategory usStrTable)
+                        {
+                            StringTable newStringTable = new StringTable(usStrTable.Data.Name);
+                            List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                DataGridViewRow row = dataGridView1.Rows[i];
+                                object transformB = row.Cells[2].Value;
+                                object value1B = row.Cells[3].Value;
+                                if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
+
+                                newStringTable.Add(new UString((string)value1B, ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
+                            }
+
+                            usStrTable.Data = newStringTable;
                         }
                         else if (pointerNode.Pointer is StructPropertyData usStruct)
                         {

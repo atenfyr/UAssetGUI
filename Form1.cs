@@ -24,6 +24,15 @@ namespace UAssetGUI
             InitializeComponent();
             dataGridView1.Visible = true;
 
+            // Extra data viewer
+            byteView1 = new ByteViewer
+            {
+                AutoScroll = true,
+                AutoSize = true,
+                Visible = false
+            };
+            Controls.Add(byteView1);
+
             // Enable double buffering to look nicer
             if (!SystemInformation.TerminalServerSession)
             {
@@ -38,13 +47,7 @@ namespace UAssetGUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Extra data viewer
-            byteView1 = new ByteViewer();
-            byteView1.SetBytes(new byte[] { 1, 2, 3 });
-            byteView1.Visible = false;
-            Controls.Add(byteView1);
-
-            frm_sizeChanged(null, null);
+            
         }
 
         public bool existsUnsavedChanges = false;
@@ -296,7 +299,7 @@ namespace UAssetGUI
             }
         }
 
-        private void frm_sizeChanged(object sender, EventArgs e)
+        public void ForceResize()
         {
             float widthAmount = 0.6f;
             dataGridView1.Size = new Size((int)(this.Size.Width * widthAmount), this.Size.Height - (this.menuStrip1.Size.Height * 3));
@@ -305,10 +308,16 @@ namespace UAssetGUI
             {
                 byteView1.Size = dataGridView1.Size;
                 byteView1.Location = dataGridView1.Location;
+                byteView1.Refresh();
             }
 
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
             listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
+        }
+
+        private void frm_sizeChanged(object sender, EventArgs e)
+        {
+            ForceResize();
         }
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)

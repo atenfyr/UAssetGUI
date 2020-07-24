@@ -218,6 +218,28 @@ namespace UAssetGUI
                         row.Cells[5].Value = colorData.Value.B;
                         row.Cells[6].Value = colorData.Value.A;
                         break;
+                    case "Vector":
+                        var vectorData = (VectorPropertyData)thisPD;
+                        row.Cells[2].Value = string.Empty;
+                        row.Cells[3].Value = vectorData.Value[0];
+                        row.Cells[4].Value = vectorData.Value[1];
+                        row.Cells[5].Value = vectorData.Value[2];
+                        break;
+                    case "Rotator":
+                        var rotatorData = (RotatorPropertyData)thisPD;
+                        row.Cells[2].Value = string.Empty;
+                        row.Cells[3].Value = rotatorData.Value[0];
+                        row.Cells[4].Value = rotatorData.Value[1];
+                        row.Cells[5].Value = rotatorData.Value[2];
+                        break;
+                    case "Quat":
+                        var quatData = (QuatPropertyData)thisPD;
+                        row.Cells[2].Value = string.Empty;
+                        row.Cells[3].Value = quatData.Value[0];
+                        row.Cells[4].Value = quatData.Value[1];
+                        row.Cells[5].Value = quatData.Value[2];
+                        row.Cells[6].Value = quatData.Value[3];
+                        break;
                     default:
                         row.Cells[2].Value = string.Empty;
                         row.Cells[3].Value = Convert.ToString(thisPD.RawValue);
@@ -396,29 +418,13 @@ namespace UAssetGUI
                             newThing = original;
                         }
 
-                        List<string> existingStrings = new List<string>();
-                        if (value1B != null) existingStrings.Add(Convert.ToString(value1B));
-                        if (value2B != null) existingStrings.Add(Convert.ToString(value2B));
-                        if (value3B != null) existingStrings.Add(Convert.ToString(value3B));
-                        if (value4B != null) existingStrings.Add(Convert.ToString(value4B));
+                        string[] existingStrings = new string[4];
+                        if (value1B != null) existingStrings[0] = Convert.ToString(value1B);
+                        if (value2B != null) existingStrings[1] = Convert.ToString(value2B);
+                        if (value3B != null) existingStrings[2] = Convert.ToString(value3B);
+                        if (value4B != null) existingStrings[3] = Convert.ToString(value4B);
 
-                        // I think this is the worst possible solution to this but it doesn't cause any problems so I'll take it
-                        switch (existingStrings.Count)
-                        {
-                            case 4:
-                                newThing.FromString(existingStrings[0], existingStrings[1], existingStrings[2], existingStrings[3]);
-                                break;
-                            case 3:
-                                newThing.FromString(existingStrings[0], existingStrings[1], existingStrings[2]);
-                                break;
-                            case 2:
-                                newThing.FromString(existingStrings[0], existingStrings[1]);
-                                break;
-                            case 1:
-                                newThing.FromString(existingStrings[0]);
-                                break;
-                        }
-
+                        newThing.FromString(existingStrings);
                         return newThing;
                 }
             }
@@ -518,6 +524,10 @@ namespace UAssetGUI
                 return;
             }
 
+            Form1 origForm = (Form1)dataGridView1.Parent;
+            var byteView1 = origForm.byteView1;
+            byteView1.Visible = false;
+            dataGridView1.Visible = true;
             dataGridView1.Columns.Clear();
             dataGridView1.Rows.Clear();
 
@@ -561,7 +571,6 @@ namespace UAssetGUI
 
                         dataGridView1.AllowUserToAddRows = true;
 
-                        var byteView1 = ((Form1)dataGridView1.Parent).byteView1;
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
@@ -592,15 +601,15 @@ namespace UAssetGUI
                         else if (pointerNode.Pointer is byte[])
                         {
                             dataGridView1.Visible = false;
-                            byteView1.Visible = true;
+                            byteView1.SetBytes(new byte[] { });
                             byteView1.SetBytes((byte[])pointerNode.Pointer);
+                            byteView1.Visible = true;
+                            origForm.ForceResize();
                             standardRendering = false;
                         }
 
                         if (standardRendering)
                         {
-                            byteView1.Visible = false;
-                            dataGridView1.Visible = true;
                             if (renderingArr != null && renderingArr.Length > 0)
                             {
                                 AddRowsForArray(renderingArr);

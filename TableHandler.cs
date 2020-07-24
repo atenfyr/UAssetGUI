@@ -361,7 +361,7 @@ namespace UAssetGUI
                         decidedNameProp.Value = nameValue2;
                         decidedNameProp.Value2 = nameValue3;
                         return decidedNameProp;
-                    case "LinearColor":
+                    case "LinearColor": // RGBA
                         LinearColorPropertyData decidedColorData = null;
                         if (original != null && original is LinearColorPropertyData)
                         {
@@ -385,6 +385,7 @@ namespace UAssetGUI
                         if (value4B is int) colorData[3] = (int)value4B;
 
                         if (colorData[0] < 0 || colorData[1] < 0 || colorData[2] < 0 || colorData[3] < 0) return null;
+                        if (colorData[0] > 255 || colorData[1] > 255 || colorData[2] > 255 || colorData[3] > 255) return null;
 
                         decidedColorData.Value = Color.FromArgb(colorData[3], colorData[0], colorData[1], colorData[2]);
                         return decidedColorData;
@@ -401,6 +402,7 @@ namespace UAssetGUI
                         if (value3B != null) existingStrings.Add(Convert.ToString(value3B));
                         if (value4B != null) existingStrings.Add(Convert.ToString(value4B));
 
+                        // I think this is the worst possible solution to this but it doesn't cause any problems so I'll take it
                         switch (existingStrings.Count)
                         {
                             case 4:

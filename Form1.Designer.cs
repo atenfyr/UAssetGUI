@@ -48,6 +48,7 @@ namespace UAssetGUI
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.listView1 = new System.Windows.Forms.TreeView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.recalculateNodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -132,7 +133,8 @@ namespace UAssetGUI
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.expandAllToolStripMenuItem,
             this.collapseAllToolStripMenuItem,
-            this.refreshToolStripMenuItem});
+            this.refreshToolStripMenuItem,
+            this.recalculateNodesToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
@@ -140,14 +142,14 @@ namespace UAssetGUI
             // expandAllToolStripMenuItem
             // 
             this.expandAllToolStripMenuItem.Name = "expandAllToolStripMenuItem";
-            this.expandAllToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.expandAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.expandAllToolStripMenuItem.Text = "Expand All";
             this.expandAllToolStripMenuItem.Click += new System.EventHandler(this.expandAllToolStripMenuItem_Click);
             // 
             // collapseAllToolStripMenuItem
             // 
             this.collapseAllToolStripMenuItem.Name = "collapseAllToolStripMenuItem";
-            this.collapseAllToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.collapseAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.collapseAllToolStripMenuItem.Text = "Collapse All";
             this.collapseAllToolStripMenuItem.Click += new System.EventHandler(this.collapseAllToolStripMenuItem_Click);
             // 
@@ -155,9 +157,17 @@ namespace UAssetGUI
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
             this.refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
+            // 
+            // recalculateNodesToolStripMenuItem
+            // 
+            this.recalculateNodesToolStripMenuItem.Name = "recalculateNodesToolStripMenuItem";
+            this.recalculateNodesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5 | Keys.Shift;
+            this.recalculateNodesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.recalculateNodesToolStripMenuItem.Text = "Recalculate Nodes";
+            this.recalculateNodesToolStripMenuItem.Click += new System.EventHandler(this.refreshFullToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -253,6 +263,7 @@ namespace UAssetGUI
         private TreeView listView1;
         private ColumnHeader columnHeader1;
         private ToolStripMenuItem refreshToolStripMenuItem;
+        private ToolStripMenuItem recalculateNodesToolStripMenuItem;
     }
 }
 

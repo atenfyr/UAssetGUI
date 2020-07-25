@@ -328,6 +328,15 @@ namespace UAssetGUI
             }
         }
 
+        private void refreshFullToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tableEditor != null)
+            {
+                tableEditor.Save(true);
+                tableEditor.FillOutTree();
+            }
+        }
+
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/atenfyr/uassetapi");

@@ -156,118 +156,143 @@ namespace UAssetGUI
                 PropertyData thisPD = arr[i];
                 if (thisPD == null) continue;
 
-                DataGridViewRow row = new DataGridViewRow();
-                row.CreateCells(dataGridView1);
-                row.Cells[0].Value = thisPD.Name;
-                row.Cells[1].Value = thisPD.Type;
-                switch (thisPD.Type)
+                //try
                 {
-                    case "BoolProperty":
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = ((BoolPropertyData)thisPD).Value ? 1 : 0;
-                        break;
-                    case "ObjectProperty":
-                        var objData = (ObjectPropertyData)thisPD;
-                        row.Cells[2].Value = objData.LinkValue;
-                        row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
-                        if (objData.LinkValue > 0)
-                        {
-                            DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
-                            sty.Font = styFont;
-                            sty.ForeColor = Color.Blue;
-                            row.Cells[3].Style = sty;
-                        }
-                        break;
-                    case "SoftObjectProperty":
-                        var objData2 = (SoftObjectPropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = objData2.Value;
-                        row.Cells[4].Value = objData2.Value2;
-                        break;
-                    case "TextProperty":
-                        var txtData = (TextPropertyData)thisPD;
-                        row.Cells[2].Value = (sbyte)txtData.HistoryType;
-                        if (txtData.Value == null)
-                        {
-                            row.Cells[3].Value = "null";
-                        }
-                        else
-                        {
-                            for (int z = 0; z < 4; z++)
+                    DataGridViewRow row = new DataGridViewRow();
+                    row.CreateCells(dataGridView1);
+                    row.Cells[0].Value = thisPD.Name;
+                    row.Cells[1].Value = thisPD.Type;
+                    switch (thisPD.Type)
+                    {
+                        case "BoolProperty":
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = ((BoolPropertyData)thisPD).Value ? 1 : 0;
+                            break;
+                        case "ObjectProperty":
+                            var objData = (ObjectPropertyData)thisPD;
+                            row.Cells[2].Value = objData.LinkValue;
+                            row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
+                            if (objData.LinkValue > 0)
                             {
-                                row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
+                                DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                sty.Font = styFont;
+                                sty.ForeColor = Color.Blue;
+                                row.Cells[3].Style = sty;
                             }
-                        }
-                        break;
-                    case "NameProperty":
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = ((NamePropertyData)thisPD).Value;
-                        row.Cells[4].Value = ((NamePropertyData)thisPD).Value2;
-                        break;
-                    case "EnumProperty":
-                        var enumData = (EnumPropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = enumData.GetEnumBase();
-                        row.Cells[3].Value = enumData.GetEnumFull();
-                        break;
-                    case "ByteProperty":
-                        var byteData = (BytePropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = byteData.GetEnumBase();
-                        if (row.Cells[3].Value.Equals("None"))
-                        {
-                            row.Cells[4].Value = byteData.GetEnumFull();
-                        }
-                        else
-                        {
-                            row.Cells[4].Value = byteData.FullEnum;
-                        }
-                        break;
-                    case "StructProperty":
-                        row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
-                        break;
-                    case "ArrayProperty":
-                        row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
-                        break;
-                    case "LinearColor":
-                        var colorData = (LinearColorPropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = colorData.Value.R;
-                        row.Cells[4].Value = colorData.Value.G;
-                        row.Cells[5].Value = colorData.Value.B;
-                        row.Cells[6].Value = colorData.Value.A;
-                        break;
-                    case "Vector":
-                        var vectorData = (VectorPropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = vectorData.Value[0];
-                        row.Cells[4].Value = vectorData.Value[1];
-                        row.Cells[5].Value = vectorData.Value[2];
-                        break;
-                    case "Rotator":
-                        var rotatorData = (RotatorPropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = rotatorData.Value[0];
-                        row.Cells[4].Value = rotatorData.Value[1];
-                        row.Cells[5].Value = rotatorData.Value[2];
-                        break;
-                    case "Quat":
-                        var quatData = (QuatPropertyData)thisPD;
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = quatData.Value[0];
-                        row.Cells[4].Value = quatData.Value[1];
-                        row.Cells[5].Value = quatData.Value[2];
-                        row.Cells[6].Value = quatData.Value[3];
-                        break;
-                    default:
-                        row.Cells[2].Value = string.Empty;
-                        row.Cells[3].Value = Convert.ToString(thisPD.RawValue);
-                        break;
+                            break;
+                        case "SoftObjectProperty":
+                            var objData2 = (SoftObjectPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = objData2.Value;
+                            row.Cells[4].Value = objData2.Value2;
+                            break;
+                        case "TextProperty":
+                            var txtData = (TextPropertyData)thisPD;
+                            row.Cells[2].Value = (sbyte)txtData.HistoryType;
+                            if (txtData.Value == null)
+                            {
+                                row.Cells[3].Value = "null";
+                            }
+                            else
+                            {
+                                for (int z = 0; z < 4; z++)
+                                {
+                                    row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
+                                }
+                            }
+                            break;
+                        case "NameProperty":
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = ((NamePropertyData)thisPD).Value;
+                            row.Cells[4].Value = ((NamePropertyData)thisPD).Value2;
+                            break;
+                        case "EnumProperty":
+                            var enumData = (EnumPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = enumData.GetEnumBase();
+                            row.Cells[3].Value = enumData.GetEnumFull();
+                            break;
+                        case "ByteProperty":
+                            var byteData = (BytePropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = byteData.GetEnumBase();
+                            if (row.Cells[3].Value.Equals("None"))
+                            {
+                                row.Cells[4].Value = byteData.FullEnum;
+                            }
+                            else
+                            {
+                                row.Cells[4].Value = byteData.GetEnumFull();
+                            }
+                            break;
+                        case "StructProperty":
+                            row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
+                            break;
+                        case "ArrayProperty":
+                            row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
+                            break;
+                        case "LinearColor":
+                            var colorData = (LinearColorPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[2].ReadOnly = true;
+                            row.Cells[2].Style.BackColor = colorData.Value;
+                            row.Cells[3].Value = colorData.Value.R;
+                            row.Cells[4].Value = colorData.Value.G;
+                            row.Cells[5].Value = colorData.Value.B;
+                            row.Cells[6].Value = colorData.Value.A;
+                            break;
+                        case "Color":
+                            var colorData2 = (ColorPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[2].ReadOnly = true;
+                            row.Cells[2].Style.BackColor = colorData2.Value;
+                            row.Cells[3].Value = colorData2.Value.R;
+                            row.Cells[4].Value = colorData2.Value.G;
+                            row.Cells[5].Value = colorData2.Value.B;
+                            row.Cells[6].Value = colorData2.Value.A;
+                            break;
+                        case "Vector":
+                            var vectorData = (VectorPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = vectorData.Value[0];
+                            row.Cells[4].Value = vectorData.Value[1];
+                            row.Cells[5].Value = vectorData.Value[2];
+                            break;
+                        case "Vector2D":
+                            var vector2DData = (Vector2DPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = vector2DData.Value[0];
+                            row.Cells[4].Value = vector2DData.Value[1];
+                            break;
+                        case "Rotator":
+                            var rotatorData = (RotatorPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = rotatorData.Value[0];
+                            row.Cells[4].Value = rotatorData.Value[1];
+                            row.Cells[5].Value = rotatorData.Value[2];
+                            break;
+                        case "Quat":
+                            var quatData = (QuatPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = quatData.Value[0];
+                            row.Cells[4].Value = quatData.Value[1];
+                            row.Cells[5].Value = quatData.Value[2];
+                            row.Cells[6].Value = quatData.Value[3];
+                            break;
+                        default:
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = Convert.ToString(thisPD.RawValue);
+                            break;
+                    }
+
+                    row.HeaderCell.Value = Convert.ToString(i);
+                    rows.Add(row);
                 }
-                
-                row.HeaderCell.Value = Convert.ToString(i);
-                rows.Add(row);
+                //catch (Exception)
+                //{
+
+                //}
             }
             dataGridView1.Rows.AddRange(rows.ToArray());
         }
@@ -403,34 +428,6 @@ namespace UAssetGUI
                         decidedNameProp.Value = nameValue2;
                         decidedNameProp.Value2 = nameValue3;
                         return decidedNameProp;
-                    case "LinearColor": // RGBA
-                        LinearColorPropertyData decidedColorData = null;
-                        if (original != null && original is LinearColorPropertyData)
-                        {
-                            decidedColorData = (LinearColorPropertyData)original;
-                        }
-                        else
-                        {
-                            decidedColorData = new LinearColorPropertyData(name, asset.data);
-                        }
-
-                        int[] colorData = new int[4] { -1, -1, -1, -1 };
-                        if (value1B == null || value2B == null || value3B == null || value4B == null) return null;
-
-                        if (value1B is string) int.TryParse((string)value1B, out colorData[0]);
-                        if (value1B is int) colorData[0] = (int)value1B;
-                        if (value2B is string) int.TryParse((string)value2B, out colorData[1]);
-                        if (value2B is int) colorData[1] = (int)value2B;
-                        if (value3B is string) int.TryParse((string)value3B, out colorData[2]);
-                        if (value3B is int) colorData[2] = (int)value3B;
-                        if (value4B is string) int.TryParse((string)value4B, out colorData[3]);
-                        if (value4B is int) colorData[3] = (int)value4B;
-
-                        if (colorData[0] < 0 || colorData[1] < 0 || colorData[2] < 0 || colorData[3] < 0) return null;
-                        if (colorData[0] > 255 || colorData[1] > 255 || colorData[2] > 255 || colorData[3] > 255) return null;
-
-                        decidedColorData.Value = Color.FromArgb(colorData[3], colorData[0], colorData[1], colorData[2]);
-                        return decidedColorData;
                     default:
                         PropertyData newThing = MainSerializer.TypeToClass(type, name, asset.data);
                         if (original != null && original.GetType().Equals(newThing.GetType()))
@@ -438,17 +435,18 @@ namespace UAssetGUI
                             newThing = original;
                         }
 
-                        string[] existingStrings = new string[4];
+                        string[] existingStrings = new string[5];
                         if (value1B != null) existingStrings[0] = Convert.ToString(value1B);
                         if (value2B != null) existingStrings[1] = Convert.ToString(value2B);
                         if (value3B != null) existingStrings[2] = Convert.ToString(value3B);
                         if (value4B != null) existingStrings[3] = Convert.ToString(value4B);
+                        if (transformB != null) existingStrings[4] = Convert.ToString(transformB);
 
                         newThing.FromString(existingStrings);
                         return newThing;
                 }
             }
-            catch (FormatException)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -523,6 +521,7 @@ namespace UAssetGUI
                     dgc.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }
 
+                dgc.SortMode = DataGridViewColumnSortMode.NotSortable;
                 dataGridView1.Columns.Add(dgc);
             }
         }
@@ -647,9 +646,9 @@ namespace UAssetGUI
 
                         if (standardRendering)
                         {
-                            if (renderingArr != null && renderingArr.Length > 0)
+                            if (renderingArr != null)
                             {
-                                AddRowsForArray(renderingArr);
+                                if (renderingArr.Length > 0) AddRowsForArray(renderingArr);
                             }
                             else
                             {
@@ -671,6 +670,8 @@ namespace UAssetGUI
         public void Save(bool forceNewLoad) // Reads from the table and updates the asset data as needed
         {
             if (!readyToSave) return;
+
+            int numFailed = 0;
             switch (mode)
             {
                 case TableHandlerMode.HeaderList:
@@ -779,9 +780,15 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
-                                if (val != null) newData.Add(val);
+                                if (val == null)
+                                {
+                                    numFailed++;
+                                    continue;
+                                }
+                                newData.Add(val);
                             }
                             usCat.Data = newData;
+                            pointerNode.Text = asset.data.GetHeaderReference(asset.data.GetLinkReference(usCat.ReferenceData.connection)) + " (" + usCat.Data.Count + ")";
                         }
                         else if (pointerNode.Pointer is StringTableCategory usStrTable)
                         {
@@ -792,12 +799,17 @@ namespace UAssetGUI
                                 DataGridViewRow row = dataGridView1.Rows[i];
                                 object transformB = row.Cells[2].Value;
                                 object value1B = row.Cells[3].Value;
-                                if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
+                                if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string))
+                                {
+                                    numFailed++;
+                                    continue;
+                                }
 
                                 newStringTable.Add(new UString((string)value1B, ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
                             }
 
                             usStrTable.Data = newStringTable;
+                            pointerNode.Text = usStrTable.Data.Name + " (" + usStrTable.Data.Count + ")";
                         }
                         else if (pointerNode.Pointer is StructPropertyData usStruct)
                         {
@@ -805,9 +817,18 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i));
-                                if (val != null) newData.Add(val);
+                                if (val == null)
+                                {
+                                    numFailed++;
+                                    continue;
+                                }
+                                newData.Add(val);
                             }
                             usStruct.Value = newData;
+
+                            string decidedName = usStruct.Name;
+                            if (((PointingTreeNode)pointerNode.Parent).Pointer is PropertyData && ((PropertyData)((PointingTreeNode)pointerNode.Parent).Pointer).Name.Equals(decidedName)) decidedName = usStruct.StructType;
+                            pointerNode.Text = decidedName + " (" + usStruct.Value.Count + ")";
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)
                         {
@@ -816,9 +837,15 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
-                                if (val != null) newData.Add(val);
+                                if (val == null)
+                                {
+                                    numFailed++;
+                                    continue;
+                                }
+                                newData.Add(val);
                             }
                             usArr.Value = newData.ToArray();
+                            pointerNode.Text = usArr.Name + " (" + usArr.Value.Length + ")";
                         }
                         else if (pointerNode.Pointer is PointingDictionaryEntry usDictEntry)
                         {
@@ -834,6 +861,7 @@ namespace UAssetGUI
             }
             else
             {
+                //if (numFailed < 2) Load();
                 ((Form1)dataGridView1.Parent).SetUnsavedChanges(true);
             }
         }

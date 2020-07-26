@@ -7,18 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
-using UAssetAPI.StructureSerializers;
+using UAssetAPI.PropertyTypes;
+using UAssetAPI.StructTypes;
 
 namespace UAssetGUI
 {
     public enum TableHandlerMode
     {
-        None,
+        None = -1,
         HeaderList,
         LinkedSectors,
         CategoryInformation,
-        CategoryStrings,
-        CategoryInts,
         CategoryData
     }
 
@@ -30,7 +29,6 @@ namespace UAssetGUI
         {
             Pointer = pointer;
             this.Text = label;
-            this.Tag = Guid.NewGuid();
         }
     }
 
@@ -53,7 +51,6 @@ namespace UAssetGUI
         public TreeView listView1;
         public DataGridView dataGridView1;
 
-        private Dictionary<Guid, bool> treeState;
         public bool readyToSave = true;
 
         public void FillOutTree()
@@ -72,30 +69,37 @@ namespace UAssetGUI
                 Category baseUs = asset.data.categories[i];
                 var categoryNode = new PointingTreeNode("Category " + (i + 1), null);
                 superTopNode.Nodes.Add(categoryNode);
-                if (baseUs is NormalCategory us)
+                switch (baseUs)
                 {
+                    case NormalCategory us:
                     {
-                        var parentNode = new PointingTreeNode(asset.data.GetHeaderReference(asset.data.GetLinkReference(us.ReferenceData.connection)) + " (" + us.Data.Count + ")", baseUs);
-                        categoryNode.Nodes.Add(parentNode);
-
-                        for (int j = 0; j < us.Data.Count; j++)
                         {
-                            InterpretThing(us.Data[j], parentNode);
-                        }
-                    }
+                            var parentNode = new PointingTreeNode(asset.data.GetHeaderReference(asset.data.GetLinkReference(us.ReferenceData.connection)) + " (" + us.Data.Count + ")", baseUs);
+                            categoryNode.Nodes.Add(parentNode);
 
-                    {
+                            for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
+                        }
+
                         if (us.Extras.Length > 0 && us.Extras.Length != 4)
                         {
                             var parentNode = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
                             categoryNode.Nodes.Add(parentNode);
                         }
+
+                        break;
                     }
-                }
-                else if (baseUs is StringTableCategory us2)
-                {
-                    var parentNode = new PointingTreeNode(us2.Data.Name + " (" + us2.Data.Count + ")", baseUs);
-                    categoryNode.Nodes.Add(parentNode);
+                    case StringTableCategory us2:
+                    {
+                        var parentNode = new PointingTreeNode(us2.Data.Name + " (" + us2.Data.Count + ")", baseUs);
+                        categoryNode.Nodes.Add(parentNode);
+                        break;
+                    }
+                    case RawCategory us3:
+                    {
+                        var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
+                        categoryNode.Nodes.Add(parentNode);
+                        break;
+                    }
                 }
             }
             listView1.EndUpdate();
@@ -171,14 +175,17 @@ namespace UAssetGUI
                         case "ObjectProperty":
                             var objData = (ObjectPropertyData)thisPD;
                             row.Cells[2].Value = objData.LinkValue;
-                            row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
-                            if (objData.LinkValue > 0)
+                            if (objData.LinkValue != 0)
                             {
-                                DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
-                                sty.Font = styFont;
-                                sty.ForeColor = Color.Blue;
-                                row.Cells[3].Style = sty;
+                                row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
+                                if (objData.LinkValue > 0)
+                                {
+                                    DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                    Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                    sty.Font = styFont;
+                                    sty.ForeColor = Color.Blue;
+                                    row.Cells[3].Style = sty;
+                                }
                             }
                             break;
                         case "SoftObjectProperty":
@@ -232,6 +239,8 @@ namespace UAssetGUI
                         case "ArrayProperty":
                             row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
                             break;
+                        case "MapProperty":
+                            break;
                         case "LinearColor":
                             var colorData = (LinearColorPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
@@ -246,7 +255,7 @@ namespace UAssetGUI
                             var colorData2 = (ColorPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
                             row.Cells[2].ReadOnly = true;
-                            row.Cells[2].Style.BackColor = colorData2.Value;
+                            if (colorData2.RawValue != null) row.Cells[2].Style.BackColor = colorData2.Value;
                             row.Cells[3].Value = colorData2.Value.R;
                             row.Cells[4].Value = colorData2.Value.G;
                             row.Cells[5].Value = colorData2.Value.B;
@@ -264,6 +273,12 @@ namespace UAssetGUI
                             row.Cells[2].Value = string.Empty;
                             row.Cells[3].Value = vector2DData.Value[0];
                             row.Cells[4].Value = vector2DData.Value[1];
+                            break;
+                        case "IntPoint":
+                            var intPointData = (IntPointPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = intPointData.Value[0];
+                            row.Cells[4].Value = intPointData.Value[1];
                             break;
                         case "Rotator":
                             var rotatorData = (RotatorPropertyData)thisPD;
@@ -360,7 +375,7 @@ namespace UAssetGUI
                                 decidedTextData.Value = null;
                                 break;
                             default:
-                                throw new FormatException("Unimplemented text history type " + histType.ToString());
+                                throw new FormatException("Unimplemented text history type " + histType);
                         }
 
                         return decidedTextData;
@@ -385,7 +400,7 @@ namespace UAssetGUI
                         decidedObjData.Value = asset.data.links.ElementAtOrDefault(UAssetAPI.Utils.GetNormalIndex(objValue));
                         return decidedObjData;
                     case "SoftObjectProperty":
-                        SoftObjectPropertyData decidedObjData2 = null;
+                        SoftObjectPropertyData decidedObjData2;
                         if (original != null && original is SoftObjectPropertyData)
                         {
                             decidedObjData2 = (SoftObjectPropertyData)original;
@@ -407,7 +422,7 @@ namespace UAssetGUI
                         decidedObjData2.Value2 = objValue3;
                         return decidedObjData2;
                     case "NameProperty":
-                        NamePropertyData decidedNameProp = null;
+                        NamePropertyData decidedNameProp;
                         if (original != null && original is NamePropertyData)
                         {
                             decidedNameProp = (NamePropertyData)original;
@@ -430,7 +445,7 @@ namespace UAssetGUI
                         return decidedNameProp;
                     default:
                         PropertyData newThing = MainSerializer.TypeToClass(type, name, asset.data);
-                        if (original != null && original.GetType().Equals(newThing.GetType()))
+                        if (original != null && original.GetType() == newThing.GetType())
                         {
                             newThing = original;
                         }
@@ -446,62 +461,40 @@ namespace UAssetGUI
                         return newThing;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
         }
 
-        public void SaveTreeState()
+        public void RestoreTreeState(bool expanding)
         {
-            Dictionary<Guid, bool> nodeStates = new Dictionary<Guid, bool>();
+            listView1.BeginUpdate();
             foreach (TreeNode node in Collect(listView1.Nodes))
             {
-                nodeStates.Add((Guid)node.Tag, node.IsExpanded);
-            }
-            treeState = nodeStates;
-        }
-
-        public void ExpandAll()
-        {
-            Dictionary<Guid, bool> nodeStates = new Dictionary<Guid, bool>();
-            foreach (TreeNode node in Collect(listView1.Nodes))
-            {
-                nodeStates.Add((Guid)node.Tag, true);
-            }
-            treeState = nodeStates;
-            RestoreTreeState();
-        }
-
-        public void CollapseAll()
-        {
-            Dictionary<Guid, bool> nodeStates = new Dictionary<Guid, bool>();
-            foreach (TreeNode node in Collect(listView1.Nodes))
-            {
-                nodeStates.Add((Guid)node.Tag, false);
-            }
-            treeState = nodeStates;
-            RestoreTreeState();
-        }
-
-        private void RestoreTreeState()
-        {
-            foreach (TreeNode node in Collect(listView1.Nodes))
-            {
-                if (treeState.Keys.Count != 0 && treeState[(Guid)node.Tag])
+                if (expanding)
+                {
                     node.Expand();
+                }
                 else
+                {
                     node.Collapse();
+                }
             }
+            listView1.EndUpdate();
+
+            (listView1.SelectedNode ?? listView1.Nodes[0]).EnsureVisible();
         }
 
-        IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
+        private static IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
         {
             foreach (TreeNode node in nodes)
             {
                 yield return node;
                 foreach (TreeNode child in Collect(node.Nodes))
+                {
                     yield return child;
+                }
             }
         }
 
@@ -509,8 +502,7 @@ namespace UAssetGUI
         {
             for (int i = 0; i < ourColumns.Length; i++)
             {
-                DataGridViewColumn dgc = new DataGridViewColumn();
-                dgc = new DataGridViewTextBoxColumn
+                DataGridViewColumn dgc = new DataGridViewTextBoxColumn
                 {
                     HeaderText = ourColumns[i]
                 };
@@ -535,8 +527,6 @@ namespace UAssetGUI
 
         public void Load() // Updates the table with selected asset data
         {
-            SaveTreeState();
-
             if (mode == TableHandlerMode.None)
             {
                 ClearScreen();
@@ -593,55 +583,55 @@ namespace UAssetGUI
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
-                        if (pointerNode.Pointer is Category usCategory)
+                        switch (pointerNode.Pointer)
                         {
-                            if (usCategory is NormalCategory normalUs)
-                            {
-                                renderingArr = normalUs.Data.ToArray();
-                            }
-                            else if (usCategory is StringTableCategory strUs)
-                            {
-                                List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                                for (int i = 0; i < strUs.Data.Count; i++)
+                            case Category usCategory:
+                                switch (usCategory)
                                 {
-                                    DataGridViewRow row = new DataGridViewRow();
-                                    row.CreateCells(dataGridView1);
-                                    row.Cells[0].Value = strUs.Data.Name;
-                                    row.Cells[1].Value = "StringTableEntry";
-                                    row.Cells[2].Value = strUs.Data[i].Encoding.HeaderName;
-                                    row.Cells[3].Value = strUs.Data[i].Value;
-                                    row.HeaderCell.Value = Convert.ToString(i);
-                                    rows.Add(row);
+                                    case NormalCategory normalUs:
+                                        renderingArr = normalUs.Data.ToArray();
+                                        break;
+                                    case StringTableCategory strUs:
+                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                                        for (int i = 0; i < strUs.Data.Count; i++)
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = strUs.Data.Name;
+                                            row.Cells[1].Value = "StringTableEntry";
+                                            row.Cells[2].Value = strUs.Data[i].Encoding.HeaderName;
+                                            row.Cells[3].Value = strUs.Data[i].Value.Replace("\n", "\\n").Replace("\r", "\\r");
+                                            row.HeaderCell.Value = Convert.ToString(i);
+                                            rows.Add(row);
+                                        }
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                        standardRendering = false;
+                                        break;
                                 }
-                                dataGridView1.Rows.AddRange(rows.ToArray());
+
+                                break;
+                            case StructPropertyData usStruct:
+                                renderingArr = usStruct.Value.ToArray();
+                                break;
+                            case ArrayPropertyData usArr:
+                                renderingArr = usArr.Value;
+                                break;
+                            case PointingDictionaryEntry usDictEntry:
+                                dataGridView1.AllowUserToAddRows = false;
+                                var ourKey = (PropertyData)usDictEntry.Entry.Key;
+                                var ourValue = (PropertyData)usDictEntry.Entry.Value;
+                                ourKey.Name = "Key";
+                                ourValue.Name = "Value";
+                                renderingArr = new PropertyData[2] { ourKey, ourValue };
+                                break;
+                            case byte[] bytes:
+                                dataGridView1.Visible = false;
+                                byteView1.SetBytes(new byte[] { });
+                                byteView1.SetBytes(bytes);
+                                byteView1.Visible = true;
+                                origForm.ForceResize();
                                 standardRendering = false;
-                            }
-                        }
-                        else if (pointerNode.Pointer is StructPropertyData usStruct)
-                        {
-                            renderingArr = usStruct.Value.ToArray();
-                        }
-                        else if (pointerNode.Pointer is ArrayPropertyData usArr)
-                        {
-                            renderingArr = usArr.Value;
-                        }
-                        else if (pointerNode.Pointer is PointingDictionaryEntry usDictEntry)
-                        {
-                            dataGridView1.AllowUserToAddRows = false;
-                            var ourKey = (PropertyData)usDictEntry.Entry.Key;
-                            var ourValue = (PropertyData)usDictEntry.Entry.Value;
-                            ourKey.Name = "Key";
-                            ourValue.Name = "Value";
-                            renderingArr = new PropertyData[2] { ourKey, ourValue };
-                        }
-                        else if (pointerNode.Pointer is byte[])
-                        {
-                            dataGridView1.Visible = false;
-                            byteView1.SetBytes(new byte[] { });
-                            byteView1.SetBytes((byte[])pointerNode.Pointer);
-                            byteView1.Visible = true;
-                            origForm.ForceResize();
-                            standardRendering = false;
+                                break;
                         }
 
                         if (standardRendering)
@@ -664,7 +654,6 @@ namespace UAssetGUI
             }
 
             readyToSave = true;
-            RestoreTreeState();
         }
 
         public void Save(bool forceNewLoad) // Reads from the table and updates the asset data as needed
@@ -805,7 +794,7 @@ namespace UAssetGUI
                                     continue;
                                 }
 
-                                newStringTable.Add(new UString((string)value1B, ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
+                                newStringTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
                             }
 
                             usStrTable.Data = newStringTable;

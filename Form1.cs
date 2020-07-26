@@ -5,6 +5,7 @@ using System.ComponentModel.Design;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -43,11 +44,53 @@ namespace UAssetGUI
 
             // Auto resizing
             SizeChanged += frm_sizeChanged;
+
+            // Command line parameters
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                LoadFileAt(args[1]);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             
+        }
+
+        public void LoadFileAt(string filePath)
+        {
+            dataGridView1.Visible = true;
+            byteView1.Visible = false;
+
+            try
+            {
+                currentSavingPath = filePath;
+                SetUnsavedChanges(false);
+
+                tableEditor = new TableHandler(dataGridView1, new AssetWriter(filePath, true, true, null, null), listView1)
+                {
+                    mode = TableHandlerMode.HeaderList
+                };
+
+                saveToolStripMenuItem.Enabled = true;
+                saveAsToolStripMenuItem.Enabled = true;
+
+                tableEditor.FillOutTree();
+                tableEditor.Load();
+            }
+            catch (IOException)
+            {
+                currentSavingPath = "";
+                SetUnsavedChanges(false);
+                tableEditor = null;
+                saveToolStripMenuItem.Enabled = false;
+                saveAsToolStripMenuItem.Enabled = false;
+
+                dataGridView1.Columns.Clear();
+                dataGridView1.Rows.Clear();
+                dataGridView1.BackgroundColor = Color.FromArgb(211, 211, 211);
+            }
         }
 
         public bool existsUnsavedChanges = false;
@@ -75,23 +118,7 @@ namespace UAssetGUI
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    string filePath = openFileDialog.FileName;
-                    currentSavingPath = filePath;
-                    SetUnsavedChanges(false);
-
-                    dataGridView1.Visible = true;
-                    byteView1.Visible = false;
-
-                    tableEditor = new TableHandler(this.dataGridView1, new AssetWriter(filePath, true, true, null, null), listView1)
-                    {
-                        mode = TableHandlerMode.HeaderList
-                    };
-
-                    saveToolStripMenuItem.Enabled = true;
-                    saveAsToolStripMenuItem.Enabled = true;
-
-                    tableEditor.FillOutTree();
-                    tableEditor.Load();
+                    LoadFileAt(openFileDialog.FileName);
                 }
             }
         }
@@ -149,7 +176,7 @@ namespace UAssetGUI
         {
             if (tableEditor != null)
             {
-                tableEditor.ExpandAll();
+                tableEditor.RestoreTreeState(true);
             }
         }
 
@@ -157,7 +184,7 @@ namespace UAssetGUI
         {
             if (tableEditor != null)
             {
-                tableEditor.CollapseAll();
+                tableEditor.RestoreTreeState(false);
             }
         }
 

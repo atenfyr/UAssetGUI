@@ -90,6 +90,7 @@ namespace UAssetGUI
                 dataGridView1.Columns.Clear();
                 dataGridView1.Rows.Clear();
                 dataGridView1.BackgroundColor = Color.FromArgb(211, 211, 211);
+                MessageBox.Show("Failed to open this file!", "Uh oh!");
             }
         }
 
@@ -174,18 +175,12 @@ namespace UAssetGUI
 
         private void expandAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (tableEditor != null)
-            {
-                tableEditor.RestoreTreeState(true);
-            }
+            tableEditor?.RestoreTreeState(true);
         }
 
         private void collapseAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (tableEditor != null)
-            {
-                tableEditor.RestoreTreeState(false);
-            }
+            tableEditor?.RestoreTreeState(false);
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)

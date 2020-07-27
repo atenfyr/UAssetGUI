@@ -147,6 +147,11 @@ namespace UAssetGUI
                         InterpretThing((PropertyData)entry.Value, softEntryNode);
                     }
                     break;
+                case "Box":
+                    var box = (BoxPropertyData) me;
+
+                    ourNode.Nodes.Add(new PointingTreeNode( box.Name + " (2)", box.Value));
+                    break;
             }
         }
 
@@ -240,6 +245,11 @@ namespace UAssetGUI
                             row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
                             break;
                         case "MapProperty":
+                            break;
+                        case "Box":
+                            var boxData = (BoxPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = boxData.IsValid;
                             break;
                         case "LinearColor":
                             var colorData = (LinearColorPropertyData)thisPD;
@@ -399,50 +409,6 @@ namespace UAssetGUI
                         decidedObjData.LinkValue = objValue;
                         decidedObjData.Value = asset.data.links.ElementAtOrDefault(UAssetAPI.Utils.GetNormalIndex(objValue));
                         return decidedObjData;
-                    case "SoftObjectProperty":
-                        SoftObjectPropertyData decidedObjData2;
-                        if (original != null && original is SoftObjectPropertyData)
-                        {
-                            decidedObjData2 = (SoftObjectPropertyData)original;
-                        }
-                        else
-                        {
-                            decidedObjData2 = new SoftObjectPropertyData(name, asset.data);
-                        }
-
-                        if (value1B == null || value2B == null) return null;
-                        if (!(value1B is string)) return null;
-
-                        string objValue2 = (string)value1B;
-                        long objValue3 = 0;
-                        if (value2B is string) long.TryParse((string)value2B, out objValue3);
-                        if (value2B is int || value2B is long) objValue3 = (long)value2B;
-
-                        decidedObjData2.Value = objValue2;
-                        decidedObjData2.Value2 = objValue3;
-                        return decidedObjData2;
-                    case "NameProperty":
-                        NamePropertyData decidedNameProp;
-                        if (original != null && original is NamePropertyData)
-                        {
-                            decidedNameProp = (NamePropertyData)original;
-                        }
-                        else
-                        {
-                            decidedNameProp = new NamePropertyData(name, asset.data);
-                        }
-
-                        if (value1B == null || value2B == null) return null;
-                        if (!(value1B is string)) return null;
-
-                        string nameValue2 = (string)value1B;
-                        int nameValue3 = 0;
-                        if (value2B is string) int.TryParse((string)value2B, out nameValue3);
-                        if (value2B is int) nameValue3 = (int)value2B;
-
-                        decidedNameProp.Value = nameValue2;
-                        decidedNameProp.Value2 = nameValue3;
-                        return decidedNameProp;
                     default:
                         PropertyData newThing = MainSerializer.TypeToClass(type, name, asset.data);
                         if (original != null && original.GetType() == newThing.GetType())
@@ -624,6 +590,10 @@ namespace UAssetGUI
                                 ourValue.Name = "Value";
                                 renderingArr = new PropertyData[2] { ourKey, ourValue };
                                 break;
+                            case PropertyData[] usRealArr:
+                                renderingArr = usRealArr;
+                                dataGridView1.AllowUserToAddRows = false;
+                                break;
                             case byte[] bytes:
                                 dataGridView1.Visible = false;
                                 byteView1.SetBytes(new byte[] { });
@@ -667,7 +637,8 @@ namespace UAssetGUI
                     asset.data.headerIndexList = new List<string>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        asset.data.headerIndexList.Add((string)(row.Cells[0].Value));
+                        string ourValue = (string)row.Cells[0].Value;
+                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.data.headerIndexList.Add(ourValue);
                     }
                     break;
                 case TableHandlerMode.LinkedSectors:
@@ -679,15 +650,15 @@ namespace UAssetGUI
                         object val2 = row.Cells[1].Value;
                         object val3 = row.Cells[2].Value;
                         object val4 = row.Cells[3].Value;
-                        if (val1 == null || val2 == null || val3 == null || val4 == null) return;
-                        if (!(val1 is string) || !(val2 is string) || !(val4 is string)) return;
-                        if (!(val3 is string) && !(val3 is int)) return;
+                        if (val1 == null || val2 == null || val3 == null || val4 == null) continue;
+                        if (!(val1 is string) || !(val2 is string) || !(val4 is string)) continue;
+                        if (!(val3 is string) && !(val3 is int)) continue;
 
                         int realVal3;
                         if (val3 is string)
                         {
                             bool result = int.TryParse((string)val3, out realVal3);
-                            if (!result) return;
+                            if (!result) continue;
                         }
                         else
                         {
@@ -697,7 +668,7 @@ namespace UAssetGUI
                         string realVal1 = (string)val1;
                         string realVal2 = (string)val2;
                         string realVal4 = (string)val4;
-                        if (string.IsNullOrEmpty(realVal1) || string.IsNullOrEmpty(realVal2) || string.IsNullOrEmpty(realVal4)) return;
+                        if (string.IsNullOrWhiteSpace(realVal1) || string.IsNullOrWhiteSpace(realVal2) || string.IsNullOrWhiteSpace(realVal4)) continue;
 
                         asset.data.AddHeaderReference(realVal1);
                         asset.data.AddHeaderReference(realVal2);
@@ -840,6 +811,22 @@ namespace UAssetGUI
                         {
                             ((PointingDictionaryEntry)pointerNode.Pointer).Entry.Key = RowToPD(0, (PropertyData)usDictEntry.Entry.Key);
                             ((PointingDictionaryEntry)pointerNode.Pointer).Entry.Value = RowToPD(1, (PropertyData)usDictEntry.Entry.Value);
+                        }
+                        else if (pointerNode.Pointer is PropertyData[] usRealArrEntry)
+                        {
+                            List<PropertyData> newData = new List<PropertyData>();
+                            List<PropertyData> origArr = usRealArrEntry.ToList();
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
+                                if (val == null)
+                                {
+                                    numFailed++;
+                                    continue;
+                                }
+                                newData.Add(val);
+                            }
+                            pointerNode.Pointer = newData.ToArray();
                         }
                     }
                     break;

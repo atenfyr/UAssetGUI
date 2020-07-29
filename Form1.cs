@@ -78,6 +78,11 @@ namespace UAssetGUI
 
                 tableEditor.FillOutTree();
                 tableEditor.Load();
+
+                if (!tableEditor.asset.VerifyParsing())
+                {
+                    MessageBox.Show("Failed to verify parsing! You may not be able to load this file in-game if modified.", "Uh oh!");
+                }
             }
             catch (IOException)
             {

@@ -251,6 +251,13 @@ namespace UAssetGUI
                             row.Cells[2].Value = string.Empty;
                             row.Cells[3].Value = boxData.IsValid;
                             break;
+                        case "MulticastDelegateProperty":
+                            var mdpData = (MulticastDelegatePropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = mdpData.Value[0];
+                            row.Cells[4].Value = mdpData.Value[1];
+                            row.Cells[5].Value = mdpData.Value2;
+                            break;
                         case "LinearColor":
                             var colorData = (LinearColorPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;

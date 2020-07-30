@@ -150,9 +150,9 @@ namespace UAssetGUI
                     SetUnsavedChanges(false);
                     tableEditor.Load();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Failed to save!", "Uh oh!");
+                    MessageBox.Show("Failed to save! " + ex.Message, "Uh oh!");
                 }
             }
             else
@@ -267,12 +267,12 @@ namespace UAssetGUI
                     case "Section Information":
                         tableEditor.mode = TableHandlerMode.CategoryInformation;
                         break;
-                    /*case 3:
+                    case "Section Ints":
                         tableEditor.mode = TableHandlerMode.CategoryInts;
                         break;
-                    case 4:
+                    case "Section Strings":
                         tableEditor.mode = TableHandlerMode.CategoryStrings;
-                        break;*/
+                        break;
                 }
                 tableEditor.Load();
             }
@@ -329,8 +329,8 @@ namespace UAssetGUI
         private static readonly string AboutText =
             "UAssetGUI v" + GUIVersion + "\n" +
             "By Atenfyr\n" +
-            "\n" +
-            "Thanks to the Astro-Techies club for the help\n" +
+            "\nThanks to the Astro-Techies club for the help\n" +
+            "\nThanks to Kai Heilos for in-depth information on Sections 1-5\n" +
             "\n(Here's where a soppy monologue goes)\n";
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)

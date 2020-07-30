@@ -18,6 +18,8 @@ namespace UAssetGUI
         HeaderList,
         LinkedSectors,
         CategoryInformation,
+        CategoryStrings,
+        CategoryInts,
         CategoryData
     }
 
@@ -61,6 +63,8 @@ namespace UAssetGUI
             listView1.Nodes.Add(new PointingTreeNode("Header List", null));
             listView1.Nodes.Add(new PointingTreeNode("Linked Sectors", null));
             listView1.Nodes.Add(new PointingTreeNode("Section Information", null));
+            listView1.Nodes.Add(new PointingTreeNode("Section Ints", null));
+            listView1.Nodes.Add(new PointingTreeNode("Section Strings", null));
             listView1.Nodes.Add(new PointingTreeNode("Category Data", null));
 
             TreeNode superTopNode = listView1.Nodes[listView1.Nodes.Count - 1];
@@ -223,7 +227,7 @@ namespace UAssetGUI
                             var enumData = (EnumPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
                             row.Cells[3].Value = enumData.GetEnumBase();
-                            row.Cells[3].Value = enumData.GetEnumFull();
+                            row.Cells[4].Value = enumData.GetEnumFull();
                             break;
                         case "ByteProperty":
                             var byteData = (BytePropertyData)thisPD;
@@ -546,6 +550,25 @@ namespace UAssetGUI
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num + 1);
                     }
                     break;
+                case TableHandlerMode.CategoryInts:
+                    AddColumns(new string[] { "Category", "Value", "" });
+
+                    for (int num = 0; num < asset.data.categoryIntReference.Count; num++)
+                    {
+                        for (int num2 = 0; num2 < asset.data.categoryIntReference[num].Length; num2++)
+                        {
+                            dataGridView1.Rows.Add((num + 1), asset.data.categoryStringReference[num][num2]);
+                        }
+                    }
+                    break;
+                case TableHandlerMode.CategoryStrings:
+                    AddColumns(new string[] { "Value", "" });
+
+                    for (int num = 0; num < asset.data.categoryStringReference.Count; num++)
+                    {
+                        dataGridView1.Rows.Add(asset.data.categoryStringReference[num]);
+                    }
+                    break;
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
@@ -740,6 +763,7 @@ namespace UAssetGUI
                         rowNum++;
                     }
                     break;
+                // TODO: Category int and string serialization
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {

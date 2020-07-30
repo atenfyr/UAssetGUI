@@ -542,7 +542,7 @@ namespace UAssetGUI
                     for (int num = 0; num < asset.data.categories.Count; num++)
                     {
                         CategoryReference refer = asset.data.categories[num].ReferenceData;
-                        dataGridView1.Rows.Add(asset.data.GetHeaderReference(asset.data.GetLinkReference(refer.connection)), asset.data.GetHeaderReference(asset.data.GetLinkReference(refer.connect)), refer.category, refer.link, refer.typeIndex, refer.type, refer.lengthV, refer.startV);
+                        dataGridView1.Rows.Add(asset.data.GetHeaderReference(asset.data.GetLinkReference(refer.connection)), asset.data.GetHeaderReference(asset.data.GetLinkReference(refer.connect)), refer.category, refer.link, asset.data.GetHeaderReference(refer.typeIndex), refer.type, refer.lengthV, refer.startV);
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num + 1);
                     }
                     break;
@@ -697,10 +697,11 @@ namespace UAssetGUI
                             vals[i] = row.Cells[i].Value;
                             if (vals[i] == null) return;
                         }
-                        if (!(vals[0] is string) || !(vals[1] is string)) return;
+                        if (!(vals[0] is string) || !(vals[1] is string) || !(vals[4] is string)) return;
 
                         string val1 = (string)vals[0];
                         string val2 = (string)vals[1];
+                        string valTypeIndex = (string)vals[4];
 
                         int[] restOfVals = new int[8];
                         for (int i = 2; i < vals.Length; i++)
@@ -719,13 +720,14 @@ namespace UAssetGUI
 
                         asset.data.AddHeaderReference(val1);
                         asset.data.AddHeaderReference(val2);
+                        asset.data.AddHeaderReference(valTypeIndex);
                         if (asset.data.categories.Count > rowNum)
                         {
                             asset.data.categories[rowNum].ReferenceData.connection = asset.data.SearchHeaderReference(val1);
                             asset.data.categories[rowNum].ReferenceData.connect = asset.data.SearchHeaderReference(val2);
                             asset.data.categories[rowNum].ReferenceData.category = restOfVals[2];
                             asset.data.categories[rowNum].ReferenceData.link = restOfVals[3];
-                            asset.data.categories[rowNum].ReferenceData.typeIndex = restOfVals[4];
+                            asset.data.categories[rowNum].ReferenceData.typeIndex = asset.data.SearchHeaderReference(valTypeIndex);
                             asset.data.categories[rowNum].ReferenceData.type = (ushort)restOfVals[5];
                             asset.data.categories[rowNum].ReferenceData.lengthV = restOfVals[6];
                             asset.data.categories[rowNum].ReferenceData.startV = restOfVals[7];

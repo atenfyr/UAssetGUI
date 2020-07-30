@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,12 +18,14 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
+        public static Version GUIVersion = new Version(0, 1, 0);
         public TableHandler tableEditor;
         public ByteViewer byteView1;
 
         public Form1()
         {
             InitializeComponent();
+            this.Text = "UAssetGUI v" + GUIVersion;
             dataGridView1.Visible = true;
 
             // Extra data viewer
@@ -102,15 +105,21 @@ namespace UAssetGUI
         public bool existsUnsavedChanges = false;
         public void SetUnsavedChanges(bool flag)
         {
-            if (string.IsNullOrEmpty(currentSavingPath)) return;
             existsUnsavedChanges = flag;
-            if (existsUnsavedChanges)
+            if (string.IsNullOrEmpty(currentSavingPath))
             {
-                dataGridView1.Parent.Text = "UAssetGUI - *" + currentSavingPath;
+                dataGridView1.Parent.Text = "UAssetGUI v" + GUIVersion;
             }
             else
             {
-                dataGridView1.Parent.Text = "UAssetGUI - " + currentSavingPath;
+                if (existsUnsavedChanges)
+                {
+                    dataGridView1.Parent.Text = "UAssetGUI v" + GUIVersion + " - *" + currentSavingPath;
+                }
+                else
+                {
+                    dataGridView1.Parent.Text = "UAssetGUI v" + GUIVersion + " - " + currentSavingPath;
+                }
             }
         }
 
@@ -190,69 +199,12 @@ namespace UAssetGUI
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                DataObject dataObj = dataGridView1.GetClipboardContent();
-                if (dataObj != null)
-                {
-                    Clipboard.SetDataObject(dataObj, true);
-                }
-            }
-            catch
-            {
-
-            }
+            SendKeys.Send("^C");
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                tableEditor.readyToSave = false;
-                string s = Clipboard.GetText();
-                string[] lines = s.Split('\n');
-                int iRow = dataGridView1.CurrentCell.RowIndex;
-                int iCol = dataGridView1.CurrentCell.ColumnIndex;
-                DataGridViewCell oCell;
-                foreach (string line in lines)
-                {
-                    if (iRow < dataGridView1.RowCount && line.Length > 0)
-                    {
-                        string[] sCells = line.Split('\t');
-                        for (int i = 0; i < sCells.GetLength(0); ++i)
-                        {
-                            if (iCol + i < this.dataGridView1.ColumnCount)
-                            {
-                                oCell = dataGridView1[iCol + i, iRow];
-                                if (!oCell.ReadOnly)
-                                {
-                                    if (oCell == null || oCell.Value == null || oCell.Value.ToString() != sCells[i])
-                                    {
-                                        oCell.Value = Convert.ChangeType(sCells[i], oCell.ValueType);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        iRow++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                tableEditor.readyToSave = true;
-                tableEditor.Save(true);
-            }
-            catch (Exception ex)
-            {
-                tableEditor.readyToSave = true;
-                Debug.WriteLine(ex);
-                MessageBox.Show("Failed to paste data", "Uh oh!");
-            }
+            SendKeys.Send("^V");
         }
 
         private void dataGridEditCell(object sender, EventArgs e)
@@ -364,9 +316,42 @@ namespace UAssetGUI
             }
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void githubToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/atenfyr/uassetgui");
+        }
+
+        private void apiLinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/atenfyr/uassetapi");
+        }
+
+        private static readonly string AboutText =
+            "UAssetGUI v" + GUIVersion + "\n" +
+            "By Atenfyr\n" +
+            "\n" +
+            "Thanks to the Astro-Techies club for the help\n" +
+            "\n(Here's where a soppy monologue goes)\n";
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var formPopup = new Form
+            {
+                Text = "About",
+                Size = new Size(300, 300)
+            };
+            formPopup.StartPosition = FormStartPosition.CenterParent;
+
+            formPopup.Controls.Add(new Label()
+            {
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Fill,
+                Text = AboutText,
+                Font = new Font(this.Font.FontFamily, 10)
+            });
+
+            formPopup.ShowDialog(this);
         }
     }
 }

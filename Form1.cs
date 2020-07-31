@@ -273,6 +273,9 @@ namespace UAssetGUI
                     case "Section Strings":
                         tableEditor.mode = TableHandlerMode.CategoryStrings;
                         break;
+                    case "UExp Ints":
+                        tableEditor.mode = TableHandlerMode.UExpInts;
+                        break;
                 }
                 tableEditor.Load();
             }

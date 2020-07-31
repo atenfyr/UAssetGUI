@@ -20,6 +20,7 @@ namespace UAssetGUI
         CategoryInformation,
         CategoryStrings,
         CategoryInts,
+        UExpInts,
         CategoryData
     }
 
@@ -65,6 +66,7 @@ namespace UAssetGUI
             listView1.Nodes.Add(new PointingTreeNode("Section Information", null));
             listView1.Nodes.Add(new PointingTreeNode("Section Ints", null));
             listView1.Nodes.Add(new PointingTreeNode("Section Strings", null));
+            if (asset.data.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("UExp Ints", null));
             listView1.Nodes.Add(new PointingTreeNode("Category Data", null));
 
             TreeNode superTopNode = listView1.Nodes[listView1.Nodes.Count - 1];
@@ -569,6 +571,14 @@ namespace UAssetGUI
                         dataGridView1.Rows.Add(asset.data.categoryStringReference[num]);
                     }
                     break;
+                case TableHandlerMode.UExpInts:
+                    AddColumns(new string[] { "Value", "" });
+
+                    for (int num = 0; num < asset.data.UExpData.Count; num++)
+                    {
+                        dataGridView1.Rows.Add(new object[] { asset.data.UExpData[num] });
+                    }
+                    break;
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
@@ -763,7 +773,77 @@ namespace UAssetGUI
                         rowNum++;
                     }
                     break;
-                // TODO: Category int and string serialization
+                case TableHandlerMode.CategoryInts:
+                    asset.data.categoryIntReference = new List<int[]>();
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        int[] vals = new int[2];
+                        for (int i = 0; i < 2; i++)
+                        {
+                            if (row.Cells[i].Value is string)
+                            {
+                                bool result = int.TryParse((string)row.Cells[i].Value, out int x);
+                                if (!result) return;
+                                vals[i] = x;
+                            }
+                            else
+                            {
+                                vals[i] = (int)row.Cells[i].Value;
+                            }
+                        }
+
+                        if (asset.data.categoryIntReference.Count > vals[0])
+                        {
+                            var arr = asset.data.categoryIntReference[vals[0]];
+                            Array.Resize(ref arr, arr.Length + 1);
+                            arr[arr.Length - 1] = vals[1];
+                            asset.data.categoryIntReference[vals[0]] = arr;
+                        }
+                        else
+                        {
+                            asset.data.categoryIntReference.Insert(vals[0], new int[]{ vals[1] });
+                        }
+                    }
+                    break;
+                case TableHandlerMode.CategoryStrings:
+                    asset.data.categoryStringReference = new List<string>();
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        asset.data.categoryStringReference.Add((string)row.Cells[0].Value);
+                    }
+                    break;
+                case TableHandlerMode.UExpInts:
+                    asset.data.UExpData = new List<int>();
+                    int rowN = 0;
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        int[] vals = new int[2];
+                        for (int i = 0; i < 2; i++)
+                        {
+                            if (row.Cells[i].Value is string)
+                            {
+                                bool result = int.TryParse((string)row.Cells[i].Value, out int x);
+                                if (!result) return;
+                                vals[i] = x;
+                            }
+                            else
+                            {
+                                vals[i] = (int)row.Cells[i].Value;
+                            }
+                        }
+
+                        if (asset.data.UExpData.Count > rowN)
+                        {
+                            asset.data.UExpData[rowN] = vals[0];
+                        }
+                        else
+                        {
+                            asset.data.UExpData.Insert(rowN, vals[0]);
+                        }
+
+                        rowN++;
+                    }
+                    break;
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {

@@ -86,7 +86,7 @@ namespace UAssetGUI
                             for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
                         }
 
-                        if (us.Extras.Length > 0 && us.Extras.Length != 4)
+                        //if (us.Extras.Length > 0 && us.Extras.Length != 4)
                         {
                             var parentNode = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
                             categoryNode.Nodes.Add(parentNode);
@@ -228,16 +228,16 @@ namespace UAssetGUI
                         case "EnumProperty":
                             var enumData = (EnumPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = enumData.GetEnumBase();
-                            row.Cells[4].Value = enumData.GetEnumFull();
+                            row.Cells[3].Value = enumData.EnumType;
+                            row.Cells[4].Value = enumData.Value;
                             break;
                         case "ByteProperty":
                             var byteData = (BytePropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
                             row.Cells[3].Value = byteData.GetEnumBase();
-                            if (row.Cells[3].Value.Equals("None"))
+                            if (byteData.ByteType == BytePropertyType.Byte)
                             {
-                                row.Cells[4].Value = byteData.FullEnum;
+                                row.Cells[4].Value = byteData.Value;
                             }
                             else
                             {
@@ -297,6 +297,14 @@ namespace UAssetGUI
                             row.Cells[3].Value = vector2DData.Value[0];
                             row.Cells[4].Value = vector2DData.Value[1];
                             break;
+                        case "Vector4":
+                            var vector4DData = (Vector4PropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = vector4DData.Value[0];
+                            row.Cells[4].Value = vector4DData.Value[1];
+                            row.Cells[5].Value = vector4DData.Value[2];
+                            row.Cells[6].Value = vector4DData.Value[3];
+                            break;
                         case "IntPoint":
                             var intPointData = (IntPointPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
@@ -324,6 +332,7 @@ namespace UAssetGUI
                             break;
                     }
 
+                    row.Cells[8].Value = thisPD.WidgetData;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -527,9 +536,10 @@ namespace UAssetGUI
                 case TableHandlerMode.HeaderList:
                     AddColumns(new string[] { "String" });
 
-                    for (int num = 0; num < asset.data.headerIndexList.Count; num++)
+                    IReadOnlyList<string> headerIndexList = asset.data.GetHeaderIndexList();
+                    for (int num = 0; num < headerIndexList.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.data.headerIndexList[num]);
+                        dataGridView1.Rows.Add(headerIndexList[num]);
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
                     }
                     break;
@@ -548,7 +558,7 @@ namespace UAssetGUI
                     for (int num = 0; num < asset.data.categories.Count; num++)
                     {
                         CategoryReference refer = asset.data.categories[num].ReferenceData;
-                        dataGridView1.Rows.Add(asset.data.GetHeaderReference(asset.data.GetLinkReference(refer.connection)), asset.data.GetHeaderReference(asset.data.GetLinkReference(refer.connect)), refer.category, refer.link, asset.data.GetHeaderReference(refer.typeIndex), refer.type, refer.lengthV, refer.startV);
+                        dataGridView1.Rows.Add(asset.data.GetHeaderReferenceWithoutZero(asset.data.GetLinkReference(refer.connection)), asset.data.GetHeaderReferenceWithoutZero(asset.data.GetLinkReference(refer.connect)), refer.category, refer.link, asset.data.GetHeaderReferenceWithoutZero(refer.typeIndex), refer.type, refer.lengthV, refer.startV);
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num + 1);
                     }
                     break;
@@ -582,7 +592,7 @@ namespace UAssetGUI
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Other", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "WData", "" });
 
                         dataGridView1.AllowUserToAddRows = true;
 
@@ -674,11 +684,11 @@ namespace UAssetGUI
             switch (mode)
             {
                 case TableHandlerMode.HeaderList:
-                    asset.data.headerIndexList = new List<string>();
+                    asset.data.ClearHeaderIndexList();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         string ourValue = (string)row.Cells[0].Value;
-                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.data.headerIndexList.Add(ourValue);
+                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.data.AddHeaderReference(ourValue);
                     }
                     break;
                 case TableHandlerMode.LinkedSectors:
@@ -702,7 +712,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            realVal3 = (int)val3;
+                            realVal3 = Convert.ToInt32(val3);
                         }
 
                         string realVal1 = (string)val1;
@@ -710,11 +720,7 @@ namespace UAssetGUI
                         string realVal4 = (string)val4;
                         if (string.IsNullOrWhiteSpace(realVal1) || string.IsNullOrWhiteSpace(realVal2) || string.IsNullOrWhiteSpace(realVal4)) continue;
 
-                        asset.data.AddHeaderReference(realVal1);
-                        asset.data.AddHeaderReference(realVal2);
-                        asset.data.AddHeaderReference(realVal4);
-
-                        Link newLink = new Link((ulong)asset.data.SearchHeaderReference(realVal1), (ulong)asset.data.SearchHeaderReference(realVal2), realVal3, (ulong)asset.data.SearchHeaderReference(realVal4), --nextIndex);
+                        Link newLink = new Link((ulong)asset.data.AddHeaderReference(realVal1), (ulong)asset.data.AddHeaderReference(realVal2), realVal3, (ulong)asset.data.AddHeaderReference(realVal4), --nextIndex);
                         asset.data.links.Add(newLink);
                     }
                     break;
@@ -722,15 +728,13 @@ namespace UAssetGUI
                     int rowNum = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        if (row.Cells.Count != 4) return;
-
                         object[] vals = new object[8];
                         for (int i = 0; i < vals.Length; i++)
                         {
                             vals[i] = row.Cells[i].Value;
-                            if (vals[i] == null) return;
                         }
-                        if (!(vals[0] is string) || !(vals[1] is string) || !(vals[4] is string)) return;
+
+                        if (!(vals[0] is string) || !(vals[1] is string) || !(vals[4] is string)) continue;
 
                         string val1 = (string)vals[0];
                         string val2 = (string)vals[1];
@@ -742,32 +746,46 @@ namespace UAssetGUI
                             if (vals[i] is string)
                             {
                                 bool result = int.TryParse((string)vals[i], out int x);
-                                if (!result) return;
+                                if (!result) continue;
                                 restOfVals[i] = x;
                             }
                             else
                             {
-                                restOfVals[i] = (int)vals[i];
+                                restOfVals[i] = Convert.ToInt32(vals[i]);
                             }
                         }
 
-                        asset.data.AddHeaderReference(val1);
-                        asset.data.AddHeaderReference(val2);
-                        asset.data.AddHeaderReference(valTypeIndex);
+                        bool connectionIsValid = false, connectIsValid = false;
+                        int connection = 0, connect = 0, typeIndex = 0;
+                        if (int.TryParse(val1, out int intVal1))
+                        {
+                            connectionIsValid = true;
+                            connection = intVal1;
+                        }
+
+                        if (int.TryParse(val2, out int intVal2))
+                        {
+                            connectIsValid = true;
+                            connect = intVal2;
+                        }
+
+                        if (int.TryParse(valTypeIndex, out int intVal3)) typeIndex = intVal3;
+                        else typeIndex = asset.data.AddHeaderReference(valTypeIndex);
+
                         if (asset.data.categories.Count > rowNum)
                         {
-                            asset.data.categories[rowNum].ReferenceData.connection = asset.data.SearchHeaderReference(val1);
-                            asset.data.categories[rowNum].ReferenceData.connect = asset.data.SearchHeaderReference(val2);
+                            if (connectionIsValid) asset.data.categories[rowNum].ReferenceData.connection = connection;
+                            if (connectIsValid) asset.data.categories[rowNum].ReferenceData.connect = connect;
                             asset.data.categories[rowNum].ReferenceData.category = restOfVals[2];
                             asset.data.categories[rowNum].ReferenceData.link = restOfVals[3];
-                            asset.data.categories[rowNum].ReferenceData.typeIndex = asset.data.SearchHeaderReference(valTypeIndex);
+                            asset.data.categories[rowNum].ReferenceData.typeIndex = typeIndex;
                             asset.data.categories[rowNum].ReferenceData.type = (ushort)restOfVals[5];
                             asset.data.categories[rowNum].ReferenceData.lengthV = restOfVals[6];
                             asset.data.categories[rowNum].ReferenceData.startV = restOfVals[7];
                         }
                         else
                         {
-                            CategoryReference refer = new CategoryReference(asset.data.SearchHeaderReference(val1), asset.data.SearchHeaderReference(val2), restOfVals[2], restOfVals[3], restOfVals[4], (ushort)restOfVals[5], restOfVals[6], restOfVals[7]);
+                            CategoryReference refer = new CategoryReference(connection, connect, restOfVals[2], restOfVals[3], typeIndex, (ushort)restOfVals[5], restOfVals[6], restOfVals[7]);
                             asset.data.categories.Add(new Category(refer, asset.data, new byte[0]));
                         }
                         rowNum++;
@@ -788,7 +806,7 @@ namespace UAssetGUI
                             }
                             else
                             {
-                                vals[i] = (int)row.Cells[i].Value;
+                                vals[i] = Convert.ToInt32(row.Cells[i].Value);
                             }
                         }
 
@@ -817,28 +835,25 @@ namespace UAssetGUI
                     int rowN = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        int[] vals = new int[2];
-                        for (int i = 0; i < 2; i++)
+                        int intVal;
+                        if (row.Cells[0].Value is string)
                         {
-                            if (row.Cells[i].Value is string)
-                            {
-                                bool result = int.TryParse((string)row.Cells[i].Value, out int x);
-                                if (!result) return;
-                                vals[i] = x;
-                            }
-                            else
-                            {
-                                vals[i] = (int)row.Cells[i].Value;
-                            }
+                            bool result = int.TryParse((string)row.Cells[0].Value, out int x);
+                            if (!result) return;
+                            intVal = x;
+                        }
+                        else
+                        {
+                            intVal = Convert.ToInt32(row.Cells[0].Value);
                         }
 
                         if (asset.data.UExpData.Count > rowN)
                         {
-                            asset.data.UExpData[rowN] = vals[0];
+                            asset.data.UExpData[rowN] = intVal;
                         }
                         else
                         {
-                            asset.data.UExpData.Insert(rowN, vals[0]);
+                            asset.data.UExpData.Insert(rowN, intVal);
                         }
 
                         rowN++;

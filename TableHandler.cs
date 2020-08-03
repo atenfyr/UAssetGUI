@@ -77,6 +77,18 @@ namespace UAssetGUI
                 superTopNode.Nodes.Add(categoryNode);
                 switch (baseUs)
                 {
+                    case StringTableCategory us2:
+                    {
+                        var parentNode = new PointingTreeNode(us2.Data2.Name + " (" + us2.Data2.Count + ")", baseUs);
+                        categoryNode.Nodes.Add(parentNode);
+                        break;
+                    }
+                    case RawCategory us3:
+                    {
+                        var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
+                        categoryNode.Nodes.Add(parentNode);
+                        break;
+                    }
                     case NormalCategory us:
                     {
                         {
@@ -92,18 +104,6 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode);
                         }
 
-                        break;
-                    }
-                    case StringTableCategory us2:
-                    {
-                        var parentNode = new PointingTreeNode(us2.Data.Name + " (" + us2.Data.Count + ")", baseUs);
-                        categoryNode.Nodes.Add(parentNode);
-                        break;
-                    }
-                    case RawCategory us3:
-                    {
-                        var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
-                        categoryNode.Nodes.Add(parentNode);
                         break;
                     }
                 }
@@ -604,24 +604,24 @@ namespace UAssetGUI
                             case Category usCategory:
                                 switch (usCategory)
                                 {
-                                    case NormalCategory normalUs:
-                                        renderingArr = normalUs.Data.ToArray();
-                                        break;
                                     case StringTableCategory strUs:
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                                        for (int i = 0; i < strUs.Data.Count; i++)
+                                        for (int i = 0; i < strUs.Data2.Count; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = strUs.Data.Name;
+                                            row.Cells[0].Value = strUs.Data2.Name;
                                             row.Cells[1].Value = "StringTableEntry";
-                                            row.Cells[2].Value = strUs.Data[i].Encoding.HeaderName;
-                                            row.Cells[3].Value = strUs.Data[i].Value.Replace("\n", "\\n").Replace("\r", "\\r");
+                                            row.Cells[2].Value = strUs.Data2[i].Encoding.HeaderName;
+                                            row.Cells[3].Value = strUs.Data2[i].Value.Replace("\n", "\\n").Replace("\r", "\\r");
                                             row.HeaderCell.Value = Convert.ToString(i);
                                             rows.Add(row);
                                         }
                                         dataGridView1.Rows.AddRange(rows.ToArray());
                                         standardRendering = false;
+                                        break;
+                                    case NormalCategory normalUs:
+                                        renderingArr = normalUs.Data.ToArray();
                                         break;
                                 }
 
@@ -862,25 +862,9 @@ namespace UAssetGUI
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        if (pointerNode.Pointer is NormalCategory usCat)
+                        if (pointerNode.Pointer is StringTableCategory usStrTable)
                         {
-                            List<PropertyData> newData = new List<PropertyData>();
-                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
-                            {
-                                PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    numFailed++;
-                                    continue;
-                                }
-                                newData.Add(val);
-                            }
-                            usCat.Data = newData;
-                            pointerNode.Text = asset.data.GetHeaderReference(asset.data.GetLinkReference(usCat.ReferenceData.connection)) + " (" + usCat.Data.Count + ")";
-                        }
-                        else if (pointerNode.Pointer is StringTableCategory usStrTable)
-                        {
-                            StringTable newStringTable = new StringTable(usStrTable.Data.Name);
+                            StringTable newStringTable = new StringTable(usStrTable.Data2.Name);
                             List<DataGridViewRow> rows = new List<DataGridViewRow>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
@@ -896,8 +880,8 @@ namespace UAssetGUI
                                 newStringTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
                             }
 
-                            usStrTable.Data = newStringTable;
-                            pointerNode.Text = usStrTable.Data.Name + " (" + usStrTable.Data.Count + ")";
+                            usStrTable.Data2 = newStringTable;
+                            pointerNode.Text = usStrTable.Data2.Name + " (" + usStrTable.Data.Count + ")";
                         }
                         else if (pointerNode.Pointer is StructPropertyData usStruct)
                         {
@@ -917,6 +901,22 @@ namespace UAssetGUI
                             string decidedName = usStruct.Name;
                             if (((PointingTreeNode)pointerNode.Parent).Pointer is PropertyData && ((PropertyData)((PointingTreeNode)pointerNode.Parent).Pointer).Name.Equals(decidedName)) decidedName = usStruct.StructType;
                             pointerNode.Text = decidedName + " (" + usStruct.Value.Count + ")";
+                        }
+                        else if (pointerNode.Pointer is NormalCategory usCat)
+                        {
+                            List<PropertyData> newData = new List<PropertyData>();
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
+                                if (val == null)
+                                {
+                                    numFailed++;
+                                    continue;
+                                }
+                                newData.Add(val);
+                            }
+                            usCat.Data = newData;
+                            pointerNode.Text = asset.data.GetHeaderReference(asset.data.GetLinkReference(usCat.ReferenceData.connection)) + " (" + usCat.Data.Count + ")";
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)
                         {

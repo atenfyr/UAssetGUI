@@ -146,6 +146,7 @@ namespace UAssetGUI
             {
                 try
                 {
+                    if (File.Exists(path)) File.Copy(path, path + ".bak");
                     tableEditor.asset.Write(path);
                     SetUnsavedChanges(false);
                     tableEditor.Load();

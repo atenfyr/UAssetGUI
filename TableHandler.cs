@@ -268,7 +268,7 @@ namespace UAssetGUI
                             var colorData = (LinearColorPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
                             row.Cells[2].ReadOnly = true;
-                            row.Cells[2].Style.BackColor = colorData.Value;
+                            row.Cells[2].Style.BackColor = colorData.Value.GetARGB();
                             row.Cells[3].Value = colorData.Value.R;
                             row.Cells[4].Value = colorData.Value.G;
                             row.Cells[5].Value = colorData.Value.B;

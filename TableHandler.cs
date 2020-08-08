@@ -81,6 +81,7 @@ namespace UAssetGUI
                     {
                         var parentNode = new PointingTreeNode(us2.Data2.Name + " (" + us2.Data2.Count + ")", baseUs);
                         categoryNode.Nodes.Add(parentNode);
+
                         break;
                     }
                     case RawCategory us3:
@@ -98,13 +99,15 @@ namespace UAssetGUI
                             for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
                         }
 
-                        //if (us.Extras.Length > 0 && us.Extras.Length != 4)
-                        {
-                            var parentNode = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
-                            categoryNode.Nodes.Add(parentNode);
-                        }
-
                         break;
+                    }
+                }
+
+                if (baseUs is NormalCategory usBB)
+                {
+                    {
+                        var parentNode = new PointingTreeNode("Extra Data (" + usBB.Extras.Length + " B)", usBB.Extras);
+                        categoryNode.Nodes.Add(parentNode);
                     }
                 }
             }

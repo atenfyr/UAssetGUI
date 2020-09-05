@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -56,6 +57,17 @@ namespace UAssetGUI
 
         public bool readyToSave = true;
 
+        public static Color ARGBtoRGB(Color ARGB)
+        {
+            double alpha = ARGB.A / 255.0;
+            return Color.FromArgb(
+                255,
+                (int)((ARGB.R * alpha) + (255 * (1 - alpha))),
+                (int)((ARGB.G * alpha) + (255 * (1 - alpha))),
+                (int)((ARGB.B * alpha) + (255 * (1 - alpha)))
+            );
+        }
+
         public void FillOutTree()
         {
             listView1.BeginUpdate();
@@ -77,13 +89,6 @@ namespace UAssetGUI
                 superTopNode.Nodes.Add(categoryNode);
                 switch (baseUs)
                 {
-                    case StringTableCategory us2:
-                    {
-                        var parentNode = new PointingTreeNode(us2.Data2.Name + " (" + us2.Data2.Count + ")", baseUs);
-                        categoryNode.Nodes.Add(parentNode);
-
-                        break;
-                    }
                     case RawCategory us3:
                     {
                         var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
@@ -92,22 +97,23 @@ namespace UAssetGUI
                     }
                     case NormalCategory us:
                     {
-                        {
-                            var parentNode = new PointingTreeNode(asset.data.GetHeaderReference(asset.data.GetLinkReference(us.ReferenceData.connection)) + " (" + us.Data.Count + ")", baseUs);
-                            categoryNode.Nodes.Add(parentNode);
+                        var parentNode = new PointingTreeNode(asset.data.GetHeaderReference(asset.data.GetLinkReference(us.ReferenceData.connection)) + " (" + us.Data.Count + ")", us);
+                        categoryNode.Nodes.Add(parentNode);
 
-                            for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
+                        for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
+
+                        if (us is StringTableCategory us2)
+                        {
+                            var parentNode2 = new PointingTreeNode(us2.Data2.Name + " (" + us2.Data2.Count + ")", us2.Data2);
+                            categoryNode.Nodes.Add(parentNode2);
+                        }
+
+                        {
+                            var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
+                            categoryNode.Nodes.Add(parentNode3);
                         }
 
                         break;
-                    }
-                }
-
-                if (baseUs is NormalCategory usBB)
-                {
-                    {
-                        var parentNode = new PointingTreeNode("Extra Data (" + usBB.Extras.Length + " B)", usBB.Extras);
-                        categoryNode.Nodes.Add(parentNode);
                     }
                 }
             }
@@ -192,6 +198,7 @@ namespace UAssetGUI
                             if (objData.LinkValue != 0)
                             {
                                 row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
+                                row.Cells[3].Tag = "CategoryJump";
                                 if (objData.LinkValue > 0)
                                 {
                                     DataGridViewCellStyle sty = new DataGridViewCellStyle();
@@ -207,6 +214,15 @@ namespace UAssetGUI
                             row.Cells[2].Value = string.Empty;
                             row.Cells[3].Value = objData2.Value;
                             row.Cells[4].Value = objData2.Value2;
+                            break;
+                        case "RichCurveKey":
+                            var curveData = (RichCurveKeyProperty)thisPD;
+                            row.Cells[2].Value = curveData.InterpMode;
+                            row.Cells[3].Value = curveData.TangentMode;
+                            row.Cells[4].Value = curveData.Time;
+                            row.Cells[5].Value = curveData.Value;
+                            row.Cells[6].Value = curveData.ArriveTangent;
+                            row.Cells[7].Value = curveData.LeaveTangent;
                             break;
                         case "TextProperty":
                             var txtData = (TextPropertyData)thisPD;
@@ -271,7 +287,7 @@ namespace UAssetGUI
                             var colorData = (LinearColorPropertyData)thisPD;
                             row.Cells[2].Value = string.Empty;
                             row.Cells[2].ReadOnly = true;
-                            row.Cells[2].Style.BackColor = colorData.Value.GetARGB();
+                            row.Cells[2].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
                             row.Cells[3].Value = colorData.Value.R;
                             row.Cells[4].Value = colorData.Value.G;
                             row.Cells[5].Value = colorData.Value.B;
@@ -328,6 +344,11 @@ namespace UAssetGUI
                             row.Cells[4].Value = quatData.Value[1];
                             row.Cells[5].Value = quatData.Value[2];
                             row.Cells[6].Value = quatData.Value[3];
+                            break;
+                        case "StrProperty":
+                            var strPropData = (StrPropertyData)thisPD;
+                            row.Cells[2].Value = strPropData.Encoding.HeaderName;
+                            row.Cells[3].Value = Convert.ToString(strPropData.Value);
                             break;
                         default:
                             row.Cells[2].Value = string.Empty;
@@ -604,31 +625,61 @@ namespace UAssetGUI
 
                         switch (pointerNode.Pointer)
                         {
-                            case Category usCategory:
-                                switch (usCategory)
-                                {
-                                    case StringTableCategory strUs:
-                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                                        for (int i = 0; i < strUs.Data2.Count; i++)
-                                        {
-                                            DataGridViewRow row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = strUs.Data2.Name;
-                                            row.Cells[1].Value = "StringTableEntry";
-                                            row.Cells[2].Value = strUs.Data2[i].Encoding.HeaderName;
-                                            row.Cells[3].Value = strUs.Data2[i].Value.Replace("\n", "\\n").Replace("\r", "\\r");
-                                            row.HeaderCell.Value = Convert.ToString(i);
-                                            rows.Add(row);
-                                        }
-                                        dataGridView1.Rows.AddRange(rows.ToArray());
-                                        standardRendering = false;
-                                        break;
-                                    case NormalCategory normalUs:
-                                        renderingArr = normalUs.Data.ToArray();
-                                        break;
-                                }
-
+                            case NormalCategory usCategory:
+                                renderingArr = usCategory.Data.ToArray();
                                 break;
+                            case StringTable strUs:
+                                {
+                                    List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                                    for (int i = 0; i < strUs.Count; i++)
+                                    {
+                                        DataGridViewRow row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = strUs.Name;
+                                        row.Cells[1].Value = "StringTableEntry";
+                                        row.Cells[2].Value = strUs[i].Encoding.HeaderName;
+                                        row.Cells[3].Value = strUs[i].Value.Replace("\n", "\\n").Replace("\r", "\\r");
+                                        row.HeaderCell.Value = Convert.ToString(i);
+                                        rows.Add(row);
+                                    }
+                                    dataGridView1.Rows.AddRange(rows.ToArray());
+                                    standardRendering = false;
+                                    break;
+                                }    
+                            case MapPropertyData usMap:
+                                {
+                                    DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
+                                    string mapKeyType = ((PropertyData)firstEntry.Key).Type;
+                                    string mapValueType = ((PropertyData)firstEntry.Value).Type;
+
+                                    List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                                    for (int i = 0; i < usMap.Value.Count; i++)
+                                    {
+                                        DataGridViewRow row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = usMap.Name;
+                                        row.Cells[1].Value = "MapEntry";
+                                        row.Cells[2].Value = string.Empty;
+
+                                        row.Cells[3].Value = "Jump";
+                                        row.Cells[3].Tag = "ChildJump";
+
+                                        DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                        Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                        sty.Font = styFont;
+                                        sty.ForeColor = Color.Blue;
+                                        row.Cells[3].Style = sty;
+
+                                        row.Cells[4].Value = mapKeyType;
+                                        row.Cells[5].Value = mapValueType;
+                                        row.HeaderCell.Value = Convert.ToString(i);
+                                        row.Tag = usMap.Value.Cast<DictionaryEntry>().ElementAt(i);
+                                        rows.Add(row);
+                                    }
+                                    dataGridView1.Rows.AddRange(rows.ToArray());
+                                    standardRendering = false;
+                                    break;
+                                }
                             case StructPropertyData usStruct:
                                 renderingArr = usStruct.Value.ToArray();
                                 break;
@@ -639,8 +690,8 @@ namespace UAssetGUI
                                 dataGridView1.AllowUserToAddRows = false;
                                 var ourKey = (PropertyData)usDictEntry.Entry.Key;
                                 var ourValue = (PropertyData)usDictEntry.Entry.Value;
-                                ourKey.Name = "Key";
-                                ourValue.Name = "Value";
+                                if (ourKey != null) ourKey.Name = "Key";
+                                if (ourValue != null) ourValue.Name = "Value";
                                 renderingArr = new PropertyData[2] { ourKey, ourValue };
                                 break;
                             case PropertyData[] usRealArr:
@@ -683,7 +734,6 @@ namespace UAssetGUI
         {
             if (!readyToSave) return;
 
-            int numFailed = 0;
             switch (mode)
             {
                 case TableHandlerMode.HeaderList:
@@ -865,26 +915,49 @@ namespace UAssetGUI
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        if (pointerNode.Pointer is StringTableCategory usStrTable)
+                        if (pointerNode.Pointer is StringTable usStrTable)
                         {
-                            StringTable newStringTable = new StringTable(usStrTable.Data2.Name);
+                            usStrTable.Clear();
                             List<DataGridViewRow> rows = new List<DataGridViewRow>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 DataGridViewRow row = dataGridView1.Rows[i];
                                 object transformB = row.Cells[2].Value;
                                 object value1B = row.Cells[3].Value;
-                                if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string))
-                                {
-                                    numFailed++;
-                                    continue;
-                                }
+                                if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
 
-                                newStringTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
+                                usStrTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
                             }
 
-                            usStrTable.Data2 = newStringTable;
-                            pointerNode.Text = usStrTable.Data2.Name + " (" + usStrTable.Data.Count + ")";
+                            pointerNode.Text = usStrTable.Name + " (" + usStrTable.Count + ")";
+                        }
+                        else if (pointerNode.Pointer is MapPropertyData usMap)
+                        {
+                            DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
+                            string mapKeyType = ((PropertyData)firstEntry.Key).Type;
+                            string mapValueType = ((PropertyData)firstEntry.Value).Type;
+
+                            OrderedDictionary newData = new OrderedDictionary();
+                            int validI = 0;
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                DataGridViewRow row = dataGridView1.Rows[i];
+                                if (row.Cells.Count <= 1 || row.Cells[1].Value == null || !row.Cells[1].Value.Equals("MapEntry")) continue;
+
+                                if (row.Tag is DictionaryEntry dictBit)
+                                {
+                                    newData.Add(dictBit.Key, dictBit.Value);
+                                }
+                                else
+                                {
+                                    newData.Add(MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset.data), MainSerializer.TypeToClass(mapValueType, usMap.Name, asset.data));
+                                }
+
+                                validI++;
+                            }
+                            usMap.Value = newData;
+
+                            pointerNode.Text = usMap.Name + " (" + usMap.Value.Count + ")";
                         }
                         else if (pointerNode.Pointer is StructPropertyData usStruct)
                         {
@@ -892,11 +965,7 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    numFailed++;
-                                    continue;
-                                }
+                                if (val == null) continue;
                                 newData.Add(val);
                             }
                             usStruct.Value = newData;
@@ -911,11 +980,7 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    numFailed++;
-                                    continue;
-                                }
+                                if (val == null) continue;
                                 newData.Add(val);
                             }
                             usCat.Data = newData;
@@ -928,11 +993,7 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    numFailed++;
-                                    continue;
-                                }
+                                if (val == null) continue;
                                 newData.Add(val);
                             }
                             usArr.Value = newData.ToArray();
@@ -950,11 +1011,7 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    numFailed++;
-                                    continue;
-                                }
+                                if (val == null) continue;
                                 newData.Add(val);
                             }
                             pointerNode.Pointer = newData.ToArray();
@@ -968,7 +1025,6 @@ namespace UAssetGUI
             }
             else
             {
-                //if (numFailed < 2) Load();
                 ((Form1)dataGridView1.Parent).SetUnsavedChanges(true);
             }
         }

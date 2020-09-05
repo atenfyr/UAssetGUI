@@ -144,16 +144,27 @@ namespace UAssetGUI
         {
             if (tableEditor != null && !string.IsNullOrEmpty(currentSavingPath))
             {
-                try
+                if (File.Exists(path)) File.Copy(path, path + ".bak", true);
+
+                bool isLooping = true;
+                while (isLooping)
                 {
-                    if (File.Exists(path)) File.Copy(path, path + ".bak", true);
-                    tableEditor.asset.Write(path);
-                    SetUnsavedChanges(false);
-                    tableEditor.Load();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to save! " + ex.Message, "Uh oh!");
+                    isLooping = false;
+                    try
+                    {
+                        tableEditor.asset.Write(path);
+                        SetUnsavedChanges(false);
+                        tableEditor.Load();
+                    }
+                    catch (HeaderOutOfRangeException ex)
+                    {
+                        tableEditor.asset.data.AddHeaderReference(ex.RequiredString);
+                        isLooping = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to save! " + ex.Message, "Uh oh!");
+                    }
                 }
             }
             else
@@ -220,9 +231,9 @@ namespace UAssetGUI
         {
             if (dataGridView1.CurrentCell != null && dataGridView1.CurrentCell.Style != null && dataGridView1.CurrentCell.Style.Font != null && dataGridView1.CurrentCell.Style.Font.Underline == true)
             {
-                switch(dataGridView1.CurrentCell.Value)
+                switch(dataGridView1.CurrentCell.Tag)
                 {
-                    case "Jump":
+                    case "CategoryJump":
                         if (dataGridView1.CurrentCell.ColumnIndex == 3)
                         {
                             DataGridViewCell previousCell = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex - 1];
@@ -243,6 +254,12 @@ namespace UAssetGUI
                                 }
                             }
                             listView1.SelectedNode = topSelectingNode;
+                        }
+                        break;
+                    case "ChildJump":
+                        if (dataGridView1.CurrentCell.ColumnIndex == 3)
+                        {
+                            listView1.SelectedNode = listView1.SelectedNode.Nodes[dataGridView1.CurrentCell.RowIndex];
                         }
                         break;
                 }

@@ -28,10 +28,12 @@ namespace UAssetGUI
     public class PointingTreeNode : TreeNode
     {
         public object Pointer;
+        public int Type;
 
-        public PointingTreeNode(string label, object pointer)
+        public PointingTreeNode(string label, object pointer, int type = 0)
         {
             Pointer = pointer;
+            Type = type;
             this.Text = label;
         }
     }
@@ -108,6 +110,12 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
+                        if (us is BlueprintGeneratedClassCategory us3)
+                        {
+                            var parentNode2 = new PointingTreeNode("Function Index Data", us3, 1);
+                            categoryNode.Nodes.Add(parentNode2);
+                        }
+
                         {
                             var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
                             categoryNode.Nodes.Add(parentNode3);
@@ -156,6 +164,9 @@ namespace UAssetGUI
 
                     foreach (DictionaryEntry entry in mapp.Value)
                     {
+                        ((PropertyData)entry.Key).Name = "Key";
+                        ((PropertyData)entry.Value).Name = "Value";
+
                         var softEntryNode = new PointingTreeNode(mapp.Name + " (2)", new PointingDictionaryEntry(entry, mapp));
                         mapNode.Nodes.Add(softEntryNode);
                         InterpretThing((PropertyData)entry.Key, softEntryNode);
@@ -619,6 +630,7 @@ namespace UAssetGUI
                         AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "WData", "" });
 
                         dataGridView1.AllowUserToAddRows = true;
+                        dataGridView1.ReadOnly = false;
 
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
@@ -626,7 +638,88 @@ namespace UAssetGUI
                         switch (pointerNode.Pointer)
                         {
                             case NormalCategory usCategory:
-                                renderingArr = usCategory.Data.ToArray();
+                                switch(pointerNode.Type)
+                                {
+                                    case 0:
+                                        renderingArr = usCategory.Data.ToArray();
+                                        break;
+                                    case 1:
+                                        BlueprintGeneratedClassCategory bgcCat = (BlueprintGeneratedClassCategory)usCategory;
+                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
+
+                                        // Header 1
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "---";
+                                            row.Cells[1].Value = "WEIRD INDEX DATA";
+                                            row.Cells[2].Value = "---";
+                                            rows.Add(row);
+                                        }
+
+                                        for (int i = 0; i < bgcCat.IndexData.Count; i++)
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = bgcCat.IndexData[i];
+                                            rows.Add(row);
+                                        }
+
+                                        // Header 2
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "---";
+                                            row.Cells[1].Value = "FUNCTION DATA";
+                                            row.Cells[2].Value = "---";
+                                            rows.Add(row);
+                                        }
+
+                                        for (int i = 0; i < bgcCat.FunctionData.Count; i++)
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = bgcCat.FunctionData[i].Name;
+                                            row.Cells[2].Value = bgcCat.FunctionData[i].Category;
+                                            if (bgcCat.FunctionData[i].Category != 0)
+                                            {
+                                                row.Cells[3].Value = "Jump";
+                                                row.Cells[3].Tag = "CategoryJump";
+                                                DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                                Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                                sty.Font = styFont;
+                                                sty.ForeColor = Color.Blue;
+                                                row.Cells[3].Style = sty;
+                                            }
+                                            row.Cells[4].Value = bgcCat.FunctionData[i].Flags;
+                                            rows.Add(row);
+                                        }
+
+                                        // Header 3
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "---";
+                                            row.Cells[1].Value = "FOOTER DATA";
+                                            row.Cells[2].Value = "---";
+                                            rows.Add(row);
+                                        }
+
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = BitConverter.ToString(BitConverter.GetBytes(bgcCat.FooterSeparator));
+                                            row.Cells[1].Value = bgcCat.FooterObject + " (" + asset.data.GetHeaderReference(asset.data.GetLinkReference(bgcCat.FooterObject)) + ")";
+                                            row.Cells[2].Value = bgcCat.FooterEngine;
+                                            rows.Add(row);
+                                        }
+
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                        dataGridView1.ReadOnly = true;
+                                        standardRendering = false;
+                                        break;
+                                }
+   
                                 break;
                             case StringTable strUs:
                                 {

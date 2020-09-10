@@ -47,6 +47,7 @@ namespace UAssetGUI
 
             // Auto resizing
             SizeChanged += frm_sizeChanged;
+            FormClosing += frm_closing;
 
             // Command line parameters
             string[] args = Environment.GetCommandLineArgs();
@@ -140,7 +141,7 @@ namespace UAssetGUI
 
         private string currentSavingPath = "";
 
-        private void ForceSave(string path)
+        private bool ForceSave(string path)
         {
             if (tableEditor != null && !string.IsNullOrEmpty(currentSavingPath))
             {
@@ -155,6 +156,7 @@ namespace UAssetGUI
                         tableEditor.asset.Write(path);
                         SetUnsavedChanges(false);
                         tableEditor.Load();
+                        return true;
                     }
                     catch (HeaderOutOfRangeException ex)
                     {
@@ -171,6 +173,7 @@ namespace UAssetGUI
             {
                 MessageBox.Show("Failed to save!", "Uh oh!");
             }
+            return false;
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -318,6 +321,22 @@ namespace UAssetGUI
         private void frm_sizeChanged(object sender, EventArgs e)
         {
             ForceResize();
+        }
+
+        private void frm_closing(object sender, FormClosingEventArgs e)
+        {
+            if (!existsUnsavedChanges) return;
+
+            DialogResult res = MessageBox.Show("Do you want to save your changes?", "UAssetGUI v" + GUIVersion, MessageBoxButtons.YesNoCancel);
+            switch(res)
+            {
+                case DialogResult.Yes:
+                    if (!ForceSave(currentSavingPath)) e.Cancel = true;
+                    break;
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    break;
+            }
         }
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)

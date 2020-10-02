@@ -83,6 +83,16 @@ namespace UAssetGUI
                 tableEditor.FillOutTree();
                 tableEditor.Load();
 
+                int failedCategoryCount = 0;
+                foreach (Category cat in tableEditor.asset.data.categories)
+                {
+                    if (cat is RawCategory) failedCategoryCount++;
+                }
+                if (failedCategoryCount > 0)
+                {
+                    MessageBox.Show("Failed to parse " + failedCategoryCount + " categories!", "Uh oh!");
+                }
+
                 if (!tableEditor.asset.VerifyParsing())
                 {
                     MessageBox.Show("Failed to verify parsing! You may not be able to load this file in-game if modified.", "Uh oh!");
@@ -285,13 +295,13 @@ namespace UAssetGUI
                     case "Linked Sectors":
                         tableEditor.mode = TableHandlerMode.LinkedSectors;
                         break;
-                    case "Section Information":
+                    case "Category Information":
                         tableEditor.mode = TableHandlerMode.CategoryInformation;
                         break;
-                    case "Section Ints":
+                    case "Category Ints":
                         tableEditor.mode = TableHandlerMode.CategoryInts;
                         break;
-                    case "Section Strings":
+                    case "Category Strings":
                         tableEditor.mode = TableHandlerMode.CategoryStrings;
                         break;
                     case "UExp Ints":

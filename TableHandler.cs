@@ -77,9 +77,9 @@ namespace UAssetGUI
             listView1.BackColor = Color.White;
             listView1.Nodes.Add(new PointingTreeNode("Header List", null));
             listView1.Nodes.Add(new PointingTreeNode("Linked Sectors", null));
-            listView1.Nodes.Add(new PointingTreeNode("Section Information", null));
-            listView1.Nodes.Add(new PointingTreeNode("Section Ints", null));
-            listView1.Nodes.Add(new PointingTreeNode("Section Strings", null));
+            listView1.Nodes.Add(new PointingTreeNode("Category Information", null));
+            listView1.Nodes.Add(new PointingTreeNode("Category Ints", null));
+            listView1.Nodes.Add(new PointingTreeNode("Category Strings", null));
             if (asset.data.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("UExp Ints", null));
             listView1.Nodes.Add(new PointingTreeNode("Category Data", null));
 
@@ -112,7 +112,7 @@ namespace UAssetGUI
 
                         if (us is BlueprintGeneratedClassCategory us3)
                         {
-                            var parentNode2 = new PointingTreeNode("Function Index Data", us3, 1);
+                            var parentNode2 = new PointingTreeNode("Category Layout Data", us3, 1);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
@@ -254,6 +254,14 @@ namespace UAssetGUI
                             row.Cells[2].Value = string.Empty;
                             row.Cells[3].Value = ((NamePropertyData)thisPD).Value;
                             row.Cells[4].Value = ((NamePropertyData)thisPD).Value2;
+                            break;
+                        case "ViewTargetBlendParams":
+                            var viewTargetBlendParamsData = (ViewTargetBlendParamsPropertyData)thisPD;
+                            row.Cells[2].Value = string.Empty;
+                            row.Cells[3].Value = viewTargetBlendParamsData.BlendTime;
+                            row.Cells[4].Value = viewTargetBlendParamsData.BlendFunction;
+                            row.Cells[5].Value = viewTargetBlendParamsData.BlendExp;
+                            row.Cells[6].Value = viewTargetBlendParamsData.bLockOutgoing;
                             break;
                         case "EnumProperty":
                             var enumData = (EnumPropertyData)thisPD;
@@ -424,12 +432,13 @@ namespace UAssetGUI
                         switch (histType)
                         {
                             case TextHistoryType.Base:
+                            case TextHistoryType.None:
                                 List<string> strAvailablesL = new List<string>();
                                 if (value1B != null && value1B is string) strAvailablesL.Add((string)value1B);
                                 if (value2B != null && value2B is string) strAvailablesL.Add((string)value2B);
                                 if (value3B != null && value3B is string) strAvailablesL.Add((string)value3B);
                                 if (value4B != null && value4B is string) strAvailablesL.Add((string)value4B);
-                                if (strAvailablesL.Count == 0) return null;
+                                if (strAvailablesL.Count == 0 && histType == TextHistoryType.Base) return null;
 
                                 decidedTextData.Value = strAvailablesL.ToArray();
                                 break;
@@ -438,9 +447,9 @@ namespace UAssetGUI
 
                                 decidedTextData.Value = new string[] { (string)value1B };
                                 break;
-                            case TextHistoryType.None:
+                            /*case TextHistoryType.None:
                                 decidedTextData.Value = null;
-                                break;
+                                break;*/
                             default:
                                 throw new FormatException("Unimplemented text history type " + histType);
                         }
@@ -562,6 +571,8 @@ namespace UAssetGUI
             dataGridView1.Visible = true;
             dataGridView1.Columns.Clear();
             dataGridView1.Rows.Clear();
+            dataGridView1.AllowUserToAddRows = true;
+            dataGridView1.ReadOnly = false;
 
             dataGridView1.BackgroundColor = Color.FromArgb(240, 240, 240);
             readyToSave = false;
@@ -629,9 +640,6 @@ namespace UAssetGUI
                     {
                         AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "WData", "" });
 
-                        dataGridView1.AllowUserToAddRows = true;
-                        dataGridView1.ReadOnly = false;
-
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
@@ -647,12 +655,24 @@ namespace UAssetGUI
                                         BlueprintGeneratedClassCategory bgcCat = (BlueprintGeneratedClassCategory)usCategory;
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
+                                        {
+                                            ObjectPropertyData testProperty = new ObjectPropertyData("Base Class", asset.data);
+                                            testProperty.SetLinkValue(bgcCat.BaseClass);
+
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "Base Class";
+                                            row.Cells[1].Value = testProperty.LinkValue;
+                                            row.Cells[2].Value = testProperty.LinkValue >= 0 ? "" : asset.data.GetHeaderReference((int)testProperty.Value.Property);
+                                            rows.Add(row);
+                                        }
+
                                         // Header 1
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "---";
-                                            row.Cells[1].Value = "WEIRD INDEX DATA";
+                                            row.Cells[1].Value = "GLOBAL VARIABLE INDEX?";
                                             row.Cells[2].Value = "---";
                                             rows.Add(row);
                                         }
@@ -741,35 +761,38 @@ namespace UAssetGUI
                                 }    
                             case MapPropertyData usMap:
                                 {
-                                    DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                                    string mapKeyType = ((PropertyData)firstEntry.Key).Type;
-                                    string mapValueType = ((PropertyData)firstEntry.Value).Type;
-
-                                    List<DataGridViewRow> rows = new List<DataGridViewRow>();
-                                    for (int i = 0; i < usMap.Value.Count; i++)
+                                    if (usMap.Value.Count > 0)
                                     {
-                                        DataGridViewRow row = new DataGridViewRow();
-                                        row.CreateCells(dataGridView1);
-                                        row.Cells[0].Value = usMap.Name;
-                                        row.Cells[1].Value = "MapEntry";
-                                        row.Cells[2].Value = string.Empty;
+                                        DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
+                                        string mapKeyType = ((PropertyData)firstEntry.Key).Type;
+                                        string mapValueType = ((PropertyData)firstEntry.Value).Type;
 
-                                        row.Cells[3].Value = "Jump";
-                                        row.Cells[3].Tag = "ChildJump";
+                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
+                                        for (int i = 0; i < usMap.Value.Count; i++)
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = usMap.Name;
+                                            row.Cells[1].Value = "MapEntry";
+                                            row.Cells[2].Value = string.Empty;
 
-                                        DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                        Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
-                                        sty.Font = styFont;
-                                        sty.ForeColor = Color.Blue;
-                                        row.Cells[3].Style = sty;
+                                            row.Cells[3].Value = "Jump";
+                                            row.Cells[3].Tag = "ChildJump";
 
-                                        row.Cells[4].Value = mapKeyType;
-                                        row.Cells[5].Value = mapValueType;
-                                        row.HeaderCell.Value = Convert.ToString(i);
-                                        row.Tag = usMap.Value.Cast<DictionaryEntry>().ElementAt(i);
-                                        rows.Add(row);
+                                            DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                            sty.Font = styFont;
+                                            sty.ForeColor = Color.Blue;
+                                            row.Cells[3].Style = sty;
+
+                                            row.Cells[4].Value = mapKeyType;
+                                            row.Cells[5].Value = mapValueType;
+                                            row.HeaderCell.Value = Convert.ToString(i);
+                                            row.Tag = usMap.Value.Cast<DictionaryEntry>().ElementAt(i);
+                                            rows.Add(row);
+                                        }
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
                                     }
-                                    dataGridView1.Rows.AddRange(rows.ToArray());
                                     standardRendering = false;
                                     break;
                                 }

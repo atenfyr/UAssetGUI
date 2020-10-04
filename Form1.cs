@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.PropertyTypes;
 
 namespace UAssetGUI
 {
@@ -26,6 +27,7 @@ namespace UAssetGUI
         {
             InitializeComponent();
             this.Text = "UAssetGUI v" + GUIVersion;
+            this.AllowDrop = true;
             dataGridView1.Visible = true;
 
             // Extra data viewer
@@ -49,7 +51,11 @@ namespace UAssetGUI
             SizeChanged += frm_sizeChanged;
             FormClosing += frm_closing;
 
-            // Command line parameters
+            // Drag-and-drop support
+            DragEnter += new DragEventHandler(frm_DragEnter);
+            DragDrop += new DragEventHandler(frm_DragDrop);
+
+            // Command line parameter support
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
@@ -84,13 +90,25 @@ namespace UAssetGUI
                 tableEditor.Load();
 
                 int failedCategoryCount = 0;
+                List<string> unknownTypes = new List<string>();
                 foreach (Category cat in tableEditor.asset.data.categories)
                 {
                     if (cat is RawCategory) failedCategoryCount++;
+                    if (cat is NormalCategory usNormal)
+                    {
+                        foreach (PropertyData dat in usNormal.Data)
+                        {
+                            if (dat is UnknownPropertyData && !string.IsNullOrEmpty(dat.Type) && !unknownTypes.Contains(dat.Type)) unknownTypes.Add(dat.Type);
+                        }
+                    }
                 }
                 if (failedCategoryCount > 0)
                 {
                     MessageBox.Show("Failed to parse " + failedCategoryCount + " categories!", "Uh oh!");
+                }
+                if (unknownTypes.Count > 0)
+                {
+                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Uh oh!");
                 }
 
                 if (!tableEditor.asset.VerifyParsing())
@@ -98,7 +116,7 @@ namespace UAssetGUI
                     MessageBox.Show("Failed to verify parsing! You may not be able to load this file in-game if modified.", "Uh oh!");
                 }
             }
-            catch (IOException)
+            catch (Exception ex)
             {
                 currentSavingPath = "";
                 SetUnsavedChanges(false);
@@ -106,10 +124,23 @@ namespace UAssetGUI
                 saveToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
 
+                listView1.Nodes.Clear();
+                listView1.BackColor = Color.FromArgb(211, 211, 211);
                 dataGridView1.Columns.Clear();
                 dataGridView1.Rows.Clear();
                 dataGridView1.BackgroundColor = Color.FromArgb(211, 211, 211);
-                MessageBox.Show("Failed to open this file!", "Uh oh!");
+                switch(ex)
+                {
+                    case IOException _:
+                        MessageBox.Show("Failed to open this file!", "Uh oh!");
+                        break;
+                    case FormatException formatEx:
+                        MessageBox.Show("Failed to parse this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                        break;
+                    default:
+                        MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                        break;
+                }
             }
         }
 
@@ -347,6 +378,17 @@ namespace UAssetGUI
                     e.Cancel = true;
                     break;
             }
+        }
+
+        private void frm_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void frm_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length > 0) LoadFileAt(files[0]);
         }
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)

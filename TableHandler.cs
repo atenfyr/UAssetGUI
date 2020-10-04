@@ -197,182 +197,190 @@ namespace UAssetGUI
                     row.CreateCells(dataGridView1);
                     row.Cells[0].Value = thisPD.Name;
                     row.Cells[1].Value = thisPD.Type;
-                    switch (thisPD.Type)
+                    if (thisPD is UnknownPropertyData)
                     {
-                        case "BoolProperty":
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = ((BoolPropertyData)thisPD).Value ? 1 : 0;
-                            break;
-                        case "ObjectProperty":
-                            var objData = (ObjectPropertyData)thisPD;
-                            row.Cells[2].Value = objData.LinkValue;
-                            if (objData.LinkValue != 0)
-                            {
-                                row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
-                                row.Cells[3].Tag = "CategoryJump";
-                                if (objData.LinkValue > 0)
+                        row.Cells[2].Value = string.Empty;
+                        row.Cells[3].Value = BitConverter.ToString(((UnknownPropertyData)thisPD).Value).Replace("-", " ");
+                    }
+                    else
+                    {
+                        switch (thisPD.Type)
+                        {
+                            case "BoolProperty":
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = ((BoolPropertyData)thisPD).Value ? 1 : 0;
+                                break;
+                            case "ObjectProperty":
+                                var objData = (ObjectPropertyData)thisPD;
+                                row.Cells[2].Value = objData.LinkValue;
+                                if (objData.LinkValue != 0)
                                 {
-                                    DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                    Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
-                                    sty.Font = styFont;
-                                    sty.ForeColor = Color.Blue;
-                                    row.Cells[3].Style = sty;
+                                    row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
+                                    row.Cells[3].Tag = "CategoryJump";
+                                    if (objData.LinkValue > 0)
+                                    {
+                                        DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                        Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                        sty.Font = styFont;
+                                        sty.ForeColor = Color.Blue;
+                                        row.Cells[3].Style = sty;
+                                    }
                                 }
-                            }
-                            break;
-                        case "SoftObjectProperty":
-                            var objData2 = (SoftObjectPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = objData2.Value;
-                            row.Cells[4].Value = objData2.Value2;
-                            break;
-                        case "RichCurveKey":
-                            var curveData = (RichCurveKeyProperty)thisPD;
-                            row.Cells[2].Value = curveData.InterpMode;
-                            row.Cells[3].Value = curveData.TangentMode;
-                            row.Cells[4].Value = curveData.Time;
-                            row.Cells[5].Value = curveData.Value;
-                            row.Cells[6].Value = curveData.ArriveTangent;
-                            row.Cells[7].Value = curveData.LeaveTangent;
-                            break;
-                        case "TextProperty":
-                            var txtData = (TextPropertyData)thisPD;
-                            row.Cells[2].Value = (sbyte)txtData.HistoryType;
-                            if (txtData.Value == null)
-                            {
-                                row.Cells[3].Value = "null";
-                            }
-                            else
-                            {
-                                for (int z = 0; z < 4; z++)
+                                break;
+                            case "SoftObjectProperty":
+                                var objData2 = (SoftObjectPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = objData2.Value;
+                                row.Cells[4].Value = objData2.Value2;
+                                break;
+                            case "RichCurveKey":
+                                var curveData = (RichCurveKeyProperty)thisPD;
+                                row.Cells[2].Value = curveData.InterpMode;
+                                row.Cells[3].Value = curveData.TangentMode;
+                                row.Cells[4].Value = curveData.Time;
+                                row.Cells[5].Value = curveData.Value;
+                                row.Cells[6].Value = curveData.ArriveTangent;
+                                row.Cells[7].Value = curveData.LeaveTangent;
+                                break;
+                            case "TextProperty":
+                                var txtData = (TextPropertyData)thisPD;
+                                row.Cells[2].Value = (sbyte)txtData.HistoryType;
+                                if (txtData.Value == null)
                                 {
-                                    row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
+                                    row.Cells[3].Value = "null";
                                 }
-                            }
-                            break;
-                        case "NameProperty":
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = ((NamePropertyData)thisPD).Value;
-                            row.Cells[4].Value = ((NamePropertyData)thisPD).Value2;
-                            break;
-                        case "ViewTargetBlendParams":
-                            var viewTargetBlendParamsData = (ViewTargetBlendParamsPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = viewTargetBlendParamsData.BlendTime;
-                            row.Cells[4].Value = viewTargetBlendParamsData.BlendFunction;
-                            row.Cells[5].Value = viewTargetBlendParamsData.BlendExp;
-                            row.Cells[6].Value = viewTargetBlendParamsData.bLockOutgoing;
-                            break;
-                        case "EnumProperty":
-                            var enumData = (EnumPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = enumData.EnumType;
-                            row.Cells[4].Value = enumData.Value;
-                            break;
-                        case "ByteProperty":
-                            var byteData = (BytePropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = byteData.GetEnumBase();
-                            if (byteData.ByteType == BytePropertyType.Byte)
-                            {
-                                row.Cells[4].Value = byteData.Value;
-                            }
-                            else
-                            {
-                                row.Cells[4].Value = byteData.GetEnumFull();
-                            }
-                            break;
-                        case "StructProperty":
-                            row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
-                            break;
-                        case "ArrayProperty":
-                            row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
-                            break;
-                        case "MapProperty":
-                            break;
-                        case "Box":
-                            var boxData = (BoxPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = boxData.IsValid;
-                            break;
-                        case "MulticastDelegateProperty":
-                            var mdpData = (MulticastDelegatePropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = mdpData.Value[0];
-                            row.Cells[4].Value = mdpData.Value[1];
-                            row.Cells[5].Value = mdpData.Value2;
-                            break;
-                        case "LinearColor":
-                            var colorData = (LinearColorPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[2].ReadOnly = true;
-                            row.Cells[2].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
-                            row.Cells[3].Value = colorData.Value.R;
-                            row.Cells[4].Value = colorData.Value.G;
-                            row.Cells[5].Value = colorData.Value.B;
-                            row.Cells[6].Value = colorData.Value.A;
-                            break;
-                        case "Color":
-                            var colorData2 = (ColorPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[2].ReadOnly = true;
-                            if (colorData2.RawValue != null) row.Cells[2].Style.BackColor = colorData2.Value;
-                            row.Cells[3].Value = colorData2.Value.R;
-                            row.Cells[4].Value = colorData2.Value.G;
-                            row.Cells[5].Value = colorData2.Value.B;
-                            row.Cells[6].Value = colorData2.Value.A;
-                            break;
-                        case "Vector":
-                            var vectorData = (VectorPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = vectorData.Value[0];
-                            row.Cells[4].Value = vectorData.Value[1];
-                            row.Cells[5].Value = vectorData.Value[2];
-                            break;
-                        case "Vector2D":
-                            var vector2DData = (Vector2DPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = vector2DData.Value[0];
-                            row.Cells[4].Value = vector2DData.Value[1];
-                            break;
-                        case "Vector4":
-                            var vector4DData = (Vector4PropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = vector4DData.Value[0];
-                            row.Cells[4].Value = vector4DData.Value[1];
-                            row.Cells[5].Value = vector4DData.Value[2];
-                            row.Cells[6].Value = vector4DData.Value[3];
-                            break;
-                        case "IntPoint":
-                            var intPointData = (IntPointPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = intPointData.Value[0];
-                            row.Cells[4].Value = intPointData.Value[1];
-                            break;
-                        case "Rotator":
-                            var rotatorData = (RotatorPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = rotatorData.Value[0];
-                            row.Cells[4].Value = rotatorData.Value[1];
-                            row.Cells[5].Value = rotatorData.Value[2];
-                            break;
-                        case "Quat":
-                            var quatData = (QuatPropertyData)thisPD;
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = quatData.Value[0];
-                            row.Cells[4].Value = quatData.Value[1];
-                            row.Cells[5].Value = quatData.Value[2];
-                            row.Cells[6].Value = quatData.Value[3];
-                            break;
-                        case "StrProperty":
-                            var strPropData = (StrPropertyData)thisPD;
-                            row.Cells[2].Value = strPropData.Encoding.HeaderName;
-                            row.Cells[3].Value = Convert.ToString(strPropData.Value);
-                            break;
-                        default:
-                            row.Cells[2].Value = string.Empty;
-                            row.Cells[3].Value = Convert.ToString(thisPD.RawValue);
-                            break;
+                                else
+                                {
+                                    for (int z = 0; z < 4; z++)
+                                    {
+                                        row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
+                                    }
+                                }
+                                break;
+                            case "NameProperty":
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = ((NamePropertyData)thisPD).Value;
+                                row.Cells[4].Value = ((NamePropertyData)thisPD).Value2;
+                                break;
+                            case "ViewTargetBlendParams":
+                                var viewTargetBlendParamsData = (ViewTargetBlendParamsPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = viewTargetBlendParamsData.BlendTime;
+                                row.Cells[4].Value = viewTargetBlendParamsData.BlendFunction;
+                                row.Cells[5].Value = viewTargetBlendParamsData.BlendExp;
+                                row.Cells[6].Value = viewTargetBlendParamsData.bLockOutgoing;
+                                break;
+                            case "EnumProperty":
+                                var enumData = (EnumPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = enumData.EnumType;
+                                row.Cells[4].Value = enumData.Value;
+                                break;
+                            case "ByteProperty":
+                                var byteData = (BytePropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = byteData.GetEnumBase();
+                                if (byteData.ByteType == BytePropertyType.Byte)
+                                {
+                                    row.Cells[4].Value = byteData.Value;
+                                }
+                                else
+                                {
+                                    row.Cells[4].Value = byteData.GetEnumFull();
+                                }
+                                break;
+                            case "StructProperty":
+                                row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
+                                break;
+                            case "ArrayProperty":
+                                row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
+                                break;
+                            case "MapProperty":
+                                break;
+                            case "Box":
+                                var boxData = (BoxPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = boxData.IsValid;
+                                break;
+                            case "MulticastDelegateProperty":
+                                var mdpData = (MulticastDelegatePropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = mdpData.Value[0];
+                                row.Cells[4].Value = mdpData.Value[1];
+                                row.Cells[5].Value = mdpData.Value2;
+                                break;
+                            case "LinearColor":
+                                var colorData = (LinearColorPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[2].ReadOnly = true;
+                                row.Cells[2].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
+                                row.Cells[3].Value = colorData.Value.R;
+                                row.Cells[4].Value = colorData.Value.G;
+                                row.Cells[5].Value = colorData.Value.B;
+                                row.Cells[6].Value = colorData.Value.A;
+                                break;
+                            case "Color":
+                                var colorData2 = (ColorPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[2].ReadOnly = true;
+                                if (colorData2.RawValue != null) row.Cells[2].Style.BackColor = colorData2.Value;
+                                row.Cells[3].Value = colorData2.Value.R;
+                                row.Cells[4].Value = colorData2.Value.G;
+                                row.Cells[5].Value = colorData2.Value.B;
+                                row.Cells[6].Value = colorData2.Value.A;
+                                break;
+                            case "Vector":
+                                var vectorData = (VectorPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = vectorData.Value[0];
+                                row.Cells[4].Value = vectorData.Value[1];
+                                row.Cells[5].Value = vectorData.Value[2];
+                                break;
+                            case "Vector2D":
+                                var vector2DData = (Vector2DPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = vector2DData.Value[0];
+                                row.Cells[4].Value = vector2DData.Value[1];
+                                break;
+                            case "Vector4":
+                                var vector4DData = (Vector4PropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = vector4DData.Value[0];
+                                row.Cells[4].Value = vector4DData.Value[1];
+                                row.Cells[5].Value = vector4DData.Value[2];
+                                row.Cells[6].Value = vector4DData.Value[3];
+                                break;
+                            case "IntPoint":
+                                var intPointData = (IntPointPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = intPointData.Value[0];
+                                row.Cells[4].Value = intPointData.Value[1];
+                                break;
+                            case "Rotator":
+                                var rotatorData = (RotatorPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = rotatorData.Value[0];
+                                row.Cells[4].Value = rotatorData.Value[1];
+                                row.Cells[5].Value = rotatorData.Value[2];
+                                break;
+                            case "Quat":
+                                var quatData = (QuatPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = quatData.Value[0];
+                                row.Cells[4].Value = quatData.Value[1];
+                                row.Cells[5].Value = quatData.Value[2];
+                                row.Cells[6].Value = quatData.Value[3];
+                                break;
+                            case "StrProperty":
+                                var strPropData = (StrPropertyData)thisPD;
+                                row.Cells[2].Value = strPropData.Encoding.HeaderName;
+                                row.Cells[3].Value = Convert.ToString(strPropData.Value);
+                                break;
+                            default:
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = Convert.ToString(thisPD.RawValue);
+                                break;
+                        }
                     }
 
                     row.Cells[8].Value = thisPD.WidgetData;

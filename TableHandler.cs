@@ -199,7 +199,7 @@ namespace UAssetGUI
                     row.Cells[1].Value = thisPD.Type;
                     if (thisPD is UnknownPropertyData)
                     {
-                        row.Cells[2].Value = string.Empty;
+                        row.Cells[2].Value = "Unknown ser.";
                         row.Cells[3].Value = BitConverter.ToString(((UnknownPropertyData)thisPD).Value).Replace("-", " ");
                     }
                     else
@@ -414,6 +414,20 @@ namespace UAssetGUI
                 string name = (string)nameB;
                 string type = (string)typeB;
                 if (name.Equals(string.Empty) || type.Equals(string.Empty)) return null;
+
+                if (value1B != null && value1B is string && transformB != null && transformB is string && (string)transformB == "Unknown ser.")
+                {
+                    string[] rawStringArr = ((string)value1B).Split(' ');
+                    byte[] byteArr = new byte[rawStringArr.Length];
+                    for (int i = 0; i < rawStringArr.Length; i++) byteArr[i] = Convert.ToByte(rawStringArr[i], 16);
+
+                    var res = new UnknownPropertyData(name, asset.data)
+                    {
+                        Value = byteArr
+                    };
+                    res.Type = type;
+                    return res;
+                }
 
                 switch (type)
                 {

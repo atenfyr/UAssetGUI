@@ -135,7 +135,7 @@ namespace UAssetGUI
                         MessageBox.Show("Failed to open this file!", "Uh oh!");
                         break;
                     case FormatException formatEx:
-                        MessageBox.Show("Failed to parse this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                        MessageBox.Show("Failed to parse this file!\n" + formatEx.GetType() + ": " + formatEx.Message, "Uh oh!");
                         break;
                     default:
                         MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");

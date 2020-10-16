@@ -116,6 +116,24 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
+                        if (us is DataTableCategory us4)
+                        {
+                            var parentNode2 = new PointingTreeNode("Table Info (" + us4.Data2.Table.Count + ")", us4.Data2);
+                            categoryNode.Nodes.Add(parentNode2);
+                            foreach (DataTableEntry entry in us4.Data2.Table)
+                            {
+                                string decidedName = entry.Data.Name;
+                                if (entry.DuplicateIndex > 0) decidedName += " [" + entry.DuplicateIndex + "]";
+
+                                var structNode = new PointingTreeNode(decidedName + " (" + entry.Data.Value.Count + ")", entry.Data);
+                                parentNode2.Nodes.Add(structNode);
+                                for (int j = 0; j < entry.Data.Value.Count; j++)
+                                {
+                                    InterpretThing(entry.Data.Value[j], structNode);
+                                }
+                            }
+                        }
+
                         {
                             var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
                             categoryNode.Nodes.Add(parentNode3);
@@ -780,7 +798,17 @@ namespace UAssetGUI
                                     dataGridView1.Rows.AddRange(rows.ToArray());
                                     standardRendering = false;
                                     break;
-                                }    
+                                }
+                            case DataTable dtUs:
+                                {
+                                    List<StructPropertyData> listOfStructs = new List<StructPropertyData>();
+                                    foreach (DataTableEntry entry in dtUs.Table)
+                                    {
+                                        listOfStructs.Add(entry.Data);
+                                    }
+                                    renderingArr = listOfStructs.ToArray();
+                                    break;
+                                }
                             case MapPropertyData usMap:
                                 {
                                     if (usMap.Value.Count > 0)
@@ -1064,7 +1092,7 @@ namespace UAssetGUI
                                 object value1B = row.Cells[3].Value;
                                 if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
 
-                                usStrTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.UTF8));
+                                usStrTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
                             }
 
                             pointerNode.Text = usStrTable.Name + " (" + usStrTable.Count + ")";
@@ -1076,7 +1104,6 @@ namespace UAssetGUI
                             string mapValueType = ((PropertyData)firstEntry.Value).Type;
 
                             OrderedDictionary newData = new OrderedDictionary();
-                            int validI = 0;
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 DataGridViewRow row = dataGridView1.Rows[i];
@@ -1090,8 +1117,6 @@ namespace UAssetGUI
                                 {
                                     newData.Add(MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset.data), MainSerializer.TypeToClass(mapValueType, usMap.Name, asset.data));
                                 }
-
-                                validI++;
                             }
                             usMap.Value = newData;
 
@@ -1123,6 +1148,28 @@ namespace UAssetGUI
                             }
                             usCat.Data = newData;
                             pointerNode.Text = asset.data.GetHeaderReference(asset.data.GetLinkReference(usCat.ReferenceData.connection)) + " (" + usCat.Data.Count + ")";
+                        }
+                        else if (pointerNode.Pointer is DataTable dtUs)
+                        {
+                            List<DataTableEntry> newData = new List<DataTableEntry>();
+                            var numTimesNameUses = new Dictionary<string, int>();
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                PropertyData val = RowToPD(i, dtUs.Table.ElementAtOrDefault(i).Data);
+                                if (val == null || !(val is StructPropertyData)) continue;
+                                if (numTimesNameUses.ContainsKey(val.Name))
+                                {
+                                    numTimesNameUses[val.Name]++;
+                                }
+                                else
+                                {
+                                    numTimesNameUses.Add(val.Name, 0);
+                                }
+                                newData.Add(new DataTableEntry((StructPropertyData)val, numTimesNameUses[val.Name]));
+                            }
+                            dtUs.Table = newData;
+                            pointerNode.Text = "Table Info (" + dtUs.Table.Count + ")";
+                            break;
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)
                         {

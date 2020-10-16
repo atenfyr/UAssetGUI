@@ -19,7 +19,7 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
-        public static Version GUIVersion = new Version(0, 1, 0);
+        public static Version GUIVersion = new Version(0, 2, 0);
         public TableHandler tableEditor;
         public ByteViewer byteView1;
 

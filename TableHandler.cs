@@ -655,7 +655,7 @@ namespace UAssetGUI
                     {
                         for (int num2 = 0; num2 < asset.data.categoryIntReference[num].Length; num2++)
                         {
-                            dataGridView1.Rows.Add((num + 1), asset.data.categoryStringReference[num][num2]);
+                            dataGridView1.Rows.Add((num + 1), asset.data.categoryIntReference[num][num2]);
                         }
                     }
                     break;
@@ -696,12 +696,12 @@ namespace UAssetGUI
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData("Base Class", asset.data);
+                                            ObjectPropertyData testProperty = new ObjectPropertyData("Inherited Class", asset.data);
                                             testProperty.SetLinkValue(bgcCat.BaseClass);
 
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "Base Class";
+                                            row.Cells[0].Value = "Inherited Class";
                                             row.Cells[1].Value = testProperty.LinkValue;
                                             row.Cells[2].Value = testProperty.LinkValue >= 0 ? "" : asset.data.GetHeaderReference((int)testProperty.Value.Property);
                                             rows.Add(row);

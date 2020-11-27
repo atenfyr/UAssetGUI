@@ -19,13 +19,17 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
-        public static Version GUIVersion = new Version(0, 2, 0);
+        public static string GUIVersion;
         public TableHandler tableEditor;
         public ByteViewer byteView1;
 
         public Form1()
         {
             InitializeComponent();
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            GUIVersion = fvi.FileVersion;
+
             this.Text = "UAssetGUI v" + GUIVersion;
             this.AllowDrop = true;
             dataGridView1.Visible = true;
@@ -422,7 +426,7 @@ namespace UAssetGUI
             "UAssetGUI v" + GUIVersion + "\n" +
             "By Atenfyr\n" +
             "\nThanks to the Astro-Techies club for the help\n" +
-            "\nThanks to Kai Heilos for in-depth information on Sections 1-5\n" +
+            "\nThanks to David Hill (Kaiheilos) for in-depth information on Sections 1-5\n" +
             "\n(Here's where a soppy monologue goes)\n";
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)

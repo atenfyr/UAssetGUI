@@ -422,19 +422,20 @@ namespace UAssetGUI
             Process.Start("https://github.com/atenfyr/uassetapi");
         }
 
-        private static readonly string AboutText =
-            "UAssetGUI v" + GUIVersion + "\n" +
+        private static string AboutText;
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutText = "UAssetGUI v" + GUIVersion + "\n" +
             "By Atenfyr\n" +
             "\nThanks to the Astro-Techies club for the help\n" +
             "\nThanks to David Hill (Kaiheilos) for in-depth information on Sections 1-5\n" +
             "\n(Here's where a soppy monologue goes)\n";
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
             var formPopup = new Form
             {
                 Text = "About",
-                Size = new Size(300, 300)
+                Size = new Size(350, 300)
             };
             formPopup.StartPosition = FormStartPosition.CenterParent;
 

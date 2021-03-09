@@ -689,6 +689,14 @@ namespace UAssetGUI
                                 switch(pointerNode.Type)
                                 {
                                     case 0:
+                                        for (int num = 0; num < usCategory.Data.Count; num++)
+                                        {
+                                            if (usCategory.Data[num] == null)
+                                            {
+                                                usCategory.Data.RemoveAt(num);
+                                                num--;
+                                            }
+                                        }
                                         renderingArr = usCategory.Data.ToArray();
                                         break;
                                     case 1:
@@ -847,6 +855,14 @@ namespace UAssetGUI
                                     break;
                                 }
                             case StructPropertyData usStruct:
+                                for (int num = 0; num < usStruct.Value.Count; num++)
+                                {
+                                    if (usStruct.Value[num] == null)
+                                    {
+                                        usStruct.Value.RemoveAt(num);
+                                        num--;
+                                    }
+                                }
                                 renderingArr = usStruct.Value.ToArray();
                                 break;
                             case ArrayPropertyData usArr:
@@ -1128,7 +1144,11 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i));
-                                if (val == null) continue;
+                                if (val == null)
+                                {
+                                    newData.Add(null);
+                                    continue;
+                                }
                                 newData.Add(val);
                             }
                             usStruct.Value = newData;
@@ -1143,7 +1163,11 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
-                                if (val == null) continue;
+                                if (val == null)
+                                {
+                                    newData.Add(null);
+                                    continue;
+                                }
                                 newData.Add(val);
                             }
                             usCat.Data = newData;

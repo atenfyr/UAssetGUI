@@ -401,7 +401,8 @@ namespace UAssetGUI
                         }
                     }
 
-                    row.Cells[8].Value = thisPD.WidgetData;
+                    row.Cells[8].Value = thisPD.DuplicationIndex;
+                    row.Cells[9].Value = thisPD.WidgetData;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -678,7 +679,7 @@ namespace UAssetGUI
                 case TableHandlerMode.CategoryData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "WData", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "WData", "" });
 
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;

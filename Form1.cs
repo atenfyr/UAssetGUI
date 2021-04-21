@@ -235,7 +235,7 @@ namespace UAssetGUI
         {
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
-                dialog.Filter = "UAssets (*.uasset)|*.uasset|All files (*.*)|*.*";
+                dialog.Filter = "Unreal Assets (*.uasset, *.umap)|*.uasset;*.umap|All files (*.*)|*.*";
                 dialog.FilterIndex = 1;
                 dialog.RestoreDirectory = true;
 

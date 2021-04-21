@@ -19,6 +19,10 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
+        internal DataGridView dataGridView1;
+        internal TreeView listView1;
+        internal MenuStrip menuStrip1;
+
         public static string GUIVersion;
         public TableHandler tableEditor;
         public ByteViewer byteView1;
@@ -26,9 +30,11 @@ namespace UAssetGUI
         public Form1()
         {
             InitializeComponent();
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             GUIVersion = fvi.FileVersion;
+
+            Utils.InitializeInvoke(this);
 
             this.Text = "UAssetGUI v" + GUIVersion;
             this.AllowDrop = true;
@@ -69,7 +75,7 @@ namespace UAssetGUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            UAGPalette.RefreshTheme(this);
         }
 
         public void LoadFileAt(string filePath)
@@ -92,6 +98,8 @@ namespace UAssetGUI
 
                 tableEditor.FillOutTree();
                 tableEditor.Load();
+
+                UAGPalette.RefreshTheme(this);
 
                 int failedCategoryCount = 0;
                 List<string> unknownTypes = new List<string>();
@@ -129,10 +137,9 @@ namespace UAssetGUI
                 saveAsToolStripMenuItem.Enabled = false;
 
                 listView1.Nodes.Clear();
-                listView1.BackColor = Color.FromArgb(211, 211, 211);
                 dataGridView1.Columns.Clear();
                 dataGridView1.Rows.Clear();
-                dataGridView1.BackgroundColor = Color.FromArgb(211, 211, 211);
+                UAGPalette.RefreshTheme(this);
                 switch(ex)
                 {
                     case IOException _:

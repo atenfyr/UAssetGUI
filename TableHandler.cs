@@ -74,7 +74,7 @@ namespace UAssetGUI
         {
             listView1.BeginUpdate();
             listView1.Nodes.Clear();
-            listView1.BackColor = Color.White;
+            listView1.BackColor = UAGPalette.BackColor;
             listView1.Nodes.Add(new PointingTreeNode("Header List", null));
             listView1.Nodes.Add(new PointingTreeNode("Linked Sectors", null));
             listView1.Nodes.Add(new PointingTreeNode("Category Information", null));
@@ -594,7 +594,7 @@ namespace UAssetGUI
         {
             dataGridView1.Columns.Clear();
             dataGridView1.Rows.Clear();
-            dataGridView1.BackgroundColor = Color.FromArgb(211, 211, 211);
+            dataGridView1.BackgroundColor = UAGPalette.InactiveColor;
         }
 
         public void Load() // Updates the table with selected asset data
@@ -614,7 +614,7 @@ namespace UAssetGUI
             dataGridView1.AllowUserToAddRows = true;
             dataGridView1.ReadOnly = false;
 
-            dataGridView1.BackgroundColor = Color.FromArgb(240, 240, 240);
+            dataGridView1.BackgroundColor = UAGPalette.DataGridViewActiveColor;
             readyToSave = false;
 
             switch (mode)
@@ -910,6 +910,8 @@ namespace UAssetGUI
             }
 
             readyToSave = true;
+            dataGridView1.ClearSelection();
+            dataGridView1.CurrentCell = null;
         }
 
         public void Save(bool forceNewLoad) // Reads from the table and updates the asset data as needed

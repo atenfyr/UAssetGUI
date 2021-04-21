@@ -12,7 +12,8 @@ namespace UAssetGUI
     {
         public static Color BackColor = Color.White;
         public static Color ForeColor = Color.Black;
-        public static Color HighlightColor = Color.FromArgb(85, 85, 85);
+        public static Color HighlightBackColor = SystemColors.Highlight;
+        public static Color HighlightForeColor = SystemColors.HighlightText;
         public static Color InactiveColor = Color.FromArgb(211, 211, 211);
         public static Color DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
         public static UAGTheme CurrentTheme = UAGTheme.Light;
@@ -37,9 +38,10 @@ namespace UAssetGUI
                 case UAGTheme.Light:
                     BackColor = Color.White;
                     ForeColor = Color.Black;
+                    HighlightBackColor = SystemColors.Highlight;
+                    HighlightForeColor = SystemColors.HighlightText;
                     InactiveColor = Color.FromArgb(211, 211, 211);
                     DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
-                    HighlightColor = SystemColors.Highlight;
                     break;
             }
 
@@ -71,8 +73,8 @@ namespace UAssetGUI
                 frm1.dataGridView1.BackgroundColor = selectedDGVBackColor;
                 frm1.dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = UAGPalette.BackColor; // intentional
                 frm1.dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = UAGPalette.ForeColor;
-                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.SelectionBackColor = UAGPalette.HighlightColor;
-                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.SelectionForeColor = UAGPalette.ForeColor;
+                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.SelectionBackColor = UAGPalette.HighlightBackColor;
+                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.SelectionForeColor = UAGPalette.HighlightForeColor;
                 frm1.dataGridView1.RowHeadersDefaultCellStyle = frm1.dataGridView1.ColumnHeadersDefaultCellStyle;
                 frm1.dataGridView1.DefaultCellStyle = frm1.dataGridView1.ColumnHeadersDefaultCellStyle;
             }

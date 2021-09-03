@@ -14,6 +14,19 @@ namespace UAssetGUI
             return default(T);
         }
 
+        public static string ConvertByteArrayToString(this byte[] val)
+        {
+            return BitConverter.ToString(val).Replace("-", " ");
+        }
+
+        public static byte[] ConvertStringToByteArray(this string val)
+        {
+            string[] rawStringArr = val.Split(' ');
+            byte[] byteArr = new byte[rawStringArr.Length];
+            for (int i = 0; i < rawStringArr.Length; i++) byteArr[i] = Convert.ToByte(rawStringArr[i], 16);
+            return byteArr;
+        }
+
         private static Control internalForm;
         public static void InitializeInvoke(Control control)
         {

@@ -218,7 +218,7 @@ namespace UAssetGUI
                     if (thisPD is UnknownPropertyData)
                     {
                         row.Cells[2].Value = "Unknown ser.";
-                        row.Cells[3].Value = BitConverter.ToString(((UnknownPropertyData)thisPD).Value).Replace("-", " ");
+                        row.Cells[3].Value = ((UnknownPropertyData)thisPD).Value.ConvertByteArrayToString();
                     }
                     else
                     {
@@ -269,10 +269,13 @@ namespace UAssetGUI
                                 }
                                 else
                                 {
-                                    for (int z = 0; z < 4; z++)
+                                    int maxValuesToDisplay = 3;
+                                    for (int z = 0; z < maxValuesToDisplay; z++)
                                     {
                                         row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
                                     }
+                                    row.Cells[3 + maxValuesToDisplay + 0].Value = txtData.Flag;
+                                    if (txtData.Extras != null) row.Cells[3 + maxValuesToDisplay + 1].Value = txtData.Extras.ConvertByteArrayToString();
                                 }
                                 break;
                             case "NameProperty":
@@ -426,6 +429,7 @@ namespace UAssetGUI
                 object value2B = row.Cells[4].Value;
                 object value3B = row.Cells[5].Value;
                 object value4B = row.Cells[6].Value;
+                object value5B = row.Cells[7].Value;
 
                 if (nameB == null || typeB == null) return null;
                 if (!(nameB is string) || !(typeB is string)) return null;
@@ -436,13 +440,9 @@ namespace UAssetGUI
 
                 if (value1B != null && value1B is string && transformB != null && transformB is string && (string)transformB == "Unknown ser.")
                 {
-                    string[] rawStringArr = ((string)value1B).Split(' ');
-                    byte[] byteArr = new byte[rawStringArr.Length];
-                    for (int i = 0; i < rawStringArr.Length; i++) byteArr[i] = Convert.ToByte(rawStringArr[i], 16);
-
                     var res = new UnknownPropertyData(name, asset.data)
                     {
-                        Value = byteArr
+                        Value = ((string)value1B).ConvertStringToByteArray()
                     };
                     res.Type = type;
                     return res;
@@ -478,7 +478,6 @@ namespace UAssetGUI
                                 if (value1B != null && value1B is string) strAvailablesL.Add((string)value1B);
                                 if (value2B != null && value2B is string) strAvailablesL.Add((string)value2B);
                                 if (value3B != null && value3B is string) strAvailablesL.Add((string)value3B);
-                                if (value4B != null && value4B is string) strAvailablesL.Add((string)value4B);
                                 if (strAvailablesL.Count == 0 && histType == TextHistoryType.Base) return null;
 
                                 decidedTextData.Value = strAvailablesL.ToArray();
@@ -494,6 +493,10 @@ namespace UAssetGUI
                             default:
                                 throw new FormatException("Unimplemented text history type " + histType);
                         }
+
+                        if (value4B != null && value4B is string) int.TryParse((string)value4B, out decidedTextData.Flag);
+                        if (value4B != null && value4B is int) decidedTextData.Flag = (int)value4B;
+                        if (value5B != null && value5B is string) decidedTextData.Extras = ((string)value5B).ConvertStringToByteArray();
 
                         return decidedTextData;
                     case "ObjectProperty":

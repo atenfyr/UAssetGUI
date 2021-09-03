@@ -116,11 +116,11 @@ namespace UAssetGUI
                 }
                 if (failedCategoryCount > 0)
                 {
-                    MessageBox.Show("Failed to parse " + failedCategoryCount + " categories!", "Uh oh!");
+                    MessageBox.Show("Failed to parse " + failedCategoryCount + " categories!", "Notice");
                 }
                 if (unknownTypes.Count > 0)
                 {
-                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Uh oh!");
+                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Notice");
                 }
 
                 if (!tableEditor.asset.VerifyParsing())

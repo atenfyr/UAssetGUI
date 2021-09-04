@@ -164,6 +164,7 @@ namespace UAssetGUI
                         InterpretThing(struc.Value[j], structNode);
                     }
                     break;
+                case "SetProperty":
                 case "ArrayProperty":
                     var arr = (ArrayPropertyData)me;
 

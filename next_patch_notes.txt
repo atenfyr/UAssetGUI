@@ -1,3 +1,4 @@
 ﻿* Added more information while displaying TextProperty data.
 * Added SetProperty support.
 * Added GameplayTagContainer support.
+* Added rudimentary support for the three per-platform properties.

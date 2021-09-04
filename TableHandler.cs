@@ -174,6 +174,16 @@ namespace UAssetGUI
                         InterpretThing(arr.Value[j], arrNode);
                     }
                     break;
+                case "GameplayTagContainer":
+                    var arr2 = (GameplayTagContainerPropertyData)me;
+
+                    var arrNode2 = new PointingTreeNode(arr2.Name + " (" + arr2.Value.Length + ")", arr2);
+                    ourNode.Nodes.Add(arrNode2);
+                    for (int j = 0; j < arr2.Value.Length; j++)
+                    {
+                        InterpretThing(arr2.Value[j], arrNode2);
+                    }
+                    break;
                 case "MapProperty":
                     var mapp = (MapPropertyData)me;
 
@@ -314,8 +324,10 @@ namespace UAssetGUI
                                 row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
                                 break;
                             case "ArrayProperty":
+                            case "SetProperty":
                                 row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
                                 break;
+                            case "GameplayTagContainer":
                             case "MapProperty":
                                 break;
                             case "Box":
@@ -872,6 +884,9 @@ namespace UAssetGUI
                             case ArrayPropertyData usArr:
                                 renderingArr = usArr.Value;
                                 break;
+                            case GameplayTagContainerPropertyData usArr2:
+                                renderingArr = usArr2.Value;
+                                break;
                             case PointingDictionaryEntry usDictEntry:
                                 dataGridView1.AllowUserToAddRows = false;
                                 var ourKey = (PropertyData)usDictEntry.Entry.Key;
@@ -1213,6 +1228,19 @@ namespace UAssetGUI
                             }
                             usArr.Value = newData.ToArray();
                             pointerNode.Text = usArr.Name + " (" + usArr.Value.Length + ")";
+                        }
+                        else if (pointerNode.Pointer is GameplayTagContainerPropertyData usArr2)
+                        {
+                            List<NamePropertyData> newData = new List<NamePropertyData>();
+                            List<NamePropertyData> origArr = usArr2.Value.ToList();
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
+                                if (val == null || !(val is NamePropertyData)) continue;
+                                newData.Add((NamePropertyData)val);
+                            }
+                            usArr2.Value = newData.ToArray();
+                            pointerNode.Text = usArr2.Name + " (" + usArr2.Value.Length + ")";
                         }
                         else if (pointerNode.Pointer is PointingDictionaryEntry usDictEntry)
                         {

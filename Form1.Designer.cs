@@ -51,6 +51,7 @@ namespace UAssetGUI
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.listView1 = new System.Windows.Forms.TreeView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.comboSpecifyVersion = new System.Windows.Forms.ComboBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -223,7 +224,7 @@ namespace UAssetGUI
             this.dataGridView1.RowHeadersWidth = 60;
             this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridView1.Size = new System.Drawing.Size(419, 411);
-            this.dataGridView1.TabIndex = 1;
+            this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridClickCell);
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridEditCell);
             // 
@@ -236,7 +237,7 @@ namespace UAssetGUI
             this.listView1.ShowLines = false;
             this.listView1.ShowNodeToolTips = true;
             this.listView1.Size = new System.Drawing.Size(344, 411);
-            this.listView1.TabIndex = 2;
+            this.listView1.TabIndex = 1;
             this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // columnHeader1
@@ -244,11 +245,22 @@ namespace UAssetGUI
             this.columnHeader1.Text = "";
             this.columnHeader1.Width = 200;
             // 
+            // comboSpecifyVersion
+            // 
+            this.comboSpecifyVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSpecifyVersion.FormattingEnabled = true;
+            this.comboSpecifyVersion.Location = new System.Drawing.Point(679, 3);
+            this.comboSpecifyVersion.Name = "comboSpecifyVersion";
+            this.comboSpecifyVersion.Size = new System.Drawing.Size(121, 21);
+            this.comboSpecifyVersion.TabIndex = 3;
+            this.comboSpecifyVersion.SelectedIndexChanged += new System.EventHandler(this.comboSpecifyVersion_SelectedIndexChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.comboSpecifyVersion);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
@@ -283,6 +295,7 @@ namespace UAssetGUI
         private ToolStripMenuItem apiLinkToolStripMenuItem1;
         private ToolStripMenuItem aboutToolStripMenuItem1;
         private ToolStripMenuItem githubToolStripMenuItem;
+        private ComboBox comboSpecifyVersion;
     }
 }
 

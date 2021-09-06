@@ -2,12 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
@@ -21,9 +19,9 @@ namespace UAssetGUI
         NameMap,
         Imports,
         ExportInformation,
-        ExportStrings,
-        ExportInts,
-        UExpInts,
+        SoftPackageReferences,
+        DependsMap,
+        PreloadDependencyMap,
         CustomVersionContainer,
         ExportData
     }
@@ -93,9 +91,9 @@ namespace UAssetGUI
             listView1.Nodes.Add(new PointingTreeNode("Name Map", null));
             listView1.Nodes.Add(new PointingTreeNode("Import Data", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Information", null));
-            listView1.Nodes.Add(new PointingTreeNode("Export Ints", null));
-            listView1.Nodes.Add(new PointingTreeNode("Export Strings", null));
-            if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("UExp Ints", null));
+            listView1.Nodes.Add(new PointingTreeNode("Depends Map", null));
+            listView1.Nodes.Add(new PointingTreeNode("Soft Package References", null));
+            if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("Preload Dependency Map", null));
             if (asset.CustomVersionContainer.Count > 0) listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
@@ -748,31 +746,31 @@ namespace UAssetGUI
                         }
                     }
                     break;
-                case TableHandlerMode.ExportInts:
+                case TableHandlerMode.DependsMap:
                     AddColumns(new string[] { "Export Index", "Value", "" });
 
-                    for (int num = 0; num < asset.ExportIntReference.Count; num++)
+                    for (int num = 0; num < asset.DependsMap.Count; num++)
                     {
-                        for (int num2 = 0; num2 < asset.ExportIntReference[num].Length; num2++)
+                        for (int num2 = 0; num2 < asset.DependsMap[num].Length; num2++)
                         {
-                            dataGridView1.Rows.Add((num + 1), asset.ExportIntReference[num][num2]);
+                            dataGridView1.Rows.Add((num + 1), asset.DependsMap[num][num2]);
                         }
                     }
                     break;
-                case TableHandlerMode.ExportStrings:
+                case TableHandlerMode.SoftPackageReferences:
                     AddColumns(new string[] { "Value", "" });
 
-                    for (int num = 0; num < asset.ExportStringReference.Count; num++)
+                    for (int num = 0; num < asset.SoftPackageReferencesMap.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.ExportStringReference[num]);
+                        dataGridView1.Rows.Add(asset.SoftPackageReferencesMap[num]);
                     }
                     break;
-                case TableHandlerMode.UExpInts:
+                case TableHandlerMode.PreloadDependencyMap:
                     AddColumns(new string[] { "Value", "" });
 
-                    for (int num = 0; num < asset.UExpData.Count; num++)
+                    for (int num = 0; num < asset.PreloadDependencyMap.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { asset.UExpData[num] });
+                        dataGridView1.Rows.Add(new object[] { asset.PreloadDependencyMap[num] });
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
@@ -1264,8 +1262,8 @@ namespace UAssetGUI
                         rowNum++;
                     }
                     break;
-                case TableHandlerMode.ExportInts:
-                    asset.ExportIntReference = new List<int[]>();
+                case TableHandlerMode.DependsMap:
+                    asset.DependsMap = new List<int[]>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         int[] vals = new int[2];
@@ -1285,29 +1283,29 @@ namespace UAssetGUI
 
                         if (vals[0] == 0) continue;
 
-                        if (asset.ExportIntReference.Count > vals[0])
+                        if (asset.DependsMap.Count > vals[0])
                         {
-                            var arr = asset.ExportIntReference[vals[0]];
+                            var arr = asset.DependsMap[vals[0]];
                             Array.Resize(ref arr, arr.Length + 1);
                             arr[arr.Length - 1] = vals[1];
-                            asset.ExportIntReference[vals[0]] = arr;
+                            asset.DependsMap[vals[0]] = arr;
                         }
                         else
                         {
-                            asset.ExportIntReference.Insert(vals[0], new int[]{ vals[1] });
+                            asset.DependsMap.Insert(vals[0], new int[]{ vals[1] });
                         }
                     }
                     break;
-                case TableHandlerMode.ExportStrings:
-                    asset.ExportStringReference = new List<string>();
+                case TableHandlerMode.SoftPackageReferences:
+                    asset.SoftPackageReferencesMap = new List<string>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         string strVal = (string)row.Cells[0].Value;
-                        if (!string.IsNullOrEmpty(strVal)) asset.ExportStringReference.Add(strVal);
+                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferencesMap.Add(strVal);
                     }
                     break;
-                case TableHandlerMode.UExpInts:
-                    asset.UExpData = new List<int>();
+                case TableHandlerMode.PreloadDependencyMap:
+                    asset.PreloadDependencyMap = new List<int>();
                     int rowN = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
@@ -1326,13 +1324,13 @@ namespace UAssetGUI
                             intVal = Convert.ToInt32(row.Cells[0].Value);
                         }
 
-                        if (asset.UExpData.Count > rowN)
+                        if (asset.PreloadDependencyMap.Count > rowN)
                         {
-                            asset.UExpData[rowN] = intVal;
+                            asset.PreloadDependencyMap[rowN] = intVal;
                         }
                         else
                         {
-                            asset.UExpData.Insert(rowN, intVal);
+                            asset.PreloadDependencyMap.Insert(rowN, intVal);
                         }
 
                         rowN++;

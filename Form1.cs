@@ -13,6 +13,7 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
+        internal UE4Version ParsingVersion = UE4Version.UNKNOWN;
         internal DataGridView dataGridView1;
         internal TreeView listView1;
         internal MenuStrip menuStrip1;
@@ -67,9 +68,43 @@ namespace UAssetGUI
             }
         }
 
+        private string[] versionOptions = new string[]
+        {
+            "Unknown version",
+            "4.0",
+            "4.1",
+            "4.2",
+            "4.3",
+            "4.4",
+            "4.5",
+            "4.6",
+            "4.7",
+            "4.8",
+            "4.9",
+            "4.10",
+            "4.11",
+            "4.12",
+            "4.13",
+            "4.14",
+            "4.15",
+            "4.16",
+            "4.17",
+            "4.18",
+            "4.19",
+            "4.20",
+            "4.21",
+            "4.22",
+            "4.23",
+            "4.24",
+            "4.25",
+            "4.26"
+        };
+
         private void Form1_Load(object sender, EventArgs e)
         {
             UAGPalette.RefreshTheme(this);
+            comboSpecifyVersion.Items.AddRange(versionOptions);
+            comboSpecifyVersion.SelectedIndex = 0;
         }
 
         public void LoadFileAt(string filePath)
@@ -82,7 +117,7 @@ namespace UAssetGUI
                 currentSavingPath = filePath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, true, true, null, null), listView1)
+                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion, true, true, null, null), listView1)
                 {
                     mode = TableHandlerMode.NameMap
                 };
@@ -141,6 +176,16 @@ namespace UAssetGUI
                         break;
                     case FormatException formatEx:
                         MessageBox.Show("Failed to parse this file!\n" + formatEx.GetType() + ": " + formatEx.Message, "Uh oh!");
+                        break;
+                    case InvalidOperationException invalidOperationException:
+                        if (invalidOperationException.Message == "Cannot begin serialization before an engine version is specified")
+                        {
+                            MessageBox.Show("Please specify an engine version before opening an unversioned asset.", "Uh oh!");
+                        }
+                        else
+                        {
+                            MessageBox.Show("An invalid operation was performed while trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                        }
                         break;
                     default:
                         MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
@@ -337,14 +382,14 @@ namespace UAssetGUI
                     case "Export Information":
                         tableEditor.mode = TableHandlerMode.ExportInformation;
                         break;
-                    case "Export Ints":
-                        tableEditor.mode = TableHandlerMode.ExportInts;
+                    case "Depends Map":
+                        tableEditor.mode = TableHandlerMode.DependsMap;
                         break;
-                    case "Export Strings":
-                        tableEditor.mode = TableHandlerMode.ExportStrings;
+                    case "Soft Package References":
+                        tableEditor.mode = TableHandlerMode.SoftPackageReferences;
                         break;
-                    case "UExp Ints":
-                        tableEditor.mode = TableHandlerMode.UExpInts;
+                    case "Preload Dependency Map":
+                        tableEditor.mode = TableHandlerMode.PreloadDependencyMap;
                         break;
                     case "Custom Version Container":
                         tableEditor.mode = TableHandlerMode.CustomVersionContainer;
@@ -358,7 +403,7 @@ namespace UAssetGUI
         {
             float widthAmount = 0.6f;
             dataGridView1.Size = new Size((int)(this.Size.Width * widthAmount), this.Size.Height - (this.menuStrip1.Size.Height * 3));
-            dataGridView1.Location = new Point(this.Size.Width - dataGridView1.Size.Width - this.menuStrip1.Size.Height, this.menuStrip1.Size.Height);
+            dataGridView1.Location = new Point(this.Size.Width - this.dataGridView1.Size.Width - this.menuStrip1.Size.Height, this.menuStrip1.Size.Height);
             if (byteView1 != null)
             {
                 byteView1.Size = dataGridView1.Size;
@@ -368,6 +413,7 @@ namespace UAssetGUI
 
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
             listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
+            comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 3);
         }
 
         private void frm_sizeChanged(object sender, EventArgs e)
@@ -456,6 +502,99 @@ namespace UAssetGUI
             });
 
             formPopup.ShowDialog(this);
+        }
+
+        private void comboSpecifyVersion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(versionOptions[comboSpecifyVersion.SelectedIndex])
+            {
+                case "Unknown version":
+                    ParsingVersion = UE4Version.UNKNOWN;
+                    break;
+                case "4.0":
+                    ParsingVersion = UE4Version.VER_UE4_0;
+                    break;
+                case "4.1":
+                    ParsingVersion = UE4Version.VER_UE4_1;
+                    break;
+                case "4.2":
+                    ParsingVersion = UE4Version.VER_UE4_2;
+                    break;
+                case "4.3":
+                    ParsingVersion = UE4Version.VER_UE4_3;
+                    break;
+                case "4.4":
+                    ParsingVersion = UE4Version.VER_UE4_4;
+                    break;
+                case "4.5":
+                    ParsingVersion = UE4Version.VER_UE4_5;
+                    break;
+                case "4.6":
+                    ParsingVersion = UE4Version.VER_UE4_6;
+                    break;
+                case "4.7":
+                    ParsingVersion = UE4Version.VER_UE4_7;
+                    break;
+                case "4.8":
+                    ParsingVersion = UE4Version.VER_UE4_8;
+                    break;
+                case "4.9":
+                    ParsingVersion = UE4Version.VER_UE4_9;
+                    break;
+                case "4.10":
+                    ParsingVersion = UE4Version.VER_UE4_10;
+                    break;
+                case "4.11":
+                    ParsingVersion = UE4Version.VER_UE4_11;
+                    break;
+                case "4.12":
+                    ParsingVersion = UE4Version.VER_UE4_12;
+                    break;
+                case "4.13":
+                    ParsingVersion = UE4Version.VER_UE4_13;
+                    break;
+                case "4.14":
+                    ParsingVersion = UE4Version.VER_UE4_14;
+                    break;
+                case "4.15":
+                    ParsingVersion = UE4Version.VER_UE4_15;
+                    break;
+                case "4.16":
+                    ParsingVersion = UE4Version.VER_UE4_16;
+                    break;
+                case "4.17":
+                    ParsingVersion = UE4Version.VER_UE4_17;
+                    break;
+                case "4.18":
+                    ParsingVersion = UE4Version.VER_UE4_18;
+                    break;
+                case "4.19":
+                    ParsingVersion = UE4Version.VER_UE4_19;
+                    break;
+                case "4.20":
+                    ParsingVersion = UE4Version.VER_UE4_20;
+                    break;
+                case "4.21":
+                    ParsingVersion = UE4Version.VER_UE4_21;
+                    break;
+                case "4.22":
+                    ParsingVersion = UE4Version.VER_UE4_22;
+                    break;
+                case "4.23":
+                    ParsingVersion = UE4Version.VER_UE4_23;
+                    break;
+                case "4.24":
+                    ParsingVersion = UE4Version.VER_UE4_24;
+                    break;
+                case "4.25":
+                    ParsingVersion = UE4Version.VER_UE4_25;
+                    break;
+                case "4.26":
+                    ParsingVersion = UE4Version.VER_UE4_26;
+                    break;
+                default:
+                    throw new NotImplementedException("Unimplemented version chosen in combo box");
+            }
         }
     }
 }

@@ -16,11 +16,23 @@ namespace UAssetGUI
         public static Color HighlightForeColor = SystemColors.HighlightText;
         public static Color InactiveColor = Color.FromArgb(211, 211, 211);
         public static Color DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
-        public static UAGTheme CurrentTheme = UAGTheme.Light;
+        private static UAGTheme CurrentTheme = UAGTheme.Light;
 
-        public enum UAGTheme
+        public static void InitializeTheme()
         {
-            Light
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.Theme)) Enum.TryParse(Properties.Settings.Default.Theme, out CurrentTheme);
+        }
+
+        public static UAGTheme GetCurrentTheme()
+        {
+            return CurrentTheme;
+        }
+
+        public static void SetCurrentTheme(UAGTheme newTheme)
+        {
+            CurrentTheme = newTheme;
+            Properties.Settings.Default.Theme = CurrentTheme.ToString();
+            Properties.Settings.Default.Save();
         }
 
         public static void RefreshTheme(Form frm)

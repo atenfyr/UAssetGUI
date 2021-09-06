@@ -59,13 +59,6 @@ namespace UAssetGUI
             // Drag-and-drop support
             DragEnter += new DragEventHandler(frm_DragEnter);
             DragDrop += new DragEventHandler(frm_DragDrop);
-
-            // Command line parameter support
-            string[] args = Environment.GetCommandLineArgs();
-            if (args.Length > 1)
-            {
-                LoadFileAt(args[1]);
-            }
         }
 
         private string[] versionOptions = new string[]
@@ -97,14 +90,45 @@ namespace UAssetGUI
             "4.23",
             "4.24",
             "4.25",
-            "4.26"
+            "4.26",
+            "4.27"
         };
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            UAGPalette.InitializeTheme();
             UAGPalette.RefreshTheme(this);
+
+            string initialSelection = versionOptions[0];
+            try
+            {
+                initialSelection = Properties.Settings.Default.PreferredVersion;
+            }
+            catch
+            {
+                initialSelection = versionOptions[0];
+            }
+
             comboSpecifyVersion.Items.AddRange(versionOptions);
             comboSpecifyVersion.SelectedIndex = 0;
+
+            for (int i = 0; i < versionOptions.Length; i++)
+            {
+                if (versionOptions[i] == initialSelection)
+                {
+                    comboSpecifyVersion.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            UpdateComboSpecifyVersion();
+
+            // Command line parameter support
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                LoadFileAt(args[1]);
+            }
         }
 
         public void LoadFileAt(string filePath)
@@ -504,9 +528,9 @@ namespace UAssetGUI
             formPopup.ShowDialog(this);
         }
 
-        private void comboSpecifyVersion_SelectedIndexChanged(object sender, EventArgs e)
+        private void UpdateComboSpecifyVersion()
         {
-            switch(versionOptions[comboSpecifyVersion.SelectedIndex])
+            switch (versionOptions[comboSpecifyVersion.SelectedIndex])
             {
                 case "Unknown version":
                     ParsingVersion = UE4Version.UNKNOWN;
@@ -592,9 +616,20 @@ namespace UAssetGUI
                 case "4.26":
                     ParsingVersion = UE4Version.VER_UE4_26;
                     break;
+                case "4.27":
+                    ParsingVersion = UE4Version.VER_UE4_27;
+                    break;
                 default:
                     throw new NotImplementedException("Unimplemented version chosen in combo box");
             }
+
+            Properties.Settings.Default.PreferredVersion = versionOptions[comboSpecifyVersion.SelectedIndex];
+            Properties.Settings.Default.Save();
+        }
+
+        private void comboSpecifyVersion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateComboSpecifyVersion();
         }
     }
 }

@@ -780,6 +780,10 @@ namespace UAssetGUI
                     {
                         dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].Version });
                     }
+
+                    // Modification is disabled
+                    dataGridView1.AllowUserToAddRows = false;
+                    dataGridView1.ReadOnly = true;
                     break;
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
@@ -1337,7 +1341,9 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
-                    asset.CustomVersionContainer = new List<CustomVersion>();
+                    // Modification is disabled
+
+                    /*asset.CustomVersionContainer = new List<CustomVersion>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         if (!Guid.TryParse((string)row.Cells[0].Value, out Guid customVersionKey)) continue;
@@ -1353,7 +1359,7 @@ namespace UAssetGUI
                         }
 
                         asset.CustomVersionContainer.Add(new CustomVersion(customVersionKey, customVersionNumber));
-                    }
+                    }*/
                     break;
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)

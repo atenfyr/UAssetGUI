@@ -61,7 +61,7 @@ namespace UAssetGUI
             DragDrop += new DragEventHandler(frm_DragDrop);
         }
 
-        private string[] versionOptions = new string[]
+        private string[] versionOptionsKeys = new string[]
         {
             "Unknown version",
             "4.0",
@@ -94,27 +94,60 @@ namespace UAssetGUI
             "4.27"
         };
 
+        private UE4Version[] versionOptionsValues = new UE4Version[]
+        {
+            UE4Version.UNKNOWN,
+            UE4Version.VER_UE4_0,
+            UE4Version.VER_UE4_1,
+            UE4Version.VER_UE4_2,
+            UE4Version.VER_UE4_3,
+            UE4Version.VER_UE4_4,
+            UE4Version.VER_UE4_5,
+            UE4Version.VER_UE4_6,
+            UE4Version.VER_UE4_7,
+            UE4Version.VER_UE4_8,
+            UE4Version.VER_UE4_9,
+            UE4Version.VER_UE4_10,
+            UE4Version.VER_UE4_11,
+            UE4Version.VER_UE4_12,
+            UE4Version.VER_UE4_13,
+            UE4Version.VER_UE4_14,
+            UE4Version.VER_UE4_15,
+            UE4Version.VER_UE4_16,
+            UE4Version.VER_UE4_17,
+            UE4Version.VER_UE4_18,
+            UE4Version.VER_UE4_19,
+            UE4Version.VER_UE4_20,
+            UE4Version.VER_UE4_21,
+            UE4Version.VER_UE4_22,
+            UE4Version.VER_UE4_23,
+            UE4Version.VER_UE4_24,
+            UE4Version.VER_UE4_25,
+            UE4Version.VER_UE4_26,
+            UE4Version.VER_UE4_27,
+        };
+
         private void Form1_Load(object sender, EventArgs e)
         {
             UAGPalette.InitializeTheme();
             UAGPalette.RefreshTheme(this);
 
-            string initialSelection = versionOptions[0];
+            string initialSelection = versionOptionsKeys[0];
             try
             {
                 initialSelection = Properties.Settings.Default.PreferredVersion;
             }
             catch
             {
-                initialSelection = versionOptions[0];
+                initialSelection = versionOptionsKeys[0];
             }
 
-            comboSpecifyVersion.Items.AddRange(versionOptions);
+            comboSpecifyVersion.Items.AddRange(versionOptionsKeys);
             comboSpecifyVersion.SelectedIndex = 0;
 
-            for (int i = 0; i < versionOptions.Length; i++)
+            for (int i = 0; i < versionOptionsKeys.Length; i++)
             {
-                if (versionOptions[i] == initialSelection)
+                if (versionOptionsKeys[i] == initialSelection)
                 {
                     comboSpecifyVersion.SelectedIndex = i;
                     break;
@@ -180,6 +213,8 @@ namespace UAssetGUI
                 {
                     MessageBox.Show("Failed to verify parsing! You may not be able to load this file in-game if modified.", "Uh oh!");
                 }
+
+                SetParsingVersion(tableEditor.asset.EngineVersion);
             }
             catch (Exception ex)
             {
@@ -201,15 +236,8 @@ namespace UAssetGUI
                     case FormatException formatEx:
                         MessageBox.Show("Failed to parse this file!\n" + formatEx.GetType() + ": " + formatEx.Message, "Uh oh!");
                         break;
-                    case InvalidOperationException invalidOperationException:
-                        if (invalidOperationException.Message == "Cannot begin serialization before an engine version is specified")
-                        {
-                            MessageBox.Show("Please specify an engine version before opening an unversioned asset.", "Uh oh!");
-                        }
-                        else
-                        {
-                            MessageBox.Show("An invalid operation was performed while trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
-                        }
+                    case UnknownEngineVersionException _:
+                        MessageBox.Show("Please specify an engine version before opening an unversioned asset.", "Uh oh!");
                         break;
                     default:
                         MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
@@ -528,102 +556,32 @@ namespace UAssetGUI
             formPopup.ShowDialog(this);
         }
 
-        private void UpdateComboSpecifyVersion()
+        public void SetParsingVersion(UE4Version ver)
         {
-            switch (versionOptions[comboSpecifyVersion.SelectedIndex])
+            for (int i = 0; i < versionOptionsValues.Length; i++)
             {
-                case "Unknown version":
-                    ParsingVersion = UE4Version.UNKNOWN;
-                    break;
-                case "4.0":
-                    ParsingVersion = UE4Version.VER_UE4_0;
-                    break;
-                case "4.1":
-                    ParsingVersion = UE4Version.VER_UE4_1;
-                    break;
-                case "4.2":
-                    ParsingVersion = UE4Version.VER_UE4_2;
-                    break;
-                case "4.3":
-                    ParsingVersion = UE4Version.VER_UE4_3;
-                    break;
-                case "4.4":
-                    ParsingVersion = UE4Version.VER_UE4_4;
-                    break;
-                case "4.5":
-                    ParsingVersion = UE4Version.VER_UE4_5;
-                    break;
-                case "4.6":
-                    ParsingVersion = UE4Version.VER_UE4_6;
-                    break;
-                case "4.7":
-                    ParsingVersion = UE4Version.VER_UE4_7;
-                    break;
-                case "4.8":
-                    ParsingVersion = UE4Version.VER_UE4_8;
-                    break;
-                case "4.9":
-                    ParsingVersion = UE4Version.VER_UE4_9;
-                    break;
-                case "4.10":
-                    ParsingVersion = UE4Version.VER_UE4_10;
-                    break;
-                case "4.11":
-                    ParsingVersion = UE4Version.VER_UE4_11;
-                    break;
-                case "4.12":
-                    ParsingVersion = UE4Version.VER_UE4_12;
-                    break;
-                case "4.13":
-                    ParsingVersion = UE4Version.VER_UE4_13;
-                    break;
-                case "4.14":
-                    ParsingVersion = UE4Version.VER_UE4_14;
-                    break;
-                case "4.15":
-                    ParsingVersion = UE4Version.VER_UE4_15;
-                    break;
-                case "4.16":
-                    ParsingVersion = UE4Version.VER_UE4_16;
-                    break;
-                case "4.17":
-                    ParsingVersion = UE4Version.VER_UE4_17;
-                    break;
-                case "4.18":
-                    ParsingVersion = UE4Version.VER_UE4_18;
-                    break;
-                case "4.19":
-                    ParsingVersion = UE4Version.VER_UE4_19;
-                    break;
-                case "4.20":
-                    ParsingVersion = UE4Version.VER_UE4_20;
-                    break;
-                case "4.21":
-                    ParsingVersion = UE4Version.VER_UE4_21;
-                    break;
-                case "4.22":
-                    ParsingVersion = UE4Version.VER_UE4_22;
-                    break;
-                case "4.23":
-                    ParsingVersion = UE4Version.VER_UE4_23;
-                    break;
-                case "4.24":
-                    ParsingVersion = UE4Version.VER_UE4_24;
-                    break;
-                case "4.25":
-                    ParsingVersion = UE4Version.VER_UE4_25;
-                    break;
-                case "4.26":
-                    ParsingVersion = UE4Version.VER_UE4_26;
-                    break;
-                case "4.27":
-                    ParsingVersion = UE4Version.VER_UE4_27;
-                    break;
-                default:
-                    throw new NotImplementedException("Unimplemented version chosen in combo box");
+                if (versionOptionsValues[i] == ver)
+                {
+                    comboSpecifyVersion.SelectedIndex = i;
+                    UpdateComboSpecifyVersion();
+                    return;
+                }
             }
 
-            Properties.Settings.Default.PreferredVersion = versionOptions[comboSpecifyVersion.SelectedIndex];
+            string verStringRepresentation = "(" + Convert.ToString((int)ver) + ")";
+            comboSpecifyVersion.Items.Add(verStringRepresentation);
+            Array.Resize(ref versionOptionsKeys, versionOptionsKeys.Length + 1);
+            versionOptionsKeys[versionOptionsKeys.Length - 1] = verStringRepresentation;
+            Array.Resize(ref versionOptionsValues, versionOptionsValues.Length + 1);
+            versionOptionsValues[versionOptionsValues.Length - 1] = ver;
+            comboSpecifyVersion.SelectedIndex = versionOptionsKeys.Length - 1;
+            UpdateComboSpecifyVersion();
+        }
+
+        private void UpdateComboSpecifyVersion()
+        {
+            ParsingVersion = versionOptionsValues[comboSpecifyVersion.SelectedIndex];
+            Properties.Settings.Default.PreferredVersion = versionOptionsKeys[comboSpecifyVersion.SelectedIndex];
             Properties.Settings.Default.Save();
         }
 

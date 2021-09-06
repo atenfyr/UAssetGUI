@@ -1,9 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace UAssetGUI
 {
-    public static class Utils
+    public static class UAGUtils
     {
         public static T TryGetElement<T>(this T[] array, int index)
         {
@@ -12,6 +13,20 @@ namespace UAssetGUI
                 return array[index];
             }
             return default(T);
+        }
+
+        public static object ArbitraryTryParse(this string input, Type type)
+        {
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(type);
+                if (converter != null)
+                {
+                    return converter.ConvertFromString(input);
+                }
+            }
+            catch (NotSupportedException) { }
+            return null;
         }
 
         public static string ConvertByteArrayToString(this byte[] val)

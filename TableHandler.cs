@@ -5,7 +5,9 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
@@ -16,13 +18,26 @@ namespace UAssetGUI
     public enum TableHandlerMode
     {
         None = -1,
-        HeaderList,
-        LinkedSectors,
-        CategoryInformation,
-        CategoryStrings,
-        CategoryInts,
+        NameMap,
+        Imports,
+        ExportInformation,
+        ExportStrings,
+        ExportInts,
         UExpInts,
-        CategoryData
+        CustomVersionContainer,
+        ExportData
+    }
+
+    public enum ExportDetailsParseType
+    {
+        None = -1,
+        Int,
+        FName,
+        EObjectFlags,
+        Long,
+        Bool,
+        Guid,
+        UInt
     }
 
     public class PointingTreeNode : TreeNode
@@ -53,7 +68,7 @@ namespace UAssetGUI
     public class TableHandler
     {
         public TableHandlerMode mode;
-        public AssetWriter asset;
+        public UAsset asset;
         public TreeView listView1;
         public DataGridView dataGridView1;
 
@@ -75,54 +90,55 @@ namespace UAssetGUI
             listView1.BeginUpdate();
             listView1.Nodes.Clear();
             listView1.BackColor = UAGPalette.BackColor;
-            listView1.Nodes.Add(new PointingTreeNode("Header List", null));
-            listView1.Nodes.Add(new PointingTreeNode("Linked Sectors", null));
-            listView1.Nodes.Add(new PointingTreeNode("Category Information", null));
-            listView1.Nodes.Add(new PointingTreeNode("Category Ints", null));
-            listView1.Nodes.Add(new PointingTreeNode("Category Strings", null));
-            if (asset.data.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("UExp Ints", null));
-            listView1.Nodes.Add(new PointingTreeNode("Category Data", null));
+            listView1.Nodes.Add(new PointingTreeNode("Name Map", null));
+            listView1.Nodes.Add(new PointingTreeNode("Import Data", null));
+            listView1.Nodes.Add(new PointingTreeNode("Export Information", null));
+            listView1.Nodes.Add(new PointingTreeNode("Export Ints", null));
+            listView1.Nodes.Add(new PointingTreeNode("Export Strings", null));
+            if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("UExp Ints", null));
+            if (asset.CustomVersionContainer.Count > 0) listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
+            listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
-            TreeNode superTopNode = listView1.Nodes[listView1.Nodes.Count - 1];
-            for (int i = 0; i < asset.data.categories.Count; i++)
+            PointingTreeNode superTopNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
+            for (int i = 0; i < asset.Exports.Count; i++)
             {
-                Category baseUs = asset.data.categories[i];
-                var categoryNode = new PointingTreeNode("Category " + (i + 1), null);
+                Export baseUs = asset.Exports[i];
+                var categoryNode = new PointingTreeNode("Export " + (i + 1) + " (" + baseUs.ReferenceData.ObjectName.Value.Value + ")", null);
                 superTopNode.Nodes.Add(categoryNode);
                 switch (baseUs)
                 {
-                    case RawCategory us3:
+                    case RawExport us3:
                     {
                         var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
                         categoryNode.Nodes.Add(parentNode);
                         break;
                     }
-                    case NormalCategory us:
+                    case NormalExport us:
                     {
-                        var parentNode = new PointingTreeNode(asset.data.GetHeaderReference(asset.data.GetLinkReference(us.ReferenceData.connection)) + " (" + us.Data.Count + ")", us);
+                        var parentNode = new PointingTreeNode(asset.GetImportObjectName(baseUs.ReferenceData.ClassIndex) + " (" + us.Data.Count + ")", us);
                         categoryNode.Nodes.Add(parentNode);
 
                         for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
 
-                        if (us is StringTableCategory us2)
+                        if (us is StringTableExport us2)
                         {
                             var parentNode2 = new PointingTreeNode(us2.Data2.Name + " (" + us2.Data2.Count + ")", us2.Data2);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
-                        if (us is BlueprintGeneratedClassCategory us3)
+                        if (us is BlueprintGeneratedClassExport us3)
                         {
-                            var parentNode2 = new PointingTreeNode("Category Layout Data", us3, 1);
+                            var parentNode2 = new PointingTreeNode("Export Layout Data", us3, 1);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
-                        if (us is DataTableCategory us4)
+                        if (us is DataTableExport us4)
                         {
                             var parentNode2 = new PointingTreeNode("Table Info (" + us4.Data2.Table.Count + ")", us4.Data2);
                             categoryNode.Nodes.Add(parentNode2);
                             foreach (DataTableEntry entry in us4.Data2.Table)
                             {
-                                string decidedName = entry.Data.Name;
+                                string decidedName = entry.Data.Name.Value.Value;
                                 if (entry.DuplicateIndex > 0) decidedName += " [" + entry.DuplicateIndex + "]";
 
                                 var structNode = new PointingTreeNode(decidedName + " (" + entry.Data.Value.Count + ")", entry.Data);
@@ -143,19 +159,21 @@ namespace UAssetGUI
                     }
                 }
             }
+
+            listView1.SelectedNode = listView1.Nodes[0];
             listView1.EndUpdate();
         }
 
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode)
         {
             if (me == null) return;
-            switch (me.Type)
+            switch (me.Type.Value.Value)
             {
                 case "StructProperty":
                     var struc = (StructPropertyData)me;
 
-                    string decidedName = struc.Name;
-                    if (ourNode.Pointer is PropertyData && ((PropertyData)ourNode.Pointer).Name.Equals(decidedName)) decidedName = struc.StructType;
+                    string decidedName = struc.Name.Value.Value;
+                    if (ourNode.Pointer is PropertyData && ((PropertyData)ourNode.Pointer).Name.Equals(decidedName)) decidedName = struc.StructType.Value.Value;
 
                     var structNode = new PointingTreeNode(decidedName + " (" + struc.Value.Count + ")", struc);
                     ourNode.Nodes.Add(structNode);
@@ -193,8 +211,8 @@ namespace UAssetGUI
 
                     foreach (DictionaryEntry entry in mapp.Value)
                     {
-                        ((PropertyData)entry.Key).Name = "Key";
-                        ((PropertyData)entry.Value).Name = "Value";
+                        ((PropertyData)entry.Key).Name = new FName("Key");
+                        ((PropertyData)entry.Value).Name = new FName("Value");
 
                         var softEntryNode = new PointingTreeNode(mapp.Name + " (2)", new PointingDictionaryEntry(entry, mapp));
                         mapNode.Nodes.Add(softEntryNode);
@@ -224,8 +242,8 @@ namespace UAssetGUI
                 {
                     DataGridViewRow row = new DataGridViewRow();
                     row.CreateCells(dataGridView1);
-                    row.Cells[0].Value = thisPD.Name;
-                    row.Cells[1].Value = thisPD.Type;
+                    row.Cells[0].Value = thisPD.Name.Value.Value;
+                    row.Cells[1].Value = thisPD.Type.Value.Value;
                     if (thisPD is UnknownPropertyData)
                     {
                         row.Cells[2].Value = "Unknown ser.";
@@ -233,20 +251,20 @@ namespace UAssetGUI
                     }
                     else
                     {
-                        switch (thisPD.Type)
+                        switch (thisPD.Type.Value.Value)
                         {
                             case "BoolProperty":
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = ((BoolPropertyData)thisPD).Value ? 1 : 0;
+                                row.Cells[3].Value = ((BoolPropertyData)thisPD).Value.ToString();
                                 break;
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;
-                                row.Cells[2].Value = objData.LinkValue;
-                                if (objData.LinkValue != 0)
+                                row.Cells[2].Value = objData.CurrentIndex;
+                                if (objData.CurrentIndex != 0)
                                 {
-                                    row.Cells[3].Value = objData.LinkValue > 0 ? "Jump" : asset.data.GetHeaderReference((int)objData.Value.Property);
+                                    row.Cells[3].Value = objData.CurrentIndex > 0 ? "Jump" : objData.Value.ObjectName.ToString();
                                     row.Cells[3].Tag = "CategoryJump";
-                                    if (objData.LinkValue > 0)
+                                    if (objData.CurrentIndex > 0)
                                     {
                                         DataGridViewCellStyle sty = new DataGridViewCellStyle();
                                         Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
@@ -260,7 +278,6 @@ namespace UAssetGUI
                                 var objData2 = (SoftObjectPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
                                 row.Cells[3].Value = objData2.Value;
-                                row.Cells[4].Value = objData2.Value2;
                                 break;
                             case "RichCurveKey":
                                 var curveData = (RichCurveKeyProperty)thisPD;
@@ -291,8 +308,8 @@ namespace UAssetGUI
                                 break;
                             case "NameProperty":
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = ((NamePropertyData)thisPD).Value;
-                                row.Cells[4].Value = ((NamePropertyData)thisPD).Value2;
+                                row.Cells[3].Value = ((NamePropertyData)thisPD).Value.Value;
+                                row.Cells[4].Value = ((NamePropertyData)thisPD).Value.Number;
                                 break;
                             case "ViewTargetBlendParams":
                                 var viewTargetBlendParamsData = (ViewTargetBlendParamsPropertyData)thisPD;
@@ -305,28 +322,29 @@ namespace UAssetGUI
                             case "EnumProperty":
                                 var enumData = (EnumPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = enumData.EnumType;
-                                row.Cells[4].Value = enumData.Value;
+                                row.Cells[3].Value = enumData.EnumType.Value.Value;
+                                row.Cells[4].Value = enumData.Value.Value.Value;
+                                //row.Cells[5].Value = enumData.Extra;
                                 break;
                             case "ByteProperty":
                                 var byteData = (BytePropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = byteData.GetEnumBase();
+                                row.Cells[3].Value = byteData.GetEnumBase().Value;
                                 if (byteData.ByteType == BytePropertyType.Byte)
                                 {
                                     row.Cells[4].Value = byteData.Value;
                                 }
                                 else
                                 {
-                                    row.Cells[4].Value = byteData.GetEnumFull();
+                                    row.Cells[4].Value = byteData.GetEnumFull().Value;
                                 }
                                 break;
                             case "StructProperty":
-                                row.Cells[2].Value = ((StructPropertyData)thisPD).StructType;
+                                row.Cells[2].Value = ((StructPropertyData)thisPD).StructType.Value.Value;
                                 break;
                             case "ArrayProperty":
                             case "SetProperty":
-                                row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType;
+                                row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType.Value.Value;
                                 break;
                             case "GameplayTagContainer":
                             case "MapProperty":
@@ -341,7 +359,7 @@ namespace UAssetGUI
                                 row.Cells[2].Value = string.Empty;
                                 row.Cells[3].Value = mdpData.Value[0];
                                 row.Cells[4].Value = mdpData.Value[1];
-                                row.Cells[5].Value = mdpData.Value2;
+                                row.Cells[5].Value = mdpData.Value2.Value.Value;
                                 break;
                             case "LinearColor":
                                 var colorData = (LinearColorPropertyData)thisPD;
@@ -418,7 +436,6 @@ namespace UAssetGUI
                     }
 
                     row.Cells[8].Value = thisPD.DuplicationIndex;
-                    row.Cells[9].Value = thisPD.WidgetData;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -453,11 +470,11 @@ namespace UAssetGUI
 
                 if (value1B != null && value1B is string && transformB != null && transformB is string && (string)transformB == "Unknown ser.")
                 {
-                    var res = new UnknownPropertyData(name, asset.data)
+                    var res = new UnknownPropertyData(new FName(name), asset)
                     {
                         Value = ((string)value1B).ConvertStringToByteArray()
                     };
-                    res.Type = type;
+                    res.Type = new FName(type);
                     return res;
                 }
 
@@ -471,7 +488,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedTextData = new TextPropertyData(name, asset.data);
+                            decidedTextData = new TextPropertyData(new FName(name), asset);
                         }
 
                         TextHistoryType histType;
@@ -520,7 +537,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedObjData = new ObjectPropertyData(name, asset.data);
+                            decidedObjData = new ObjectPropertyData(new FName(name), asset);
                         }
 
                         int objValue = int.MinValue;
@@ -529,11 +546,39 @@ namespace UAssetGUI
                         if (transformB is int) objValue = (int)transformB;
                         if (objValue == int.MinValue) return null;
 
-                        decidedObjData.LinkValue = objValue;
-                        decidedObjData.Value = asset.data.links.ElementAtOrDefault(UAssetAPI.Utils.GetNormalIndex(objValue));
+                        decidedObjData.CurrentIndex = objValue;
+                        decidedObjData.Value = asset.Imports.ElementAtOrDefault(UAPUtils.GetNormalIndex(objValue));
                         return decidedObjData;
+                    case "RichCurveKey":
+                        RichCurveKeyProperty decidedRCKProperty = null;
+                        if (original != null && original is RichCurveKeyProperty)
+                        {
+                            decidedRCKProperty = (RichCurveKeyProperty)original;
+                        }
+                        else
+                        {
+                            decidedRCKProperty = new RichCurveKeyProperty(new FName(name), asset);
+                        }
+
+                        if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
+                        if (value1B is string) Enum.TryParse((string)value1B, out decidedRCKProperty.TangentMode);
+
+                        if (value2B is string) float.TryParse((string)value2B, out decidedRCKProperty.Time);
+                        if (value2B is int) decidedRCKProperty.Time = (float)(int)value2B;
+                        if (value2B is float) decidedRCKProperty.Time = (float)value2B;
+                        if (value3B is string) float.TryParse((string)value3B, out decidedRCKProperty.Value);
+                        if (value3B is int) decidedRCKProperty.Value = (float)(int)value3B;
+                        if (value3B is float) decidedRCKProperty.Value = (float)value3B;
+                        if (value4B is string) float.TryParse((string)value4B, out decidedRCKProperty.ArriveTangent);
+                        if (value4B is int) decidedRCKProperty.ArriveTangent = (float)(int)value4B;
+                        if (value4B is float) decidedRCKProperty.ArriveTangent = (float)value4B;
+                        if (value5B is string) float.TryParse((string)value5B, out decidedRCKProperty.LeaveTangent);
+                        if (value5B is int) decidedRCKProperty.LeaveTangent = (float)(int)value5B;
+                        if (value5B is float) decidedRCKProperty.LeaveTangent = (float)value5B;
+
+                        return decidedRCKProperty;
                     default:
-                        PropertyData newThing = MainSerializer.TypeToClass(type, name, asset.data);
+                        PropertyData newThing = MainSerializer.TypeToClass(new FName(type), new FName(name), asset);
                         if (original != null && original.GetType() == newThing.GetType())
                         {
                             newThing = original;
@@ -556,7 +601,7 @@ namespace UAssetGUI
             }
         }
 
-        public void RestoreTreeState(bool expanding)
+        public void ChangeAllExpansionStatus(bool expanding)
         {
             listView1.BeginUpdate();
             foreach (TreeNode node in Collect(listView1.Nodes))
@@ -636,63 +681,109 @@ namespace UAssetGUI
 
             switch (mode)
             {
-                case TableHandlerMode.HeaderList:
-                    AddColumns(new string[] { "String" });
+                case TableHandlerMode.NameMap:
+                    AddColumns(new string[] { "Name", "Encoding" });
 
-                    IReadOnlyList<string> headerIndexList = asset.data.GetHeaderIndexList();
+                    IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
                     for (int num = 0; num < headerIndexList.Count; num++)
                     {
-                        dataGridView1.Rows.Add(headerIndexList[num]);
+                        dataGridView1.Rows.Add(headerIndexList[num].Value, headerIndexList[num].Encoding.HeaderName);
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
                     }
                     break;
-                case TableHandlerMode.LinkedSectors:
-                    AddColumns(new string[] { "Base", "Class", "Link", "Connection", "" });
+                case TableHandlerMode.Imports:
+                    AddColumns(new string[] { "ClassPackage", "N", "ClassName", "N", "OuterIndex", "ObjectName", "N", "" });
 
-                    for (int num = 0; num < asset.data.links.Count; num++)
+                    for (int num = 0; num < asset.Imports.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.data.GetHeaderReference((int)asset.data.links[num].Base), asset.data.GetHeaderReference((int)asset.data.links[num].Class), asset.data.links[num].Linkage, asset.data.GetHeaderReference((int)asset.data.links[num].Property));
-                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(asset.data.links[num].Index);
+                        dataGridView1.Rows.Add(asset.Imports[num].ClassPackage.Value.Value, asset.Imports[num].ClassPackage.Number, asset.Imports[num].ClassName.Value.Value, asset.Imports[num].ClassName.Number, asset.Imports[num].OuterIndex, asset.Imports[num].ObjectName.Value.Value, asset.Imports[num].ObjectName.Number);
+                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(asset.Imports[num].Index);
                     }
                     break;
-                case TableHandlerMode.CategoryInformation:
-                    AddColumns(new string[] { "Connection", "Connect", "Category", "Link", "Type Index", "Type", "Length", "Offset", "" });
+                case TableHandlerMode.ExportInformation:
+                    string[] allExportDetailsFields = ExportDetails.GetAllFieldNames();
+                    string[] allExportDetailsFields2 = new string[allExportDetailsFields.Length + 1];
+                    allExportDetailsFields.CopyTo(allExportDetailsFields2, 0);
+                    allExportDetailsFields2[allExportDetailsFields2.Length - 1] = "";
+                    AddColumns(allExportDetailsFields2);
 
-                    for (int num = 0; num < asset.data.categories.Count; num++)
+                    for (int num = 0; num < asset.Exports.Count; num++)
                     {
-                        CategoryReference refer = asset.data.categories[num].ReferenceData;
-                        dataGridView1.Rows.Add(asset.data.GetHeaderReferenceWithoutZero(asset.data.GetLinkReference(refer.connection)), asset.data.GetHeaderReferenceWithoutZero(asset.data.GetLinkReference(refer.connect)), refer.category, refer.link, asset.data.GetHeaderReferenceWithoutZero(refer.typeIndex), refer.type, refer.lengthV, refer.startV);
-                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num + 1);
-                    }
-                    break;
-                case TableHandlerMode.CategoryInts:
-                    AddColumns(new string[] { "Category", "Value", "" });
-
-                    for (int num = 0; num < asset.data.categoryIntReference.Count; num++)
-                    {
-                        for (int num2 = 0; num2 < asset.data.categoryIntReference[num].Length; num2++)
+                        ExportDetails refer = asset.Exports[num].ReferenceData;
+                        string[] newCellsTooltips = new string[allExportDetailsFields.Length];
+                        object[] newCells = new object[allExportDetailsFields.Length];
+                        for (int num2 = 0; num2 < allExportDetailsFields.Length; num2++)
                         {
-                            dataGridView1.Rows.Add((num + 1), asset.data.categoryIntReference[num][num2]);
+                            string cellTooltip = null;
+
+                            object printingVal = refer.GetType().GetField(allExportDetailsFields[num2]).GetValue(refer);
+                            if (printingVal is FName parsingName)
+                            {
+                                string actualName = parsingName?.Value?.Value;
+                                if (actualName == null) actualName = "null";
+                                newCells[num2] = "FName(\"" + actualName.Replace(@"\", @"\\").Replace(@"""", @"\""") + "\", " + parsingName?.Number + ")";
+                            }
+                            else
+                            {
+                                newCells[num2] = printingVal;
+                            }
+
+                            if (printingVal is int testInt)
+                            {
+                                if (testInt < 0) cellTooltip = asset.GetImportObjectName(testInt).Value.Value;
+                            }
+
+                            newCellsTooltips[num2] = cellTooltip;
+                        }
+
+                        dataGridView1.Rows.Add(newCells);
+                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num + 1);
+
+                        for (int num3 = 0; num3 < newCellsTooltips.Length; num3++)
+                        {
+                            if (!string.IsNullOrEmpty(newCellsTooltips[num3]))
+                            {
+                                dataGridView1.Rows[num].Cells[num3].ToolTipText = newCellsTooltips[num3];
+                            }
                         }
                     }
                     break;
-                case TableHandlerMode.CategoryStrings:
+                case TableHandlerMode.ExportInts:
+                    AddColumns(new string[] { "Export Index", "Value", "" });
+
+                    for (int num = 0; num < asset.ExportIntReference.Count; num++)
+                    {
+                        for (int num2 = 0; num2 < asset.ExportIntReference[num].Length; num2++)
+                        {
+                            dataGridView1.Rows.Add((num + 1), asset.ExportIntReference[num][num2]);
+                        }
+                    }
+                    break;
+                case TableHandlerMode.ExportStrings:
                     AddColumns(new string[] { "Value", "" });
 
-                    for (int num = 0; num < asset.data.categoryStringReference.Count; num++)
+                    for (int num = 0; num < asset.ExportStringReference.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.data.categoryStringReference[num]);
+                        dataGridView1.Rows.Add(asset.ExportStringReference[num]);
                     }
                     break;
                 case TableHandlerMode.UExpInts:
                     AddColumns(new string[] { "Value", "" });
 
-                    for (int num = 0; num < asset.data.UExpData.Count; num++)
+                    for (int num = 0; num < asset.UExpData.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { asset.data.UExpData[num] });
+                        dataGridView1.Rows.Add(new object[] { asset.UExpData[num] });
                     }
                     break;
-                case TableHandlerMode.CategoryData:
+                case TableHandlerMode.CustomVersionContainer:
+                    AddColumns(new string[] { "Key", "Version" });
+
+                    for (int num = 0; num < asset.CustomVersionContainer.Count; num++)
+                    {
+                        dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].Version });
+                    }
+                    break;
+                case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "WData", "" });
@@ -702,7 +793,7 @@ namespace UAssetGUI
 
                         switch (pointerNode.Pointer)
                         {
-                            case NormalCategory usCategory:
+                            case NormalExport usCategory:
                                 switch(pointerNode.Type)
                                 {
                                     case 0:
@@ -717,18 +808,18 @@ namespace UAssetGUI
                                         renderingArr = usCategory.Data.ToArray();
                                         break;
                                     case 1:
-                                        BlueprintGeneratedClassCategory bgcCat = (BlueprintGeneratedClassCategory)usCategory;
+                                        BlueprintGeneratedClassExport bgcCat = (BlueprintGeneratedClassExport)usCategory;
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData("Inherited Class", asset.data);
-                                            testProperty.SetLinkValue(bgcCat.BaseClass);
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Inherited Class"), asset);
+                                            testProperty.SetCurrentIndex(bgcCat.BaseClass);
 
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "Inherited Class";
-                                            row.Cells[1].Value = testProperty.LinkValue;
-                                            row.Cells[2].Value = testProperty.LinkValue >= 0 ? "" : asset.data.GetHeaderReference((int)testProperty.Value.Property);
+                                            row.Cells[1].Value = testProperty.CurrentIndex;
+                                            row.Cells[2].Value = testProperty.CurrentIndex >= 0 ? "" : testProperty.Value.ObjectName.ToString();
                                             rows.Add(row);
                                         }
 
@@ -794,7 +885,7 @@ namespace UAssetGUI
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = BitConverter.ToString(BitConverter.GetBytes(bgcCat.FooterSeparator));
-                                            row.Cells[1].Value = bgcCat.FooterObject + " (" + asset.data.GetHeaderReference(asset.data.GetLinkReference(bgcCat.FooterObject)) + ")";
+                                            row.Cells[1].Value = bgcCat.FooterObject + " (" + asset.GetImportObjectName(bgcCat.FooterObject) + ")";
                                             row.Cells[2].Value = bgcCat.FooterEngine;
                                             rows.Add(row);
                                         }
@@ -839,15 +930,15 @@ namespace UAssetGUI
                                     if (usMap.Value.Count > 0)
                                     {
                                         DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                                        string mapKeyType = ((PropertyData)firstEntry.Key).Type;
-                                        string mapValueType = ((PropertyData)firstEntry.Value).Type;
+                                        FName mapKeyType = ((PropertyData)firstEntry.Key).Type;
+                                        FName mapValueType = ((PropertyData)firstEntry.Value).Type;
 
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
                                         for (int i = 0; i < usMap.Value.Count; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = usMap.Name;
+                                            row.Cells[0].Value = usMap.Name.Value.Value;
                                             row.Cells[1].Value = "MapEntry";
                                             row.Cells[2].Value = string.Empty;
 
@@ -860,8 +951,8 @@ namespace UAssetGUI
                                             sty.ForeColor = Color.Blue;
                                             row.Cells[3].Style = sty;
 
-                                            row.Cells[4].Value = mapKeyType;
-                                            row.Cells[5].Value = mapValueType;
+                                            row.Cells[4].Value = mapKeyType.Value.Value;
+                                            row.Cells[5].Value = mapValueType.Value.Value;
                                             row.HeaderCell.Value = Convert.ToString(i);
                                             row.Tag = usMap.Value.Cast<DictionaryEntry>().ElementAt(i);
                                             rows.Add(row);
@@ -892,8 +983,8 @@ namespace UAssetGUI
                                 dataGridView1.AllowUserToAddRows = false;
                                 var ourKey = (PropertyData)usDictEntry.Entry.Key;
                                 var ourValue = (PropertyData)usDictEntry.Entry.Value;
-                                if (ourKey != null) ourKey.Name = "Key";
-                                if (ourValue != null) ourValue.Name = "Value";
+                                if (ourKey != null) ourKey.Name = new FName("Key");
+                                if (ourValue != null) ourValue.Name = new FName("Value");
                                 renderingArr = new PropertyData[2] { ourKey, ourValue };
                                 break;
                             case PropertyData[] usRealArr:
@@ -940,36 +1031,70 @@ namespace UAssetGUI
 
             switch (mode)
             {
-                case TableHandlerMode.HeaderList:
-                    asset.data.ClearHeaderIndexList();
+                case TableHandlerMode.NameMap:
+                    asset.ClearNameIndexList();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         string ourValue = (string)row.Cells[0].Value;
-                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.data.AddHeaderReference(ourValue);
+                        string encoding = (string)row.Cells[1].Value;
+                        if (string.IsNullOrWhiteSpace(encoding)) encoding = "ascii";
+                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.AddNameReference(new FString(ourValue, encoding.Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
                     }
                     break;
-                case TableHandlerMode.LinkedSectors:
-                    asset.data.links = new List<Link>();
+                case TableHandlerMode.Imports:
+                    asset.Imports = new List<Import>();
                     int nextIndex = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         object val1 = row.Cells[0].Value;
-                        object val2 = row.Cells[1].Value;
-                        object val3 = row.Cells[2].Value;
-                        object val4 = row.Cells[3].Value;
-                        if (val1 == null || val2 == null || val3 == null || val4 == null) continue;
+                        object val1N = row.Cells[1].Value;
+                        object val2 = row.Cells[2].Value;
+                        object val2N = row.Cells[3].Value;
+                        object val3 = row.Cells[4].Value;
+                        object val4 = row.Cells[5].Value;
+                        object val4N = row.Cells[6].Value;
+                        if (val1 == null || val2 == null || val3 == null || val4 == null || val1N == null || val2N == null || val4N == null) continue;
                         if (!(val1 is string) || !(val2 is string) || !(val4 is string)) continue;
                         if (!(val3 is string) && !(val3 is int)) continue;
 
                         int realVal3;
                         if (val3 is string)
                         {
-                            bool result = int.TryParse((string)val3, out realVal3);
-                            if (!result) continue;
+                            if (!int.TryParse((string)val3, out realVal3)) continue;
                         }
                         else
                         {
                             realVal3 = Convert.ToInt32(val3);
+                        }
+
+                        int realVal1N;
+                        if (val1N is string)
+                        {
+                            if (!int.TryParse((string)val1N, out realVal1N)) continue;
+                        }
+                        else
+                        {
+                            realVal1N = Convert.ToInt32(val1N);
+                        }
+
+                        int realVal2N;
+                        if (val2N is string)
+                        {
+                            if (!int.TryParse((string)val2N, out realVal2N)) continue;
+                        }
+                        else
+                        {
+                            realVal2N = Convert.ToInt32(val2N);
+                        }
+
+                        int realVal4N;
+                        if (val4N is string)
+                        {
+                            if (!int.TryParse((string)val4N, out realVal4N)) continue;
+                        }
+                        else
+                        {
+                            realVal4N = Convert.ToInt32(val4N);
                         }
 
                         string realVal1 = (string)val1;
@@ -977,79 +1102,170 @@ namespace UAssetGUI
                         string realVal4 = (string)val4;
                         if (string.IsNullOrWhiteSpace(realVal1) || string.IsNullOrWhiteSpace(realVal2) || string.IsNullOrWhiteSpace(realVal4)) continue;
 
-                        Link newLink = new Link((ulong)asset.data.AddHeaderReference(realVal1), (ulong)asset.data.AddHeaderReference(realVal2), realVal3, (ulong)asset.data.AddHeaderReference(realVal4), --nextIndex);
-                        asset.data.links.Add(newLink);
+                        asset.AddNameReference(new FString(realVal1));
+                        asset.AddNameReference(new FString(realVal2));
+                        asset.AddNameReference(new FString(realVal4));
+                        Import newLink = new Import(new FName(realVal1, realVal1N), new FName(realVal2, realVal2N), realVal3, new FName(realVal4, realVal4N), --nextIndex);
+                        asset.Imports.Add(newLink);
                     }
                     break;
-                case TableHandlerMode.CategoryInformation:
+                case TableHandlerMode.ExportInformation:
+                    FieldInfo[] allExportDetailsFields = typeof(ExportDetails).GetFields();
+                    ExportDetailsParseType[] parsingTypes = new ExportDetailsParseType[]
+                    {
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.FName,
+                        ExportDetailsParseType.EObjectFlags,
+                        ExportDetailsParseType.Long,
+                        ExportDetailsParseType.Long,
+                        ExportDetailsParseType.Bool,
+                        ExportDetailsParseType.Bool,
+                        ExportDetailsParseType.Bool,
+                        ExportDetailsParseType.Guid,
+                        ExportDetailsParseType.UInt,
+                        ExportDetailsParseType.Bool,
+                        ExportDetailsParseType.Bool,
+
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.Int
+                    };
+
                     int rowNum = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        object[] vals = new object[8];
-                        for (int i = 0; i < vals.Length; i++)
+                        ExportDetails newRef = new ExportDetails();
+                        bool isInvalidRow = false;
+
+                        for (int i = 0; i < allExportDetailsFields.Length; i++)
                         {
-                            vals[i] = row.Cells[i].Value;
-                        }
-
-                        if (!(vals[0] is string) || !(vals[1] is string) || !(vals[4] is string)) continue;
-
-                        string val1 = (string)vals[0];
-                        string val2 = (string)vals[1];
-                        string valTypeIndex = (string)vals[4];
-
-                        int[] restOfVals = new int[8];
-                        for (int i = 2; i < vals.Length; i++)
-                        {
-                            if (vals[i] is string)
+                            object currentVal = row.Cells[i].Value;
+                            object settingVal = null;
+                            switch (parsingTypes[i])
                             {
-                                bool result = int.TryParse((string)vals[i], out int x);
-                                if (!result) continue;
-                                restOfVals[i] = x;
+                                case ExportDetailsParseType.Int:
+                                    settingVal = 0;
+                                    if (currentVal is string)
+                                    {
+                                        int x = 0;
+                                        int.TryParse((string)currentVal, out x);
+                                        settingVal = x;
+                                    }
+                                    else
+                                    {
+                                        settingVal = Convert.ToInt32(currentVal);
+                                    }
+                                    break;
+                                case ExportDetailsParseType.FName:
+                                    settingVal = new FName();
+                                    if (currentVal is string rawFName) // FName("blah", 0)
+                                    {
+                                        if (rawFName.Length < 8) break;
+                                        string[] fNameData = rawFName.Substring(6, rawFName.Length - 7).Split(','); // {"\"blah\"", 0}
+                                        if (fNameData.Length != 2) break;
+                                        int.TryParse(fNameData[1], out int x);
+                                        string newStrVal = fNameData[0].Substring(1, fNameData[0].Length - 2).Replace(@"\""", @"""").Replace(@"\\", @"\");
+                                        settingVal = new FName(newStrVal, x);
+                                    }
+                                    else
+                                    {
+                                        isInvalidRow = true;
+                                    }
+                                    break;
+                                case ExportDetailsParseType.EObjectFlags:
+                                    settingVal = EObjectFlags.RF_NoFlags;
+                                    if (currentVal is string)
+                                    {
+                                        EObjectFlags x;
+                                        Enum.TryParse((string)currentVal, out x);
+                                        settingVal = x;
+                                    }
+                                    else if (currentVal is EObjectFlags)
+                                    {
+                                        settingVal = (EObjectFlags)currentVal;
+                                    }
+                                    break;
+                                case ExportDetailsParseType.Long:
+                                    settingVal = 0;
+                                    if (currentVal is string)
+                                    {
+                                        long x = 0;
+                                        long.TryParse((string)currentVal, out x);
+                                        settingVal = x;
+                                    }
+                                    else
+                                    {
+                                        settingVal = Convert.ToInt64(currentVal);
+                                    }
+                                    break;
+                                case ExportDetailsParseType.Bool:
+                                    settingVal = false;
+                                    if (currentVal is string)
+                                    {
+                                        settingVal = ((string)currentVal).Equals("1") || ((string)currentVal).ToLower().Equals("true");
+                                    }
+                                    else if (currentVal is bool)
+                                    {
+                                        settingVal = (bool)currentVal;
+                                    }
+                                    else
+                                    {
+                                        settingVal = false;
+                                    }
+                                    break;
+                                case ExportDetailsParseType.Guid:
+                                    settingVal = new Guid();
+                                    if (currentVal is string)
+                                    {
+                                        Guid x = new Guid();
+                                        Guid.TryParse((string)currentVal, out x);
+                                        settingVal = x;
+                                    }
+                                    else if (currentVal is Guid)
+                                    {
+                                        settingVal = (Guid)currentVal;
+                                    }
+                                    break;
+                                case ExportDetailsParseType.UInt:
+                                    settingVal = 0;
+                                    if (currentVal is string)
+                                    {
+                                        uint x = 0;
+                                        uint.TryParse((string)currentVal, out x);
+                                        settingVal = x;
+                                    }
+                                    else
+                                    {
+                                        settingVal = Convert.ToUInt32(currentVal);
+                                    }
+                                    break;
                             }
-                            else
-                            {
-                                restOfVals[i] = Convert.ToInt32(vals[i]);
-                            }
+                            allExportDetailsFields[i].SetValue(newRef, settingVal);
                         }
 
-                        bool connectionIsValid = false, connectIsValid = false;
-                        int connection = 0, connect = 0, typeIndex = 0;
-                        if (int.TryParse(val1, out int intVal1))
-                        {
-                            connectionIsValid = true;
-                            connection = intVal1;
-                        }
+                        if (isInvalidRow) continue;
 
-                        if (int.TryParse(val2, out int intVal2))
+                        if (asset.Exports.Count > rowNum)
                         {
-                            connectIsValid = true;
-                            connect = intVal2;
-                        }
-
-                        if (int.TryParse(valTypeIndex, out int intVal3)) typeIndex = intVal3;
-                        else typeIndex = asset.data.AddHeaderReference(valTypeIndex);
-
-                        if (asset.data.categories.Count > rowNum)
-                        {
-                            if (connectionIsValid) asset.data.categories[rowNum].ReferenceData.connection = connection;
-                            if (connectIsValid) asset.data.categories[rowNum].ReferenceData.connect = connect;
-                            asset.data.categories[rowNum].ReferenceData.category = restOfVals[2];
-                            asset.data.categories[rowNum].ReferenceData.link = restOfVals[3];
-                            asset.data.categories[rowNum].ReferenceData.typeIndex = typeIndex;
-                            asset.data.categories[rowNum].ReferenceData.type = (ushort)restOfVals[5];
-                            asset.data.categories[rowNum].ReferenceData.lengthV = restOfVals[6];
-                            asset.data.categories[rowNum].ReferenceData.startV = restOfVals[7];
+                            asset.Exports[rowNum].ReferenceData = newRef;
                         }
                         else
                         {
-                            CategoryReference refer = new CategoryReference(connection, connect, restOfVals[2], restOfVals[3], typeIndex, (ushort)restOfVals[5], restOfVals[6], restOfVals[7]);
-                            asset.data.categories.Add(new Category(refer, asset.data, new byte[0]));
+                            // If we add a new category, we'll make a new NormalExport (None-terminated UProperty list). If you want to make some other kind of export, you'll need to do it manually with UAssetAPI
+                            var newCat = new NormalExport(newRef, asset, new byte[4]);
+                            newCat.Data = new List<PropertyData>();
+                            asset.Exports.Add(newCat);
                         }
                         rowNum++;
                     }
                     break;
-                case TableHandlerMode.CategoryInts:
-                    asset.data.categoryIntReference = new List<int[]>();
+                case TableHandlerMode.ExportInts:
+                    asset.ExportIntReference = new List<int[]>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         int[] vals = new int[2];
@@ -1067,36 +1283,42 @@ namespace UAssetGUI
                             }
                         }
 
-                        if (asset.data.categoryIntReference.Count > vals[0])
+                        if (vals[0] == 0) continue;
+
+                        if (asset.ExportIntReference.Count > vals[0])
                         {
-                            var arr = asset.data.categoryIntReference[vals[0]];
+                            var arr = asset.ExportIntReference[vals[0]];
                             Array.Resize(ref arr, arr.Length + 1);
                             arr[arr.Length - 1] = vals[1];
-                            asset.data.categoryIntReference[vals[0]] = arr;
+                            asset.ExportIntReference[vals[0]] = arr;
                         }
                         else
                         {
-                            asset.data.categoryIntReference.Insert(vals[0], new int[]{ vals[1] });
+                            asset.ExportIntReference.Insert(vals[0], new int[]{ vals[1] });
                         }
                     }
                     break;
-                case TableHandlerMode.CategoryStrings:
-                    asset.data.categoryStringReference = new List<string>();
+                case TableHandlerMode.ExportStrings:
+                    asset.ExportStringReference = new List<string>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        asset.data.categoryStringReference.Add((string)row.Cells[0].Value);
+                        string strVal = (string)row.Cells[0].Value;
+                        if (!string.IsNullOrEmpty(strVal)) asset.ExportStringReference.Add(strVal);
                     }
                     break;
                 case TableHandlerMode.UExpInts:
-                    asset.data.UExpData = new List<int>();
+                    asset.UExpData = new List<int>();
                     int rowN = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         int intVal;
+                        if (row.Cells[0].Value == null) continue;
                         if (row.Cells[0].Value is string)
                         {
-                            bool result = int.TryParse((string)row.Cells[0].Value, out int x);
-                            if (!result) return;
+                            string strVal = (string)row.Cells[0].Value;
+                            if (string.IsNullOrEmpty(strVal)) continue;
+                            bool result = int.TryParse(strVal, out int x);
+                            if (!result) continue;
                             intVal = x;
                         }
                         else
@@ -1104,19 +1326,38 @@ namespace UAssetGUI
                             intVal = Convert.ToInt32(row.Cells[0].Value);
                         }
 
-                        if (asset.data.UExpData.Count > rowN)
+                        if (asset.UExpData.Count > rowN)
                         {
-                            asset.data.UExpData[rowN] = intVal;
+                            asset.UExpData[rowN] = intVal;
                         }
                         else
                         {
-                            asset.data.UExpData.Insert(rowN, intVal);
+                            asset.UExpData.Insert(rowN, intVal);
                         }
 
                         rowN++;
                     }
                     break;
-                case TableHandlerMode.CategoryData:
+                case TableHandlerMode.CustomVersionContainer:
+                    asset.CustomVersionContainer = new List<CustomVersion>();
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        if (!Guid.TryParse((string)row.Cells[0].Value, out Guid customVersionKey)) continue;
+
+                        int customVersionNumber;
+                        if (row.Cells[1].Value is string)
+                        {
+                            if (!int.TryParse((string)row.Cells[1].Value, out customVersionNumber)) continue;
+                        }
+                        else
+                        {
+                            customVersionNumber = Convert.ToInt32(row.Cells[1].Value);
+                        }
+
+                        asset.CustomVersionContainer.Add(new CustomVersion(customVersionKey, customVersionNumber));
+                    }
+                    break;
+                case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         if (pointerNode.Pointer is StringTable usStrTable)
@@ -1130,7 +1371,7 @@ namespace UAssetGUI
                                 object value1B = row.Cells[3].Value;
                                 if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
 
-                                usStrTable.Add(new UString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
+                                usStrTable.Add(new FString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
                             }
 
                             pointerNode.Text = usStrTable.Name + " (" + usStrTable.Count + ")";
@@ -1138,8 +1379,8 @@ namespace UAssetGUI
                         else if (pointerNode.Pointer is MapPropertyData usMap)
                         {
                             DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                            string mapKeyType = ((PropertyData)firstEntry.Key).Type;
-                            string mapValueType = ((PropertyData)firstEntry.Value).Type;
+                            FName mapKeyType = ((PropertyData)firstEntry.Key).Type;
+                            FName mapValueType = ((PropertyData)firstEntry.Value).Type;
 
                             OrderedDictionary newData = new OrderedDictionary();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
@@ -1153,7 +1394,7 @@ namespace UAssetGUI
                                 }
                                 else
                                 {
-                                    newData.Add(MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset.data), MainSerializer.TypeToClass(mapValueType, usMap.Name, asset.data));
+                                    newData.Add(MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset), MainSerializer.TypeToClass(mapValueType, usMap.Name, asset));
                                 }
                             }
                             usMap.Value = newData;
@@ -1162,6 +1403,7 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is StructPropertyData usStruct)
                         {
+                            int newCount = 0;
                             List<PropertyData> newData = new List<PropertyData>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
@@ -1172,14 +1414,19 @@ namespace UAssetGUI
                                     continue;
                                 }
                                 newData.Add(val);
+                                newCount++;
                             }
                             usStruct.Value = newData;
 
-                            string decidedName = usStruct.Name;
-                            if (((PointingTreeNode)pointerNode.Parent).Pointer is PropertyData && ((PropertyData)((PointingTreeNode)pointerNode.Parent).Pointer).Name.Equals(decidedName)) decidedName = usStruct.StructType;
-                            pointerNode.Text = decidedName + " (" + usStruct.Value.Count + ")";
+                            string decidedName = usStruct.Name.Value.Value;
+                            if (((PointingTreeNode)pointerNode.Parent).Pointer is PropertyData && ((PropertyData)((PointingTreeNode)pointerNode.Parent).Pointer).Name.Equals(decidedName)) decidedName = usStruct.StructType.Value.Value;
+                            pointerNode.Text = decidedName + " (" + newCount + ")";
                         }
-                        else if (pointerNode.Pointer is NormalCategory usCat)
+                        else if (pointerNode.Pointer is BlueprintGeneratedClassExport usBGCCat)
+                        {
+                            // No writing here
+                        }
+                        else if (pointerNode.Pointer is NormalExport usCat)
                         {
                             List<PropertyData> newData = new List<PropertyData>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
@@ -1193,12 +1440,12 @@ namespace UAssetGUI
                                 newData.Add(val);
                             }
                             usCat.Data = newData;
-                            pointerNode.Text = asset.data.GetHeaderReference(asset.data.GetLinkReference(usCat.ReferenceData.connection)) + " (" + usCat.Data.Count + ")";
+                            pointerNode.Text = asset.GetImportObjectName(usCat.ReferenceData.ClassIndex) + " (" + usCat.Data.Count + ")";
                         }
                         else if (pointerNode.Pointer is DataTable dtUs)
                         {
                             List<DataTableEntry> newData = new List<DataTableEntry>();
-                            var numTimesNameUses = new Dictionary<string, int>();
+                            var numTimesNameUses = new Dictionary<FName, int>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, dtUs.Table.ElementAtOrDefault(i).Data);
@@ -1273,7 +1520,7 @@ namespace UAssetGUI
             }
         }
 
-        public TableHandler(DataGridView dataGridView1, AssetWriter asset, TreeView listView1)
+        public TableHandler(DataGridView dataGridView1, UAsset asset, TreeView listView1)
         {
             this.asset = asset;
             this.dataGridView1 = dataGridView1;

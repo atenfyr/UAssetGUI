@@ -25,7 +25,7 @@ namespace UAssetGUI
 
         public static void RefreshTheme(Form frm)
         {
-            Utils.InvokeUI(() =>
+            UAGUtils.InvokeUI(() =>
             {
                 RefreshThemeInternal(frm);
             });

@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Design;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
@@ -34,7 +28,7 @@ namespace UAssetGUI
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             GUIVersion = fvi.FileVersion;
 
-            Utils.InitializeInvoke(this);
+            UAGUtils.InitializeInvoke(this);
 
             this.Text = "UAssetGUI v" + GUIVersion;
             this.AllowDrop = true;
@@ -88,9 +82,9 @@ namespace UAssetGUI
                 currentSavingPath = filePath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, new AssetWriter(filePath, true, true, null, null), listView1)
+                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, true, true, null, null), listView1)
                 {
-                    mode = TableHandlerMode.HeaderList
+                    mode = TableHandlerMode.NameMap
                 };
 
                 saveToolStripMenuItem.Enabled = true;
@@ -103,14 +97,14 @@ namespace UAssetGUI
 
                 int failedCategoryCount = 0;
                 List<string> unknownTypes = new List<string>();
-                foreach (Category cat in tableEditor.asset.data.categories)
+                foreach (Export cat in tableEditor.asset.Exports)
                 {
-                    if (cat is RawCategory) failedCategoryCount++;
-                    if (cat is NormalCategory usNormal)
+                    if (cat is RawExport) failedCategoryCount++;
+                    if (cat is NormalExport usNormal)
                     {
                         foreach (PropertyData dat in usNormal.Data)
                         {
-                            if (dat is UnknownPropertyData && !string.IsNullOrEmpty(dat.Type) && !unknownTypes.Contains(dat.Type)) unknownTypes.Add(dat.Type);
+                            if (dat is UnknownPropertyData && !string.IsNullOrEmpty(dat.Type.Value.Value) && !unknownTypes.Contains(dat.Type.Value.Value)) unknownTypes.Add(dat.Type.Value.Value);
                         }
                     }
                 }
@@ -213,9 +207,9 @@ namespace UAssetGUI
                         tableEditor.Load();
                         return true;
                     }
-                    catch (HeaderOutOfRangeException ex)
+                    catch (NameMapOutOfRangeException ex)
                     {
-                        tableEditor.asset.data.AddHeaderReference(ex.RequiredString);
+                        tableEditor.asset.AddNameReference(ex.RequiredName);
                         isLooping = true;
                     }
                     catch (Exception ex)
@@ -259,12 +253,12 @@ namespace UAssetGUI
 
         private void expandAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tableEditor?.RestoreTreeState(true);
+            tableEditor?.ChangeAllExpansionStatus(true);
         }
 
         private void collapseAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tableEditor?.RestoreTreeState(false);
+            tableEditor?.ChangeAllExpansionStatus(false);
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
@@ -331,26 +325,29 @@ namespace UAssetGUI
             string selectedNodeText = e.Node.Text;
             if (tableEditor != null)
             {
-                tableEditor.mode = TableHandlerMode.CategoryData;
+                tableEditor.mode = TableHandlerMode.ExportData;
                 switch (selectedNodeText)
                 {
-                    case "Header List":
-                        tableEditor.mode = TableHandlerMode.HeaderList;
+                    case "Name Map":
+                        tableEditor.mode = TableHandlerMode.NameMap;
                         break;
-                    case "Linked Sectors":
-                        tableEditor.mode = TableHandlerMode.LinkedSectors;
+                    case "Import Data":
+                        tableEditor.mode = TableHandlerMode.Imports;
                         break;
-                    case "Category Information":
-                        tableEditor.mode = TableHandlerMode.CategoryInformation;
+                    case "Export Information":
+                        tableEditor.mode = TableHandlerMode.ExportInformation;
                         break;
-                    case "Category Ints":
-                        tableEditor.mode = TableHandlerMode.CategoryInts;
+                    case "Export Ints":
+                        tableEditor.mode = TableHandlerMode.ExportInts;
                         break;
-                    case "Category Strings":
-                        tableEditor.mode = TableHandlerMode.CategoryStrings;
+                    case "Export Strings":
+                        tableEditor.mode = TableHandlerMode.ExportStrings;
                         break;
                     case "UExp Ints":
                         tableEditor.mode = TableHandlerMode.UExpInts;
+                        break;
+                    case "Custom Version Container":
+                        tableEditor.mode = TableHandlerMode.CustomVersionContainer;
                         break;
                 }
                 tableEditor.Load();

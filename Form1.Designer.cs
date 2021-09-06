@@ -234,6 +234,7 @@ namespace UAssetGUI
             this.listView1.Location = new System.Drawing.Point(12, 27);
             this.listView1.Name = "listView1";
             this.listView1.ShowLines = false;
+            this.listView1.ShowNodeToolTips = true;
             this.listView1.Size = new System.Drawing.Size(344, 411);
             this.listView1.TabIndex = 2;
             this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);

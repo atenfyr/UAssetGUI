@@ -440,8 +440,8 @@ namespace UAssetGUI
                     case "Soft Package References":
                         tableEditor.mode = TableHandlerMode.SoftPackageReferences;
                         break;
-                    case "Preload Dependency Map":
-                        tableEditor.mode = TableHandlerMode.PreloadDependencyMap;
+                    case "Preload Dependencies":
+                        tableEditor.mode = TableHandlerMode.PreloadDependencies;
                         break;
                     case "Custom Version Container":
                         tableEditor.mode = TableHandlerMode.CustomVersionContainer;

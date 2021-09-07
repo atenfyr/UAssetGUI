@@ -21,7 +21,7 @@ namespace UAssetGUI
         ExportInformation,
         SoftPackageReferences,
         DependsMap,
-        PreloadDependencyMap,
+        PreloadDependencies,
         CustomVersionContainer,
         ExportData
     }
@@ -93,7 +93,7 @@ namespace UAssetGUI
             listView1.Nodes.Add(new PointingTreeNode("Export Information", null));
             listView1.Nodes.Add(new PointingTreeNode("Depends Map", null));
             listView1.Nodes.Add(new PointingTreeNode("Soft Package References", null));
-            if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("Preload Dependency Map", null));
+            if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("Preload Dependencies", null));
             if (asset.CustomVersionContainer.Count > 0) listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
@@ -295,13 +295,23 @@ namespace UAssetGUI
                                 }
                                 else
                                 {
-                                    int maxValuesToDisplay = 3;
-                                    for (int z = 0; z < maxValuesToDisplay; z++)
+                                    if (txtData.HistoryType == TextHistoryType.StringTableEntry)
                                     {
-                                        row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
+                                        row.Cells[3].Value = txtData.Value[0];
+                                        row.Cells[4].Value = txtData.StringTable.Value.Value;
+                                        row.Cells[5].Value = txtData.StringTable.Number;
                                     }
-                                    row.Cells[3 + maxValuesToDisplay + 0].Value = txtData.Flag;
-                                    if (txtData.Extras != null) row.Cells[3 + maxValuesToDisplay + 1].Value = txtData.Extras.ConvertByteArrayToString();
+                                    else
+                                    {
+                                        int maxValuesToDisplay = 3;
+                                        for (int z = 0; z < maxValuesToDisplay; z++)
+                                        {
+                                            row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
+                                        }
+
+                                        row.Cells[3 + maxValuesToDisplay + 0].Value = txtData.Flag;
+                                        if (txtData.Extras != null && txtData.Extras.Length > 0) row.Cells[3 + maxValuesToDisplay + 1].Value = txtData.Extras.ConvertByteArrayToString();
+                                    }
                                 }
                                 break;
                             case "NameProperty":
@@ -511,8 +521,19 @@ namespace UAssetGUI
                                 decidedTextData.Value = strAvailablesL.ToArray();
                                 break;
                             case TextHistoryType.StringTableEntry:
-                                if (value1B == null || !(value1B is string)) return null;
+                                if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
 
+                                int fInt = 0;
+                                if (value3B is string)
+                                {
+                                    int.TryParse((string)value3B, out fInt);
+                                }
+                                else
+                                {
+                                    fInt = Convert.ToInt32(value3B);
+                                }
+
+                                decidedTextData.StringTable = new FName((string)value2B, fInt);
                                 decidedTextData.Value = new string[] { (string)value1B };
                                 break;
                             /*case TextHistoryType.None:
@@ -580,6 +601,7 @@ namespace UAssetGUI
                         if (original != null && original.GetType() == newThing.GetType())
                         {
                             newThing = original;
+                            newThing.Name = new FName(name);
                         }
 
                         string[] existingStrings = new string[5];
@@ -760,17 +782,17 @@ namespace UAssetGUI
                 case TableHandlerMode.SoftPackageReferences:
                     AddColumns(new string[] { "Value", "" });
 
-                    for (int num = 0; num < asset.SoftPackageReferencesMap.Count; num++)
+                    for (int num = 0; num < asset.SoftPackageReferenceList.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.SoftPackageReferencesMap[num]);
+                        dataGridView1.Rows.Add(asset.SoftPackageReferenceList[num]);
                     }
                     break;
-                case TableHandlerMode.PreloadDependencyMap:
+                case TableHandlerMode.PreloadDependencies:
                     AddColumns(new string[] { "Value", "" });
 
-                    for (int num = 0; num < asset.PreloadDependencyMap.Count; num++)
+                    for (int num = 0; num < asset.PreloadDependencies.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { asset.PreloadDependencyMap[num] });
+                        dataGridView1.Rows.Add(new object[] { asset.PreloadDependencies[num] });
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
@@ -788,7 +810,7 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "WData", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "" });
 
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
@@ -1301,15 +1323,15 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.SoftPackageReferences:
-                    asset.SoftPackageReferencesMap = new List<string>();
+                    asset.SoftPackageReferenceList = new List<string>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         string strVal = (string)row.Cells[0].Value;
-                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferencesMap.Add(strVal);
+                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferenceList.Add(strVal);
                     }
                     break;
-                case TableHandlerMode.PreloadDependencyMap:
-                    asset.PreloadDependencyMap = new List<int>();
+                case TableHandlerMode.PreloadDependencies:
+                    asset.PreloadDependencies = new List<int>();
                     int rowN = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
@@ -1328,13 +1350,13 @@ namespace UAssetGUI
                             intVal = Convert.ToInt32(row.Cells[0].Value);
                         }
 
-                        if (asset.PreloadDependencyMap.Count > rowN)
+                        if (asset.PreloadDependencies.Count > rowN)
                         {
-                            asset.PreloadDependencyMap[rowN] = intVal;
+                            asset.PreloadDependencies[rowN] = intVal;
                         }
                         else
                         {
-                            asset.PreloadDependencyMap.Insert(rowN, intVal);
+                            asset.PreloadDependencies.Insert(rowN, intVal);
                         }
 
                         rowN++;

@@ -796,11 +796,11 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
-                    AddColumns(new string[] { "Key", "Version" });
+                    AddColumns(new string[] { "Key", "Friendly Name", "Version" });
 
                     for (int num = 0; num < asset.CustomVersionContainer.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].Version });
+                        dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].FriendlyName, asset.CustomVersionContainer[num].Version });
                     }
 
                     // Modification is disabled

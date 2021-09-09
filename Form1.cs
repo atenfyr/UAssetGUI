@@ -558,6 +558,8 @@ namespace UAssetGUI
 
         public void SetParsingVersion(UE4Version ver)
         {
+            if (ver == ParsingVersion) return;
+
             for (int i = 0; i < versionOptionsValues.Length; i++)
             {
                 if (versionOptionsValues[i] == ver)

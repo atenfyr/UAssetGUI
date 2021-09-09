@@ -1,10 +1,9 @@
 ﻿* Overhauled internal code and improved on support for a variety of engine versions (UAssetAPI 1.0).
-* Renamed the tabs to be more tool-agnostic.
-* Added the ability to add new NormalExports within UAssetGUI.
-* Added DPI awareness.
-* Added the ability to manually change the encoding of entries in the name map.
-* Added more information while displaying TextProperty data.
-* Added SetProperty support.
-* Added GameplayTagContainer support.
-* Added rudimentary support for the three per-platform properties.
+* Renamed tabs and fields to be more tool-agnostic.
 * Added a new tab containing information about the custom versions container, if it exists.
+* Added the ability to select an engine version to parse assets with.
+* Added the ability to add new NormalExports (None-terminated UProperty list categories) within UAssetGUI.
+* Added DPI awareness.
+* Added the ability to manually change the encoding of entries in the name map (header list).
+* Added more information while displaying TextProperty data.
+* Added support for SetProperty, AssetObjectProperty, GameplayTagContainer, and the three per-platform properties.

@@ -21,6 +21,7 @@ namespace UAssetGUI
         ExportInformation,
         SoftPackageReferences,
         DependsMap,
+        WorldTileInfo,
         PreloadDependencies,
         CustomVersionContainer,
         ExportData
@@ -93,6 +94,18 @@ namespace UAssetGUI
             listView1.Nodes.Add(new PointingTreeNode("Export Information", null));
             listView1.Nodes.Add(new PointingTreeNode("Depends Map", null));
             listView1.Nodes.Add(new PointingTreeNode("Soft Package References", null));
+            if (asset.WorldTileInfo != null)
+            {
+                listView1.Nodes.Add(new PointingTreeNode("World Tile Info", null));
+                PointingTreeNode worldInfoNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
+                worldInfoNode.Nodes.Add(new PointingTreeNode("Layer (5)", asset.WorldTileInfo.Layer));
+                worldInfoNode.Nodes.Add(new PointingTreeNode("LODList (" + asset.WorldTileInfo.LODList.Length + ")", asset.WorldTileInfo.LODList));
+                PointingTreeNode lodListNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
+                for (int i = 0; i < asset.WorldTileInfo.LODList.Length; i++)
+                {
+                    lodListNode.Nodes.Add(new PointingTreeNode("LOD entry #" + (i + 1), asset.WorldTileInfo.LODList[i]));
+                }
+            }
             if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("Preload Dependencies", null));
             if (asset.CustomVersionContainer.Count > 0) listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
@@ -124,7 +137,7 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
-                        if (us is BlueprintGeneratedClassExport us3)
+                        if (us is ClassExport us3)
                         {
                             var parentNode2 = new PointingTreeNode("Export Layout Data", us3, 1);
                             categoryNode.Nodes.Add(parentNode2);
@@ -330,8 +343,8 @@ namespace UAssetGUI
                             case "EnumProperty":
                                 var enumData = (EnumPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = enumData.EnumType.Value.Value;
-                                row.Cells[4].Value = enumData.Value.Value.Value;
+                                row.Cells[3].Value = enumData.EnumType?.Value?.Value == null ? "null" : enumData.EnumType?.Value?.Value;
+                                row.Cells[4].Value = enumData.Value?.Value?.Value == null ? "null" : enumData.Value?.Value?.Value;
                                 //row.Cells[5].Value = enumData.Extra;
                                 break;
                             case "ByteProperty":
@@ -787,6 +800,49 @@ namespace UAssetGUI
                         dataGridView1.Rows.Add(asset.SoftPackageReferenceList[num]);
                     }
                     break;
+                case TableHandlerMode.WorldTileInfo:
+                    AddColumns(new string[] { "Name", "Value", "Value 2", "Value 3" });
+
+                    if (listView1.SelectedNode is PointingTreeNode wtlPointerNode)
+                    {
+                        if (wtlPointerNode.Pointer == null)
+                        {
+                            dataGridView1.Rows.Add(new object[] { "Position", asset.WorldTileInfo.Position[0], asset.WorldTileInfo.Position[1], asset.WorldTileInfo.Position[2] });
+                            dataGridView1.Rows.Add(new object[] { "AbsolutePosition", asset.WorldTileInfo.AbsolutePosition[0], asset.WorldTileInfo.AbsolutePosition[1], asset.WorldTileInfo.AbsolutePosition[2] });
+                            dataGridView1.Rows.Add(new object[] { "Bounds", asset.WorldTileInfo.Bounds.ToString() });
+                            dataGridView1.Rows.Add(new object[] { "Layer", "" });
+                            dataGridView1.Rows.Add(new object[] { "bHideInTileView", asset.WorldTileInfo.bHideInTileView });
+                            dataGridView1.Rows.Add(new object[] { "ParentTilePackageName", asset.WorldTileInfo.ParentTilePackageName.Value });
+                            dataGridView1.Rows.Add(new object[] { "LODList", "" });
+                            dataGridView1.Rows.Add(new object[] { "ZOrder", asset.WorldTileInfo.ZOrder });
+                        }
+                        else if (wtlPointerNode.Pointer is FWorldTileLayer fWTL)
+                        {
+                            dataGridView1.Rows.Add(new object[] { "Name", fWTL.Name });
+                            dataGridView1.Rows.Add(new object[] { "Reserved0", fWTL.Reserved0 });
+                            dataGridView1.Rows.Add(new object[] { "Reserved1", fWTL.Reserved1.ToString() });
+                            dataGridView1.Rows.Add(new object[] { "StreamingDistance", fWTL.StreamingDistance });
+                            dataGridView1.Rows.Add(new object[] { "DistanceStreamingEnabled", fWTL.DistanceStreamingEnabled });
+                        }
+                        else if (wtlPointerNode.Pointer is FWorldTileLODInfo fWTLI)
+                        {
+                            dataGridView1.Rows.Add(new object[] { "Name", fWTLI.RelativeStreamingDistance });
+                            dataGridView1.Rows.Add(new object[] { "Reserved0", fWTLI.Reserved0 });
+                            dataGridView1.Rows.Add(new object[] { "Reserved1", fWTLI.Reserved1 });
+                            dataGridView1.Rows.Add(new object[] { "Reserved2", fWTLI.Reserved2 });
+                            dataGridView1.Rows.Add(new object[] { "Reserved3", fWTLI.Reserved3 });
+                        }
+                    }
+
+                    for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                    {
+                        dataGridView1.Rows[i].HeaderCell.Value = Convert.ToString(i + 1);
+                    }
+
+                    // Modification is disabled
+                    dataGridView1.AllowUserToAddRows = false;
+                    dataGridView1.ReadOnly = true;
+                    break;
                 case TableHandlerMode.PreloadDependencies:
                     AddColumns(new string[] { "Value", "" });
 
@@ -800,7 +856,7 @@ namespace UAssetGUI
 
                     for (int num = 0; num < asset.CustomVersionContainer.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].FriendlyName, asset.CustomVersionContainer[num].Version });
+                        dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].FriendlyName == null ? "" : asset.CustomVersionContainer[num].FriendlyName, asset.CustomVersionContainer[num].Version });
                     }
 
                     // Modification is disabled
@@ -832,18 +888,72 @@ namespace UAssetGUI
                                         renderingArr = usCategory.Data.ToArray();
                                         break;
                                     case 1:
-                                        BlueprintGeneratedClassExport bgcCat = (BlueprintGeneratedClassExport)usCategory;
+                                        ClassExport bgcCat = (ClassExport)usCategory;
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Inherited Class"), asset);
-                                            testProperty.SetCurrentIndex(bgcCat.BaseClass);
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
+                                            testProperty.SetCurrentIndex(bgcCat.SuperStruct);
 
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "Inherited Class";
+                                            row.Cells[0].Value = "Super Struct";
                                             row.Cells[1].Value = testProperty.CurrentIndex;
-                                            row.Cells[2].Value = testProperty.CurrentIndex >= 0 ? "" : testProperty.Value.ObjectName.ToString();
+                                            row.Cells[2].Value = testProperty.CurrentIndex >= 0 ? "" : testProperty.Value.ObjectName.Value.Value;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ScriptBytecodeSize";
+                                            row.Cells[1].Value = bgcCat.ScriptBytecodeSize;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ScriptBytecode";
+                                            row.Cells[1].Value = bgcCat.ScriptBytecode.ConvertByteArrayToString();
+                                            rows.Add(row);
+                                            /*row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassFlags";
+                                            row.Cells[1].Value = bgcCat.ClassFlags.ToString();
+                                            rows.Add(row);*/
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassWithin";
+                                            row.Cells[1].Value = bgcCat.ClassWithin;
+                                            row.Cells[2].Value = bgcCat.ClassWithin >= 0 ? "" : asset.GetImportObjectName(bgcCat.ClassWithin).Value.Value;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassConfigName";
+                                            row.Cells[1].Value = bgcCat.ClassConfigName.Value.Value;
+                                            row.Cells[2].Value = bgcCat.ClassConfigName.Number;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassGeneratedBy";
+                                            row.Cells[1].Value = bgcCat.ClassGeneratedBy;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "bDeprecatedForceScriptOrder";
+                                            row.Cells[1].Value = bgcCat.bDeprecatedForceScriptOrder;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "bCooked";
+                                            row.Cells[1].Value = bgcCat.bCooked;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassDefaultObject";
+                                            row.Cells[2].Value = bgcCat.ClassDefaultObject;
+                                            row.Cells[3].Value = "Jump";
+                                            row.Cells[3].Tag = "CategoryJump";
+                                            DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                            sty.Font = styFont;
+                                            sty.ForeColor = Color.Blue;
+                                            row.Cells[3].Style = sty;
                                             rows.Add(row);
                                         }
 
@@ -852,16 +962,16 @@ namespace UAssetGUI
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "---";
-                                            row.Cells[1].Value = "GLOBAL VARIABLE INDEX?";
+                                            row.Cells[1].Value = "CHILDREN";
                                             row.Cells[2].Value = "---";
                                             rows.Add(row);
                                         }
 
-                                        for (int i = 0; i < bgcCat.IndexData.Count; i++)
+                                        for (int i = 0; i < bgcCat.Children.Length; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = bgcCat.IndexData[i];
+                                            row.Cells[0].Value = bgcCat.Children[i];
                                             rows.Add(row);
                                         }
 
@@ -870,18 +980,18 @@ namespace UAssetGUI
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "---";
-                                            row.Cells[1].Value = "FUNCTION DATA";
+                                            row.Cells[1].Value = "FUNCTION MAP";
                                             row.Cells[2].Value = "---";
                                             rows.Add(row);
                                         }
 
-                                        for (int i = 0; i < bgcCat.FunctionData.Count; i++)
+                                        for (int i = 0; i < bgcCat.FuncMap.Length; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = bgcCat.FunctionData[i].Name;
-                                            row.Cells[2].Value = bgcCat.FunctionData[i].Category;
-                                            if (bgcCat.FunctionData[i].Category != 0)
+                                            row.Cells[0].Value = bgcCat.FuncMap[i].Name.Value.Value;
+                                            row.Cells[2].Value = bgcCat.FuncMap[i].Category;
+                                            if (bgcCat.FuncMap[i].Category != 0)
                                             {
                                                 row.Cells[3].Value = "Jump";
                                                 row.Cells[3].Tag = "CategoryJump";
@@ -891,26 +1001,7 @@ namespace UAssetGUI
                                                 sty.ForeColor = Color.Blue;
                                                 row.Cells[3].Style = sty;
                                             }
-                                            row.Cells[4].Value = bgcCat.FunctionData[i].Flags;
-                                            rows.Add(row);
-                                        }
-
-                                        // Header 3
-                                        {
-                                            DataGridViewRow row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "---";
-                                            row.Cells[1].Value = "FOOTER DATA";
-                                            row.Cells[2].Value = "---";
-                                            rows.Add(row);
-                                        }
-
-                                        {
-                                            DataGridViewRow row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = BitConverter.ToString(BitConverter.GetBytes(bgcCat.FooterSeparator));
-                                            row.Cells[1].Value = bgcCat.FooterObject + " (" + asset.GetImportObjectName(bgcCat.FooterObject) + ")";
-                                            row.Cells[2].Value = bgcCat.FooterEngine;
+                                            row.Cells[4].Value = bgcCat.FuncMap[i].Name.Number;
                                             rows.Add(row);
                                         }
 
@@ -1362,6 +1453,10 @@ namespace UAssetGUI
                         rowN++;
                     }
                     break;
+                case TableHandlerMode.WorldTileInfo:
+                    // Modification is disabled
+
+                    break;
                 case TableHandlerMode.CustomVersionContainer:
                     // Modification is disabled
 
@@ -1448,7 +1543,7 @@ namespace UAssetGUI
                             if (((PointingTreeNode)pointerNode.Parent).Pointer is PropertyData && ((PropertyData)((PointingTreeNode)pointerNode.Parent).Pointer).Name.Equals(decidedName)) decidedName = usStruct.StructType.Value.Value;
                             pointerNode.Text = decidedName + " (" + newCount + ")";
                         }
-                        else if (pointerNode.Pointer is BlueprintGeneratedClassExport usBGCCat)
+                        else if (pointerNode.Pointer is ClassExport usBGCCat)
                         {
                             // No writing here
                         }

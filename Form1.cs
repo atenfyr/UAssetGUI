@@ -202,7 +202,7 @@ namespace UAssetGUI
                 }
                 if (failedCategoryCount > 0)
                 {
-                    MessageBox.Show("Failed to parse " + failedCategoryCount + " categories!", "Notice");
+                    MessageBox.Show("Failed to parse " + failedCategoryCount + " exports!", "Notice");
                 }
                 if (unknownTypes.Count > 0)
                 {
@@ -211,7 +211,7 @@ namespace UAssetGUI
 
                 if (!tableEditor.asset.VerifyParsing())
                 {
-                    MessageBox.Show("Failed to verify parsing! You may not be able to load this file in-game if modified.", "Uh oh!");
+                    MessageBox.Show("Failed to verify parsing! It is likely that UAssetAPI cannot parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
                 }
 
                 SetParsingVersion(tableEditor.asset.EngineVersion);
@@ -420,6 +420,7 @@ namespace UAssetGUI
             if (e.Node == null) return;
 
             string selectedNodeText = e.Node.Text;
+            string parentSelectedNodeText = e.Node.Parent?.Text;
             if (tableEditor != null)
             {
                 tableEditor.mode = TableHandlerMode.ExportData;
@@ -440,6 +441,9 @@ namespace UAssetGUI
                     case "Soft Package References":
                         tableEditor.mode = TableHandlerMode.SoftPackageReferences;
                         break;
+                    case "World Tile Info":
+                        tableEditor.mode = TableHandlerMode.WorldTileInfo;
+                        break;
                     case "Preload Dependencies":
                         tableEditor.mode = TableHandlerMode.PreloadDependencies;
                         break;
@@ -447,6 +451,9 @@ namespace UAssetGUI
                         tableEditor.mode = TableHandlerMode.CustomVersionContainer;
                         break;
                 }
+
+                if (parentSelectedNodeText == "World Tile Info") tableEditor.mode = TableHandlerMode.WorldTileInfo;
+
                 tableEditor.Load();
             }
         }

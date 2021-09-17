@@ -1,6 +1,7 @@
 ﻿* Overhauled internal code and improved on support for a variety of engine versions (UAssetAPI 1.0).
 * Renamed tabs and fields to be more tool-agnostic.
-* Added a new tab containing information about the custom versions container, if it exists.
+* Added a new tab containing information about the CustomVersionContainer, if it exists.
+* Added a new tab containing information about the WorldTileInfo, if it exists.
 * Added the ability to select an engine version to parse assets with.
 * Added the ability to add new NormalExports (None-terminated UProperty list categories) within UAssetGUI.
 * Added DPI awareness.

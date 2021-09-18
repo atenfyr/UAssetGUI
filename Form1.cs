@@ -187,6 +187,19 @@ namespace UAssetGUI
 
                 UAGPalette.RefreshTheme(this);
 
+                bool hasDuplicates = false;
+                Dictionary<string, bool> nameMapRefs = new Dictionary<string, bool>();
+                foreach (FString x in tableEditor.asset.GetNameMapIndexList())
+                {
+                    if (nameMapRefs.ContainsKey(x.Value))
+                    {
+                        hasDuplicates = true;
+                        break;
+                    }
+                    nameMapRefs.Add(x.Value, true);
+                }
+                nameMapRefs = null;
+
                 int failedCategoryCount = 0;
                 List<string> unknownTypes = new List<string>();
                 foreach (Export cat in tableEditor.asset.Exports)
@@ -200,10 +213,17 @@ namespace UAssetGUI
                         }
                     }
                 }
+
                 if (failedCategoryCount > 0)
                 {
                     MessageBox.Show("Failed to parse " + failedCategoryCount + " exports!", "Notice");
                 }
+
+                if (hasDuplicates)
+                {
+                    MessageBox.Show("Encountered duplicate name map entries! Serialized FNames will coalesce to one of the entries in the map and binary equality may not be maintained.", "Notice");
+                }
+
                 if (unknownTypes.Count > 0)
                 {
                     MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Notice");
@@ -211,7 +231,7 @@ namespace UAssetGUI
 
                 if (!tableEditor.asset.VerifyParsing())
                 {
-                    MessageBox.Show("Failed to verify parsing! It is likely that UAssetAPI cannot parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
+                    MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
                 }
 
                 SetParsingVersion(tableEditor.asset.EngineVersion);
@@ -541,7 +561,7 @@ namespace UAssetGUI
             AboutText = "UAssetGUI v" + GUIVersion + "\n" +
             "By Atenfyr\n" +
             "\nThanks to the Astro-Techies club for the help\n" +
-            "\nThanks to David Hill (Kaiheilos) for in-depth information on Sections 1-5\n" +
+            "\nThanks to David Hill (Kaiheilos) for early assistance with the package summary format\n" +
             "\n(Here's where a soppy monologue goes)\n";
 
             var formPopup = new Form

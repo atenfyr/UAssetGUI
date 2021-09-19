@@ -31,11 +31,13 @@ namespace UAssetGUI
 
         public static string ConvertByteArrayToString(this byte[] val)
         {
+            if (val == null) return "";
             return BitConverter.ToString(val).Replace("-", " ");
         }
 
         public static byte[] ConvertStringToByteArray(this string val)
         {
+            if (val == null) return new byte[0];
             string[] rawStringArr = val.Split(' ');
             byte[] byteArr = new byte[rawStringArr.Length];
             for (int i = 0; i < rawStringArr.Length; i++) byteArr[i] = Convert.ToByte(rawStringArr[i], 16);

@@ -868,7 +868,6 @@ namespace UAssetGUI
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "" });
-
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
@@ -889,6 +888,9 @@ namespace UAssetGUI
                                         renderingArr = usCategory.Data.ToArray();
                                         break;
                                     case 1:
+                                        dataGridView1.Columns.Clear();
+                                        AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
+
                                         ClassExport bgcCat = (ClassExport)usCategory;
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
@@ -912,11 +914,11 @@ namespace UAssetGUI
                                             row.Cells[0].Value = "ScriptBytecode";
                                             row.Cells[1].Value = bgcCat.ScriptBytecode.ConvertByteArrayToString();
                                             rows.Add(row);
-                                            /*row = new DataGridViewRow();
+                                            row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "ClassFlags";
                                             row.Cells[1].Value = bgcCat.ClassFlags.ToString();
-                                            rows.Add(row);*/
+                                            rows.Add(row);
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "ClassWithin";
@@ -977,6 +979,27 @@ namespace UAssetGUI
                                         }
 
                                         // Header 2
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "---";
+                                            row.Cells[1].Value = "LOADED PROPERTIES";
+                                            row.Cells[2].Value = "---";
+                                            rows.Add(row);
+                                        }
+
+                                        for (int i = 0; i < bgcCat.LoadedProperties.Length; i++)
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = bgcCat.LoadedProperties[i].Name.ToString();
+                                            row.Cells[1].Value = bgcCat.LoadedProperties[i].Type.ToString();
+                                            row.Cells[2].Value = bgcCat.LoadedProperties[i].Flags.ToString();
+                                            row.Cells[3].Value = UAGUtils.ConvertByteArrayToString(bgcCat.LoadedProperties[i].Extras);
+                                            rows.Add(row);
+                                        }
+
+                                        // Header 3
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);

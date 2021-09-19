@@ -59,6 +59,8 @@ namespace UAssetGUI
             // Drag-and-drop support
             DragEnter += new DragEventHandler(frm_DragEnter);
             DragDrop += new DragEventHandler(frm_DragDrop);
+
+            dataGridView1.MouseWheel += dataGridView1_MouseWheel;
         }
 
         private string[] versionOptionsKeys = new string[]
@@ -477,6 +479,46 @@ namespace UAssetGUI
 
                 tableEditor.Load();
             }
+        }
+
+        private void dataGridView1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (dataGridView1.SelectedCells.Count < 1) return;
+            var selectedCell = dataGridView1.SelectedCells[0];
+
+            int deltaDir = e.Delta > 0 ? -1 : 1;
+
+            if (selectedCell.Value is int)
+            {
+                selectedCell.Value = (int)selectedCell.Value + deltaDir;
+            }
+            else if (selectedCell.Value is float)
+            {
+                selectedCell.Value = (float)selectedCell.Value + deltaDir;
+            }
+            else if (selectedCell.Value is bool)
+            {
+                selectedCell.Value = !(bool)selectedCell.Value;
+            }
+            else if (selectedCell.Value is string)
+            {
+                string rawVal = (string)selectedCell.Value;
+                string rawValLower = rawVal.ToLowerInvariant();
+                if (int.TryParse(rawVal, out int castedInt))
+                {
+                    selectedCell.Value = (castedInt + deltaDir).ToString();
+                }
+                else if (float.TryParse(rawVal, out float castedFloat))
+                {
+                    selectedCell.Value = (castedFloat + deltaDir).ToString();
+                }
+                else if (rawValLower == "true" || rawValLower == "false")
+                {
+                    selectedCell.Value = rawValLower == "true" ? "False" : "True";
+                }
+            }
+
+            dataGridView1.RefreshEdit();
         }
 
         public void ForceResize()

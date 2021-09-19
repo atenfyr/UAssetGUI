@@ -16,6 +16,7 @@ namespace UAssetGUI
     public enum TableHandlerMode
     {
         None = -1,
+        GeneralInformation,
         NameMap,
         Imports,
         ExportInformation,
@@ -89,6 +90,7 @@ namespace UAssetGUI
             listView1.BeginUpdate();
             listView1.Nodes.Clear();
             listView1.BackColor = UAGPalette.BackColor;
+            listView1.Nodes.Add(new PointingTreeNode("General Information", null));
             listView1.Nodes.Add(new PointingTreeNode("Name Map", null));
             listView1.Nodes.Add(new PointingTreeNode("Import Data", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Information", null));
@@ -107,7 +109,7 @@ namespace UAssetGUI
                 }
             }
             if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("Preload Dependencies", null));
-            if (asset.CustomVersionContainer.Count > 0) listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
+            listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
             PointingTreeNode superTopNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
@@ -317,7 +319,6 @@ namespace UAssetGUI
                                     {
                                         row.Cells[3].Value = txtData.Value[0];
                                         row.Cells[4].Value = txtData.StringTable.ToString();
-                                        row.Cells[5].Value = txtData.StringTable.Number;
                                     }
                                     else
                                     {
@@ -537,17 +538,7 @@ namespace UAssetGUI
                             case TextHistoryType.StringTableEntry:
                                 if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
 
-                                int fInt = 0;
-                                if (value3B is string)
-                                {
-                                    int.TryParse((string)value3B, out fInt);
-                                }
-                                else
-                                {
-                                    fInt = Convert.ToInt32(value3B);
-                                }
-
-                                decidedTextData.StringTable = new FName((string)value2B, fInt);
+                                decidedTextData.StringTable = FName.FromString((string)value2B);
                                 decidedTextData.Value = new string[] { (string)value1B };
                                 break;
                             /*case TextHistoryType.None:
@@ -715,8 +706,34 @@ namespace UAssetGUI
 
             switch (mode)
             {
+                case TableHandlerMode.GeneralInformation:
+                    AddColumns(new string[] { "Property Name", "Value", "" });
+
+                    dataGridView1.Rows.Add(new object[] { "LegacyFileVersion", asset.LegacyFileVersion.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "IsUnversioned", asset.IsUnversioned.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "FileVersionLicenseeUE4", asset.FileVersionLicenseeUE4.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "PackageGuid", asset.PackageGuid.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "PackageFlags", asset.PackageFlags.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "PackageSource", asset.PackageSource.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "FolderName", asset.FolderName.Value });
+
+                    dataGridView1.Rows[0].Cells[0].ToolTipText = "The package file version number when this package was saved. Unrelated to imports.";
+                    dataGridView1.Rows[1].Cells[0].ToolTipText = "Should this asset not serialize its engine and custom versions?";
+                    dataGridView1.Rows[2].Cells[0].ToolTipText = "The licensee file version. Used by some games to add their own Engine-level versioning.";
+                    dataGridView1.Rows[3].Cells[0].ToolTipText = "Current ID for this package. Effectively unused.";
+                    dataGridView1.Rows[4].Cells[0].ToolTipText = "The flags for this package.";
+                    dataGridView1.Rows[5].Cells[0].ToolTipText = "Value that is used to determine if the package was saved by Epic, a licensee, modder, etc.";
+                    dataGridView1.Rows[6].Cells[0].ToolTipText = "The Generic Browser folder name that this package lives in. Usually \"None\" in cooked assets.";
+
+                    for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                    {
+                        dataGridView1.Rows[i].HeaderCell.Value = Convert.ToString(i + 1);
+                    }
+
+                    dataGridView1.AllowUserToAddRows = false;
+                    break;
                 case TableHandlerMode.NameMap:
-                    AddColumns(new string[] { "Name", "Encoding" });
+                    AddColumns(new string[] { "Name", "Encoding", "" });
 
                     IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
                     for (int num = 0; num < headerIndexList.Count; num++)
@@ -802,7 +819,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.WorldTileInfo:
-                    AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3" });
+                    AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "" });
 
                     if (listView1.SelectedNode is PointingTreeNode wtlPointerNode)
                     {
@@ -853,16 +870,12 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
-                    AddColumns(new string[] { "Key", "Friendly Name", "Version" });
+                    AddColumns(new string[] { "Name", "Version", "" });
 
                     for (int num = 0; num < asset.CustomVersionContainer.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { Convert.ToString(asset.CustomVersionContainer[num].Key), asset.CustomVersionContainer[num].FriendlyName == null ? "" : asset.CustomVersionContainer[num].FriendlyName, asset.CustomVersionContainer[num].Version });
+                        dataGridView1.Rows.Add(new object[] { asset.CustomVersionContainer[num].FriendlyName == null ? Convert.ToString(asset.CustomVersionContainer[num].Key) : asset.CustomVersionContainer[num].FriendlyName, asset.CustomVersionContainer[num].Version });
                     }
-
-                    // Modification is disabled
-                    dataGridView1.AllowUserToAddRows = false;
-                    dataGridView1.ReadOnly = true;
                     break;
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
@@ -929,7 +942,6 @@ namespace UAssetGUI
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "ClassConfigName";
                                             row.Cells[1].Value = bgcCat.ClassConfigName.ToString();
-                                            row.Cells[2].Value = bgcCat.ClassConfigName.Number;
                                             rows.Add(row);
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
@@ -1176,6 +1188,38 @@ namespace UAssetGUI
 
             switch (mode)
             {
+                case TableHandlerMode.GeneralInformation:
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        string propertyName = (string)row.Cells[0].Value;
+                        string propertyValue = (string)row.Cells[1].Value;
+                        switch (propertyName)
+                        {
+                            case "LegacyFileVersion":
+                                asset.LegacyFileVersion = Convert.ToInt32(propertyValue);
+                                break;
+                            case "IsUnversioned":
+                                asset.IsUnversioned = propertyValue.ToLowerInvariant() == "true" || propertyValue == "1";
+                                break;
+                            case "FileVersionLicenseeUE4":
+                                asset.FileVersionLicenseeUE4 = Convert.ToInt32(propertyValue);
+                                break;
+                            case "PackageGuid":
+                                if (Guid.TryParse(propertyValue, out Guid newPackageGuid)) asset.PackageGuid = newPackageGuid;
+                                break;
+                            case "PackageFlags":
+                                if (Enum.TryParse(propertyValue, out EPackageFlags newPackageFlags)) asset.PackageFlags = newPackageFlags;
+                                break;
+                            case "PackageSource":
+                                if (uint.TryParse(propertyValue, out uint newPackageSource)) asset.PackageSource = newPackageSource;
+                                break;
+                            case "FolderName":
+                                asset.FolderName = new FString(propertyValue, Encoding.UTF8.GetByteCount(propertyValue) == propertyValue.Length ? Encoding.ASCII : Encoding.Unicode);
+                                break;
+                        }
+
+                    }
+                    break;
                 case TableHandlerMode.NameMap:
                     asset.ClearNameIndexList();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
@@ -1453,12 +1497,16 @@ namespace UAssetGUI
 
                     break;
                 case TableHandlerMode.CustomVersionContainer:
-                    // Modification is disabled
-
-                    /*asset.CustomVersionContainer = new List<CustomVersion>();
+                    asset.CustomVersionContainer = new List<CustomVersion>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        if (!Guid.TryParse((string)row.Cells[0].Value, out Guid customVersionKey)) continue;
+                        string rawCustomVersion = (string)row.Cells[0].Value;
+                        Guid customVersionKey = CustomVersion.UnusedCustomVersionKey;
+                        if (!Guid.TryParse(rawCustomVersion, out customVersionKey))
+                        {
+                            customVersionKey = CustomVersion.GetCustomVersionGuidFromFriendlyName(rawCustomVersion);
+                        }
+                        if (customVersionKey == CustomVersion.UnusedCustomVersionKey) continue;
 
                         int customVersionNumber;
                         if (row.Cells[1].Value is string)
@@ -1471,7 +1519,7 @@ namespace UAssetGUI
                         }
 
                         asset.CustomVersionContainer.Add(new CustomVersion(customVersionKey, customVersionNumber));
-                    }*/
+                    }
                     break;
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
@@ -1641,6 +1689,7 @@ namespace UAssetGUI
             this.asset = asset;
             this.dataGridView1 = dataGridView1;
             this.listView1 = listView1;
+            this.mode = 0;
         }
     }
 }

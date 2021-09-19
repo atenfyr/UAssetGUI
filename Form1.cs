@@ -174,10 +174,7 @@ namespace UAssetGUI
                 currentSavingPath = filePath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion, true, true, null, null), listView1)
-                {
-                    mode = TableHandlerMode.NameMap
-                };
+                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion, true, true, null, null), listView1);
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
@@ -238,6 +235,7 @@ namespace UAssetGUI
             }
             catch (Exception ex)
             {
+                //MessageBox.Show(ex.StackTrace);
                 currentSavingPath = "";
                 SetUnsavedChanges(false);
                 tableEditor = null;
@@ -257,7 +255,7 @@ namespace UAssetGUI
                         MessageBox.Show("Failed to parse this file!\n" + formatEx.GetType() + ": " + formatEx.Message, "Uh oh!");
                         break;
                     case UnknownEngineVersionException _:
-                        MessageBox.Show("Please specify an engine version before opening an unversioned asset.", "Uh oh!");
+                        MessageBox.Show("Please specify an engine version using the dropdown at the upper-right corner of this window before opening an unversioned asset.", "Uh oh!");
                         break;
                     default:
                         MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
@@ -446,6 +444,9 @@ namespace UAssetGUI
                 tableEditor.mode = TableHandlerMode.ExportData;
                 switch (selectedNodeText)
                 {
+                    case "General Information":
+                        tableEditor.mode = TableHandlerMode.GeneralInformation;
+                        break;
                     case "Name Map":
                         tableEditor.mode = TableHandlerMode.NameMap;
                         break;

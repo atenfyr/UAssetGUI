@@ -81,7 +81,7 @@ namespace UAssetGUI
                     }
                 }
 
-                Color selectedDGVBackColor = frm1.dataGridView1.Columns.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
+                Color selectedDGVBackColor = frm1.dataGridView1.Columns.Count > 0 ? UAGPalette.DataGridViewActiveColor : UAGPalette.InactiveColor;
                 frm1.dataGridView1.BackgroundColor = selectedDGVBackColor;
                 frm1.dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = UAGPalette.BackColor; // intentional
                 frm1.dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = UAGPalette.ForeColor;

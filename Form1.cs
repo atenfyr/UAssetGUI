@@ -176,7 +176,7 @@ namespace UAssetGUI
                 currentSavingPath = filePath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion, true, true, null, null), listView1);
+                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion, true, true), listView1);
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
@@ -488,6 +488,7 @@ namespace UAssetGUI
 
             int deltaDir = e.Delta > 0 ? -1 : 1;
 
+            bool didSomething = true;
             if (selectedCell.Value is int)
             {
                 selectedCell.Value = (int)selectedCell.Value + deltaDir;
@@ -514,11 +515,23 @@ namespace UAssetGUI
                 }
                 else if (rawValLower == "true" || rawValLower == "false")
                 {
-                    selectedCell.Value = rawValLower == "true" ? "False" : "True";
+                    selectedCell.Value = (rawValLower == "true" ? false : true).ToString();
+                }
+                else
+                {
+                    didSomething = false;
                 }
             }
+            else
+            {
+                didSomething = false;
+            }
 
-            dataGridView1.RefreshEdit();
+            if (didSomething)
+            {
+                dataGridView1.RefreshEdit();
+                ((HandledMouseEventArgs)e).Handled = true;
+            }
         }
 
         public void ForceResize()

@@ -1149,10 +1149,12 @@ namespace UAssetGUI
                                 dataGridView1.AllowUserToAddRows = false;
                                 break;
                             case byte[] bytes:
+                                Control currentlyFocusedControl = ((Form1)dataGridView1.Parent).ActiveControl;
                                 dataGridView1.Visible = false;
                                 byteView1.SetBytes(new byte[] { });
                                 byteView1.SetBytes(bytes);
                                 byteView1.Visible = true;
+                                currentlyFocusedControl.Focus();
                                 origForm.ForceResize();
                                 standardRendering = false;
                                 break;

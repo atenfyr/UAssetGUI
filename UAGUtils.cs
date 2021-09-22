@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
+using UAssetAPI.PropertyTypes;
 
 namespace UAssetGUI
 {
@@ -27,6 +29,32 @@ namespace UAssetGUI
             }
             catch (NotSupportedException) { }
             return null;
+        }
+
+        public static void UpdateObjectPropertyValues(DataGridViewRow row, DataGridView dgv, ObjectPropertyData objData)
+        {
+            if (dgv == null || row == null || objData == null) return;
+
+            bool underlineStyle = false;
+            if (objData.CurrentIndex <= 0 && objData.Value == null)
+            {
+                row.Cells[3].Value = string.Empty;
+            }
+            else
+            {
+                row.Cells[3].Value = objData.CurrentIndex > 0 ? "Jump" : objData.Value?.ObjectName?.ToString();
+                row.Cells[3].Tag = "CategoryJump";
+                if (objData.CurrentIndex > 0) underlineStyle = true;
+            }
+
+            DataGridViewCellStyle sty = new DataGridViewCellStyle();
+            if (underlineStyle)
+            {
+                Font styFont = new Font(dgv.Font.Name, dgv.Font.Size, FontStyle.Underline);
+                sty.Font = styFont;
+                sty.ForeColor = Color.Blue;
+            }
+            row.Cells[3].Style = sty;
         }
 
         public static string ConvertByteArrayToString(this byte[] val)

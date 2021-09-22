@@ -278,19 +278,7 @@ namespace UAssetGUI
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;
                                 row.Cells[2].Value = objData.CurrentIndex;
-                                if (objData.CurrentIndex != 0)
-                                {
-                                    row.Cells[3].Value = objData.CurrentIndex > 0 ? "Jump" : objData.Value.ObjectName.ToString();
-                                    row.Cells[3].Tag = "CategoryJump";
-                                    if (objData.CurrentIndex > 0)
-                                    {
-                                        DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                        Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
-                                        sty.Font = styFont;
-                                        sty.ForeColor = Color.Blue;
-                                        row.Cells[3].Style = sty;
-                                    }
-                                }
+                                if (objData.CurrentIndex != 0) UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, objData);
                                 break;
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
@@ -501,7 +489,7 @@ namespace UAssetGUI
                     return res;
                 }
 
-                switch (type)
+                switch (FName.FromString(type).Value.Value)
                 {
                     case "TextProperty":
                         TextPropertyData decidedTextData = null;
@@ -570,8 +558,8 @@ namespace UAssetGUI
                         if (transformB is int) objValue = (int)transformB;
                         if (objValue == int.MinValue) return null;
 
-                        decidedObjData.CurrentIndex = objValue;
-                        decidedObjData.Value = asset.Imports.ElementAtOrDefault(UAPUtils.GetNormalIndex(objValue));
+                        decidedObjData.SetCurrentIndex(objValue);
+                        UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, decidedObjData);
                         return decidedObjData;
                     case "RichCurveKey":
                         RichCurveKeyProperty decidedRCKProperty = null;
@@ -1005,9 +993,8 @@ namespace UAssetGUI
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = bgcCat.LoadedProperties[i].Name.ToString();
-                                            row.Cells[1].Value = bgcCat.LoadedProperties[i].Type.ToString();
+                                            row.Cells[1].Value = bgcCat.LoadedProperties[i].SerializedType.ToString();
                                             row.Cells[2].Value = bgcCat.LoadedProperties[i].Flags.ToString();
-                                            row.Cells[3].Value = UAGUtils.ConvertByteArrayToString(bgcCat.LoadedProperties[i].Extras);
                                             rows.Add(row);
                                         }
 

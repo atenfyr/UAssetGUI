@@ -530,7 +530,10 @@ namespace UAssetGUI
             if (didSomething)
             {
                 dataGridView1.RefreshEdit();
-                ((HandledMouseEventArgs)e).Handled = true;
+                if (e is HandledMouseEventArgs ee)
+                {
+                    ee.Handled = true;
+                }
             }
         }
 

@@ -677,5 +677,29 @@ namespace UAssetGUI
         {
             UpdateComboSpecifyVersion();
         }
+
+        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (ModifierKeys == Keys.Shift)
+            {
+                TreeNode newNode = null;
+                if (e.KeyCode.HasFlag(Keys.Up)) // SHIFT + UP = navigate to previous node @ same level
+                {
+                    newNode = listView1.SelectedNode.PrevNode;
+                    e.Handled = true;
+                }
+                else if (e.KeyCode.HasFlag(Keys.Down)) // SHIFT + DOWN = navigate to next node @ same level
+                {
+                    newNode = listView1.SelectedNode.NextNode;
+                    e.Handled = true;
+                }
+
+                if (newNode != null)
+                {
+                    listView1.SelectedNode = newNode;
+                    listView1.SelectedNode.EnsureVisible();
+                }
+            }
+        }
     }
 }

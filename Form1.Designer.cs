@@ -241,6 +241,7 @@ namespace UAssetGUI
             this.listView1.Size = new System.Drawing.Size(344, 411);
             this.listView1.TabIndex = 1;
             this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
             // 
             // columnHeader1
             // 

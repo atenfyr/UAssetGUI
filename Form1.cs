@@ -208,7 +208,7 @@ namespace UAssetGUI
                     {
                         foreach (PropertyData dat in usNormal.Data)
                         {
-                            if (dat is UnknownPropertyData && !string.IsNullOrEmpty(dat.Type.Value.Value) && !unknownTypes.Contains(dat.Type.Value.Value)) unknownTypes.Add(dat.Type.Value.Value);
+                            if (dat is UnknownPropertyData unknownDat && !string.IsNullOrEmpty(unknownDat.SerializingPropertyType.Value.Value) && !unknownTypes.Contains(unknownDat.SerializingPropertyType.Value.Value)) unknownTypes.Add(unknownDat.SerializingPropertyType.Value.Value);
                         }
                     }
                 }

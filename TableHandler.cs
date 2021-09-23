@@ -180,7 +180,7 @@ namespace UAssetGUI
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode)
         {
             if (me == null) return;
-            switch (me.Type.Value.Value)
+            switch (me.PropertyType.Value.Value)
             {
                 case "StructProperty":
                     var struc = (StructPropertyData)me;
@@ -261,7 +261,7 @@ namespace UAssetGUI
                     DataGridViewRow row = new DataGridViewRow();
                     row.CreateCells(dataGridView1);
                     row.Cells[0].Value = thisPD.Name.ToString();
-                    row.Cells[1].Value = thisPD.Type.ToString();
+                    row.Cells[1].Value = thisPD.PropertyType.ToString();
                     if (thisPD is UnknownPropertyData)
                     {
                         row.Cells[2].Value = "Unknown ser.";
@@ -269,7 +269,7 @@ namespace UAssetGUI
                     }
                     else
                     {
-                        switch (thisPD.Type.Value.Value)
+                        switch (thisPD.PropertyType.Value.Value)
                         {
                             case "BoolProperty":
                                 row.Cells[2].Value = string.Empty;
@@ -362,6 +362,7 @@ namespace UAssetGUI
                                 break;
                             case "GameplayTagContainer":
                             case "MapProperty":
+                            case "SkeletalMeshSamplingLODBuiltData":
                                 break;
                             case "Box":
                                 var boxData = (BoxPropertyData)thisPD;
@@ -447,6 +448,7 @@ namespace UAssetGUI
                     }
 
                     row.Cells[8].Value = thisPD.DuplicationIndex;
+                    row.Cells[9].Value = asset.UseSeparateBulkDataFiles ? thisPD.Offset - asset.Exports[0].ReferenceData.SerialOffset : thisPD.Offset;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -485,7 +487,7 @@ namespace UAssetGUI
                     {
                         Value = ((string)value1B).ConvertStringToByteArray()
                     };
-                    res.Type = FName.FromString(type);
+                    res.SetSerializingPropertyType(FName.FromString(type));
                     return res;
                 }
 
@@ -868,7 +870,7 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "Serial Offset", "" });
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
@@ -1067,8 +1069,8 @@ namespace UAssetGUI
                                     if (usMap.Value.Count > 0)
                                     {
                                         DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                                        FName mapKeyType = ((PropertyData)firstEntry.Key).Type;
-                                        FName mapValueType = ((PropertyData)firstEntry.Value).Type;
+                                        FName mapKeyType = ((PropertyData)firstEntry.Key).PropertyType;
+                                        FName mapValueType = ((PropertyData)firstEntry.Value).PropertyType;
 
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
                                         for (int i = 0; i < usMap.Value.Count; i++)
@@ -1532,8 +1534,8 @@ namespace UAssetGUI
                         else if (pointerNode.Pointer is MapPropertyData usMap)
                         {
                             DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                            FName mapKeyType = ((PropertyData)firstEntry.Key).Type;
-                            FName mapValueType = ((PropertyData)firstEntry.Value).Type;
+                            FName mapKeyType = ((PropertyData)firstEntry.Key).PropertyType;
+                            FName mapValueType = ((PropertyData)firstEntry.Value).PropertyType;
 
                             OrderedDictionary newData = new OrderedDictionary();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
@@ -8,6 +9,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
+using UAssetAPI.StructTypes;
 
 namespace UAssetGUI
 {
@@ -166,6 +168,45 @@ namespace UAssetGUI
             }
         }
 
+        private List<string> unknownTypes = new List<string>();
+        private bool RecordUnknownProperty(PropertyData dat)
+        {
+            if (dat == null) return false;
+
+            if (dat is UnknownPropertyData unknownDat)
+            {
+                string serializingType = unknownDat?.SerializingPropertyType?.Value?.Value;
+                if (!string.IsNullOrEmpty(serializingType) && !unknownTypes.Contains(serializingType))
+                {
+                    unknownTypes.Add(serializingType);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void GetUnknownProperties(PropertyData dat)
+        {
+            RecordUnknownProperty(dat);
+
+            if (dat is ArrayPropertyData arrDat)
+            {
+                for (int i = 0; i < arrDat.Value.Length; i++) GetUnknownProperties(arrDat.Value[i]);
+            }
+            else if (dat is StructPropertyData strucDat)
+            {
+                for (int i = 0; i < strucDat.Value.Count; i++) GetUnknownProperties(strucDat.Value[i]);
+            }
+            else if (dat is MapPropertyData mapDat)
+            {
+                foreach (DictionaryEntry entry in mapDat.Value) 
+                {
+                    GetUnknownProperties(entry.Key as PropertyData);
+                    GetUnknownProperties(entry.Value as PropertyData);
+                }
+            }
+        }
+
         public void LoadFileAt(string filePath)
         {
             dataGridView1.Visible = true;
@@ -200,16 +241,13 @@ namespace UAssetGUI
                 nameMapRefs = null;
 
                 int failedCategoryCount = 0;
-                List<string> unknownTypes = new List<string>();
+                unknownTypes = new List<string>();
                 foreach (Export cat in tableEditor.asset.Exports)
                 {
                     if (cat is RawExport) failedCategoryCount++;
                     if (cat is NormalExport usNormal)
                     {
-                        foreach (PropertyData dat in usNormal.Data)
-                        {
-                            if (dat is UnknownPropertyData unknownDat && !string.IsNullOrEmpty(unknownDat.SerializingPropertyType.Value.Value) && !unknownTypes.Contains(unknownDat.SerializingPropertyType.Value.Value)) unknownTypes.Add(unknownDat.SerializingPropertyType.Value.Value);
-                        }
+                        foreach (PropertyData dat in usNormal.Data) GetUnknownProperties(dat);
                     }
                 }
 

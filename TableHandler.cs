@@ -286,6 +286,7 @@ namespace UAssetGUI
                     row.Cells[1].Value = thisPD.PropertyType.ToString();
                     if (thisPD is UnknownPropertyData)
                     {
+                        row.Cells[1].Value = ((UnknownPropertyData)thisPD).SerializingPropertyType.ToString();
                         row.Cells[2].Value = "Unknown ser.";
                         row.Cells[3].Value = ((UnknownPropertyData)thisPD).Value.ConvertByteArrayToString();
                     }

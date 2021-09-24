@@ -1123,7 +1123,6 @@ namespace UAssetGUI
                                         }
 
                                         dataGridView1.Rows.AddRange(enumRows.ToArray());
-                                        dataGridView1.AllowUserToAddRows = false;
                                         standardRendering = false;
                                         break;
                                 }

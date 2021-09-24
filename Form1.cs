@@ -289,7 +289,7 @@ namespace UAssetGUI
                 switch(ex)
                 {
                     case IOException _:
-                        MessageBox.Show("Failed to open this file!", "Uh oh!");
+                        MessageBox.Show("Failed to open this file! Please make sure the specified engine version is correct.", "Uh oh!");
                         break;
                     case FormatException formatEx:
                         MessageBox.Show("Failed to parse this file!\n" + formatEx.GetType() + ": " + formatEx.Message, "Uh oh!");

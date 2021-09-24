@@ -163,6 +163,12 @@ namespace UAssetGUI
                             }
                         }
 
+                        if (us is EnumExport us5)
+                        {
+                            var parentNode2 = new PointingTreeNode("Enum Data", us5, 2);
+                            categoryNode.Nodes.Add(parentNode2);
+                        }
+
                         {
                             var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
                             categoryNode.Nodes.Add(parentNode3);
@@ -1033,6 +1039,35 @@ namespace UAssetGUI
                                         dataGridView1.ReadOnly = true;
                                         standardRendering = false;
                                         break;
+                                    case 2:
+                                        dataGridView1.Columns.Clear();
+                                        AddColumns(new string[] { "Name", "Value", "" });
+
+                                        EnumExport enumCat = (EnumExport)usCategory;
+                                        List<DataGridViewRow> enumRows = new List<DataGridViewRow>();
+
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "CppForm";
+                                            row.Cells[0].ToolTipText = "How the enum was originally defined.";
+                                            row.Cells[1].Value = enumCat.CppForm.ToString();
+                                            enumRows.Add(row);
+                                        }
+
+                                        for (int i = 0; i < enumCat.Names.Count; i++)
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = enumCat.Names[i].Item1.ToString();
+                                            row.Cells[1].Value = enumCat.Names[i].Item2.ToString();
+                                            enumRows.Add(row);
+                                        }
+
+                                        dataGridView1.Rows.AddRange(enumRows.ToArray());
+                                        dataGridView1.AllowUserToAddRows = false;
+                                        standardRendering = false;
+                                        break;
                                 }
    
                                 break;
@@ -1583,19 +1618,48 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is NormalExport usCat)
                         {
-                            List<PropertyData> newData = new List<PropertyData>();
-                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            switch(pointerNode.Type)
                             {
-                                PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    newData.Add(null);
-                                    continue;
-                                }
-                                newData.Add(val);
+                                case 0:
+                                    List<PropertyData> newData = new List<PropertyData>();
+                                    for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                                    {
+                                        PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
+                                        if (val == null)
+                                        {
+                                            newData.Add(null);
+                                            continue;
+                                        }
+                                        newData.Add(val);
+                                    }
+                                    usCat.Data = newData;
+                                    pointerNode.Text = asset.GetImportObjectName(usCat.ReferenceData.ClassIndex).Value.Value + " (" + usCat.Data.Count + ")";
+                                    break;
+                                case 2:
+                                    if (usCat is EnumExport enumCat)
+                                    {
+                                        enumCat.Names = new List<Tuple<FName, long>>();
+                                        for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                                        {
+                                            var currRow = dataGridView1.Rows[i];
+                                            if (currRow == null || currRow.Cells.Count < 2) continue;
+                                            
+                                            string enumFrontValue = (string)currRow.Cells[0].Value;
+                                            string enumValueValue = (string)currRow.Cells[1].Value;
+                                            if (enumFrontValue == "CppForm")
+                                            {
+                                                Enum.TryParse(enumValueValue, out enumCat.CppForm);
+                                            }
+                                            else
+                                            {
+                                                long.TryParse(enumValueValue, out long enumValue);
+                                                enumCat.Names.Add(new Tuple<FName, long>(FName.FromString(enumFrontValue), enumValue));
+                                            }
+                                        }
+                                    }
+                                    break;
                             }
-                            usCat.Data = newData;
-                            pointerNode.Text = asset.GetImportObjectName(usCat.ReferenceData.ClassIndex).Value.Value + " (" + usCat.Data.Count + ")";
+                            
                         }
                         else if (pointerNode.Pointer is DataTable dtUs)
                         {

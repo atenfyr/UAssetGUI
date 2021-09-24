@@ -1,4 +1,5 @@
-﻿* Overhauled internal code and improved on support for a variety of engine versions (UAssetAPI 1.0).
+﻿* Overhauled internal code and improved support for a variety of engine versions and assets (UAssetAPI 1.0).
+* Added further BlueprintGeneratedClass and UserDefinedEnum support.
 * Renamed tabs and fields to be more tool-agnostic.
 * Added support for versioned assets.
 * Added a new tab containing information about the CustomVersionContainer.

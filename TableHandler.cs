@@ -40,12 +40,20 @@ namespace UAssetGUI
         UInt
     }
 
+    public enum PointingTreeNodeType
+    {
+        Normal,
+        StructData,
+        ClassData,
+        EnumData,
+    }
+
     public class PointingTreeNode : TreeNode
     {
         public object Pointer;
-        public int Type;
+        public PointingTreeNodeType Type;
 
-        public PointingTreeNode(string label, object pointer, int type = 0)
+        public PointingTreeNode(string label, object pointer, PointingTreeNodeType type = 0)
         {
             Pointer = pointer;
             Type = type;
@@ -139,9 +147,17 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
-                        if (us is ClassExport us3)
+                        if (us is StructExport structUs)
                         {
-                            var parentNode2 = new PointingTreeNode("Export Layout Data", us3, 1);
+                            var parentNode2 = new PointingTreeNode("UStruct Data", structUs, PointingTreeNodeType.StructData);
+                            categoryNode.Nodes.Add(parentNode2);
+                            var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " B)", structUs.ScriptBytecode, PointingTreeNodeType.Normal);
+                            parentNode2.Nodes.Add(bytecodeNode);
+                        }
+
+                        if (us is ClassExport)
+                        {
+                            var parentNode2 = new PointingTreeNode("UClass Data", (ClassExport)us, PointingTreeNodeType.ClassData);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
@@ -165,7 +181,7 @@ namespace UAssetGUI
 
                         if (us is EnumExport us5)
                         {
-                            var parentNode2 = new PointingTreeNode("Enum Data", us5, 2);
+                            var parentNode2 = new PointingTreeNode("Enum Data", us5, PointingTreeNodeType.EnumData);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
@@ -885,7 +901,7 @@ namespace UAssetGUI
                             case NormalExport usCategory:
                                 switch(pointerNode.Type)
                                 {
-                                    case 0:
+                                    case PointingTreeNodeType.Normal:
                                         for (int num = 0; num < usCategory.Data.Count; num++)
                                         {
                                             if (usCategory.Data[num] == null)
@@ -896,16 +912,16 @@ namespace UAssetGUI
                                         }
                                         renderingArr = usCategory.Data.ToArray();
                                         break;
-                                    case 1:
+                                    case PointingTreeNodeType.StructData:
                                         dataGridView1.Columns.Clear();
                                         AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
 
-                                        ClassExport bgcCat = (ClassExport)usCategory;
+                                        StructExport strucCat = (StructExport)usCategory;
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
                                             ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
-                                            testProperty.SetCurrentIndex(bgcCat.SuperStruct);
+                                            testProperty.SetCurrentIndex(strucCat.SuperStruct);
 
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
@@ -916,55 +932,13 @@ namespace UAssetGUI
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "ScriptBytecodeSize";
-                                            row.Cells[1].Value = bgcCat.ScriptBytecodeSize;
+                                            row.Cells[0].ToolTipText = "Number of bytecode instructions in this UStruct";
+                                            row.Cells[1].Value = strucCat.ScriptBytecodeSize;
                                             rows.Add(row);
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "ScriptBytecode";
-                                            row.Cells[1].Value = bgcCat.ScriptBytecode.ConvertByteArrayToString();
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "ClassFlags";
-                                            row.Cells[1].Value = bgcCat.ClassFlags.ToString();
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "ClassWithin";
-                                            row.Cells[1].Value = bgcCat.ClassWithin;
-                                            row.Cells[2].Value = bgcCat.ClassWithin >= 0 ? "" : asset.GetImportObjectName(bgcCat.ClassWithin).ToString();
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "ClassConfigName";
-                                            row.Cells[1].Value = bgcCat.ClassConfigName.ToString();
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "ClassGeneratedBy";
-                                            row.Cells[1].Value = bgcCat.ClassGeneratedBy;
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "bDeprecatedForceScriptOrder";
-                                            row.Cells[1].Value = bgcCat.bDeprecatedForceScriptOrder;
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "bCooked";
-                                            row.Cells[1].Value = bgcCat.bCooked;
-                                            rows.Add(row);
-                                            row = new DataGridViewRow();
-                                            row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = "ClassDefaultObject";
-                                            row.Cells[2].Value = bgcCat.ClassDefaultObject;
-                                            row.Cells[3].Value = "Jump";
-                                            row.Cells[3].Tag = "CategoryJump";
-                                            DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
-                                            sty.Font = styFont;
-                                            sty.ForeColor = Color.Blue;
-                                            row.Cells[3].Style = sty;
+                                            row.Cells[1].Value = string.Empty;
                                             rows.Add(row);
                                         }
 
@@ -978,11 +952,11 @@ namespace UAssetGUI
                                             rows.Add(row);
                                         }
 
-                                        for (int i = 0; i < bgcCat.Children.Length; i++)
+                                        for (int i = 0; i < strucCat.Children.Length; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = bgcCat.Children[i];
+                                            row.Cells[0].Value = strucCat.Children[i];
                                             rows.Add(row);
                                         }
 
@@ -996,13 +970,13 @@ namespace UAssetGUI
                                             rows.Add(row);
                                         }
 
-                                        for (int i = 0; i < bgcCat.LoadedProperties.Length; i++)
+                                        for (int i = 0; i < strucCat.LoadedProperties.Length; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = bgcCat.LoadedProperties[i].Name.ToString();
-                                            row.Cells[1].Value = bgcCat.LoadedProperties[i].SerializedType.ToString();
-                                            row.Cells[2].Value = bgcCat.LoadedProperties[i].Flags.ToString();
+                                            row.Cells[0].Value = strucCat.LoadedProperties[i].Name.ToString();
+                                            row.Cells[1].Value = strucCat.LoadedProperties[i].SerializedType.ToString();
+                                            row.Cells[2].Value = strucCat.LoadedProperties[i].Flags.ToString();
                                             rows.Add(row);
                                         }
 
@@ -1011,9 +985,81 @@ namespace UAssetGUI
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "---";
-                                            row.Cells[1].Value = "FUNCTION MAP";
+                                            row.Cells[1].Value = "END";
                                             row.Cells[2].Value = "---";
                                             rows.Add(row);
+                                        }
+
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                        dataGridView1.ReadOnly = true;
+                                        dataGridView1.AllowUserToAddRows = false;
+                                        standardRendering = false;
+                                        break;
+                                    case PointingTreeNodeType.ClassData:
+                                        dataGridView1.Columns.Clear();
+                                        AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
+
+                                        ClassExport bgcCat = (ClassExport)usCategory;
+                                        List<DataGridViewRow> classRows = new List<DataGridViewRow>();
+
+                                        {
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
+                                            testProperty.SetCurrentIndex(bgcCat.SuperStruct);
+
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassFlags";
+                                            row.Cells[1].Value = bgcCat.ClassFlags.ToString();
+                                            classRows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassWithin";
+                                            row.Cells[1].Value = bgcCat.ClassWithin;
+                                            row.Cells[2].Value = bgcCat.ClassWithin >= 0 ? "" : asset.GetImportObjectName(bgcCat.ClassWithin).ToString();
+                                            classRows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassConfigName";
+                                            row.Cells[1].Value = bgcCat.ClassConfigName.ToString();
+                                            classRows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassGeneratedBy";
+                                            row.Cells[1].Value = bgcCat.ClassGeneratedBy;
+                                            classRows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "bDeprecatedForceScriptOrder";
+                                            row.Cells[1].Value = bgcCat.bDeprecatedForceScriptOrder;
+                                            classRows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "bCooked";
+                                            row.Cells[1].Value = bgcCat.bCooked;
+                                            classRows.Add(row);
+                                            row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "ClassDefaultObject";
+                                            row.Cells[2].Value = bgcCat.ClassDefaultObject;
+                                            row.Cells[3].Value = "Jump";
+                                            row.Cells[3].Tag = "CategoryJump";
+                                            DataGridViewCellStyle sty = new DataGridViewCellStyle();
+                                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                            sty.Font = styFont;
+                                            sty.ForeColor = Color.Blue;
+                                            row.Cells[3].Style = sty;
+                                            classRows.Add(row);
+                                        }
+
+                                        // Header 1
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "---";
+                                            row.Cells[1].Value = "FUNCTION MAP";
+                                            row.Cells[2].Value = "---";
+                                            classRows.Add(row);
                                         }
 
                                         for (int i = 0; i < bgcCat.FuncMap.Length; i++)
@@ -1032,14 +1078,25 @@ namespace UAssetGUI
                                                 sty.ForeColor = Color.Blue;
                                                 row.Cells[3].Style = sty;
                                             }
-                                            rows.Add(row);
+                                            classRows.Add(row);
                                         }
 
-                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                        // Header 2
+                                        {
+                                            DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "---";
+                                            row.Cells[1].Value = "END";
+                                            row.Cells[2].Value = "---";
+                                            classRows.Add(row);
+                                        }
+
+                                        dataGridView1.Rows.AddRange(classRows.ToArray());
                                         dataGridView1.ReadOnly = true;
+                                        dataGridView1.AllowUserToAddRows = false;
                                         standardRendering = false;
                                         break;
-                                    case 2:
+                                    case PointingTreeNodeType.EnumData:
                                         dataGridView1.Columns.Clear();
                                         AddColumns(new string[] { "Name", "Value", "" });
 
@@ -1051,16 +1108,16 @@ namespace UAssetGUI
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "CppForm";
                                             row.Cells[0].ToolTipText = "How the enum was originally defined.";
-                                            row.Cells[1].Value = enumCat.CppForm.ToString();
+                                            row.Cells[1].Value = enumCat.Enum.CppForm.ToString();
                                             enumRows.Add(row);
                                         }
 
-                                        for (int i = 0; i < enumCat.Names.Count; i++)
+                                        for (int i = 0; i < enumCat.Enum.Names.Count; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = enumCat.Names[i].Item1.ToString();
-                                            row.Cells[1].Value = enumCat.Names[i].Item2.ToString();
+                                            row.Cells[0].Value = enumCat.Enum.Names[i].Item1.ToString();
+                                            row.Cells[1].Value = enumCat.Enum.Names[i].Item2.ToString();
                                             enumRows.Add(row);
                                         }
 
@@ -1620,7 +1677,7 @@ namespace UAssetGUI
                         {
                             switch(pointerNode.Type)
                             {
-                                case 0:
+                                case PointingTreeNodeType.Normal:
                                     List<PropertyData> newData = new List<PropertyData>();
                                     for (int i = 0; i < dataGridView1.Rows.Count; i++)
                                     {
@@ -1635,10 +1692,10 @@ namespace UAssetGUI
                                     usCat.Data = newData;
                                     pointerNode.Text = asset.GetImportObjectName(usCat.ReferenceData.ClassIndex).Value.Value + " (" + usCat.Data.Count + ")";
                                     break;
-                                case 2:
+                                case PointingTreeNodeType.EnumData:
                                     if (usCat is EnumExport enumCat)
                                     {
-                                        enumCat.Names = new List<Tuple<FName, long>>();
+                                        enumCat.Enum = new UEnum();
                                         for (int i = 0; i < dataGridView1.Rows.Count; i++)
                                         {
                                             var currRow = dataGridView1.Rows[i];
@@ -1648,12 +1705,12 @@ namespace UAssetGUI
                                             string enumValueValue = (string)currRow.Cells[1].Value;
                                             if (enumFrontValue == "CppForm")
                                             {
-                                                Enum.TryParse(enumValueValue, out enumCat.CppForm);
+                                                Enum.TryParse(enumValueValue, out enumCat.Enum.CppForm);
                                             }
                                             else
                                             {
                                                 long.TryParse(enumValueValue, out long enumValue);
-                                                enumCat.Names.Add(new Tuple<FName, long>(FName.FromString(enumFrontValue), enumValue));
+                                                enumCat.Enum.Names.Add(new Tuple<FName, long>(FName.FromString(enumFrontValue), enumValue));
                                             }
                                         }
                                     }

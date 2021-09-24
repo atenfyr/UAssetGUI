@@ -1710,7 +1710,8 @@ namespace UAssetGUI
                                             else
                                             {
                                                 long.TryParse(enumValueValue, out long enumValue);
-                                                enumCat.Enum.Names.Add(new Tuple<FName, long>(FName.FromString(enumFrontValue), enumValue));
+                                                FName enumEntryName = FName.FromString(enumFrontValue);
+                                                if (enumEntryName != null) enumCat.Enum.Names.Add(new Tuple<FName, long>(enumEntryName, enumValue));
                                             }
                                         }
                                     }

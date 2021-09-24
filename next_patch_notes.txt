@@ -1,6 +1,7 @@
 ﻿* Overhauled internal code and improved support for a variety of engine versions and assets (UAssetAPI 1.0).
-* Added further BlueprintGeneratedClass and UserDefinedEnum support.
+* Added further BlueprintGeneratedClass, UFunction, and UserDefinedEnum support.
 * Renamed tabs and fields to be more tool-agnostic.
+* Added many new shortcut keys.
 * Added support for versioned assets.
 * Added a new tab containing information about the CustomVersionContainer.
 * Added a new tab containing information about the WorldTileInfo, if it exists.
@@ -9,4 +10,4 @@
 * Added DPI awareness.
 * Added the ability to manually change the encoding of entries in the name map (header list).
 * Added more information while displaying TextProperty data.
-* Added support for a variety of different properties.
+* Added support for a variety of new properties.

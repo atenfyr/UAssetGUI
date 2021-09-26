@@ -217,7 +217,7 @@ namespace UAssetGUI
                 currentSavingPath = filePath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion, true, true), listView1);
+                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion), listView1);
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -319,29 +320,30 @@ namespace UAssetGUI
                                 break;
                             case "TextProperty":
                                 var txtData = (TextPropertyData)thisPD;
-                                row.Cells[2].Value = (sbyte)txtData.HistoryType;
-                                if (txtData.Value == null)
+                                row.Cells[2].Value = txtData.HistoryType.ToString();
+                                row.Cells[2].ToolTipText = "HistoryType";
+                                switch (txtData.HistoryType)
                                 {
-                                    row.Cells[3].Value = "null";
-                                }
-                                else
-                                {
-                                    if (txtData.HistoryType == TextHistoryType.StringTableEntry)
-                                    {
-                                        row.Cells[3].Value = txtData.Value[0];
-                                        row.Cells[4].Value = txtData.StringTable.ToString();
-                                    }
-                                    else
-                                    {
-                                        int maxValuesToDisplay = 3;
-                                        for (int z = 0; z < maxValuesToDisplay; z++)
-                                        {
-                                            row.Cells[3 + z].Value = txtData.Value.TryGetElement(z);
-                                        }
-
-                                        row.Cells[3 + maxValuesToDisplay + 0].Value = txtData.Flag;
-                                        if (txtData.Extras != null && txtData.Extras.Length > 0) row.Cells[3 + maxValuesToDisplay + 1].Value = txtData.Extras.ConvertByteArrayToString();
-                                    }
+                                    case TextHistoryType.None:
+                                        row.Cells[3].Value = txtData.CultureInvariantString.ToString();
+                                        row.Cells[3].ToolTipText = "CultureInvariantString";
+                                        break;
+                                    case TextHistoryType.Base:
+                                        row.Cells[3].Value = txtData.Namespace.ToString();
+                                        row.Cells[3].ToolTipText = "Namespace";
+                                        row.Cells[4].Value = txtData.Value.ToString();
+                                        row.Cells[4].ToolTipText = "Key";
+                                        row.Cells[5].Value = txtData.CultureInvariantString.ToString();
+                                        row.Cells[5].ToolTipText = "CultureInvariantString";
+                                        break;
+                                    case TextHistoryType.StringTableEntry:
+                                        row.Cells[3].Value = txtData.TableId.ToString();
+                                        row.Cells[3].ToolTipText = "TableId";
+                                        row.Cells[4].Value = txtData.Value.ToString();
+                                        row.Cells[4].ToolTipText = "Key";
+                                        break;
+                                    default:
+                                        throw new NotImplementedException("Unimplemented display for " + txtData.HistoryType.ToString());
                                 }
                                 break;
                             case "NameProperty":
@@ -527,43 +529,34 @@ namespace UAssetGUI
                             decidedTextData = new TextPropertyData(FName.FromString(name), asset);
                         }
 
-                        TextHistoryType histType;
-                        int histTypeInt = -100;
+                        TextHistoryType histType = TextHistoryType.Base;
                         if (transformB == null || value1B == null || !(value1B is string)) return null;
-                        if (transformB is string) int.TryParse((string)transformB, out histTypeInt);
-                        if (transformB is sbyte) histTypeInt = (sbyte)transformB;
-                        if (transformB is int) histTypeInt = unchecked((sbyte)(int)transformB);
-                        histType = (TextHistoryType)histTypeInt;
+                        if (transformB is string) Enum.TryParse((string)transformB, out histType);
 
                         decidedTextData.HistoryType = histType;
                         switch (histType)
                         {
-                            case TextHistoryType.Base:
                             case TextHistoryType.None:
-                                List<string> strAvailablesL = new List<string>();
-                                if (value1B != null && value1B is string) strAvailablesL.Add((string)value1B);
-                                if (value2B != null && value2B is string) strAvailablesL.Add((string)value2B);
-                                if (value3B != null && value3B is string) strAvailablesL.Add((string)value3B);
-                                if (strAvailablesL.Count == 0 && histType == TextHistoryType.Base) return null;
-
-                                decidedTextData.Value = strAvailablesL.ToArray();
+                                decidedTextData.Value = null;
+                                if (value1B != null && value1B is string) decidedTextData.CultureInvariantString = (string)value1B == "null" ? null : new FString((string)value1B);
+                                break;
+                            case TextHistoryType.Base:
+                                if (value1B == null || value2B == null || value3B == null || !(value1B is string) || !(value2B is string) || !(value3B is string)) return null;
+                                decidedTextData.Namespace = (string)value1B == "null" ? null : new FString((string)value1B);
+                                decidedTextData.Value = (string)value2B == "null" ? null :  new FString((string)value2B);
+                                decidedTextData.CultureInvariantString = (string)value3B == "null" ? null : new FString((string)value3B);
                                 break;
                             case TextHistoryType.StringTableEntry:
                                 if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
 
-                                decidedTextData.StringTable = FName.FromString((string)value2B);
-                                decidedTextData.Value = new string[] { (string)value1B };
+                                decidedTextData.TableId = FName.FromString((string)value1B);
+                                decidedTextData.Value = (string)value2B == "null" ? null : new FString((string)value2B);
                                 break;
-                            /*case TextHistoryType.None:
-                                decidedTextData.Value = null;
-                                break;*/
                             default:
                                 throw new FormatException("Unimplemented text history type " + histType);
                         }
 
-                        if (value4B != null && value4B is string) int.TryParse((string)value4B, out decidedTextData.Flag);
-                        if (value4B != null && value4B is int) decidedTextData.Flag = (int)value4B;
-                        if (value5B != null && value5B is string) decidedTextData.Extras = ((string)value5B).ConvertStringToByteArray();
+                        if (value4B != null && value4B is string) Enum.TryParse((string)value4B, out decidedTextData.Flags);
 
                         return decidedTextData;
                     case "ObjectProperty":

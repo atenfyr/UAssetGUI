@@ -138,7 +138,7 @@ namespace UAssetGUI
                     }
                     case NormalExport us:
                     {
-                        var parentNode = new PointingTreeNode(baseUs.ClassIndex.ToImport(asset).ObjectName.Value.Value + " (" + us.Data.Count + ")", us);
+                        var parentNode = new PointingTreeNode((baseUs.ClassIndex.IsImport() ? baseUs.ClassIndex.ToImport(asset).ObjectName.Value.Value : baseUs.ClassIndex.Index.ToString()) + " (" + us.Data.Count + ")", us);
                         categoryNode.Nodes.Add(parentNode);
 
                         for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);

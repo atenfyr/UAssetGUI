@@ -36,15 +36,15 @@ namespace UAssetGUI
             if (dgv == null || row == null || objData == null) return;
 
             bool underlineStyle = false;
-            if (objData.CurrentIndex <= 0 && objData.Value == null)
+            if (objData.Value.IsImport() && objData.Value == null)
             {
                 row.Cells[3].Value = string.Empty;
             }
             else
             {
-                row.Cells[3].Value = objData.CurrentIndex > 0 ? "Jump" : objData.Value?.ObjectName?.ToString();
+                row.Cells[3].Value = objData.Value.IsExport() ? "Jump" : (objData.Value.IsImport() ? objData.ToImport().ObjectName?.ToString() : string.Empty);
                 row.Cells[3].Tag = "CategoryJump";
-                if (objData.CurrentIndex > 0) underlineStyle = true;
+                if (objData.Value.IsExport()) underlineStyle = true;
             }
 
             DataGridViewCellStyle sty = new DataGridViewCellStyle();

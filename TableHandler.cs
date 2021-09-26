@@ -33,6 +33,7 @@ namespace UAssetGUI
     {
         None = -1,
         Int,
+        FPackageIndex,
         FName,
         EObjectFlags,
         Long,
@@ -125,7 +126,7 @@ namespace UAssetGUI
             for (int i = 0; i < asset.Exports.Count; i++)
             {
                 Export baseUs = asset.Exports[i];
-                var categoryNode = new PointingTreeNode("Export " + (i + 1) + " (" + baseUs.ReferenceData.ObjectName.Value.Value + ")", null);
+                var categoryNode = new PointingTreeNode("Export " + (i + 1) + " (" + baseUs.ObjectName.Value.Value + ")", null);
                 superTopNode.Nodes.Add(categoryNode);
                 switch (baseUs)
                 {
@@ -137,7 +138,7 @@ namespace UAssetGUI
                     }
                     case NormalExport us:
                     {
-                        var parentNode = new PointingTreeNode(asset.GetImportObjectName(baseUs.ReferenceData.ClassIndex).Value.Value + " (" + us.Data.Count + ")", us);
+                        var parentNode = new PointingTreeNode(baseUs.ClassIndex.ToImport(asset).ObjectName.Value.Value + " (" + us.Data.Count + ")", us);
                         categoryNode.Nodes.Add(parentNode);
 
                         for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
@@ -301,8 +302,8 @@ namespace UAssetGUI
                                 break;
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;
-                                row.Cells[2].Value = objData.CurrentIndex;
-                                if (objData.CurrentIndex != 0) UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, objData);
+                                row.Cells[2].Value = objData.Value.Index;
+                                if (!objData.Value.IsNull()) UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, objData);
                                 break;
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
@@ -462,8 +463,8 @@ namespace UAssetGUI
                                 break;
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
-                                row.Cells[2].Value = strPropData.Encoding.HeaderName;
-                                row.Cells[3].Value = Convert.ToString(strPropData.Value);
+                                row.Cells[2].Value = strPropData.Value.Encoding.HeaderName;
+                                row.Cells[3].Value = Convert.ToString(strPropData.Value.Value);
                                 break;
                             default:
                                 row.Cells[2].Value = string.Empty;
@@ -473,7 +474,7 @@ namespace UAssetGUI
                     }
 
                     row.Cells[8].Value = thisPD.DuplicationIndex;
-                    row.Cells[9].Value = asset.UseSeparateBulkDataFiles ? thisPD.Offset - asset.Exports[0].ReferenceData.SerialOffset : thisPD.Offset;
+                    row.Cells[9].Value = asset.UseSeparateBulkDataFiles ? thisPD.Offset - asset.Exports[0].SerialOffset : thisPD.Offset;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -576,7 +577,7 @@ namespace UAssetGUI
                         if (transformB is int) objValue = (int)transformB;
                         if (objValue == int.MinValue) return null;
 
-                        decidedObjData.SetCurrentIndex(objValue);
+                        decidedObjData.Value = new FPackageIndex(objValue);
                         UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, decidedObjData);
                         return decidedObjData;
                     case "RichCurveKey":
@@ -754,11 +755,11 @@ namespace UAssetGUI
                     for (int num = 0; num < asset.Imports.Count; num++)
                     {
                         dataGridView1.Rows.Add(asset.Imports[num].ClassPackage.ToString(), asset.Imports[num].ClassName.ToString(), asset.Imports[num].OuterIndex, asset.Imports[num].ObjectName.ToString());
-                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(asset.Imports[num].Index);
+                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(FPackageIndex.FromImport(num));
                     }
                     break;
                 case TableHandlerMode.ExportInformation:
-                    string[] allExportDetailsFields = ExportDetails.GetAllFieldNames();
+                    string[] allExportDetailsFields = Export.GetAllFieldNames();
                     string[] allExportDetailsFields2 = new string[allExportDetailsFields.Length + 1];
                     allExportDetailsFields.CopyTo(allExportDetailsFields2, 0);
                     allExportDetailsFields2[allExportDetailsFields2.Length - 1] = "";
@@ -766,7 +767,7 @@ namespace UAssetGUI
 
                     for (int num = 0; num < asset.Exports.Count; num++)
                     {
-                        ExportDetails refer = asset.Exports[num].ReferenceData;
+                        Export refer = asset.Exports[num];
                         string[] newCellsTooltips = new string[allExportDetailsFields.Length];
                         object[] newCells = new object[allExportDetailsFields.Length];
                         for (int num2 = 0; num2 < allExportDetailsFields.Length; num2++)
@@ -780,6 +781,10 @@ namespace UAssetGUI
                                 if (actualName == null) actualName = "null";
                                 newCells[num2] = actualName;
                             }
+                            else if (printingVal is FPackageIndex parsingIndex)
+                            {
+                                newCells[num2] = parsingIndex.Index;
+                            }
                             else
                             {
                                 newCells[num2] = printingVal;
@@ -787,7 +792,7 @@ namespace UAssetGUI
 
                             if (printingVal is int testInt)
                             {
-                                if (testInt < 0) cellTooltip = asset.GetImportObjectName(testInt).Value.Value;
+                                if (testInt < 0) cellTooltip = new FPackageIndex(testInt).ToImport(asset).ObjectName.Value.Value;
                             }
 
                             newCellsTooltips[num2] = cellTooltip;
@@ -915,13 +920,13 @@ namespace UAssetGUI
 
                                         {
                                             ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
-                                            testProperty.SetCurrentIndex(strucCat.SuperStruct);
+                                            testProperty.Value = strucCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "Super Struct";
-                                            row.Cells[1].Value = testProperty.CurrentIndex;
-                                            row.Cells[2].Value = testProperty.CurrentIndex >= 0 ? "" : testProperty.Value.ObjectName.ToString();
+                                            row.Cells[1].Value = testProperty.Value;
+                                            row.Cells[2].Value = testProperty.Value.IsImport() ? testProperty.Value.ToImport(asset).ObjectName.ToString() : "";
                                             rows.Add(row);
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
@@ -998,7 +1003,7 @@ namespace UAssetGUI
 
                                         {
                                             ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
-                                            testProperty.SetCurrentIndex(bgcCat.SuperStruct);
+                                            testProperty.Value = bgcCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
                                             row = new DataGridViewRow();
@@ -1010,7 +1015,7 @@ namespace UAssetGUI
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "ClassWithin";
                                             row.Cells[1].Value = bgcCat.ClassWithin;
-                                            row.Cells[2].Value = bgcCat.ClassWithin >= 0 ? "" : asset.GetImportObjectName(bgcCat.ClassWithin).ToString();
+                                            row.Cells[2].Value = bgcCat.ClassWithin.IsImport() ? bgcCat.ClassWithin.ToImport(asset).ObjectName.ToString() : "";
                                             classRows.Add(row);
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
@@ -1308,7 +1313,6 @@ namespace UAssetGUI
                     break;
                 case TableHandlerMode.Imports:
                     asset.Imports = new List<Import>();
-                    int nextIndex = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         object val1 = row.Cells[0].Value;
@@ -1340,19 +1344,20 @@ namespace UAssetGUI
                         asset.AddNameReference(parsedVal1.Value);
                         asset.AddNameReference(parsedVal2.Value);
                         asset.AddNameReference(parsedVal4.Value);
-                        Import newLink = new Import(parsedVal1, parsedVal2, realVal3, parsedVal4, --nextIndex);
+                        Import newLink = new Import(parsedVal1, parsedVal2, realVal3, parsedVal4);
                         asset.Imports.Add(newLink);
                     }
                     break;
                 case TableHandlerMode.ExportInformation:
-                    FieldInfo[] allExportDetailsFields = typeof(ExportDetails).GetFields();
+                    FieldInfo[] allExportDetailsFields = Export.GetAllObjectExportFields();
                     ExportDetailsParseType[] parsingTypes = new ExportDetailsParseType[]
                     {
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int,
                         ExportDetailsParseType.FName,
+                        ExportDetailsParseType.Int,
+
+                        ExportDetailsParseType.FPackageIndex,
+                        ExportDetailsParseType.FPackageIndex,
+                        ExportDetailsParseType.FPackageIndex,
                         ExportDetailsParseType.EObjectFlags,
                         ExportDetailsParseType.Long,
                         ExportDetailsParseType.Long,
@@ -1374,7 +1379,16 @@ namespace UAssetGUI
                     int rowNum = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        ExportDetails newRef = new ExportDetails();
+                        bool isNewExport = false;
+                        if (asset.Exports.Count <= rowNum)
+                        {
+                            // If we add a new category, we'll make a new NormalExport (None-terminated UProperty list). If you want to make some other kind of export, you'll need to do it manually with UAssetAPI
+                            var newCat = new NormalExport(asset, new byte[4]);
+                            newCat.Data = new List<PropertyData>();
+                            asset.Exports.Add(newCat);
+                            isNewExport = true;
+                        }
+
                         bool isInvalidRow = false;
 
                         for (int i = 0; i < allExportDetailsFields.Length; i++)
@@ -1394,6 +1408,19 @@ namespace UAssetGUI
                                     else
                                     {
                                         settingVal = Convert.ToInt32(currentVal);
+                                    }
+                                    break;
+                                case ExportDetailsParseType.FPackageIndex:
+                                    settingVal = 0;
+                                    if (currentVal is string)
+                                    {
+                                        int x = 0;
+                                        int.TryParse((string)currentVal, out x);
+                                        settingVal = new FPackageIndex(x);
+                                    }
+                                    else
+                                    {
+                                        settingVal = new FPackageIndex(Convert.ToInt32(currentVal));
                                     }
                                     break;
                                 case ExportDetailsParseType.FName:
@@ -1475,21 +1502,13 @@ namespace UAssetGUI
                                     }
                                     break;
                             }
-                            allExportDetailsFields[i].SetValue(newRef, settingVal);
+
+                            allExportDetailsFields[i].SetValue(asset.Exports[rowNum], settingVal);
                         }
 
-                        if (isInvalidRow) continue;
-
-                        if (asset.Exports.Count > rowNum)
+                        if (isInvalidRow && isNewExport)
                         {
-                            asset.Exports[rowNum].ReferenceData = newRef;
-                        }
-                        else
-                        {
-                            // If we add a new category, we'll make a new NormalExport (None-terminated UProperty list). If you want to make some other kind of export, you'll need to do it manually with UAssetAPI
-                            var newCat = new NormalExport(newRef, asset, new byte[4]);
-                            newCat.Data = new List<PropertyData>();
-                            asset.Exports.Add(newCat);
+                            asset.Exports.RemoveAt(asset.Exports.Count - 1);
                         }
                         rowNum++;
                     }
@@ -1683,7 +1702,7 @@ namespace UAssetGUI
                                         newData.Add(val);
                                     }
                                     usCat.Data = newData;
-                                    pointerNode.Text = asset.GetImportObjectName(usCat.ReferenceData.ClassIndex).Value.Value + " (" + usCat.Data.Count + ")";
+                                    pointerNode.Text = usCat.ClassIndex.ToImport(asset).ObjectName.Value.Value + " (" + usCat.Data.Count + ")";
                                     break;
                                 case PointingTreeNodeType.EnumData:
                                     if (usCat is EnumExport enumCat)

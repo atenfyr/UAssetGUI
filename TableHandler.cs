@@ -876,7 +876,7 @@ namespace UAssetGUI
 
                     for (int num = 0; num < asset.PreloadDependencies.Count; num++)
                     {
-                        dataGridView1.Rows.Add(new object[] { asset.PreloadDependencies[num] });
+                        dataGridView1.Rows.Add(new object[] { asset.PreloadDependencies[num].Index });
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
@@ -1550,7 +1550,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.PreloadDependencies:
-                    asset.PreloadDependencies = new List<int>();
+                    asset.PreloadDependencies = new List<FPackageIndex>();
                     int rowN = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
@@ -1571,11 +1571,11 @@ namespace UAssetGUI
 
                         if (asset.PreloadDependencies.Count > rowN)
                         {
-                            asset.PreloadDependencies[rowN] = intVal;
+                            asset.PreloadDependencies[rowN] = FPackageIndex.FromRawIndex(intVal);
                         }
                         else
                         {
-                            asset.PreloadDependencies.Insert(rowN, intVal);
+                            asset.PreloadDependencies.Insert(rowN, FPackageIndex.FromRawIndex(intVal));
                         }
 
                         rowN++;

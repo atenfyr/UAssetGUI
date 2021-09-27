@@ -325,21 +325,21 @@ namespace UAssetGUI
                                 switch (txtData.HistoryType)
                                 {
                                     case TextHistoryType.None:
-                                        row.Cells[3].Value = txtData.CultureInvariantString.ToString();
+                                        row.Cells[3].Value = txtData?.CultureInvariantString == null ? "null" : txtData.CultureInvariantString.ToString();
                                         row.Cells[3].ToolTipText = "CultureInvariantString";
                                         break;
                                     case TextHistoryType.Base:
-                                        row.Cells[3].Value = txtData.Namespace.ToString();
+                                        row.Cells[3].Value = txtData?.Namespace == null ? "null" : txtData.Namespace.ToString();
                                         row.Cells[3].ToolTipText = "Namespace";
-                                        row.Cells[4].Value = txtData.Value.ToString();
+                                        row.Cells[4].Value = txtData?.Value == null ? "null" : txtData.Value.ToString();
                                         row.Cells[4].ToolTipText = "Key";
-                                        row.Cells[5].Value = txtData.CultureInvariantString.ToString();
+                                        row.Cells[5].Value = txtData?.CultureInvariantString == null ? "null" : txtData.CultureInvariantString.ToString();
                                         row.Cells[5].ToolTipText = "CultureInvariantString";
                                         break;
                                     case TextHistoryType.StringTableEntry:
-                                        row.Cells[3].Value = txtData.TableId.ToString();
+                                        row.Cells[3].Value = txtData?.TableId == null ? "null" : txtData.TableId.ToString();
                                         row.Cells[3].ToolTipText = "TableId";
-                                        row.Cells[4].Value = txtData.Value.ToString();
+                                        row.Cells[4].Value = txtData?.Value == null ? "null" : txtData.Value.ToString();
                                         row.Cells[4].ToolTipText = "Key";
                                         break;
                                     default:

@@ -42,10 +42,11 @@ namespace UAssetGUI
             }
             else
             {
-                row.Cells[3].Value = objData.Value.IsExport() ? "Jump" : (objData.Value.IsImport() ? objData.ToImport().ObjectName?.ToString() : string.Empty);
+                row.Cells[3].Value = objData.Value.IsExport() ? "Jump" : (objData.Value.IsImport() ? objData.ToImport()?.ObjectName?.ToString() : string.Empty);
                 row.Cells[3].Tag = "CategoryJump";
                 if (objData.Value.IsExport()) underlineStyle = true;
             }
+            row.Cells[3].ReadOnly = objData.Value.IsImport();
 
             DataGridViewCellStyle sty = new DataGridViewCellStyle();
             if (underlineStyle)

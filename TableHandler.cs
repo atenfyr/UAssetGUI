@@ -165,18 +165,17 @@ namespace UAssetGUI
 
                         if (us is DataTableExport us4)
                         {
-                            var parentNode2 = new PointingTreeNode("Table Info (" + us4.Data2.Table.Count + ")", us4.Data2);
+                            var parentNode2 = new PointingTreeNode("Table Info (" + us4.Table.Data.Count + ")", us4.Table);
                             categoryNode.Nodes.Add(parentNode2);
-                            foreach (DataTableEntry entry in us4.Data2.Table)
+                            foreach (StructPropertyData entry in us4.Table.Data)
                             {
-                                string decidedName = entry.Data.Name.Value.Value;
-                                if (entry.DuplicateIndex > 0) decidedName += " [" + entry.DuplicateIndex + "]";
+                                string decidedName = entry.Name.ToString();
 
-                                var structNode = new PointingTreeNode(decidedName + " (" + entry.Data.Value.Count + ")", entry.Data);
+                                var structNode = new PointingTreeNode(decidedName + " (" + entry.Value.Count + ")", entry);
                                 parentNode2.Nodes.Add(structNode);
-                                for (int j = 0; j < entry.Data.Value.Count; j++)
+                                for (int j = 0; j < entry.Value.Count; j++)
                                 {
-                                    InterpretThing(entry.Data.Value[j], structNode);
+                                    InterpretThing(entry.Value[j], structNode);
                                 }
                             }
                         }
@@ -1146,12 +1145,7 @@ namespace UAssetGUI
                                 }
                             case DataTable dtUs:
                                 {
-                                    List<StructPropertyData> listOfStructs = new List<StructPropertyData>();
-                                    foreach (DataTableEntry entry in dtUs.Table)
-                                    {
-                                        listOfStructs.Add(entry.Data);
-                                    }
-                                    renderingArr = listOfStructs.ToArray();
+                                    renderingArr = dtUs.Data.ToArray();
                                     break;
                                 }
                             case MapPropertyData usMap:
@@ -1733,24 +1727,25 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is DataTable dtUs)
                         {
-                            List<DataTableEntry> newData = new List<DataTableEntry>();
-                            var numTimesNameUses = new Dictionary<FName, int>();
+                            List<StructPropertyData> newData = new List<StructPropertyData>();
+                            var numTimesNameUses = new Dictionary<string, int>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, dtUs.Table.ElementAtOrDefault(i).Data);
+                                PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i));
                                 if (val == null || !(val is StructPropertyData)) continue;
-                                if (numTimesNameUses.ContainsKey(val.Name))
+                                if (numTimesNameUses.ContainsKey(val.Name.Value.Value))
                                 {
-                                    numTimesNameUses[val.Name]++;
+                                    numTimesNameUses[val.Name.Value.Value]++;
                                 }
                                 else
                                 {
-                                    numTimesNameUses.Add(val.Name, 0);
+                                    numTimesNameUses.Add(val.Name.Value.Value, 0);
                                 }
-                                newData.Add(new DataTableEntry((StructPropertyData)val, numTimesNameUses[val.Name]));
+                                val.Name.Number = numTimesNameUses[val.Name.Value.Value];
+                                newData.Add((StructPropertyData)val);
                             }
-                            dtUs.Table = newData;
-                            pointerNode.Text = "Table Info (" + dtUs.Table.Count + ")";
+                            dtUs.Data = newData;
+                            pointerNode.Text = "Table Info (" + dtUs.Data.Count + ")";
                             break;
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)

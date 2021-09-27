@@ -462,8 +462,8 @@ namespace UAssetGUI
                                 break;
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
-                                row.Cells[2].Value = strPropData.Value.Encoding.HeaderName;
-                                row.Cells[3].Value = Convert.ToString(strPropData.Value.Value);
+                                row.Cells[2].Value = (strPropData.Value?.Encoding ?? Encoding.ASCII).HeaderName;
+                                row.Cells[3].Value = strPropData.Value?.Value == null ? "null" : Convert.ToString(strPropData.Value.Value);
                                 break;
                             default:
                                 row.Cells[2].Value = string.Empty;
@@ -1695,8 +1695,9 @@ namespace UAssetGUI
                                         }
                                         newData.Add(val);
                                     }
+                                    if (newData[newData.Count - 1] == null) newData.RemoveAt(newData.Count - 1);
                                     usCat.Data = newData;
-                                    pointerNode.Text = usCat.ClassIndex.ToImport(asset).ObjectName.Value.Value + " (" + usCat.Data.Count + ")";
+                                    pointerNode.Text = (usCat.ClassIndex.IsImport() ? usCat.ClassIndex.ToImport(asset).ObjectName.Value.Value : usCat.ClassIndex.Index.ToString()) + " (" + usCat.Data.Count + ")";
                                     break;
                                 case PointingTreeNodeType.EnumData:
                                     if (usCat is EnumExport enumCat)

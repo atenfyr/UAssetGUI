@@ -473,7 +473,7 @@ namespace UAssetGUI
                     }
 
                     row.Cells[8].Value = thisPD.DuplicationIndex;
-                    row.Cells[9].Value = asset.UseSeparateBulkDataFiles ? thisPD.Offset - asset.Exports[0].SerialOffset : thisPD.Offset;
+                    row.Cells[9].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }

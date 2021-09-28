@@ -402,21 +402,37 @@ namespace UAssetGUI
                                 var colorData = (LinearColorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
                                 row.Cells[2].ReadOnly = true;
-                                row.Cells[2].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
+                                if (colorData.RawValue != null)
+                                {
+                                    row.Cells[2].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
+                                    row.Cells[2].ToolTipText = "Preview";
+                                }
                                 row.Cells[3].Value = colorData.Value.R;
+                                row.Cells[3].ToolTipText = "Red";
                                 row.Cells[4].Value = colorData.Value.G;
+                                row.Cells[4].ToolTipText = "Green";
                                 row.Cells[5].Value = colorData.Value.B;
+                                row.Cells[5].ToolTipText = "Blue";
                                 row.Cells[6].Value = colorData.Value.A;
+                                row.Cells[6].ToolTipText = "Alpha";
                                 break;
                             case "Color":
                                 var colorData2 = (ColorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
                                 row.Cells[2].ReadOnly = true;
-                                if (colorData2.RawValue != null) row.Cells[2].Style.BackColor = colorData2.Value;
+                                if (colorData2.RawValue != null)
+                                {
+                                    row.Cells[2].Style.BackColor = colorData2.Value;
+                                    row.Cells[2].ToolTipText = "Preview";
+                                }
                                 row.Cells[3].Value = colorData2.Value.R;
+                                row.Cells[3].ToolTipText = "Red";
                                 row.Cells[4].Value = colorData2.Value.G;
+                                row.Cells[4].ToolTipText = "Green";
                                 row.Cells[5].Value = colorData2.Value.B;
+                                row.Cells[5].ToolTipText = "Blue";
                                 row.Cells[6].Value = colorData2.Value.A;
+                                row.Cells[6].ToolTipText = "Alpha";
                                 break;
                             case "Vector":
                                 var vectorData = (VectorPropertyData)thisPD;

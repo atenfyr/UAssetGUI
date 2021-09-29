@@ -65,10 +65,10 @@ namespace UAssetGUI
 
     public class PointingDictionaryEntry
     {
-        public DictionaryEntry Entry;
+        public KeyValuePair<PropertyData, PropertyData> Entry;
         public object Pointer;
 
-        public PointingDictionaryEntry(DictionaryEntry entry, object pointer)
+        public PointingDictionaryEntry(KeyValuePair<PropertyData, PropertyData> entry, object pointer)
         {
             Entry = entry;
             Pointer = pointer;
@@ -245,15 +245,15 @@ namespace UAssetGUI
                     var mapNode = new PointingTreeNode(mapp.Name.Value.Value + " (" + mapp.Value.Keys.Count + ")", mapp);
                     ourNode.Nodes.Add(mapNode);
 
-                    foreach (DictionaryEntry entry in mapp.Value)
+                    foreach (var entry in mapp.Value)
                     {
-                        ((PropertyData)entry.Key).Name = new FName("Key");
-                        ((PropertyData)entry.Value).Name = new FName("Value");
+                        entry.Key.Name = new FName("Key");
+                        entry.Value.Name = new FName("Value");
 
                         var softEntryNode = new PointingTreeNode(mapp.Name.Value.Value + " (2)", new PointingDictionaryEntry(entry, mapp));
                         mapNode.Nodes.Add(softEntryNode);
-                        InterpretThing((PropertyData)entry.Key, softEntryNode);
-                        InterpretThing((PropertyData)entry.Value, softEntryNode);
+                        InterpretThing(entry.Key, softEntryNode);
+                        InterpretThing(entry.Value, softEntryNode);
                     }
                     break;
                 case "MulticastDelegateProperty":
@@ -301,8 +301,9 @@ namespace UAssetGUI
                                 break;
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;
-                                row.Cells[2].Value = objData.Value.Index;
-                                if (!objData.Value.IsNull()) UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, objData);
+                                int decidedIndex = objData.Value?.Index ?? 0;
+                                row.Cells[2].Value = decidedIndex;
+                                if (decidedIndex != 0) UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, objData);
                                 break;
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
@@ -310,7 +311,7 @@ namespace UAssetGUI
                                 row.Cells[3].Value = objData2.Value;
                                 break;
                             case "RichCurveKey":
-                                var curveData = (RichCurveKeyProperty)thisPD;
+                                var curveData = (RichCurveKeyPropertyData)thisPD;
                                 row.Cells[2].Value = curveData.InterpMode;
                                 row.Cells[3].Value = curveData.TangentMode;
                                 row.Cells[4].Value = curveData.Time;
@@ -437,23 +438,32 @@ namespace UAssetGUI
                             case "Vector":
                                 var vectorData = (VectorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vectorData.Value[0];
-                                row.Cells[4].Value = vectorData.Value[1];
-                                row.Cells[5].Value = vectorData.Value[2];
+                                row.Cells[3].Value = vectorData.X;
+                                row.Cells[3].ToolTipText = "X";
+                                row.Cells[4].Value = vectorData.Y;
+                                row.Cells[4].ToolTipText = "Y";
+                                row.Cells[5].Value = vectorData.Z;
+                                row.Cells[5].ToolTipText = "Z";
                                 break;
                             case "Vector2D":
                                 var vector2DData = (Vector2DPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vector2DData.Value[0];
-                                row.Cells[4].Value = vector2DData.Value[1];
+                                row.Cells[3].Value = vector2DData.X;
+                                row.Cells[3].ToolTipText = "X";
+                                row.Cells[4].Value = vector2DData.Y;
+                                row.Cells[4].ToolTipText = "Y";
                                 break;
                             case "Vector4":
                                 var vector4DData = (Vector4PropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vector4DData.Value[0];
-                                row.Cells[4].Value = vector4DData.Value[1];
-                                row.Cells[5].Value = vector4DData.Value[2];
-                                row.Cells[6].Value = vector4DData.Value[3];
+                                row.Cells[3].Value = vector4DData.X;
+                                row.Cells[3].ToolTipText = "X";
+                                row.Cells[4].Value = vector4DData.Y;
+                                row.Cells[4].ToolTipText = "Y";
+                                row.Cells[5].Value = vector4DData.Z;
+                                row.Cells[5].ToolTipText = "Y";
+                                row.Cells[6].Value = vector4DData.W;
+                                row.Cells[6].ToolTipText = "W";
                                 break;
                             case "IntPoint":
                                 var intPointData = (IntPointPropertyData)thisPD;
@@ -464,17 +474,24 @@ namespace UAssetGUI
                             case "Rotator":
                                 var rotatorData = (RotatorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = rotatorData.Value[0];
-                                row.Cells[4].Value = rotatorData.Value[1];
-                                row.Cells[5].Value = rotatorData.Value[2];
+                                row.Cells[3].Value = rotatorData.Pitch;
+                                row.Cells[3].ToolTipText = "Pitch";
+                                row.Cells[4].Value = rotatorData.Yaw;
+                                row.Cells[4].ToolTipText = "Yaw";
+                                row.Cells[5].Value = rotatorData.Roll;
+                                row.Cells[5].ToolTipText = "Roll";
                                 break;
                             case "Quat":
                                 var quatData = (QuatPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = quatData.Value[0];
-                                row.Cells[4].Value = quatData.Value[1];
-                                row.Cells[5].Value = quatData.Value[2];
-                                row.Cells[6].Value = quatData.Value[3];
+                                row.Cells[3].Value = quatData.X;
+                                row.Cells[3].ToolTipText = "X";
+                                row.Cells[4].Value = quatData.Y;
+                                row.Cells[4].ToolTipText = "Y";
+                                row.Cells[5].Value = quatData.Z;
+                                row.Cells[5].ToolTipText = "Z";
+                                row.Cells[6].Value = quatData.W;
+                                row.Cells[6].ToolTipText = "W";
                                 break;
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
@@ -596,14 +613,14 @@ namespace UAssetGUI
                         UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, decidedObjData);
                         return decidedObjData;
                     case "RichCurveKey":
-                        RichCurveKeyProperty decidedRCKProperty = null;
-                        if (original != null && original is RichCurveKeyProperty)
+                        RichCurveKeyPropertyData decidedRCKProperty = null;
+                        if (original != null && original is RichCurveKeyPropertyData)
                         {
-                            decidedRCKProperty = (RichCurveKeyProperty)original;
+                            decidedRCKProperty = (RichCurveKeyPropertyData)original;
                         }
                         else
                         {
-                            decidedRCKProperty = new RichCurveKeyProperty(FName.FromString(name), asset);
+                            decidedRCKProperty = new RichCurveKeyPropertyData(FName.FromString(name), asset);
                         }
 
                         if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
@@ -1076,13 +1093,13 @@ namespace UAssetGUI
                                             classRows.Add(row);
                                         }
 
-                                        for (int i = 0; i < bgcCat.FuncMap.Length; i++)
+                                        for (int i = 0; i < bgcCat.FuncMap.Count; i++)
                                         {
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
-                                            row.Cells[0].Value = bgcCat.FuncMap[i].Name.ToString();
-                                            row.Cells[2].Value = bgcCat.FuncMap[i].Category;
-                                            if (bgcCat.FuncMap[i].Category != 0)
+                                            row.Cells[0].Value = bgcCat.FuncMap.Keys.ElementAt(i).ToString();
+                                            row.Cells[2].Value = bgcCat.FuncMap[i].Index;
+                                            if (bgcCat.FuncMap[i].Index != 0)
                                             {
                                                 row.Cells[3].Value = "Jump";
                                                 row.Cells[3].Tag = "CategoryJump";
@@ -1168,9 +1185,8 @@ namespace UAssetGUI
                                 {
                                     if (usMap.Value.Count > 0)
                                     {
-                                        DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                                        FName mapKeyType = ((PropertyData)firstEntry.Key).PropertyType;
-                                        FName mapValueType = ((PropertyData)firstEntry.Value).PropertyType;
+                                        FName mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
+                                        FName mapValueType = usMap.Value[0].PropertyType;
 
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
                                         for (int i = 0; i < usMap.Value.Count; i++)
@@ -1193,7 +1209,7 @@ namespace UAssetGUI
                                             row.Cells[4].Value = mapKeyType.ToString();
                                             row.Cells[5].Value = mapValueType.ToString();
                                             row.HeaderCell.Value = Convert.ToString(i);
-                                            row.Tag = usMap.Value.Cast<DictionaryEntry>().ElementAt(i);
+                                            row.Tag = new KeyValuePair<PropertyData, PropertyData>(usMap.Value.Keys.ElementAt(i), usMap.Value[i]);
                                             rows.Add(row);
                                         }
                                         dataGridView1.Rows.AddRange(rows.ToArray());
@@ -1220,8 +1236,8 @@ namespace UAssetGUI
                                 break;
                             case PointingDictionaryEntry usDictEntry:
                                 dataGridView1.AllowUserToAddRows = false;
-                                var ourKey = (PropertyData)usDictEntry.Entry.Key;
-                                var ourValue = (PropertyData)usDictEntry.Entry.Value;
+                                var ourKey = usDictEntry.Entry.Key;
+                                var ourValue = usDictEntry.Entry.Value;
                                 if (ourKey != null) ourKey.Name = new FName("Key");
                                 if (ourValue != null) ourValue.Name = new FName("Value");
                                 renderingArr = new PropertyData[2] { ourKey, ourValue };
@@ -1647,17 +1663,16 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is MapPropertyData usMap)
                         {
-                            DictionaryEntry firstEntry = usMap.Value.Cast<DictionaryEntry>().ElementAt(0);
-                            FName mapKeyType = ((PropertyData)firstEntry.Key).PropertyType;
-                            FName mapValueType = ((PropertyData)firstEntry.Value).PropertyType;
+                            FName mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
+                            FName mapValueType = usMap.Value[0].PropertyType;
 
-                            OrderedDictionary newData = new OrderedDictionary();
+                            var newData = new TMap<PropertyData, PropertyData>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 DataGridViewRow row = dataGridView1.Rows[i];
                                 if (row.Cells.Count <= 1 || row.Cells[1].Value == null || !row.Cells[1].Value.Equals("MapEntry")) continue;
 
-                                if (row.Tag is DictionaryEntry dictBit)
+                                if (row.Tag is KeyValuePair<PropertyData, PropertyData> dictBit)
                                 {
                                     newData.Add(dictBit.Key, dictBit.Value);
                                 }
@@ -1793,8 +1808,31 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is PointingDictionaryEntry usDictEntry)
                         {
-                            ((PointingDictionaryEntry)pointerNode.Pointer).Entry.Key = RowToPD(0, (PropertyData)usDictEntry.Entry.Key);
-                            ((PointingDictionaryEntry)pointerNode.Pointer).Entry.Value = RowToPD(1, (PropertyData)usDictEntry.Entry.Value);
+                            MapPropertyData parentMap = ((PointingDictionaryEntry)pointerNode.Pointer).Pointer as MapPropertyData;
+
+                            var allKeys = parentMap.Value.Keys.ToArray();
+                            int currentEntry = -1;
+                            for (int i = 0; i < parentMap.Value.Count; i++)
+                            {
+                                if (allKeys[i] == usDictEntry.Entry.Key)
+                                {
+                                    currentEntry = i;
+                                    break;
+                                }
+                            }
+
+                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key);
+                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value);
+
+                            if (currentEntry >= 0)
+                            {
+                                parentMap.Value.RemoveAt(currentEntry);
+                                parentMap.Value.Insert(currentEntry, desiredKey, desiredValue);
+                            }
+                            else
+                            {
+                                parentMap.Value.Add(desiredKey, desiredValue);
+                            }
                         }
                         else if (pointerNode.Pointer is PropertyData[] usRealArrEntry)
                         {

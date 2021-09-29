@@ -199,10 +199,10 @@ namespace UAssetGUI
             }
             else if (dat is MapPropertyData mapDat)
             {
-                foreach (DictionaryEntry entry in mapDat.Value) 
+                foreach (var entry in mapDat.Value) 
                 {
-                    GetUnknownProperties(entry.Key as PropertyData);
-                    GetUnknownProperties(entry.Value as PropertyData);
+                    GetUnknownProperties(entry.Key);
+                    GetUnknownProperties(entry.Value);
                 }
             }
         }
@@ -266,7 +266,7 @@ namespace UAssetGUI
                     MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Notice");
                 }
 
-                if (!tableEditor.asset.VerifyParsing())
+                if (!tableEditor.asset.VerifyBinaryEquality())
                 {
                     MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
                 }

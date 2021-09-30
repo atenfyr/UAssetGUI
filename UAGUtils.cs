@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using UAssetAPI;
 using UAssetAPI.PropertyTypes;
 
 namespace UAssetGUI
@@ -31,7 +32,7 @@ namespace UAssetGUI
             return null;
         }
 
-        public static void UpdateObjectPropertyValues(DataGridViewRow row, DataGridView dgv, ObjectPropertyData objData)
+        public static void UpdateObjectPropertyValues(UAsset asset, DataGridViewRow row, DataGridView dgv, ObjectPropertyData objData)
         {
             if (dgv == null || row == null || objData == null) return;
 
@@ -42,7 +43,7 @@ namespace UAssetGUI
             }
             else
             {
-                row.Cells[3].Value = objData.Value.IsExport() ? "Jump" : (objData.Value.IsImport() ? objData.ToImport()?.ObjectName?.ToString() : string.Empty);
+                row.Cells[3].Value = objData.Value.IsExport() ? "Jump" : (objData.Value.IsImport() ? objData.ToImport(asset)?.ObjectName?.ToString() : string.Empty);
                 row.Cells[3].Tag = "CategoryJump";
                 if (objData.Value.IsExport()) underlineStyle = true;
             }

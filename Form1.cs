@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
@@ -214,10 +213,29 @@ namespace UAssetGUI
 
             try
             {
-                currentSavingPath = filePath;
+                UAsset targetAsset;
+                string fileExtension = Path.GetExtension(filePath);
+                string savingPath = filePath;
+                bool desiredSetUnsavedChanges = false;
+                switch (fileExtension)
+                {
+                    case ".json":
+                        savingPath = Path.ChangeExtension(filePath, "uasset");
+                        using (var sr = new FileStream(filePath, FileMode.Open))
+                        {
+                            targetAsset = UAsset.DeserializeJson(sr);
+                        }
+                        desiredSetUnsavedChanges = true;
+                        break;
+                    default:
+                        targetAsset = new UAsset(filePath, ParsingVersion);
+                        break;
+                }
+
+                currentSavingPath = savingPath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, new UAsset(filePath, ParsingVersion), listView1);
+                tableEditor = new TableHandler(dataGridView1, targetAsset, listView1);
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
@@ -266,12 +284,13 @@ namespace UAssetGUI
                     MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Notice");
                 }
 
-                if (!tableEditor.asset.VerifyBinaryEquality())
+                if (!string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.VerifyBinaryEquality())
                 {
                     MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
                 }
 
                 SetParsingVersion(tableEditor.asset.EngineVersion);
+                if (desiredSetUnsavedChanges) SetUnsavedChanges(desiredSetUnsavedChanges);
             }
             catch (Exception ex)
             {

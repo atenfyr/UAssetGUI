@@ -303,7 +303,7 @@ namespace UAssetGUI
                                 var objData = (ObjectPropertyData)thisPD;
                                 int decidedIndex = objData.Value?.Index ?? 0;
                                 row.Cells[2].Value = decidedIndex;
-                                if (decidedIndex != 0) UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, objData);
+                                if (decidedIndex != 0) UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, objData);
                                 break;
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
@@ -369,14 +369,14 @@ namespace UAssetGUI
                             case "ByteProperty":
                                 var byteData = (BytePropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = byteData.GetEnumBase().Value;
+                                row.Cells[3].Value = byteData.GetEnumBase(asset).Value;
                                 if (byteData.ByteType == BytePropertyType.Byte)
                                 {
                                     row.Cells[4].Value = byteData.Value;
                                 }
                                 else
                                 {
-                                    row.Cells[4].Value = byteData.GetEnumFull().Value;
+                                    row.Cells[4].Value = byteData.GetEnumFull(asset).Value;
                                 }
                                 break;
                             case "StructProperty":
@@ -541,7 +541,7 @@ namespace UAssetGUI
 
                 if (value1B != null && value1B is string && transformB != null && transformB is string && (string)transformB == "Unknown ser.")
                 {
-                    var res = new UnknownPropertyData(FName.FromString(name), asset)
+                    var res = new UnknownPropertyData(FName.FromString(name))
                     {
                         Value = ((string)value1B).ConvertStringToByteArray()
                     };
@@ -559,7 +559,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedTextData = new TextPropertyData(FName.FromString(name), asset);
+                            decidedTextData = new TextPropertyData(FName.FromString(name));
                         }
 
                         TextHistoryType histType = TextHistoryType.Base;
@@ -600,7 +600,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedObjData = new ObjectPropertyData(FName.FromString(name), asset);
+                            decidedObjData = new ObjectPropertyData(FName.FromString(name));
                         }
 
                         int objValue = int.MinValue;
@@ -610,7 +610,7 @@ namespace UAssetGUI
                         if (objValue == int.MinValue) return null;
 
                         decidedObjData.Value = new FPackageIndex(objValue);
-                        UAGUtils.UpdateObjectPropertyValues(row, dataGridView1, decidedObjData);
+                        UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, decidedObjData);
                         return decidedObjData;
                     case "RichCurveKey":
                         RichCurveKeyPropertyData decidedRCKProperty = null;
@@ -620,7 +620,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedRCKProperty = new RichCurveKeyPropertyData(FName.FromString(name), asset);
+                            decidedRCKProperty = new RichCurveKeyPropertyData(FName.FromString(name));
                         }
 
                         if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
@@ -655,7 +655,7 @@ namespace UAssetGUI
                         if (value4B != null) existingStrings[3] = Convert.ToString(value4B);
                         if (transformB != null) existingStrings[4] = Convert.ToString(transformB);
 
-                        newThing.FromString(existingStrings);
+                        newThing.FromString(existingStrings, asset);
                         return newThing;
                 }
             }
@@ -786,7 +786,7 @@ namespace UAssetGUI
 
                     for (int num = 0; num < asset.Imports.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.Imports[num].ClassPackage.ToString(), asset.Imports[num].ClassName.ToString(), asset.Imports[num].OuterIndex, asset.Imports[num].ObjectName.ToString());
+                        dataGridView1.Rows.Add(asset.Imports[num].ClassPackage.ToString(), asset.Imports[num].ClassName.ToString(), asset.Imports[num].OuterIndex.Index, asset.Imports[num].ObjectName.ToString());
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(FPackageIndex.FromImport(num));
                     }
                     break;
@@ -951,7 +951,7 @@ namespace UAssetGUI
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"));
                                             testProperty.Value = strucCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
@@ -1034,7 +1034,7 @@ namespace UAssetGUI
                                         List<DataGridViewRow> classRows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"), asset);
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"));
                                             testProperty.Value = bgcCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
@@ -1370,7 +1370,7 @@ namespace UAssetGUI
                         asset.AddNameReference(parsedVal1.Value);
                         asset.AddNameReference(parsedVal2.Value);
                         asset.AddNameReference(parsedVal4.Value);
-                        Import newLink = new Import(parsedVal1, parsedVal2, realVal3, parsedVal4);
+                        Import newLink = new Import(parsedVal1, parsedVal2, new FPackageIndex(realVal3), parsedVal4);
                         asset.Imports.Add(newLink);
                     }
                     break;
@@ -1574,11 +1574,11 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.SoftPackageReferences:
-                    asset.SoftPackageReferenceList = new List<string>();
+                    asset.SoftPackageReferenceList = new List<FString>();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         string strVal = (string)row.Cells[0].Value;
-                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferenceList.Add(strVal);
+                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferenceList.Add(new FString(strVal));
                     }
                     break;
                 case TableHandlerMode.PreloadDependencies:

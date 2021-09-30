@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Specialized, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Specialized.4.3.0\lib\net46\System.Collections.Specialized.dll</HintPath>
@@ -92,13 +95,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UAssetAPI\UAssetAPI.csproj">
-      <Project>{178417EC-1177-413E-BE85-C83AECD64279}</Project>
-      <Name>UAssetAPI</Name>
-    </ProjectReference>
+    <Content Include="next_patch_notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="next_patch_notes.txt" />
+    <ProjectReference Include="..\UAssetAPI\UAssetAPI.csproj">
+      <Project>{178417ec-1177-413e-be85-c83aecd64279}</Project>
+      <Name>UAssetAPI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1181,10 +1181,9 @@ namespace UAssetGUI
                                     break;
                                 }
                             case DataTable dtUs:
-                                {
-                                    renderingArr = dtUs.Data.ToArray();
-                                    break;
-                                }
+                                dtUs.Data.StripNullsFromList();
+                                renderingArr = dtUs.Data.ToArray();
+                                break;
                             case MapPropertyData usMap:
                                 {
                                     if (usMap.Value.Count > 0)
@@ -1222,20 +1221,15 @@ namespace UAssetGUI
                                     break;
                                 }
                             case StructPropertyData usStruct:
-                                for (int num = 0; num < usStruct.Value.Count; num++)
-                                {
-                                    if (usStruct.Value[num] == null)
-                                    {
-                                        usStruct.Value.RemoveAt(num);
-                                        num--;
-                                    }
-                                }
+                                usStruct.Value.StripNullsFromList();
                                 renderingArr = usStruct.Value.ToArray();
                                 break;
                             case ArrayPropertyData usArr:
+                                usArr.Value = usArr.Value.StripNullsFromArray();
                                 renderingArr = usArr.Value;
                                 break;
                             case GameplayTagContainerPropertyData usArr2:
+                                usArr2.Value = usArr2.Value.StripNullsFromArray();
                                 renderingArr = usArr2.Value;
                                 break;
                             case PointingDictionaryEntry usDictEntry:
@@ -1763,13 +1757,20 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is DataTable dtUs)
                         {
+                            int count = 0;
                             List<StructPropertyData> newData = new List<StructPropertyData>();
-                            var numTimesNameUses = new Dictionary<string, int>();
+                            ///var numTimesNameUses = new Dictionary<string, int>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i));
-                                if (val == null || !(val is StructPropertyData)) continue;
-                                if (numTimesNameUses.ContainsKey(val.Name.Value.Value))
+                                if (val == null || !(val is StructPropertyData))
+                                {
+                                    newData.Add(null);
+                                    continue;
+                                }
+
+                                // Cannot be guaranteed
+                                /*if (numTimesNameUses.ContainsKey(val.Name.Value.Value))
                                 {
                                     numTimesNameUses[val.Name.Value.Value]++;
                                 }
@@ -1777,11 +1778,12 @@ namespace UAssetGUI
                                 {
                                     numTimesNameUses.Add(val.Name.Value.Value, 0);
                                 }
-                                val.Name.Number = numTimesNameUses[val.Name.Value.Value];
+                                val.Name.Number = numTimesNameUses[val.Name.Value.Value];*/
                                 newData.Add((StructPropertyData)val);
+                                count++;
                             }
                             dtUs.Data = newData;
-                            pointerNode.Text = "Table Info (" + dtUs.Data.Count + ")";
+                            pointerNode.Text = "Table Info (" + count + ")";
                             break;
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)
@@ -1791,7 +1793,6 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
-                                if (val == null) continue;
                                 newData.Add(val);
                             }
                             usArr.Value = newData.ToArray();

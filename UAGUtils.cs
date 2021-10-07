@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -57,6 +58,36 @@ namespace UAssetGUI
                 sty.ForeColor = Color.Blue;
             }
             row.Cells[3].Style = sty;
+        }
+
+        public static T[] StripNullsFromArray<T>(this T[] usArr)
+        {
+            int c = 0;
+            for (int num = 0; num < usArr.Length; num++)
+            {
+                if (usArr[num] != null) c++;
+            }
+
+            var newData = new T[c];
+            int indexAdded = 0;
+            for (int num = 0; num < usArr.Length; num++)
+            {
+                if (usArr[num] != null) newData[indexAdded++] = usArr[num];
+            }
+            return newData;
+        }
+
+        public static List<T> StripNullsFromList<T>(this List<T> usList)
+        {
+            for (int num = 0; num < usList.Count; num++)
+            {
+                if (usList[num] == null)
+                {
+                    usList.RemoveAt(num);
+                    num--;
+                }
+            }
+            return usList;
         }
 
         public static string ConvertByteArrayToString(this byte[] val)

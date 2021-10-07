@@ -1690,13 +1690,8 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i));
-                                if (val == null)
-                                {
-                                    newData.Add(null);
-                                    continue;
-                                }
                                 newData.Add(val);
-                                newCount++;
+                                if (val != null) newCount++;
                             }
                             usStruct.Value = newData;
 
@@ -1788,15 +1783,17 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)
                         {
+                            int count = 0;
                             List<PropertyData> newData = new List<PropertyData>();
                             List<PropertyData> origArr = usArr.Value.ToList();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
+                                if (val != null) count++;
                                 newData.Add(val);
                             }
                             usArr.Value = newData.ToArray();
-                            pointerNode.Text = usArr.Name.Value.Value + " (" + usArr.Value.Length + ")";
+                            pointerNode.Text = usArr.Name.Value.Value + " (" + count + ")";
                         }
                         else if (pointerNode.Pointer is GameplayTagContainerPropertyData usArr2)
                         {

@@ -11,6 +11,7 @@ namespace UAssetGUI
     public static class UAGPalette
     {
         public static Color BackColor = Color.White;
+        public static Color ButtonBackColor = Color.FromArgb(240, 240, 240);
         public static Color ForeColor = Color.Black;
         public static Color HighlightBackColor = SystemColors.Highlight;
         public static Color HighlightForeColor = SystemColors.HighlightText;
@@ -42,6 +43,22 @@ namespace UAssetGUI
                 RefreshThemeInternal(frm);
             });
         }
+        private static void RefreshAllButtonsInControl(this Control ctrl)
+        {
+            foreach (Control ctrl2 in ctrl.Controls)
+            {
+                if (ctrl2 is Button butto)
+                {
+                    butto.FlatStyle = FlatStyle.Flat;
+                    butto.ForeColor = UAGPalette.ForeColor;
+                    butto.FlatAppearance.BorderColor = UAGPalette.ForeColor;
+                    butto.FlatAppearance.BorderSize = 1;
+                    butto.BackColor = UAGPalette.ButtonBackColor;
+                    butto.MinimumSize = new Size(0, 26);
+                }
+                RefreshAllButtonsInControl(ctrl2);
+            }
+        }
 
         private static void RefreshThemeInternal(Form frm)
         {
@@ -49,6 +66,7 @@ namespace UAssetGUI
             {
                 case UAGTheme.Light:
                     BackColor = Color.White;
+                    ButtonBackColor = Color.FromArgb(240, 240, 240);
                     ForeColor = Color.Black;
                     HighlightBackColor = SystemColors.Highlight;
                     HighlightForeColor = SystemColors.HighlightText;
@@ -90,6 +108,7 @@ namespace UAssetGUI
                 frm1.dataGridView1.RowHeadersDefaultCellStyle = frm1.dataGridView1.ColumnHeadersDefaultCellStyle;
                 frm1.dataGridView1.DefaultCellStyle = frm1.dataGridView1.ColumnHeadersDefaultCellStyle;
             }
+            frm.RefreshAllButtonsInControl();
         }
     }
 }

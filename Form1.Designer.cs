@@ -30,6 +30,7 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,8 +53,11 @@ namespace UAssetGUI
             this.listView1 = new System.Windows.Forms.TreeView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.comboSpecifyVersion = new System.Windows.Forms.ComboBox();
+            this.nameMapContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.replaceAllReferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.nameMapContext.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -229,6 +233,7 @@ namespace UAssetGUI
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridClickCell);
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridEditCell);
+            this.dataGridView1.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridView1_EditingControlShowing);
             // 
             // listView1
             // 
@@ -258,6 +263,20 @@ namespace UAssetGUI
             this.comboSpecifyVersion.TabIndex = 3;
             this.comboSpecifyVersion.SelectedIndexChanged += new System.EventHandler(this.comboSpecifyVersion_SelectedIndexChanged);
             // 
+            // nameMapContext
+            // 
+            this.nameMapContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.replaceAllReferencesToolStripMenuItem});
+            this.nameMapContext.Name = "treeNodeContext";
+            this.nameMapContext.Size = new System.Drawing.Size(197, 48);
+            // 
+            // replaceAllReferencesToolStripMenuItem
+            // 
+            this.replaceAllReferencesToolStripMenuItem.Name = "replaceAllReferencesToolStripMenuItem";
+            this.replaceAllReferencesToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.replaceAllReferencesToolStripMenuItem.Text = "Replace all references...";
+            this.replaceAllReferencesToolStripMenuItem.Click += new System.EventHandler(this.replaceAllReferencesToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -274,6 +293,7 @@ namespace UAssetGUI
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.nameMapContext.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,6 +319,8 @@ namespace UAssetGUI
         private ToolStripMenuItem aboutToolStripMenuItem1;
         private ToolStripMenuItem githubToolStripMenuItem;
         private ComboBox comboSpecifyVersion;
+        private ToolStripMenuItem replaceAllReferencesToolStripMenuItem;
+        public ContextMenuStrip nameMapContext;
     }
 }
 

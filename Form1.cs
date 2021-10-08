@@ -485,7 +485,15 @@ namespace UAssetGUI
                     case "ChildJump":
                         if (dataGridView1.CurrentCell.ColumnIndex == 3)
                         {
-                            listView1.SelectedNode = listView1.SelectedNode.Nodes[dataGridView1.CurrentCell.RowIndex];
+                            int jumpingIndex = dataGridView1.CurrentCell.RowIndex;
+                            if (jumpingIndex < 0 || jumpingIndex >= listView1.SelectedNode.Nodes.Count)
+                            {
+                                MessageBox.Show("Please select View -> Recalculate Nodes before attempting to jump to this node.", "Notice");
+                            }
+                            else
+                            {
+                                listView1.SelectedNode = listView1.SelectedNode.Nodes[jumpingIndex];
+                            }
                         }
                         break;
                 }
@@ -757,6 +765,67 @@ namespace UAssetGUI
                     listView1.SelectedNode.EnsureVisible();
                 }
             }
+        }
+
+        private ContextMenuStrip _currentDataGridViewStrip;
+        public ContextMenuStrip CurrentDataGridViewStrip
+        {
+            get
+            {
+                return _currentDataGridViewStrip;
+            }
+            set
+            {
+                _currentDataGridViewStrip = value;
+                //UAGUtils.InvokeUI(UpdateDataGridViewWithExpectedStrip);
+            }
+        }
+
+        public void ResetCurrentDataGridViewStrip()
+        {
+            _currentDataGridViewStrip = null;
+            //UAGUtils.InvokeUI(UpdateDataGridViewWithExpectedStrip);
+        }
+
+        private void UpdateDataGridViewWithExpectedStrip()
+        {
+            foreach (DataGridViewRow row in dataGridView1.Rows) UAGUtils.UpdateContextMenuStripOfRow(row, CurrentDataGridViewStrip);
+        }
+
+        private void dataGridView1_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (_currentDataGridViewStrip == null)
+            {
+                e.Control.ContextMenuStrip = null;
+                return;
+            }
+            e.Control.ContextMenuStrip = UAGUtils.MergeContextMenus(e.Control.ContextMenuStrip, _currentDataGridViewStrip);
+        }
+
+        private void replaceAllReferencesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataGridViewTextBoxEditingControl dadControl = dataGridView1.EditingControl as DataGridViewTextBoxEditingControl;
+            if (dadControl == null) return;
+
+            int changingRow = dadControl.EditingControlRowIndex;
+            FString replacingName = tableEditor?.asset?.GetNameReference(changingRow);
+            if (replacingName == null) return;
+
+            TextPrompt replacementPrompt = new TextPrompt()
+            {
+                DisplayText = "Enter a string to replace references of this name with"
+            };
+            
+            if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
+            {
+                FString newTxt = new FString(replacementPrompt.OutputText);
+                int numReplaced = tableEditor.ReplaceAllReferencesInNameMap(replacingName, newTxt);
+                dataGridView1.Rows[changingRow].Cells[0].Value = newTxt.Value;
+                dataGridView1.Rows[changingRow].Cells[1].Value = newTxt.Encoding.HeaderName;
+                dataGridView1.RefreshEdit();
+                MessageBox.Show("Successfully replaced " + numReplaced + " reference" + (numReplaced == 1 ? "" : "s") + ".", this.Text);
+            }
+            replacementPrompt.Dispose();
         }
     }
 }

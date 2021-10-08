@@ -511,6 +511,7 @@ namespace UAssetGUI
 
                     row.Cells[8].Value = thisPD.DuplicationIndex;
                     row.Cells[9].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
+                    row.Cells[9].ReadOnly = true;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -700,6 +701,22 @@ namespace UAssetGUI
             }
         }
 
+        internal int ReplaceAllReferencesInNameMap(FString antiguo, FString nuevo)
+        {
+            int replacedCount = 0;
+            List<FName> allNamesThatExist = UAPUtils.FindAllInstances<FName>(asset);
+            for (int i = 0; i < allNamesThatExist.Count; i++)
+            {
+                FName thisOne = allNamesThatExist[i];
+                if (thisOne.Value == antiguo)
+                {
+                    thisOne.Value = nuevo;
+                    replacedCount++;
+                }
+            }
+            return replacedCount;
+        }
+
         private void AddColumns(string[] ourColumns)
         {
             for (int i = 0; i < ourColumns.Length; i++)
@@ -747,6 +764,8 @@ namespace UAssetGUI
             dataGridView1.BackgroundColor = UAGPalette.DataGridViewActiveColor;
             readyToSave = false;
 
+            ((Form1)dataGridView1.Parent).ResetCurrentDataGridViewStrip();
+
             switch (mode)
             {
                 case TableHandlerMode.GeneralInformation:
@@ -784,6 +803,7 @@ namespace UAssetGUI
                         dataGridView1.Rows.Add(headerIndexList[num].Value, headerIndexList[num].Encoding.HeaderName);
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
                     }
+                    ((Form1)dataGridView1.Parent).CurrentDataGridViewStrip = ((Form1)dataGridView1.Parent).nameMapContext;
                     break;
                 case TableHandlerMode.Imports:
                     AddColumns(new string[] { "ClassPackage", "ClassName", "OuterIndex", "ObjectName", "" });
@@ -1343,14 +1363,13 @@ namespace UAssetGUI
                         object val2 = row.Cells[1].Value;
                         object val3 = row.Cells[2].Value;
                         object val4 = row.Cells[3].Value;
-                        if (val1 == null || val2 == null || val3 == null || val4 == null) continue;
+                        if (val1 == null || val2 == null || val4 == null) continue;
                         if (!(val1 is string) || !(val2 is string) || !(val4 is string)) continue;
-                        if (!(val3 is string) && !(val3 is int)) continue;
 
-                        int realVal3;
+                        int realVal3 = 0;
                         if (val3 is string)
                         {
-                            if (!int.TryParse((string)val3, out realVal3)) continue;
+                            int.TryParse((string)val3, out realVal3);
                         }
                         else
                         {

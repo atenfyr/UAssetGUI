@@ -33,6 +33,31 @@ namespace UAssetGUI
             return null;
         }
 
+        public static ContextMenuStrip MergeContextMenus(ContextMenuStrip one, ContextMenuStrip two)
+        {
+            if (one == null) return two;
+            if (two == null) return one;
+
+            one.Items.AddRange(two.Items);
+            return one;
+        }
+
+        // ((Form1)x.DataGridView.Parent).nameMapContext;
+        public static void UpdateContextMenuStripOfRow(DataGridViewRow x, ContextMenuStrip strip)
+        {
+            x.ContextMenuStrip = MergeContextMenus(x.ContextMenuStrip, strip);
+            x.HeaderCell.ContextMenuStrip = MergeContextMenus(x.HeaderCell.ContextMenuStrip, strip);
+            foreach (DataGridViewCell y in x.Cells)
+            {
+                y.ContextMenuStrip = MergeContextMenus(y.ContextMenuStrip, strip);
+            }
+        }
+
+        public static void AdjustFormPosition(this Form frm1)
+        {
+            if (frm1.Owner != null) frm1.Location = new Point((frm1.Owner.Location.X + frm1.Owner.Width / 2) - (frm1.Width / 2), (frm1.Owner.Location.Y + frm1.Owner.Height / 2) - (frm1.Height / 2));
+        }
+
         public static void UpdateObjectPropertyValues(UAsset asset, DataGridViewRow row, DataGridView dgv, ObjectPropertyData objData)
         {
             if (dgv == null || row == null || objData == null) return;

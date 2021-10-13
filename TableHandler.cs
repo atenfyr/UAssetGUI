@@ -169,7 +169,7 @@ namespace UAssetGUI
                             categoryNode.Nodes.Add(parentNode2);
                             foreach (StructPropertyData entry in us4.Table.Data)
                             {
-                                string decidedName = entry.Name.ToString();
+                                string decidedName = entry.Name.Value.Value;
 
                                 var structNode = new PointingTreeNode(decidedName + " (" + entry.Value.Count + ")", entry);
                                 parentNode2.Nodes.Add(structNode);
@@ -1665,7 +1665,6 @@ namespace UAssetGUI
                         if (pointerNode.Pointer is StringTable usStrTable)
                         {
                             usStrTable.Clear();
-                            List<DataGridViewRow> rows = new List<DataGridViewRow>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 DataGridViewRow row = dataGridView1.Rows[i];

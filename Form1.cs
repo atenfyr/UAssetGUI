@@ -19,20 +19,39 @@ namespace UAssetGUI
         internal TreeView listView1;
         internal MenuStrip menuStrip1;
 
-        public static string GUIVersion;
         public TableHandler tableEditor;
         public ByteViewer byteView1;
+
+        private string _displayVersion = string.Empty;
+        public string DisplayVersion
+        {
+            get
+            {
+                return _displayVersion;
+            }
+        }
 
         public Form1()
         {
             InitializeComponent();
             Assembly assembly = Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            GUIVersion = fvi.FileVersion;
+            _displayVersion = "UAssetGUI v" + fvi.FileVersion;
+
+            string gitVersion = string.Empty;
+            using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    gitVersion = reader.ReadToEnd();
+                }
+            }
+            
+            if (!string.IsNullOrEmpty(gitVersion)) _displayVersion += " (" + gitVersion + ")";
 
             UAGUtils.InitializeInvoke(this);
 
-            this.Text = "UAssetGUI v" + GUIVersion;
+            this.Text = DisplayVersion;
             this.AllowDrop = true;
             dataGridView1.Visible = true;
 
@@ -329,17 +348,17 @@ namespace UAssetGUI
             existsUnsavedChanges = flag;
             if (string.IsNullOrEmpty(currentSavingPath))
             {
-                dataGridView1.Parent.Text = "UAssetGUI v" + GUIVersion;
+                dataGridView1.Parent.Text = DisplayVersion;
             }
             else
             {
                 if (existsUnsavedChanges)
                 {
-                    dataGridView1.Parent.Text = "UAssetGUI v" + GUIVersion + " - *" + currentSavingPath;
+                    dataGridView1.Parent.Text = DisplayVersion + " - *" + currentSavingPath;
                 }
                 else
                 {
-                    dataGridView1.Parent.Text = "UAssetGUI v" + GUIVersion + " - " + currentSavingPath;
+                    dataGridView1.Parent.Text = DisplayVersion + " - " + currentSavingPath;
                 }
             }
         }
@@ -628,7 +647,7 @@ namespace UAssetGUI
         {
             if (!existsUnsavedChanges) return;
 
-            DialogResult res = MessageBox.Show("Do you want to save your changes?", "UAssetGUI v" + GUIVersion, MessageBoxButtons.YesNoCancel);
+            DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);
             switch(res)
             {
                 case DialogResult.Yes:
@@ -682,7 +701,7 @@ namespace UAssetGUI
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutText = "UAssetGUI v" + GUIVersion + "\n" +
+            AboutText = DisplayVersion + "\n" +
             "By Atenfyr\n" +
             "\nThanks to the Astro-Techies club for the help\n" +
             "\nThanks to David Hill (Kaiheilos) for early assistance with the package summary format\n" +

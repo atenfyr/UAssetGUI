@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace UAssetGUI
@@ -43,6 +39,7 @@ namespace UAssetGUI
                 RefreshThemeInternal(frm);
             });
         }
+
         private static void RefreshAllButtonsInControl(this Control ctrl)
         {
             foreach (Control ctrl2 in ctrl.Controls)

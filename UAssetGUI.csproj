@@ -104,6 +104,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="git_commit.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="next_patch_notes.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -113,4 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>git rev-parse --short HEAD &gt; "$(ProjectDir)\git_commit.txt"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

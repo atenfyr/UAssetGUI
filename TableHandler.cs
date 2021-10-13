@@ -1396,7 +1396,7 @@ namespace UAssetGUI
                     ExportDetailsParseType[] parsingTypes = new ExportDetailsParseType[]
                     {
                         ExportDetailsParseType.FName,
-                        ExportDetailsParseType.Int,
+                        ExportDetailsParseType.FPackageIndex,
 
                         ExportDetailsParseType.FPackageIndex,
                         ExportDetailsParseType.FPackageIndex,

@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 10]
- - Version or Commit [e.g. 1.0.2/c7d9f8d]
+ - Version or Commit: [e.g. 1.0.2/c7d9f8d]
 
 **Additional context**
 Add any other context about the problem here.

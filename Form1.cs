@@ -288,6 +288,8 @@ namespace UAssetGUI
                     }
                 }
 
+                bool failedToMaintainBinaryEquality = !string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.VerifyBinaryEquality();
+
                 if (failedCategoryCount > 0)
                 {
                     MessageBox.Show("Failed to parse " + failedCategoryCount + " exports!", "Notice");
@@ -300,10 +302,10 @@ namespace UAssetGUI
 
                 if (unknownTypes.Count > 0)
                 {
-                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes), "Notice");
+                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes) + (failedToMaintainBinaryEquality ? "" : "\n\nThis is not a cause for alarm. The asset will still parse normally."), "Notice");
                 }
 
-                if (!string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.VerifyBinaryEquality())
+                if (failedToMaintainBinaryEquality)
                 {
                     MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
                 }

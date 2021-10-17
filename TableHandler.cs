@@ -153,9 +153,17 @@ namespace UAssetGUI
                         {
                             var parentNode2 = new PointingTreeNode("UStruct Data", structUs, PointingTreeNodeType.StructData);
                             categoryNode.Nodes.Add(parentNode2);
-                            var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " B)", structUs.ScriptBytecode, PointingTreeNodeType.Normal);
-                            parentNode2.Nodes.Add(bytecodeNode);
-                        }
+                            if (structUs.ScriptBytecode == null)
+                            {
+                                var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs.ScriptBytecodeRaw, PointingTreeNodeType.Normal);
+                                parentNode2.Nodes.Add(bytecodeNode);
+                            }
+                            else
+                            {
+                                var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs.ScriptBytecode, PointingTreeNodeType.Normal);
+                                parentNode2.Nodes.Add(bytecodeNode);
+                            }
+                         }
 
                         if (us is ClassExport)
                         {
@@ -442,11 +450,11 @@ namespace UAssetGUI
                             case "Vector":
                                 var vectorData = (VectorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vectorData.X;
+                                row.Cells[3].Value = vectorData.Value.X;
                                 row.Cells[3].ToolTipText = "X";
-                                row.Cells[4].Value = vectorData.Y;
+                                row.Cells[4].Value = vectorData.Value.Y;
                                 row.Cells[4].ToolTipText = "Y";
-                                row.Cells[5].Value = vectorData.Z;
+                                row.Cells[5].Value = vectorData.Value.Z;
                                 row.Cells[5].ToolTipText = "Z";
                                 break;
                             case "Vector2D":
@@ -478,23 +486,23 @@ namespace UAssetGUI
                             case "Rotator":
                                 var rotatorData = (RotatorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = rotatorData.Pitch;
+                                row.Cells[3].Value = rotatorData.Value.Pitch;
                                 row.Cells[3].ToolTipText = "Pitch";
-                                row.Cells[4].Value = rotatorData.Yaw;
+                                row.Cells[4].Value = rotatorData.Value.Yaw;
                                 row.Cells[4].ToolTipText = "Yaw";
-                                row.Cells[5].Value = rotatorData.Roll;
+                                row.Cells[5].Value = rotatorData.Value.Roll;
                                 row.Cells[5].ToolTipText = "Roll";
                                 break;
                             case "Quat":
                                 var quatData = (QuatPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = quatData.X;
+                                row.Cells[3].Value = quatData.Value.X;
                                 row.Cells[3].ToolTipText = "X";
-                                row.Cells[4].Value = quatData.Y;
+                                row.Cells[4].Value = quatData.Value.Y;
                                 row.Cells[4].ToolTipText = "Y";
-                                row.Cells[5].Value = quatData.Z;
+                                row.Cells[5].Value = quatData.Value.Z;
                                 row.Cells[5].ToolTipText = "Z";
-                                row.Cells[6].Value = quatData.W;
+                                row.Cells[6].Value = quatData.Value.W;
                                 row.Cells[6].ToolTipText = "W";
                                 break;
                             case "StrProperty":

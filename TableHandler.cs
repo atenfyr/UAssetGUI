@@ -242,10 +242,6 @@ namespace UAssetGUI
 
                     var arrNode2 = new PointingTreeNode(arr2.Name.Value.Value + " (" + arr2.Value.Length + ")", arr2);
                     ourNode.Nodes.Add(arrNode2);
-                    for (int j = 0; j < arr2.Value.Length; j++)
-                    {
-                        InterpretThing(arr2.Value[j], arrNode2);
-                    }
                     break;
                 case "MapProperty":
                     var mapp = (MapPropertyData)me;
@@ -1257,8 +1253,14 @@ namespace UAssetGUI
                                 renderingArr = usArr.Value;
                                 break;
                             case GameplayTagContainerPropertyData usArr2:
+                                dataGridView1.Columns.Clear();
+                                AddColumns(new string[] { "Tag Name", "" });
                                 usArr2.Value = usArr2.Value.StripNullsFromArray();
-                                renderingArr = usArr2.Value;
+                                for (int i = 0; i < usArr2.Value.Length; i++)
+                                {
+                                    dataGridView1.Rows.Add(usArr2.Value[i].ToString());
+                                }
+                                standardRendering = false;
                                 break;
                             case PointingDictionaryEntry usDictEntry:
                                 dataGridView1.AllowUserToAddRows = false;
@@ -1823,13 +1825,12 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is GameplayTagContainerPropertyData usArr2)
                         {
-                            List<NamePropertyData> newData = new List<NamePropertyData>();
-                            List<NamePropertyData> origArr = usArr2.Value.ToList();
+                            List<FName> newData = new List<FName>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
-                                if (val == null || !(val is NamePropertyData)) continue;
-                                newData.Add((NamePropertyData)val);
+                                object val = dataGridView1.Rows[i].Cells[0].Value;
+                                if (val == null || !(val is string)) continue;
+                                newData.Add(FName.FromString((string)val));
                             }
                             usArr2.Value = newData.ToArray();
                             pointerNode.Text = usArr2.Name.Value.Value + " (" + usArr2.Value.Length + ")";

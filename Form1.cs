@@ -45,7 +45,7 @@ namespace UAssetGUI
                 {
                     using (StreamReader reader = new StreamReader(stream))
                     {
-                        if (reader != null) gitVersionGUI = reader.ReadToEnd();
+                        if (reader != null) gitVersionGUI = reader.ReadToEnd().Trim();
                     }
                 }
             }
@@ -57,7 +57,7 @@ namespace UAssetGUI
                 {
                     using (StreamReader reader = new StreamReader(stream))
                     {
-                        if (reader != null) gitVersionAPI = reader.ReadToEnd();
+                        if (reader != null) gitVersionAPI = reader.ReadToEnd().Trim();
                     }
                 }
             }
@@ -281,6 +281,7 @@ namespace UAssetGUI
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
+                exportJSONToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree();
                 tableEditor.Load();
@@ -344,6 +345,7 @@ namespace UAssetGUI
                 tableEditor = null;
                 saveToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
+                exportJSONToolStripMenuItem.Enabled = false;
 
                 listView1.Nodes.Clear();
                 dataGridView1.Columns.Clear();
@@ -392,7 +394,7 @@ namespace UAssetGUI
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Unreal Assets (*.uasset, *.umap)|*.uasset;*.umap|All files (*.*)|*.*";
+                openFileDialog.Filter = "Unreal Assets (*.uasset, *.umap, *.json)|*.uasset;*.umap;*.json|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 
@@ -870,6 +872,29 @@ namespace UAssetGUI
                 MessageBox.Show("Successfully replaced " + numReplaced + " reference" + (numReplaced == 1 ? "" : "s") + ".", this.Text);
             }
             replacementPrompt.Dispose();
+        }
+
+        private void exportJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tableEditor?.asset == null) return;
+
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "UAssetAPI JSON (*.json)|*.json|All files (*.*)|*.*";
+                dialog.FilterIndex = 1;
+                dialog.RestoreDirectory = true;
+
+                DialogResult res = dialog.ShowDialog();
+                if (res == DialogResult.OK)
+                {
+                    string jsonSerializedAsset = tableEditor.asset.SerializeJson();
+                    File.WriteAllText(dialog.FileName, jsonSerializedAsset);
+                }
+                else if (res != DialogResult.Cancel)
+                {
+                    MessageBox.Show("Failed to export!", "Uh oh!");
+                }
+            }
         }
     }
 }

@@ -38,16 +38,39 @@ namespace UAssetGUI
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             _displayVersion = "UAssetGUI v" + fvi.FileVersion;
 
-            string gitVersion = string.Empty;
+            string gitVersionGUI = string.Empty;
             using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
             {
-                using (StreamReader reader = new StreamReader(stream))
+                if (stream != null)
                 {
-                    gitVersion = reader.ReadToEnd();
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        if (reader != null) gitVersionGUI = reader.ReadToEnd();
+                    }
                 }
             }
-            
-            if (!string.IsNullOrEmpty(gitVersion)) _displayVersion += " (" + gitVersion + ")";
+
+            string gitVersionAPI = string.Empty;
+            using (Stream stream = typeof(PropertyData).Assembly.GetManifestResourceStream("UAssetAPI.git_commit.txt"))
+            {
+                if (stream != null)
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        if (reader != null) gitVersionAPI = reader.ReadToEnd();
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(gitVersionGUI))
+            {
+                _displayVersion += " (" + gitVersionGUI;
+                if (!string.IsNullOrEmpty(gitVersionAPI))
+                {
+                    _displayVersion += " - " + gitVersionAPI;
+                }
+                _displayVersion += ")";
+            }
 
             UAGUtils.InitializeInvoke(this);
 

@@ -501,6 +501,22 @@ namespace UAssetGUI
                                 row.Cells[6].Value = quatData.Value.W;
                                 row.Cells[6].ToolTipText = "W";
                                 break;
+                            case "SmartName":
+                                var smartNameData = (SmartNamePropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = smartNameData.DisplayName == null ? FString.NullCase : smartNameData.DisplayName.ToString();
+                                row.Cells[3].ToolTipText = "DisplayName";
+                                if (asset.GetCustomVersion<FAnimPhysObjectVersion>() < FAnimPhysObjectVersion.RemoveUIDFromSmartNameSerialize)
+                                {
+                                    row.Cells[4].Value = smartNameData.SmartNameID;
+                                    row.Cells[4].ToolTipText = "SmartNameID";
+                                }
+                                if (asset.GetCustomVersion<FAnimPhysObjectVersion>() < FAnimPhysObjectVersion.SmartNameRefactorForDeterministicCooking)
+                                {
+                                    row.Cells[5].Value = smartNameData.TempGUID == null ? FString.NullCase : smartNameData.TempGUID.ToString();
+                                    row.Cells[5].ToolTipText = "TempGUID";
+                                }
+                                break;
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
                                 row.Cells[2].Value = (strPropData.Value?.Encoding ?? Encoding.ASCII).HeaderName;
@@ -514,11 +530,14 @@ namespace UAssetGUI
                                 if (asset.EngineVersion < UE4Version.VER_UE4_ADDED_SOFT_OBJECT_PATH)
                                 {
                                     row.Cells[3].Value = sopPropData.Path.ToString();
+                                    row.Cells[3].ToolTipText = "Path";
                                 }
                                 else
                                 {
                                     row.Cells[3].Value = sopPropData.AssetPathName == null ? FString.NullCase : sopPropData.AssetPathName.ToString();
+                                    row.Cells[3].ToolTipText = "AssetPathName";
                                     row.Cells[4].Value = sopPropData.SubPathString == null ? FString.NullCase : sopPropData.SubPathString.ToString();
+                                    row.Cells[3].ToolTipText = "SubPathString";
                                 }
                                 break;
                             default:

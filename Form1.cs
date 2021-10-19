@@ -864,7 +864,7 @@ namespace UAssetGUI
             
             if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
             {
-                FString newTxt = new FString(replacementPrompt.OutputText);
+                FString newTxt = FString.FromString(replacementPrompt.OutputText);
                 int numReplaced = tableEditor.ReplaceAllReferencesInNameMap(replacingName, newTxt);
                 dataGridView1.Rows[changingRow].Cells[0].Value = newTxt.Value;
                 dataGridView1.Rows[changingRow].Cells[1].Value = newTxt.Encoding.HeaderName;

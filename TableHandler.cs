@@ -334,21 +334,21 @@ namespace UAssetGUI
                                 switch (txtData.HistoryType)
                                 {
                                     case TextHistoryType.None:
-                                        row.Cells[3].Value = txtData?.CultureInvariantString == null ? "null" : txtData.CultureInvariantString.ToString();
+                                        row.Cells[3].Value = txtData?.CultureInvariantString == null ? FString.NullCase : txtData.CultureInvariantString.ToString();
                                         row.Cells[3].ToolTipText = "CultureInvariantString";
                                         break;
                                     case TextHistoryType.Base:
-                                        row.Cells[3].Value = txtData?.Namespace == null ? "null" : txtData.Namespace.ToString();
+                                        row.Cells[3].Value = txtData?.Namespace == null ? FString.NullCase : txtData.Namespace.ToString();
                                         row.Cells[3].ToolTipText = "Namespace";
-                                        row.Cells[4].Value = txtData?.Value == null ? "null" : txtData.Value.ToString();
+                                        row.Cells[4].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
                                         row.Cells[4].ToolTipText = "Key";
-                                        row.Cells[5].Value = txtData?.CultureInvariantString == null ? "null" : txtData.CultureInvariantString.ToString();
+                                        row.Cells[5].Value = txtData?.CultureInvariantString == null ? FString.NullCase : txtData.CultureInvariantString.ToString();
                                         row.Cells[5].ToolTipText = "CultureInvariantString";
                                         break;
                                     case TextHistoryType.StringTableEntry:
-                                        row.Cells[3].Value = txtData?.TableId == null ? "null" : txtData.TableId.ToString();
+                                        row.Cells[3].Value = txtData?.TableId == null ? FString.NullCase : txtData.TableId.ToString();
                                         row.Cells[3].ToolTipText = "TableId";
-                                        row.Cells[4].Value = txtData?.Value == null ? "null" : txtData.Value.ToString();
+                                        row.Cells[4].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
                                         row.Cells[4].ToolTipText = "Key";
                                         break;
                                     default:
@@ -370,21 +370,21 @@ namespace UAssetGUI
                             case "EnumProperty":
                                 var enumData = (EnumPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = enumData.EnumType?.Value?.Value == null ? "null" : enumData.EnumType.ToString();
-                                row.Cells[4].Value = enumData.Value?.Value?.Value == null ? "null" : enumData.Value.ToString();
+                                row.Cells[3].Value = enumData.EnumType?.Value?.Value == null ? FString.NullCase : enumData.EnumType.ToString();
+                                row.Cells[4].Value = enumData.Value?.Value?.Value == null ? FString.NullCase : enumData.Value.ToString();
                                 //row.Cells[5].Value = enumData.Extra;
                                 break;
                             case "ByteProperty":
                                 var byteData = (BytePropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = byteData.GetEnumBase(asset).Value;
+                                row.Cells[3].Value = byteData.GetEnumBase(asset)?.Value == null ? FString.NullCase : byteData.GetEnumBase(asset)?.Value;
                                 if (byteData.ByteType == BytePropertyType.Byte)
                                 {
                                     row.Cells[4].Value = byteData.Value;
                                 }
                                 else
                                 {
-                                    row.Cells[4].Value = byteData.GetEnumFull(asset).Value;
+                                    row.Cells[4].Value = byteData.GetEnumFull(asset)?.Value == null ? FString.NullCase : byteData.GetEnumFull(asset)?.Value;
                                 }
                                 break;
                             case "StructProperty":
@@ -504,7 +504,22 @@ namespace UAssetGUI
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
                                 row.Cells[2].Value = (strPropData.Value?.Encoding ?? Encoding.ASCII).HeaderName;
-                                row.Cells[3].Value = strPropData.Value?.Value == null ? "null" : Convert.ToString(strPropData.Value.Value);
+                                row.Cells[3].Value = strPropData.Value?.Value == null ? FString.NullCase : Convert.ToString(strPropData.Value.Value);
+                                break;
+                            case "SoftObjectPath":
+                            case "SoftAssetPath":
+                            case "SoftClassPath":
+                                var sopPropData = (SoftObjectPathPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                if (asset.EngineVersion < UE4Version.VER_UE4_ADDED_SOFT_OBJECT_PATH)
+                                {
+                                    row.Cells[3].Value = sopPropData.Path.ToString();
+                                }
+                                else
+                                {
+                                    row.Cells[3].Value = sopPropData.AssetPathName == null ? FString.NullCase : sopPropData.AssetPathName.ToString();
+                                    row.Cells[4].Value = sopPropData.SubPathString == null ? FString.NullCase : sopPropData.SubPathString.ToString();
+                                }
                                 break;
                             default:
                                 row.Cells[2].Value = string.Empty;
@@ -580,19 +595,19 @@ namespace UAssetGUI
                         {
                             case TextHistoryType.None:
                                 decidedTextData.Value = null;
-                                if (value1B != null && value1B is string) decidedTextData.CultureInvariantString = (string)value1B == "null" ? null : new FString((string)value1B);
+                                if (value1B != null && value1B is string) decidedTextData.CultureInvariantString = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
                                 break;
                             case TextHistoryType.Base:
                                 if (value1B == null || value2B == null || value3B == null || !(value1B is string) || !(value2B is string) || !(value3B is string)) return null;
-                                decidedTextData.Namespace = (string)value1B == "null" ? null : new FString((string)value1B);
-                                decidedTextData.Value = (string)value2B == "null" ? null :  new FString((string)value2B);
-                                decidedTextData.CultureInvariantString = (string)value3B == "null" ? null : new FString((string)value3B);
+                                decidedTextData.Namespace = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
+                                decidedTextData.Value = (string)value2B == FString.NullCase ? null :  FString.FromString((string)value2B);
+                                decidedTextData.CultureInvariantString = (string)value3B == FString.NullCase ? null : FString.FromString((string)value3B);
                                 break;
                             case TextHistoryType.StringTableEntry:
                                 if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
 
                                 decidedTextData.TableId = FName.FromString((string)value1B);
-                                decidedTextData.Value = (string)value2B == "null" ? null : new FString((string)value2B);
+                                decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
                                 break;
                             default:
                                 throw new FormatException("Unimplemented text history type " + histType);
@@ -838,7 +853,7 @@ namespace UAssetGUI
                             if (printingVal is FName parsingName)
                             {
                                 string actualName = parsingName?.ToString();
-                                if (actualName == null) actualName = "null";
+                                if (actualName == null) actualName = FString.NullCase;
                                 newCells[num2] = actualName;
                             }
                             else if (printingVal is FPackageIndex parsingIndex)
@@ -1349,7 +1364,7 @@ namespace UAssetGUI
                                 if (uint.TryParse(propertyValue, out uint newPackageSource)) asset.PackageSource = newPackageSource;
                                 break;
                             case "FolderName":
-                                asset.FolderName = new FString(propertyValue, Encoding.UTF8.GetByteCount(propertyValue) == propertyValue.Length ? Encoding.ASCII : Encoding.Unicode);
+                                asset.FolderName = FString.FromString(propertyValue, Encoding.UTF8.GetByteCount(propertyValue) == propertyValue.Length ? Encoding.ASCII : Encoding.Unicode);
                                 break;
                         }
 
@@ -1362,7 +1377,7 @@ namespace UAssetGUI
                         string ourValue = (string)row.Cells[0].Value;
                         string encoding = (string)row.Cells[1].Value;
                         if (string.IsNullOrWhiteSpace(encoding)) encoding = "ascii";
-                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.AddNameReference(new FString(ourValue, encoding.Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII), true);
+                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.AddNameReference(FString.FromString(ourValue, encoding.Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII), true);
                     }
                     break;
                 case TableHandlerMode.Imports:
@@ -1605,7 +1620,7 @@ namespace UAssetGUI
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
                         string strVal = (string)row.Cells[0].Value;
-                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferenceList.Add(new FString(strVal));
+                        if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferenceList.Add(FString.FromString(strVal));
                     }
                     break;
                 case TableHandlerMode.PreloadDependencies:
@@ -1682,7 +1697,7 @@ namespace UAssetGUI
                                 object value1B = row.Cells[3].Value;
                                 if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
 
-                                usStrTable.Add(new FString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
+                                usStrTable.Add(FString.FromString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
                             }
 
                             pointerNode.Text = usStrTable.Name + " (" + usStrTable.Count + ")";

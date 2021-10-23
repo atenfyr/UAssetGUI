@@ -429,8 +429,15 @@ namespace UAssetGUI
                     }
                     catch (NameMapOutOfRangeException ex)
                     {
-                        tableEditor.asset.AddNameReference(ex.RequiredName);
-                        isLooping = true;
+                        try
+                        {
+                            tableEditor.asset.AddNameReference(ex.RequiredName);
+                            isLooping = true;
+                        }
+                        catch (Exception ex2)
+                        {
+                            MessageBox.Show("Failed to save! " + ex2.Message, "Uh oh!");
+                        }
                     }
                     catch (Exception ex)
                     {

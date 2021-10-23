@@ -56,6 +56,7 @@ namespace UAssetGUI
             this.comboSpecifyVersion = new System.Windows.Forms.ComboBox();
             this.nameMapContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.replaceAllReferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.issuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.nameMapContext.SuspendLayout();
@@ -89,7 +90,7 @@ namespace UAssetGUI
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -98,7 +99,7 @@ namespace UAssetGUI
             this.saveToolStripMenuItem.Enabled = false;
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -108,7 +109,7 @@ namespace UAssetGUI
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             this.saveAsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
@@ -193,6 +194,7 @@ namespace UAssetGUI
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.issuesToolStripMenuItem,
             this.githubToolStripMenuItem,
             this.apiLinkToolStripMenuItem1,
             this.aboutToolStripMenuItem1});
@@ -289,6 +291,13 @@ namespace UAssetGUI
             this.replaceAllReferencesToolStripMenuItem.Text = "Replace all references...";
             this.replaceAllReferencesToolStripMenuItem.Click += new System.EventHandler(this.replaceAllReferencesToolStripMenuItem_Click);
             // 
+            // issuesToolStripMenuItem
+            // 
+            this.issuesToolStripMenuItem.Name = "issuesToolStripMenuItem";
+            this.issuesToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.issuesToolStripMenuItem.Text = "Give Feedback";
+            this.issuesToolStripMenuItem.Click += new System.EventHandler(this.issuesToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -334,6 +343,7 @@ namespace UAssetGUI
         private ToolStripMenuItem replaceAllReferencesToolStripMenuItem;
         public ContextMenuStrip nameMapContext;
         private ToolStripMenuItem exportJSONToolStripMenuItem;
+        private ToolStripMenuItem issuesToolStripMenuItem;
     }
 }
 

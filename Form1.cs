@@ -714,6 +714,11 @@ namespace UAssetGUI
             }
         }
 
+        private void issuesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/atenfyr/uassetgui/issues");
+        }
+
         private void githubToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/atenfyr/uassetgui");

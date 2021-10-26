@@ -307,6 +307,10 @@ namespace UAssetGUI
                                 row.Cells[2].Value = string.Empty;
                                 row.Cells[3].Value = ((FloatPropertyData)thisPD).Value.ToString();
                                 break;
+                            case "DoubleProperty":
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = ((DoublePropertyData)thisPD).Value.ToString();
+                                break;
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;
                                 int decidedIndex = objData.Value?.Index ?? 0;

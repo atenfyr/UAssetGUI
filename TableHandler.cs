@@ -1250,8 +1250,13 @@ namespace UAssetGUI
                                 {
                                     if (usMap.Value.Count > 0)
                                     {
-                                        FName mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
-                                        FName mapValueType = usMap.Value[0].PropertyType;
+                                        FName mapKeyType = usMap.KeyType;
+                                        FName mapValueType = usMap.ValueType;
+                                        if (usMap.Value.Count != 0)
+                                        {
+                                            mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
+                                            mapValueType = usMap.Value[0].PropertyType;
+                                        }
 
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
                                         for (int i = 0; i < usMap.Value.Count; i++)
@@ -1727,8 +1732,29 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is MapPropertyData usMap)
                         {
-                            FName mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
-                            FName mapValueType = usMap.Value[0].PropertyType;
+                            FName mapKeyType = usMap.KeyType;
+                            FName mapValueType = usMap.ValueType;
+                            if (usMap.Value.Count != 0)
+                            {
+                                mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
+                                mapValueType = usMap.Value[0].PropertyType;
+                            }
+
+                            if (dataGridView1.Rows.Count > 0)
+                            {
+                                DataGridViewRow row = dataGridView1.Rows[0];
+                                if (row.Cells.Count >= 6 && row.Cells[1].Value != null && row.Cells[4].Value != null && row.Cells[5].Value != null && row.Cells[1].Value.Equals("MapEntry"))
+                                {
+                                    FName newKey = FName.FromString(row.Cells[4].Value as string);
+                                    FName newVal = FName.FromString(row.Cells[5].Value as string);
+                                    if (newKey != null) mapKeyType = newKey;
+                                    if (newVal != null) mapValueType = newVal;
+                                }
+                            }
+
+                            // Failsafe
+                            if (mapKeyType == null) mapKeyType = FName.FromString("IntProperty");
+                            if (mapValueType == null) mapValueType = FName.FromString("IntProperty");
 
                             var newData = new TMap<PropertyData, PropertyData>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
@@ -1736,13 +1762,17 @@ namespace UAssetGUI
                                 DataGridViewRow row = dataGridView1.Rows[i];
                                 if (row.Cells.Count <= 1 || row.Cells[1].Value == null || !row.Cells[1].Value.Equals("MapEntry")) continue;
 
-                                if (row.Tag is KeyValuePair<PropertyData, PropertyData> dictBit)
+                                if (row.Tag is KeyValuePair<PropertyData, PropertyData> dictBit && dictBit.Key.PropertyType == mapKeyType && dictBit.Value.PropertyType == mapValueType)
                                 {
                                     newData.Add(dictBit.Key, dictBit.Value);
                                 }
                                 else
                                 {
-                                    newData.Add(MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset), MainSerializer.TypeToClass(mapValueType, usMap.Name, asset));
+                                    var newKeyProp = MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset);
+                                    var newValProp = MainSerializer.TypeToClass(mapValueType, usMap.Name, asset);
+                                    if (newKeyProp is StructPropertyData) ((StructPropertyData)newKeyProp).StructType = new FName("Generic");
+                                    if (newValProp is StructPropertyData) ((StructPropertyData)newValProp).StructType = new FName("Generic");
+                                    newData.Add(newKeyProp, newValProp);
                                 }
                             }
                             usMap.Value = newData;

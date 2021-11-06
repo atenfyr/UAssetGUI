@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
@@ -22,12 +23,11 @@ namespace UAssetGUI
         public TableHandler tableEditor;
         public ByteViewer byteView1;
 
-        private string _displayVersion = string.Empty;
         public string DisplayVersion
         {
             get
             {
-                return _displayVersion;
+                return "UAssetGUI v" + UAGUtils._displayVersion;
             }
         }
 
@@ -36,7 +36,7 @@ namespace UAssetGUI
             InitializeComponent();
             Assembly assembly = Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            _displayVersion = "UAssetGUI v" + fvi.FileVersion;
+            UAGUtils._displayVersion = fvi.FileVersion;
 
             string gitVersionGUI = string.Empty;
             using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
@@ -64,12 +64,12 @@ namespace UAssetGUI
 
             if (!string.IsNullOrEmpty(gitVersionGUI))
             {
-                _displayVersion += " (" + gitVersionGUI;
+                UAGUtils._displayVersion += " (" + gitVersionGUI;
                 if (!string.IsNullOrEmpty(gitVersionAPI))
                 {
-                    _displayVersion += " - " + gitVersionAPI;
+                    UAGUtils._displayVersion += " - " + gitVersionAPI;
                 }
-                _displayVersion += ")";
+                UAGUtils._displayVersion += ")";
             }
 
             UAGUtils.InitializeInvoke(this);
@@ -172,6 +172,8 @@ namespace UAssetGUI
             UE4Version.VER_UE4_27,
         };
 
+        public static readonly string GitHubRepo = "atenfyr/UAssetGUI";
+        private Version latestOnlineVersion = null;
         private void Form1_Load(object sender, EventArgs e)
         {
             UAGPalette.InitializeTheme();
@@ -200,6 +202,18 @@ namespace UAssetGUI
             }
 
             UpdateComboSpecifyVersion();
+
+            // Fetch the latest version from github
+            Task.Run(() =>
+            {
+                latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
+            }).ContinueWith(res =>
+            {
+                if (latestOnlineVersion != null && latestOnlineVersion.IsUAGVersionLower())
+                {
+                    MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!");
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
 
             // Command line parameter support
             string[] args = Environment.GetCommandLineArgs();

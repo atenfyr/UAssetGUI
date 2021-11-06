@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
@@ -10,6 +11,8 @@ namespace UAssetGUI
 {
     public static class UAGUtils
     {
+        internal static string _displayVersion = string.Empty;
+
         public static T TryGetElement<T>(this T[] array, int index)
         {
             if (array != null && index < array.Length)
@@ -128,6 +131,21 @@ namespace UAssetGUI
             byte[] byteArr = new byte[rawStringArr.Length];
             for (int i = 0; i < rawStringArr.Length; i++) byteArr[i] = Convert.ToByte(rawStringArr[i], 16);
             return byteArr;
+        }
+
+        /*
+            UAssetGUI versions are formatted as follows: MAJOR.MINOR.BUILD.REVISION
+            * MAJOR - incremented for very big changes or backwards-incompatible changes
+            * MINOR - incremented for notable changes
+            * BUILD - incremented for bug fixes or very small improvements
+            * REVISION - incremented for test/alpha builds of the existing version
+            
+            2.0.0.0 > 1.5.0.0 > 1.4.1.0 > 1.4.0.1 > 1.4.0.0
+        */
+        public static bool IsUAGVersionLower(this Version v1)
+        {
+            Version fullUagVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            return v1.CompareTo(fullUagVersion) > 0;
         }
 
         private static Control internalForm;

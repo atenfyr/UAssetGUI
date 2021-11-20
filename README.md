@@ -2,7 +2,7 @@
 This is a work-in-progress .NET GUI to facilitate reading and modifying Unreal Engine 4 game assets using [my UAssetAPI](https://github.com/atenfyr/UAssetAPI).
 
 ## Getting Started
-You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository.](https://github.com/atenfyr/UAssetGUI/releases).
+You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository](https://github.com/atenfyr/UAssetGUI/releases).
 
 If you'd like to compile UAssetGUI for yourself, read on:
 

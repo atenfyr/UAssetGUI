@@ -10,7 +10,7 @@ If you'd like to compile UAssetGUI for yourself, read on:
 * Visual Studio 2017 or later
 * Git
 
-### Compilation
+### Initial Setup
 1. Clone the UAssetAPI repository, which is a pre-requisite for UAssetGUI:
 
 ```sh

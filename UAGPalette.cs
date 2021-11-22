@@ -72,6 +72,7 @@ namespace UAssetGUI
                     break;
             }
 
+            frm.Icon = Properties.Resources.icon;
             frm.BackColor = UAGPalette.BackColor;
             frm.ForeColor = UAGPalette.ForeColor;
             if (frm is Form1 frm1)

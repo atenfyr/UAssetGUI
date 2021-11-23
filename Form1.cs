@@ -284,7 +284,10 @@ namespace UAssetGUI
                         desiredSetUnsavedChanges = true;
                         break;
                     default:
-                        targetAsset = new UAsset(filePath, ParsingVersion);
+                        targetAsset = new UAsset(ParsingVersion);
+                        targetAsset.FilePath = filePath;
+                        if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
+                        targetAsset.Read(targetAsset.PathToReader(targetAsset.FilePath));
                         break;
                 }
 
@@ -921,6 +924,13 @@ namespace UAssetGUI
                     MessageBox.Show("Failed to export!", "Uh oh!");
                 }
             }
+        }
+
+        private void mapStructTypeOverridesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var mstoForm = new MapStructTypeOverrideForm();
+            mstoForm.ShowDialog();
+            mstoForm.Dispose();
         }
     }
 }

@@ -46,5 +46,16 @@ namespace UAssetGUI.Properties {
                 this["Theme"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection MapStructTypeOverride {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["MapStructTypeOverride"]));
+            }
+            set {
+                this["MapStructTypeOverride"] = value;
+            }
+        }
     }
 }

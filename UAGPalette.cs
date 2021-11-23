@@ -57,6 +57,18 @@ namespace UAssetGUI
             }
         }
 
+        private static void AdjustDGV(DataGridView dgv)
+        {
+            Color selectedDGVBackColor = dgv.Columns.Count > 0 ? UAGPalette.DataGridViewActiveColor : UAGPalette.InactiveColor;
+            dgv.BackgroundColor = selectedDGVBackColor;
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = UAGPalette.BackColor; // intentional
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = UAGPalette.ForeColor;
+            dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = UAGPalette.HighlightBackColor;
+            dgv.ColumnHeadersDefaultCellStyle.SelectionForeColor = UAGPalette.HighlightForeColor;
+            dgv.RowHeadersDefaultCellStyle = dgv.ColumnHeadersDefaultCellStyle;
+            dgv.DefaultCellStyle = dgv.ColumnHeadersDefaultCellStyle;
+        }
+
         private static void RefreshThemeInternal(Form frm)
         {
             switch (CurrentTheme)
@@ -97,14 +109,11 @@ namespace UAssetGUI
                     }
                 }
 
-                Color selectedDGVBackColor = frm1.dataGridView1.Columns.Count > 0 ? UAGPalette.DataGridViewActiveColor : UAGPalette.InactiveColor;
-                frm1.dataGridView1.BackgroundColor = selectedDGVBackColor;
-                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = UAGPalette.BackColor; // intentional
-                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = UAGPalette.ForeColor;
-                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.SelectionBackColor = UAGPalette.HighlightBackColor;
-                frm1.dataGridView1.ColumnHeadersDefaultCellStyle.SelectionForeColor = UAGPalette.HighlightForeColor;
-                frm1.dataGridView1.RowHeadersDefaultCellStyle = frm1.dataGridView1.ColumnHeadersDefaultCellStyle;
-                frm1.dataGridView1.DefaultCellStyle = frm1.dataGridView1.ColumnHeadersDefaultCellStyle;
+                AdjustDGV(frm1.dataGridView1);
+            }
+            if (frm is MapStructTypeOverrideForm frm2)
+            {
+                AdjustDGV(frm2.mstoDataGridView);
             }
             frm.RefreshAllButtonsInControl();
         }

@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
 
@@ -29,6 +25,11 @@ namespace UAssetGUI
                 PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
                 pi.SetValue(mstoDataGridView, true, null);
             }
+        }
+
+        private static void CheckIfMapStructTypeOverrideIsNull()
+        {
+            if (MapStructTypeOverride == null) MapStructTypeOverride = new UAsset().MapStructTypeOverride;
         }
 
         private void MapStructTypeOverrideForm_Resize(object sender, EventArgs e)
@@ -63,7 +64,7 @@ namespace UAssetGUI
 
         private void MapStructTypeOverrideForm_Load(object sender, EventArgs e)
         {
-            if (MapStructTypeOverride == null) MapStructTypeOverride = new UAsset().MapStructTypeOverride;
+            CheckIfMapStructTypeOverrideIsNull();
 
             if (this.Owner is Form1 parentForm)
             {
@@ -78,7 +79,7 @@ namespace UAssetGUI
 
         private void SaveFromDGV()
         {
-            if (MapStructTypeOverride == null) return;
+            CheckIfMapStructTypeOverrideIsNull();
 
             MapStructTypeOverride.Clear();
             foreach (DataGridViewRow row in mstoDataGridView.Rows)
@@ -94,7 +95,7 @@ namespace UAssetGUI
 
         private void LoadOntoDGV()
         {
-            if (MapStructTypeOverride == null) return;
+            CheckIfMapStructTypeOverrideIsNull();
 
             mstoDataGridView.Visible = true;
             mstoDataGridView.Columns.Clear();
@@ -112,31 +113,58 @@ namespace UAssetGUI
 
         internal static void SaveToConfig()
         {
-            if (MapStructTypeOverride == null) return;
+            CheckIfMapStructTypeOverrideIsNull();
 
-            Properties.Settings.Default.MapStructTypeOverride = new StringCollection();
-            foreach (KeyValuePair<string, Tuple<FName, FName>> entry in MapStructTypeOverride)
-            {
-                Properties.Settings.Default.MapStructTypeOverride.Add(entry.Key.ToString());
-                Properties.Settings.Default.MapStructTypeOverride.Add(entry.Value.Item1?.ToString() ?? FString.NullCase);
-                Properties.Settings.Default.MapStructTypeOverride.Add(entry.Value.Item2?.ToString() ?? FString.NullCase);
-            }
-
+            Properties.Settings.Default.MapStructTypeOverride = ExportData();
             Properties.Settings.Default.Save();
         }
 
         internal static void LoadFromConfig()
         {
-            if (MapStructTypeOverride == null) MapStructTypeOverride = new UAsset().MapStructTypeOverride;
+            CheckIfMapStructTypeOverrideIsNull();
 
-            StringCollection serializedMapStructTypeOverride = Properties.Settings.Default.MapStructTypeOverride;
-            if (serializedMapStructTypeOverride == null || serializedMapStructTypeOverride.Count == 0) return;
+            ImportData(Properties.Settings.Default.MapStructTypeOverride);
+        }
+
+        private static void ImportData(string data)
+        {
+            if (data == null) return;
+            CheckIfMapStructTypeOverrideIsNull();
+
+            Dictionary<string, string[]> temp = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(data);
+            if (temp == null || temp.Count == 0) return;
 
             MapStructTypeOverride.Clear();
-            for (int i = 0; i < serializedMapStructTypeOverride.Count; i += 3)
+            foreach (KeyValuePair<string, string[]> entry in temp)
             {
-                MapStructTypeOverride.Add(serializedMapStructTypeOverride[i], new Tuple<FName, FName>(FName.FromString(serializedMapStructTypeOverride[i + 1]), FName.FromString(serializedMapStructTypeOverride[i + 2])));
+                MapStructTypeOverride.Add(entry.Key, new Tuple<FName, FName>(FName.FromString(entry.Value[0]), FName.FromString(entry.Value[1])));
             }
+        }
+
+        private static string ExportData()
+        {
+            CheckIfMapStructTypeOverrideIsNull();
+
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.Indented;
+
+                writer.WriteStartObject();
+                foreach (KeyValuePair<string, Tuple<FName, FName>> entry in MapStructTypeOverride)
+                {
+                    writer.WritePropertyName(entry.Key.ToString());
+                    writer.WriteStartArray();
+                    writer.WriteValue(entry.Value.Item1?.ToString());
+                    writer.WriteValue(entry.Value.Item2?.ToString());
+                    writer.WriteEnd();
+                }
+                writer.WriteEndObject();
+            }
+
+            return sb.ToString();
         }
 
         private void mstoDataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -152,6 +180,40 @@ namespace UAssetGUI
         private void closeButton_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void importButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Map Struct Type Override JSON (*.json)|*.json|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ImportData(File.ReadAllText(openFileDialog.FileName));
+                    LoadOntoDGV();
+                    SaveToConfig();
+                }
+            }
+        }
+
+        private void exportButton_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "Map Struct Type Override JSON (*.json)|*.json|All files (*.*)|*.*";
+                dialog.FilterIndex = 1;
+                dialog.RestoreDirectory = true;
+
+                DialogResult res = dialog.ShowDialog();
+                if (res == DialogResult.OK)
+                {
+                    SaveFromDGV();
+                    File.WriteAllText(dialog.FileName, ExportData());
+                }
+            }
         }
     }
 }

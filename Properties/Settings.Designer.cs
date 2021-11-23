@@ -49,9 +49,10 @@ namespace UAssetGUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection MapStructTypeOverride {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MapStructTypeOverride {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["MapStructTypeOverride"]));
+                return ((string)(this["MapStructTypeOverride"]));
             }
             set {
                 this["MapStructTypeOverride"] = value;

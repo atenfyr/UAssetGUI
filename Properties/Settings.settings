@@ -8,7 +8,7 @@
     <Setting Name="Theme" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="MapStructTypeOverride" Type="System.Collections.Specialized.StringCollection" Scope="User">
+    <Setting Name="MapStructTypeOverride" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

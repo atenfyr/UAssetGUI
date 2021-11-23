@@ -64,7 +64,6 @@ namespace UAssetGUI
         private void MapStructTypeOverrideForm_Load(object sender, EventArgs e)
         {
             if (MapStructTypeOverride == null) MapStructTypeOverride = new UAsset().MapStructTypeOverride;
-            LoadFromConfig();
 
             if (this.Owner is Form1 parentForm)
             {
@@ -111,7 +110,7 @@ namespace UAssetGUI
             }
         }
 
-        private void SaveToConfig()
+        internal static void SaveToConfig()
         {
             if (MapStructTypeOverride == null) return;
 
@@ -126,9 +125,9 @@ namespace UAssetGUI
             Properties.Settings.Default.Save();
         }
 
-        private void LoadFromConfig()
+        internal static void LoadFromConfig()
         {
-            if (MapStructTypeOverride == null) return;
+            if (MapStructTypeOverride == null) MapStructTypeOverride = new UAsset().MapStructTypeOverride;
 
             StringCollection serializedMapStructTypeOverride = Properties.Settings.Default.MapStructTypeOverride;
             if (serializedMapStructTypeOverride == null || serializedMapStructTypeOverride.Count == 0) return;

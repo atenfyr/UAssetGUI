@@ -29,7 +29,7 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.mstoDataGridView = new System.Windows.Forms.DataGridView();
             this.infoLabel = new System.Windows.Forms.Label();
             this.refreshButton = new System.Windows.Forms.Button();
@@ -45,14 +45,14 @@ namespace UAssetGUI
             this.mstoDataGridView.BackgroundColor = System.Drawing.Color.LightGray;
             this.mstoDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.mstoDataGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.mstoDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.mstoDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.mstoDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.mstoDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.mstoDataGridView.EnableHeadersVisualStyles = false;
@@ -72,7 +72,7 @@ namespace UAssetGUI
             this.infoLabel.Location = new System.Drawing.Point(13, 9);
             this.infoLabel.Name = "infoLabel";
             this.infoLabel.Size = new System.Drawing.Size(544, 40);
-            this.infoLabel.TabIndex = 2;
+            this.infoLabel.TabIndex = 0;
             this.infoLabel.Text = "blah blah blah";
             this.infoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -84,7 +84,7 @@ namespace UAssetGUI
             this.refreshButton.Location = new System.Drawing.Point(12, 347);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(75, 26);
-            this.refreshButton.TabIndex = 3;
+            this.refreshButton.TabIndex = 2;
             this.refreshButton.Text = "Refresh";
             this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
@@ -98,7 +98,7 @@ namespace UAssetGUI
             this.closeButton.Location = new System.Drawing.Point(482, 347);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
-            this.closeButton.TabIndex = 4;
+            this.closeButton.TabIndex = 3;
             this.closeButton.Text = "Close";
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);

@@ -284,6 +284,8 @@ namespace UAssetGUI
                         desiredSetUnsavedChanges = true;
                         break;
                     default:
+                        MapStructTypeOverrideForm.LoadFromConfig();
+
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;

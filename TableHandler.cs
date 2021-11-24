@@ -145,7 +145,7 @@ namespace UAssetGUI
 
                         if (us is StringTableExport us2)
                         {
-                            var parentNode2 = new PointingTreeNode(us2.Data2.TableNamespace + " (" + us2.Data2.Count + ")", us2.Data2);
+                            var parentNode2 = new PointingTreeNode(us2.Table.TableNamespace + " (" + us2.Table.Count + ")", us2.Table);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 

@@ -1247,7 +1247,7 @@ namespace UAssetGUI
                                     standardRendering = false;
                                     break;
                                 }
-                            case DataTable dtUs:
+                            case UDataTable dtUs:
                                 dtUs.Data.StripNullsFromList();
                                 renderingArr = dtUs.Data.ToArray();
                                 break;
@@ -1855,7 +1855,7 @@ namespace UAssetGUI
                             }
                             
                         }
-                        else if (pointerNode.Pointer is DataTable dtUs)
+                        else if (pointerNode.Pointer is UDataTable dtUs)
                         {
                             int count = 0;
                             List<StructPropertyData> newData = new List<StructPropertyData>();

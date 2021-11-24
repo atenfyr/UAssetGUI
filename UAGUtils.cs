@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes;
@@ -146,6 +147,16 @@ namespace UAssetGUI
         {
             Version fullUagVersion = Assembly.GetExecutingAssembly().GetName().Version;
             return v1.CompareTo(fullUagVersion) > 0;
+        }
+
+        public static string FEncode(this FString val)
+        {
+            return val.Value.Replace("\n", "\\n").Replace("\r", "\\r");
+        }
+
+        public static FString FDecode(this string val, string encodingHeaderName)
+        {
+            return FString.FromString(val.Replace("\\n", "\n").Replace("\\r", "\r"), encodingHeaderName.Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII);
         }
 
         private static Control internalForm;

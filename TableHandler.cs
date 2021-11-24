@@ -145,7 +145,7 @@ namespace UAssetGUI
 
                         if (us is StringTableExport us2)
                         {
-                            var parentNode2 = new PointingTreeNode(us2.Data2.Name + " (" + us2.Data2.Count + ")", us2.Data2);
+                            var parentNode2 = new PointingTreeNode(us2.Data2.TableNamespace + " (" + us2.Data2.Count + ")", us2.Data2);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
@@ -1224,17 +1224,22 @@ namespace UAssetGUI
                                 }
    
                                 break;
-                            case StringTable strUs:
+                            case FStringTable strUs:
                                 {
+                                    dataGridView1.Columns.Clear();
+                                    AddColumns(new string[] { "Key", "Encoding", "Source String", "Encoding", "" });
                                     List<DataGridViewRow> rows = new List<DataGridViewRow>();
                                     for (int i = 0; i < strUs.Count; i++)
                                     {
+                                        FString key = strUs.Keys.ElementAt(i);
+                                        FString value = strUs[i];
+
                                         DataGridViewRow row = new DataGridViewRow();
                                         row.CreateCells(dataGridView1);
-                                        row.Cells[0].Value = strUs.Name;
-                                        row.Cells[1].Value = "StringTableEntry";
-                                        row.Cells[2].Value = strUs[i].Encoding.HeaderName;
-                                        row.Cells[3].Value = strUs[i].Value.Replace("\n", "\\n").Replace("\r", "\\r");
+                                        row.Cells[0].Value = key.FEncode();
+                                        row.Cells[1].Value = key.Encoding.HeaderName;
+                                        row.Cells[2].Value = value.FEncode();
+                                        row.Cells[3].Value = value.Encoding.HeaderName;
                                         row.HeaderCell.Value = Convert.ToString(i);
                                         rows.Add(row);
                                     }
@@ -1715,20 +1720,24 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        if (pointerNode.Pointer is StringTable usStrTable)
+                        if (pointerNode.Pointer is FStringTable usStrTable)
                         {
                             usStrTable.Clear();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 DataGridViewRow row = dataGridView1.Rows[i];
-                                object transformB = row.Cells[2].Value;
-                                object value1B = row.Cells[3].Value;
-                                if (transformB == null || value1B == null || !(transformB is string) || !(value1B is string)) continue;
+                                object val0 = row.Cells[0].Value as string;
+                                object val1 = row.Cells[1].Value as string;
+                                object val2 = row.Cells[2].Value as string;
+                                object val3 = row.Cells[3].Value as string;
+                                if (val0 == null || val1 == null || val2 == null || val3 == null) continue;
 
-                                usStrTable.Add(FString.FromString(((string)value1B).Replace("\\n", "\n").Replace("\\r", "\r"), ((string)transformB).Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII));
+                                FString key = ((string)val0).FDecode((string)val1);
+                                FString value = ((string)val2).FDecode((string)val3);
+                                usStrTable.Add(key, value);
                             }
 
-                            pointerNode.Text = usStrTable.Name + " (" + usStrTable.Count + ")";
+                            pointerNode.Text = usStrTable.TableNamespace + " (" + usStrTable.Count + ")";
                         }
                         else if (pointerNode.Pointer is MapPropertyData usMap)
                         {

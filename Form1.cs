@@ -532,40 +532,34 @@ namespace UAssetGUI
                 switch(dataGridView1.CurrentCell.Tag)
                 {
                     case "CategoryJump":
-                        if (dataGridView1.CurrentCell.ColumnIndex == 3)
+                        DataGridViewCell previousCell = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex - 1];
+                        if (previousCell == null || previousCell.Value == null) return;
+
+                        int jumpingTo = -1;
+                        if (previousCell.Value is string) int.TryParse((string)previousCell.Value, out jumpingTo);
+                        if (previousCell.Value is int) jumpingTo = (int)previousCell.Value;
+                        if (jumpingTo < 0) return;
+
+                        TreeNode topSelectingNode = listView1.Nodes[listView1.Nodes.Count - 1];
+                        if (topSelectingNode.Nodes.Count > (jumpingTo - 1))
                         {
-                            DataGridViewCell previousCell = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex - 1];
-                            if (previousCell == null || previousCell.Value == null) return;
-
-                            int jumpingTo = -1;
-                            if (previousCell.Value is string) int.TryParse((string)previousCell.Value, out jumpingTo);
-                            if (previousCell.Value is int) jumpingTo = (int)previousCell.Value;
-                            if (jumpingTo < 0) return;
-
-                            TreeNode topSelectingNode = listView1.Nodes[listView1.Nodes.Count - 1];
-                            if (topSelectingNode.Nodes.Count > (jumpingTo - 1))
+                            topSelectingNode = topSelectingNode.Nodes[jumpingTo - 1];
+                            if (topSelectingNode.Nodes.Count > 0)
                             {
-                                topSelectingNode = topSelectingNode.Nodes[jumpingTo - 1];
-                                if (topSelectingNode.Nodes.Count > 0)
-                                {
-                                    topSelectingNode = topSelectingNode.Nodes[0];
-                                }
+                                topSelectingNode = topSelectingNode.Nodes[0];
                             }
-                            listView1.SelectedNode = topSelectingNode;
                         }
+                        listView1.SelectedNode = topSelectingNode;
                         break;
                     case "ChildJump":
-                        if (dataGridView1.CurrentCell.ColumnIndex == 3)
+                        int jumpingIndex = dataGridView1.CurrentCell.RowIndex;
+                        if (jumpingIndex < 0 || jumpingIndex >= listView1.SelectedNode.Nodes.Count)
                         {
-                            int jumpingIndex = dataGridView1.CurrentCell.RowIndex;
-                            if (jumpingIndex < 0 || jumpingIndex >= listView1.SelectedNode.Nodes.Count)
-                            {
-                                MessageBox.Show("Please select View -> Recalculate Nodes before attempting to jump to this node.", "Notice");
-                            }
-                            else
-                            {
-                                listView1.SelectedNode = listView1.SelectedNode.Nodes[jumpingIndex];
-                            }
+                            MessageBox.Show("Please select View -> Recalculate Nodes before attempting to jump to this node.", "Notice");
+                        }
+                        else
+                        {
+                            listView1.SelectedNode = listView1.SelectedNode.Nodes[jumpingIndex];
                         }
                         break;
                 }

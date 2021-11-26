@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -48,6 +45,7 @@ namespace UAssetGUI
         StructData,
         ClassData,
         EnumData,
+        UPropertyData
     }
 
     public class PointingTreeNode : TreeNode
@@ -168,6 +166,12 @@ namespace UAssetGUI
                         if (us is ClassExport)
                         {
                             var parentNode2 = new PointingTreeNode("UClass Data", (ClassExport)us, PointingTreeNodeType.ClassData);
+                            categoryNode.Nodes.Add(parentNode2);
+                        }
+
+                        if (us is PropertyExport)
+                        {
+                            var parentNode2 = new PointingTreeNode("UProperty Data", (PropertyExport)us, PointingTreeNodeType.UPropertyData);
                             categoryNode.Nodes.Add(parentNode2);
                         }
 
@@ -315,7 +319,7 @@ namespace UAssetGUI
                                 var objData = (ObjectPropertyData)thisPD;
                                 int decidedIndex = objData.Value?.Index ?? 0;
                                 row.Cells[2].Value = decidedIndex;
-                                if (decidedIndex != 0) UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, objData);
+                                if (decidedIndex != 0) UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, objData.Value);
                                 break;
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
@@ -657,7 +661,7 @@ namespace UAssetGUI
                         if (objValue == int.MinValue) return null;
 
                         decidedObjData.Value = new FPackageIndex(objValue);
-                        UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, decidedObjData);
+                        UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, decidedObjData.Value);
                         return decidedObjData;
                     case "RichCurveKey":
                         RichCurveKeyPropertyData decidedRCKProperty = null;
@@ -1024,7 +1028,7 @@ namespace UAssetGUI
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "Super Struct";
                                             row.Cells[1].Value = testProperty.Value;
-                                            row.Cells[2].Value = testProperty.Value.IsImport() ? testProperty.Value.ToImport(asset).ObjectName.ToString() : "";
+                                            UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, testProperty.Value, 2);
                                             rows.Add(row);
                                             row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
@@ -1219,6 +1223,36 @@ namespace UAssetGUI
                                         }
 
                                         dataGridView1.Rows.AddRange(enumRows.ToArray());
+                                        standardRendering = false;
+                                        break;
+                                    case PointingTreeNodeType.UPropertyData:
+                                        dataGridView1.Columns.Clear();
+                                        AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
+
+                                        PropertyExport uPropData = (PropertyExport)usCategory;
+                                        List<DataGridViewRow> uPropRows = new List<DataGridViewRow>();
+
+                                        {
+                                            var allUPropFields = UAPUtils.GetOrderedFields(uPropData.Property.GetType());
+                                            for (int i = 0; i < allUPropFields.Length; i++)
+                                            {
+                                                FieldInfo currFieldInfo = allUPropFields[i];
+                                                string currFieldName = currFieldInfo.Name;
+                                                object currFieldValue = currFieldInfo.GetValue(uPropData.Property);
+                                                if (currFieldInfo.Name == "Next" && currFieldValue == null) continue;
+
+                                                DataGridViewRow row = new DataGridViewRow();
+                                                row.CreateCells(dataGridView1);
+                                                row.Cells[0].Value = currFieldName;
+                                                row.Cells[1].Value = currFieldValue.ToString();
+                                                if (currFieldValue is FPackageIndex fpi) UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, fpi, 2);
+                                                uPropRows.Add(row);
+                                            }
+                                        }
+
+                                        dataGridView1.Rows.AddRange(uPropRows.ToArray());
+                                        dataGridView1.ReadOnly = true;
+                                        dataGridView1.AllowUserToAddRows = false;
                                         standardRendering = false;
                                         break;
                                 }

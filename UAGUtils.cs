@@ -62,22 +62,22 @@ namespace UAssetGUI
             if (frm1.Owner != null) frm1.Location = new Point((frm1.Owner.Location.X + frm1.Owner.Width / 2) - (frm1.Width / 2), (frm1.Owner.Location.Y + frm1.Owner.Height / 2) - (frm1.Height / 2));
         }
 
-        public static void UpdateObjectPropertyValues(UAsset asset, DataGridViewRow row, DataGridView dgv, ObjectPropertyData objData)
+        public static void UpdateObjectPropertyValues(UAsset asset, DataGridViewRow row, DataGridView dgv, FPackageIndex objData, int column = 3)
         {
             if (dgv == null || row == null || objData == null) return;
 
             bool underlineStyle = false;
-            if (objData.Value.IsImport() && objData.Value == null)
+            if (objData.IsImport() && objData == null)
             {
-                row.Cells[3].Value = string.Empty;
+                row.Cells[column].Value = string.Empty;
             }
             else
             {
-                row.Cells[3].Value = objData.Value.IsExport() ? "Jump" : (objData.Value.IsImport() ? objData.ToImport(asset)?.ObjectName?.ToString() : string.Empty);
-                row.Cells[3].Tag = "CategoryJump";
-                if (objData.Value.IsExport()) underlineStyle = true;
+                row.Cells[column].Value = objData.IsExport() ? "Jump" : (objData.IsImport() ? objData.ToImport(asset)?.ObjectName?.ToString() : string.Empty);
+                row.Cells[column].Tag = "CategoryJump";
+                if (objData.IsExport()) underlineStyle = true;
             }
-            row.Cells[3].ReadOnly = objData.Value.IsImport();
+            row.Cells[column].ReadOnly = objData.IsImport();
 
             DataGridViewCellStyle sty = new DataGridViewCellStyle();
             if (underlineStyle)
@@ -86,7 +86,7 @@ namespace UAssetGUI
                 sty.Font = styFont;
                 sty.ForeColor = Color.Blue;
             }
-            row.Cells[3].Style = sty;
+            row.Cells[column].Style = sty;
         }
 
         public static T[] StripNullsFromArray<T>(this T[] usArr)

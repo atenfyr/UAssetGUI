@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -180,6 +180,23 @@ namespace UAssetGUI
                             var parentNode2 = new PointingTreeNode("Table Info (" + us4.Table.Data.Count + ")", us4.Table);
                             categoryNode.Nodes.Add(parentNode2);
                             foreach (StructPropertyData entry in us4.Table.Data)
+                            {
+                                string decidedName = entry.Name.Value.Value;
+
+                                var structNode = new PointingTreeNode(decidedName + " (" + entry.Value.Count + ")", entry);
+                                parentNode2.Nodes.Add(structNode);
+                                for (int j = 0; j < entry.Value.Count; j++)
+                                {
+                                    InterpretThing(entry.Value[j], structNode);
+                                }
+                            }
+                        }
+                        
+                        if (us is ImalVersionizedDataTableExport us6)
+                        {
+                            var parentNode2 = new PointingTreeNode("Table Info (" + us6.Table.Data.Count + ")", us6.Table);
+                            categoryNode.Nodes.Add(parentNode2);
+                            foreach (StructPropertyData entry in us6.Table.Data)
                             {
                                 string decidedName = entry.Name.Value.Value;
 
@@ -1285,6 +1302,10 @@ namespace UAssetGUI
                                 dtUs.Data.StripNullsFromList();
                                 renderingArr = dtUs.Data.ToArray();
                                 break;
+                            case UImalVersionizedDataTable idtUs:
+                                idtUs.Data.StripNullsFromList();
+                                renderingArr = idtUs.Data.ToArray();
+                                break;
                             case MapPropertyData usMap:
                                 {
                                     if (usMap.Value.Count > 0)
@@ -1917,6 +1938,37 @@ namespace UAssetGUI
                                 count++;
                             }
                             dtUs.Data = newData;
+                            pointerNode.Text = "Table Info (" + count + ")";
+                            break;
+                        }
+                        else if (pointerNode.Pointer is UImalVersionizedDataTable idtUs)
+                        {
+                            int count = 0;
+                            List<StructPropertyData> newData = new List<StructPropertyData>();
+                            ///var numTimesNameUses = new Dictionary<string, int>();
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                PropertyData val = RowToPD(i, idtUs.Data.ElementAtOrDefault(i));
+                                if (val == null || !(val is StructPropertyData))
+                                {
+                                    newData.Add(null);
+                                    continue;
+                                }
+
+                                // Cannot be guaranteed
+                                /*if (numTimesNameUses.ContainsKey(val.Name.Value.Value))
+                                {
+                                    numTimesNameUses[val.Name.Value.Value]++;
+                                }
+                                else
+                                {
+                                    numTimesNameUses.Add(val.Name.Value.Value, 0);
+                                }
+                                val.Name.Number = numTimesNameUses[val.Name.Value.Value];*/
+                                newData.Add((StructPropertyData)val);
+                                count++;
+                            }
+                            idtUs.Data = newData;
                             pointerNode.Text = "Table Info (" + count + ")";
                             break;
                         }

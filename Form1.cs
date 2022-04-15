@@ -598,9 +598,6 @@ namespace UAssetGUI
                     case "World Tile Info":
                         tableEditor.mode = TableHandlerMode.WorldTileInfo;
                         break;
-                    case "Preload Dependencies":
-                        tableEditor.mode = TableHandlerMode.PreloadDependencies;
-                        break;
                     case "Custom Version Container":
                         tableEditor.mode = TableHandlerMode.CustomVersionContainer;
                         break;

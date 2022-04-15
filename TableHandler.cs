@@ -21,7 +21,6 @@ namespace UAssetGUI
         SoftPackageReferences,
         DependsMap,
         WorldTileInfo,
-        PreloadDependencies,
         CustomVersionContainer,
         ExportData
     }
@@ -36,7 +35,8 @@ namespace UAssetGUI
         Long,
         Bool,
         Guid,
-        UInt
+        UInt,
+        FPackageIndexList
     }
 
     public enum PointingTreeNodeType
@@ -116,7 +116,6 @@ namespace UAssetGUI
                     lodListNode.Nodes.Add(new PointingTreeNode("LOD entry #" + (i + 1), asset.WorldTileInfo.LODList[i]));
                 }
             }
-            if (asset.UseSeparateBulkDataFiles) listView1.Nodes.Add(new PointingTreeNode("Preload Dependencies", null));
             listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
             listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
@@ -887,6 +886,10 @@ namespace UAssetGUI
                             {
                                 newCells[num2] = parsingIndex.Index;
                             }
+                            else if (printingVal is List<FPackageIndex> parsingIndices)
+                            {
+                                newCells[num2] = parsingIndices.Count == 0 ? string.Empty : string.Join(",", parsingIndices.Select(x => x.Index).ToArray());
+                            }
                             else
                             {
                                 newCells[num2] = printingVal;
@@ -974,14 +977,6 @@ namespace UAssetGUI
                     dataGridView1.AllowUserToAddRows = false;
                     dataGridView1.ReadOnly = true;
                     break;
-                case TableHandlerMode.PreloadDependencies:
-                    AddColumns(new string[] { "Value", "" });
-
-                    for (int num = 0; num < asset.PreloadDependencies.Count; num++)
-                    {
-                        dataGridView1.Rows.Add(new object[] { asset.PreloadDependencies[num].Index });
-                    }
-                    break;
                 case TableHandlerMode.CustomVersionContainer:
                     AddColumns(new string[] { "Name", "Version", "" });
 
@@ -1025,6 +1020,12 @@ namespace UAssetGUI
                                             testProperty.Value = strucCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
+                                            row.CreateCells(dataGridView1);
+                                            row.Cells[0].Value = "Next";
+                                            row.Cells[0].ToolTipText = "Next Field in the linked list";
+                                            row.Cells[1].Value = strucCat.Field.Next;
+                                            rows.Add(row);
+                                            row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = "Super Struct";
                                             row.Cells[1].Value = testProperty.Value;
@@ -1504,11 +1505,11 @@ namespace UAssetGUI
                         ExportDetailsParseType.Bool,
                         ExportDetailsParseType.Bool,
 
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int,
-                        ExportDetailsParseType.Int
+                        ExportDetailsParseType.FPackageIndexList,
+                        ExportDetailsParseType.FPackageIndexList,
+                        ExportDetailsParseType.FPackageIndexList,
+                        ExportDetailsParseType.FPackageIndexList,
+                        ExportDetailsParseType.FPackageIndexList
                     };
 
                     int rowNum = 0;
@@ -1636,6 +1637,22 @@ namespace UAssetGUI
                                         settingVal = Convert.ToUInt32(currentVal);
                                     }
                                     break;
+                                case ExportDetailsParseType.FPackageIndexList:
+                                    var finalList = new List<FPackageIndex>();
+                                    if (currentVal is string)
+                                    {
+                                        string[] separateInts = ((string)currentVal).Split(',');
+                                        foreach (string separateInt in separateInts)
+                                        {
+                                            if (int.TryParse(separateInt.Trim(), out int x)) finalList.Add(new FPackageIndex(x));
+                                        }
+                                    }
+                                    else if (currentVal is List<FPackageIndex>)
+                                    {
+                                        finalList = (List<FPackageIndex>)currentVal;
+                                    }
+                                    settingVal = finalList;
+                                    break;
                             }
 
                             allExportDetailsFields[i].SetValue(asset.Exports[rowNum], settingVal);
@@ -1688,38 +1705,6 @@ namespace UAssetGUI
                     {
                         string strVal = (string)row.Cells[0].Value;
                         if (!string.IsNullOrEmpty(strVal)) asset.SoftPackageReferenceList.Add(FString.FromString(strVal));
-                    }
-                    break;
-                case TableHandlerMode.PreloadDependencies:
-                    asset.PreloadDependencies = new List<FPackageIndex>();
-                    int rowN = 0;
-                    foreach (DataGridViewRow row in dataGridView1.Rows)
-                    {
-                        int intVal;
-                        if (row.Cells[0].Value == null) continue;
-                        if (row.Cells[0].Value is string)
-                        {
-                            string strVal = (string)row.Cells[0].Value;
-                            if (string.IsNullOrEmpty(strVal)) continue;
-                            bool result = int.TryParse(strVal, out int x);
-                            if (!result) continue;
-                            intVal = x;
-                        }
-                        else
-                        {
-                            intVal = Convert.ToInt32(row.Cells[0].Value);
-                        }
-
-                        if (asset.PreloadDependencies.Count > rowN)
-                        {
-                            asset.PreloadDependencies[rowN] = FPackageIndex.FromRawIndex(intVal);
-                        }
-                        else
-                        {
-                            asset.PreloadDependencies.Insert(rowN, FPackageIndex.FromRawIndex(intVal));
-                        }
-
-                        rowN++;
                     }
                     break;
                 case TableHandlerMode.WorldTileInfo:

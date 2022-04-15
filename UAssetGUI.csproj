@@ -128,7 +128,7 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>git rev-parse --short HEAD &gt; "$(ProjectDir)\git_commit.txt"</PreBuildEvent>
-  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <Exec ContinueOnError="true" Command="git rev-parse --short HEAD &gt; &quot;$(ProjectDir)\git_commit.txt&quot;" />
+  </Target>
 </Project>

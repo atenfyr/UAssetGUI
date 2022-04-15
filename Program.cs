@@ -36,7 +36,7 @@ namespace UAssetGUI
                             if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = (UE4Version)selectedVerRaw;
                         }
 
-                        string jsonSerializedAsset = new UAsset(args[2], selectedVer).SerializeJson();
+                        string jsonSerializedAsset = new UAsset(args[2], selectedVer).SerializeJson(Newtonsoft.Json.Formatting.Indented);
                         File.WriteAllText(args[3], jsonSerializedAsset);
                         return;
                     // fromjson <source> <destination>

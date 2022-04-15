@@ -300,7 +300,6 @@ namespace UAssetGUI
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
-                exportJSONToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree();
                 tableEditor.Load();
@@ -364,7 +363,6 @@ namespace UAssetGUI
                 tableEditor = null;
                 saveToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
-                exportJSONToolStripMenuItem.Enabled = false;
 
                 listView1.Nodes.Clear();
                 dataGridView1.Columns.Clear();
@@ -473,17 +471,28 @@ namespace UAssetGUI
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (tableEditor?.asset == null) return;
+
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
-                dialog.Filter = "Unreal Assets (*.uasset, *.umap)|*.uasset;*.umap|All files (*.*)|*.*";
+                dialog.Filter = "Unreal Assets (*.uasset, *.umap)|*.uasset;*.umap|UAssetAPI JSON (*.json)|*.json|All files (*.*)|*.*";
                 dialog.FilterIndex = 1;
                 dialog.RestoreDirectory = true;
 
                 DialogResult res = dialog.ShowDialog();
                 if (res == DialogResult.OK)
                 {
-                    currentSavingPath = dialog.FileName;
-                    ForceSave(currentSavingPath);
+                    if (Path.GetExtension(dialog.FileName) == ".json")
+                    {
+                        // JSON export
+                        string jsonSerializedAsset = tableEditor.asset.SerializeJson(Newtonsoft.Json.Formatting.Indented);
+                        File.WriteAllText(dialog.FileName, jsonSerializedAsset);
+                    }
+                    else
+                    {
+                        currentSavingPath = dialog.FileName;
+                        ForceSave(currentSavingPath);
+                    }
                 }
                 else if (res != DialogResult.Cancel)
                 {
@@ -894,29 +903,6 @@ namespace UAssetGUI
                 MessageBox.Show("Successfully replaced " + numReplaced + " reference" + (numReplaced == 1 ? "" : "s") + ".", this.Text);
             }
             replacementPrompt.Dispose();
-        }
-
-        private void exportJSONToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (tableEditor?.asset == null) return;
-
-            using (SaveFileDialog dialog = new SaveFileDialog())
-            {
-                dialog.Filter = "UAssetAPI JSON (*.json)|*.json|All files (*.*)|*.*";
-                dialog.FilterIndex = 1;
-                dialog.RestoreDirectory = true;
-
-                DialogResult res = dialog.ShowDialog();
-                if (res == DialogResult.OK)
-                {
-                    string jsonSerializedAsset = tableEditor.asset.SerializeJson();
-                    File.WriteAllText(dialog.FileName, jsonSerializedAsset);
-                }
-                else if (res != DialogResult.Cancel)
-                {
-                    MessageBox.Show("Failed to export!", "Uh oh!");
-                }
-            }
         }
 
         private void mapStructTypeOverridesToolStripMenuItem_Click(object sender, EventArgs e)

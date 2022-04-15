@@ -37,7 +37,6 @@ namespace UAssetGUI
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exportJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,8 +80,7 @@ namespace UAssetGUI
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem,
-            this.saveAsToolStripMenuItem,
-            this.exportJSONToolStripMenuItem});
+            this.saveAsToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -113,16 +111,6 @@ namespace UAssetGUI
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
             this.saveAsToolStripMenuItem.Text = "Save As";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
-            // 
-            // exportJSONToolStripMenuItem
-            // 
-            this.exportJSONToolStripMenuItem.Enabled = false;
-            this.exportJSONToolStripMenuItem.Name = "exportJSONToolStripMenuItem";
-            this.exportJSONToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-            | System.Windows.Forms.Keys.E)));
-            this.exportJSONToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
-            this.exportJSONToolStripMenuItem.Text = "Export JSON";
-            this.exportJSONToolStripMenuItem.Click += new System.EventHandler(this.exportJSONToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
             // 
@@ -351,7 +339,6 @@ namespace UAssetGUI
         private ComboBox comboSpecifyVersion;
         private ToolStripMenuItem replaceAllReferencesToolStripMenuItem;
         public ContextMenuStrip nameMapContext;
-        private ToolStripMenuItem exportJSONToolStripMenuItem;
         private ToolStripMenuItem issuesToolStripMenuItem;
         private ToolStripMenuItem mapStructTypeOverridesToolStripMenuItem;
     }

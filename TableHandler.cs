@@ -384,14 +384,14 @@ namespace UAssetGUI
                             case "ByteProperty":
                                 var byteData = (BytePropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = byteData.GetEnumBase(asset)?.Value == null ? FString.NullCase : byteData.GetEnumBase(asset)?.Value;
+                                row.Cells[3].Value = byteData.GetEnumBase()?.Value.Value == null ? FString.NullCase : byteData.GetEnumBase()?.Value.Value;
                                 if (byteData.ByteType == BytePropertyType.Byte)
                                 {
                                     row.Cells[4].Value = byteData.Value;
                                 }
                                 else
                                 {
-                                    row.Cells[4].Value = byteData.GetEnumFull(asset)?.Value == null ? FString.NullCase : byteData.GetEnumFull(asset)?.Value;
+                                    row.Cells[4].Value = byteData.GetEnumFull()?.Value.Value == null ? FString.NullCase : byteData.GetEnumFull()?.Value.Value;
                                 }
                                 break;
                             case "StructProperty":

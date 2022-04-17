@@ -22,6 +22,7 @@ namespace UAssetGUI
 
         public TableHandler tableEditor;
         public ByteViewer byteView1;
+        public TextBox jsonView;
 
         public string DisplayVersion
         {
@@ -86,6 +87,16 @@ namespace UAssetGUI
                 Visible = false
             };
             Controls.Add(byteView1);
+
+            jsonView = new TextBox
+            {
+                Visible = false,
+                AutoSize = true,
+                Multiline = true,
+                ReadOnly = true,
+                ScrollBars = ScrollBars.Both
+            };
+            Controls.Add(jsonView);
 
             // Enable double buffering to look nicer
             if (!SystemInformation.TerminalServerSession)
@@ -266,6 +277,7 @@ namespace UAssetGUI
         {
             dataGridView1.Visible = true;
             byteView1.Visible = false;
+            jsonView.Visible = false;
 
             try
             {
@@ -684,6 +696,13 @@ namespace UAssetGUI
                 byteView1.Size = dataGridView1.Size;
                 byteView1.Location = dataGridView1.Location;
                 byteView1.Refresh();
+            }
+
+            if (jsonView != null) 
+            {
+                jsonView.Size = dataGridView1.Size;
+                jsonView.Location = dataGridView1.Location;
+                jsonView.Refresh();
             }
 
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));

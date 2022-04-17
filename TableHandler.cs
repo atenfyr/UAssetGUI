@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -6,8 +7,10 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.Kismet.Bytecode;
 using UAssetAPI.PropertyTypes;
 using UAssetAPI.StructTypes;
+using static UAssetAPI.Kismet.KismetSerializer;
 
 namespace UAssetGUI
 {
@@ -800,6 +803,8 @@ namespace UAssetGUI
             Form1 origForm = (Form1)dataGridView1.Parent;
             var byteView1 = origForm.byteView1;
             byteView1.Visible = false;
+            var jsonView = origForm.jsonView;
+            jsonView.Visible = false;
             dataGridView1.Visible = true;
             dataGridView1.Columns.Clear();
             dataGridView1.Rows.Clear();
@@ -1371,6 +1376,16 @@ namespace UAssetGUI
                                 byteView1.SetBytes(bytes);
                                 byteView1.Visible = true;
                                 currentlyFocusedControl.Focus();
+                                origForm.ForceResize();
+                                standardRendering = false;
+                                break;
+                            case KismetExpression[] bytecode:
+                                UAssetAPI.Kismet.KismetSerializer.asset = asset;
+                                Control currentlyFocusedControl1 = ((Form1)dataGridView1.Parent).ActiveControl;
+                                dataGridView1.Visible = false;
+                                jsonView.Text = new JObject(new JProperty("Script", SerializeScript(bytecode))).ToString();
+                                jsonView.Visible = true;
+                                currentlyFocusedControl1.Focus();
                                 origForm.ForceResize();
                                 standardRendering = false;
                                 break;

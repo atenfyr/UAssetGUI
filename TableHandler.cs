@@ -131,82 +131,82 @@ namespace UAssetGUI
                 switch (baseUs)
                 {
                     case RawExport us3:
-                    {
-                        var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
-                        categoryNode.Nodes.Add(parentNode);
-                        break;
-                    }
+                        {
+                            var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3.Data);
+                            categoryNode.Nodes.Add(parentNode);
+                            break;
+                        }
                     case NormalExport us:
-                    {
-                        var parentNode = new PointingTreeNode((baseUs.ClassIndex.IsImport() ? baseUs.ClassIndex.ToImport(asset).ObjectName.Value.Value : baseUs.ClassIndex.Index.ToString()) + " (" + us.Data.Count + ")", us);
-                        categoryNode.Nodes.Add(parentNode);
-
-                        for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
-
-                        if (us is StringTableExport us2)
                         {
-                            var parentNode2 = new PointingTreeNode(us2.Table.TableNamespace + " (" + us2.Table.Count + ")", us2.Table);
-                            categoryNode.Nodes.Add(parentNode2);
-                        }
+                            var parentNode = new PointingTreeNode((baseUs.ClassIndex.IsImport() ? baseUs.ClassIndex.ToImport(asset).ObjectName.Value.Value : baseUs.ClassIndex.Index.ToString()) + " (" + us.Data.Count + ")", us);
+                            categoryNode.Nodes.Add(parentNode);
 
-                        if (us is StructExport structUs)
-                        {
-                            var parentNode2 = new PointingTreeNode("UStruct Data", structUs, PointingTreeNodeType.StructData);
-                            categoryNode.Nodes.Add(parentNode2);
-                            if (structUs.ScriptBytecode == null)
+                            for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode);
+
+                            if (us is StringTableExport us2)
                             {
-                                var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs.ScriptBytecodeRaw, PointingTreeNodeType.Normal);
-                                parentNode2.Nodes.Add(bytecodeNode);
+                                var parentNode2 = new PointingTreeNode(us2.Table.TableNamespace + " (" + us2.Table.Count + ")", us2.Table);
+                                categoryNode.Nodes.Add(parentNode2);
                             }
-                            else
+
+                            if (us is StructExport structUs)
                             {
-                                var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs.ScriptBytecode, PointingTreeNodeType.Normal);
-                                parentNode2.Nodes.Add(bytecodeNode);
-                            }
-                         }
-
-                        if (us is ClassExport)
-                        {
-                            var parentNode2 = new PointingTreeNode("UClass Data", (ClassExport)us, PointingTreeNodeType.ClassData);
-                            categoryNode.Nodes.Add(parentNode2);
-                        }
-
-                        if (us is PropertyExport)
-                        {
-                            var parentNode2 = new PointingTreeNode("UProperty Data", (PropertyExport)us, PointingTreeNodeType.UPropertyData);
-                            categoryNode.Nodes.Add(parentNode2);
-                        }
-
-                        if (us is DataTableExport us4)
-                        {
-                            var parentNode2 = new PointingTreeNode("Table Info (" + us4.Table.Data.Count + ")", us4.Table);
-                            categoryNode.Nodes.Add(parentNode2);
-                            foreach (StructPropertyData entry in us4.Table.Data)
-                            {
-                                string decidedName = entry.Name.Value.Value;
-
-                                var structNode = new PointingTreeNode(decidedName + " (" + entry.Value.Count + ")", entry);
-                                parentNode2.Nodes.Add(structNode);
-                                for (int j = 0; j < entry.Value.Count; j++)
+                                var parentNode2 = new PointingTreeNode("UStruct Data", structUs, PointingTreeNodeType.StructData);
+                                categoryNode.Nodes.Add(parentNode2);
+                                if (structUs.ScriptBytecode == null)
                                 {
-                                    InterpretThing(entry.Value[j], structNode);
+                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs.ScriptBytecodeRaw, PointingTreeNodeType.Normal);
+                                    parentNode2.Nodes.Add(bytecodeNode);
+                                }
+                                else
+                                {
+                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs.ScriptBytecode, PointingTreeNodeType.Normal);
+                                    parentNode2.Nodes.Add(bytecodeNode);
                                 }
                             }
-                        }
 
-                        if (us is EnumExport us5)
-                        {
-                            var parentNode2 = new PointingTreeNode("Enum Data", us5, PointingTreeNodeType.EnumData);
-                            categoryNode.Nodes.Add(parentNode2);
-                        }
+                            if (us is ClassExport)
+                            {
+                                var parentNode2 = new PointingTreeNode("UClass Data", (ClassExport)us, PointingTreeNodeType.ClassData);
+                                categoryNode.Nodes.Add(parentNode2);
+                            }
 
-                        {
-                            var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
-                            categoryNode.Nodes.Add(parentNode3);
-                        }
+                            if (us is PropertyExport)
+                            {
+                                var parentNode2 = new PointingTreeNode("UProperty Data", (PropertyExport)us, PointingTreeNodeType.UPropertyData);
+                                categoryNode.Nodes.Add(parentNode2);
+                            }
 
-                        break;
-                    }
+                            if (us is DataTableExport us4)
+                            {
+                                var parentNode2 = new PointingTreeNode("Table Info (" + us4.Table.Data.Count + ")", us4.Table);
+                                categoryNode.Nodes.Add(parentNode2);
+                                foreach (StructPropertyData entry in us4.Table.Data)
+                                {
+                                    string decidedName = entry.Name.Value.Value;
+
+                                    var structNode = new PointingTreeNode(decidedName + " (" + entry.Value.Count + ")", entry);
+                                    parentNode2.Nodes.Add(structNode);
+                                    for (int j = 0; j < entry.Value.Count; j++)
+                                    {
+                                        InterpretThing(entry.Value[j], structNode);
+                                    }
+                                }
+                            }
+
+                            if (us is EnumExport us5)
+                            {
+                                var parentNode2 = new PointingTreeNode("Enum Data", us5, PointingTreeNodeType.EnumData);
+                                categoryNode.Nodes.Add(parentNode2);
+                            }
+
+                            {
+                                var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
+                                categoryNode.Nodes.Add(parentNode3);
+                            }
+
+                            break;
+                        }
                 }
             }
 
@@ -629,7 +629,7 @@ namespace UAssetGUI
                             case TextHistoryType.Base:
                                 if (value1B == null || value2B == null || value3B == null || !(value1B is string) || !(value2B is string) || !(value3B is string)) return null;
                                 decidedTextData.Namespace = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
-                                decidedTextData.Value = (string)value2B == FString.NullCase ? null :  FString.FromString((string)value2B);
+                                decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
                                 decidedTextData.CultureInvariantString = (string)value3B == FString.NullCase ? null : FString.FromString((string)value3B);
                                 break;
                             case TextHistoryType.StringTableEntry:
@@ -1000,7 +1000,7 @@ namespace UAssetGUI
                         switch (pointerNode.Pointer)
                         {
                             case NormalExport usCategory:
-                                switch(pointerNode.Type)
+                                switch (pointerNode.Type)
                                 {
                                     case PointingTreeNodeType.Normal:
                                         for (int num = 0; num < usCategory.Data.Count; num++)
@@ -1262,7 +1262,7 @@ namespace UAssetGUI
                                         standardRendering = false;
                                         break;
                                 }
-   
+
                                 break;
                             case FStringTable strUs:
                                 {
@@ -1710,7 +1710,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            asset.DependsMap.Insert(vals[0], new int[]{ vals[1] });
+                            asset.DependsMap.Insert(vals[0], new int[] { vals[1] });
                         }
                     }
                     break;
@@ -1844,7 +1844,7 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is NormalExport usCat)
                         {
-                            switch(pointerNode.Type)
+                            switch (pointerNode.Type)
                             {
                                 case PointingTreeNodeType.Normal:
                                     List<PropertyData> newData = new List<PropertyData>();
@@ -1870,7 +1870,7 @@ namespace UAssetGUI
                                         {
                                             var currRow = dataGridView1.Rows[i];
                                             if (currRow == null || currRow.Cells.Count < 2) continue;
-                                            
+
                                             string enumFrontValue = (string)currRow.Cells[0].Value;
                                             string enumValueValue = (string)currRow.Cells[1].Value;
                                             if (enumFrontValue == "CppForm")
@@ -1887,7 +1887,7 @@ namespace UAssetGUI
                                     }
                                     break;
                             }
-                            
+
                         }
                         else if (pointerNode.Pointer is UDataTable dtUs)
                         {

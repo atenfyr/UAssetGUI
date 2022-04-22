@@ -265,7 +265,7 @@ namespace UAssetGUI
             }
             else if (dat is MapPropertyData mapDat)
             {
-                foreach (var entry in mapDat.Value) 
+                foreach (var entry in mapDat.Value)
                 {
                     GetUnknownProperties(entry.Key);
                     GetUnknownProperties(entry.Value);
@@ -380,7 +380,7 @@ namespace UAssetGUI
                 dataGridView1.Columns.Clear();
                 dataGridView1.Rows.Clear();
                 UAGPalette.RefreshTheme(this);
-                switch(ex)
+                switch (ex)
                 {
                     case IOException _:
                         MessageBox.Show("Failed to open this file! Please make sure the specified engine version is correct.", "Uh oh!");
@@ -550,7 +550,7 @@ namespace UAssetGUI
         {
             if (dataGridView1.CurrentCell != null && dataGridView1.CurrentCell.Style != null && dataGridView1.CurrentCell.Style.Font != null && dataGridView1.CurrentCell.Style.Font.Underline == true)
             {
-                switch(dataGridView1.CurrentCell.Tag)
+                switch (dataGridView1.CurrentCell.Tag)
                 {
                     case "CategoryJump":
                         DataGridViewCell previousCell = dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells[dataGridView1.CurrentCell.ColumnIndex - 1];
@@ -698,7 +698,7 @@ namespace UAssetGUI
                 byteView1.Refresh();
             }
 
-            if (jsonView != null) 
+            if (jsonView != null)
             {
                 jsonView.Size = dataGridView1.Size;
                 jsonView.Location = dataGridView1.Location;
@@ -720,7 +720,7 @@ namespace UAssetGUI
             if (!existsUnsavedChanges) return;
 
             DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);
-            switch(res)
+            switch (res)
             {
                 case DialogResult.Yes:
                     if (!ForceSave(currentSavingPath)) e.Cancel = true;
@@ -911,7 +911,7 @@ namespace UAssetGUI
             {
                 DisplayText = "Enter a string to replace references of this name with"
             };
-            
+
             if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
             {
                 FString newTxt = FString.FromString(replacementPrompt.OutputText);

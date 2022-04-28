@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UAssetGUI")]
-[assembly: AssemblyCopyright("Copyright © Atenfyr 2021")]
+[assembly: AssemblyCopyright("Copyright © Atenfyr 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

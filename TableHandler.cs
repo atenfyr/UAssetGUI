@@ -489,6 +489,11 @@ namespace UAssetGUI
                                 row.Cells[3].Value = intPointData.Value[0];
                                 row.Cells[4].Value = intPointData.Value[1];
                                 break;
+                            case "Guid":
+                                var guidData = (GuidPropertyData)thisPD;
+                                row.Cells[2].Value = string.Empty;
+                                row.Cells[3].Value = guidData.Value.ConvertToString();
+                                break;
                             case "Rotator":
                                 var rotatorData = (RotatorPropertyData)thisPD;
                                 row.Cells[2].Value = string.Empty;
@@ -523,7 +528,7 @@ namespace UAssetGUI
                                 }
                                 if (asset.GetCustomVersion<FAnimPhysObjectVersion>() < FAnimPhysObjectVersion.SmartNameRefactorForDeterministicCooking)
                                 {
-                                    row.Cells[5].Value = smartNameData.TempGUID == null ? FString.NullCase : smartNameData.TempGUID.ToString();
+                                    row.Cells[5].Value = smartNameData.TempGUID == null ? FString.NullCase : smartNameData.TempGUID.ConvertToString();
                                     row.Cells[5].ToolTipText = "TempGUID";
                                 }
                                 break;
@@ -824,7 +829,7 @@ namespace UAssetGUI
                     dataGridView1.Rows.Add(new object[] { "LegacyFileVersion", asset.LegacyFileVersion.ToString() });
                     dataGridView1.Rows.Add(new object[] { "IsUnversioned", asset.IsUnversioned.ToString() });
                     dataGridView1.Rows.Add(new object[] { "FileVersionLicenseeUE4", asset.FileVersionLicenseeUE4.ToString() });
-                    dataGridView1.Rows.Add(new object[] { "PackageGuid", asset.PackageGuid.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "PackageGuid", asset.PackageGuid.ConvertToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageFlags", asset.PackageFlags.ToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageSource", asset.PackageSource.ToString() });
                     dataGridView1.Rows.Add(new object[] { "FolderName", asset.FolderName.Value });
@@ -1438,7 +1443,8 @@ namespace UAssetGUI
                                 asset.FileVersionLicenseeUE4 = Convert.ToInt32(propertyValue);
                                 break;
                             case "PackageGuid":
-                                if (Guid.TryParse(propertyValue, out Guid newPackageGuid)) asset.PackageGuid = newPackageGuid;
+                                Guid newPackageGuid = propertyValue.ConvertToGUID();
+                                if (newPackageGuid != Guid.Empty) asset.PackageGuid = newPackageGuid;
                                 break;
                             case "PackageFlags":
                                 if (Enum.TryParse(propertyValue, out EPackageFlags newPackageFlags)) asset.PackageFlags = newPackageFlags;
@@ -1631,7 +1637,7 @@ namespace UAssetGUI
                                     if (currentVal is string)
                                     {
                                         Guid x = new Guid();
-                                        Guid.TryParse((string)currentVal, out x);
+                                        x = ((string)currentVal).ConvertToGUID();
                                         settingVal = x;
                                     }
                                     else if (currentVal is Guid)
@@ -1732,9 +1738,14 @@ namespace UAssetGUI
                     {
                         string rawCustomVersion = (string)row.Cells[0].Value;
                         Guid customVersionKey = CustomVersion.UnusedCustomVersionKey;
-                        if (!Guid.TryParse(rawCustomVersion, out customVersionKey))
+                        Guid parsedVersionKey = rawCustomVersion.ConvertToGUID();
+                        if (parsedVersionKey == Guid.Empty)
                         {
                             customVersionKey = CustomVersion.GetCustomVersionGuidFromFriendlyName(rawCustomVersion);
+                        }
+                        else
+                        {
+                            customVersionKey = parsedVersionKey;
                         }
                         if (customVersionKey == CustomVersion.UnusedCustomVersionKey) continue;
 

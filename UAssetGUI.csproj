@@ -133,6 +133,7 @@
   </Target>
   <Target Name="AfterBuild">
     <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)\LICENSE&quot; &quot;$(TargetDir)\LICENSE*&quot;" />
+        <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)\NOTICE.md&quot; &quot;$(TargetDir)\NOTICE.md*&quot;" />
     <Exec ContinueOnError="true" Command="del &quot;$(TargetDir)\git_commit.txt&quot;" />
   </Target>
 </Project>

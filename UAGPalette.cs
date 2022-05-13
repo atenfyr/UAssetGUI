@@ -100,7 +100,7 @@ namespace UAssetGUI
             }
         }
 
-        private static float RecommendedFontSize
+        public static float RecommendedFontSize
         {
             get
             {

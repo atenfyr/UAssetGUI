@@ -82,7 +82,7 @@ namespace UAssetGUI
             DataGridViewCellStyle sty = new DataGridViewCellStyle();
             if (underlineStyle)
             {
-                Font styFont = new Font(dgv.Font.Name, dgv.Font.Size, FontStyle.Underline);
+                Font styFont = new Font(dgv.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                 sty.Font = styFont;
                 sty.ForeColor = Color.Blue;
             }

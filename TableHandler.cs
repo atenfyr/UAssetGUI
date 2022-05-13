@@ -1157,7 +1157,7 @@ namespace UAssetGUI
                                             row.Cells[3].Value = "Jump";
                                             row.Cells[3].Tag = "CategoryJump";
                                             DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                            Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                                             sty.Font = styFont;
                                             sty.ForeColor = Color.Blue;
                                             row.Cells[3].Style = sty;
@@ -1185,7 +1185,7 @@ namespace UAssetGUI
                                                 row.Cells[3].Value = "Jump";
                                                 row.Cells[3].Tag = "CategoryJump";
                                                 DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                                Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                                Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                                                 sty.Font = styFont;
                                                 sty.ForeColor = Color.Blue;
                                                 row.Cells[3].Style = sty;
@@ -1321,7 +1321,7 @@ namespace UAssetGUI
                                             row.Cells[3].Tag = "ChildJump";
 
                                             DataGridViewCellStyle sty = new DataGridViewCellStyle();
-                                            Font styFont = new Font(dataGridView1.Font.Name, dataGridView1.Font.Size, FontStyle.Underline);
+                                            Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                                             sty.Font = styFont;
                                             sty.ForeColor = Color.Blue;
                                             row.Cells[3].Style = sty;

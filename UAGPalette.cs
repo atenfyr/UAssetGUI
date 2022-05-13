@@ -4,6 +4,27 @@ using System.Windows.Forms;
 
 namespace UAssetGUI
 {
+    public class UAGMenuStripRenderer : ToolStripProfessionalRenderer
+    {
+        protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                if (!e.Item.Selected && !Form1.IsDropDownOpened(e.Item))
+                {
+                    e.Item.ForeColor = UAGPalette.ForeColor;
+                    base.OnRenderMenuItemBackground(e);
+                }
+                else
+                {
+                    e.Item.ForeColor = UAGPalette.HighlightForeColor;
+                    e.Graphics.FillRectangle(new SolidBrush(UAGPalette.HighlightBackColor), new Rectangle(Point.Empty, e.Item.Size));
+                }
+            });
+        }
+    }
+
+
     public static class UAGPalette
     {
         public static Color BackColor = Color.White;
@@ -53,6 +74,12 @@ namespace UAssetGUI
                     butto.BackColor = UAGPalette.ButtonBackColor;
                     butto.MinimumSize = new Size(0, 26);
                 }
+                if (ctrl2 is ComboBox combo)
+                {
+                    combo.ForeColor = UAGPalette.ForeColor;
+                    combo.BackColor = UAGPalette.ButtonBackColor;
+                    combo.FlatStyle = CurrentTheme == UAGTheme.Light ? FlatStyle.Standard : FlatStyle.Flat;
+                }
                 RefreshAllButtonsInControl(ctrl2);
             }
         }
@@ -82,6 +109,15 @@ namespace UAssetGUI
                     InactiveColor = Color.FromArgb(211, 211, 211);
                     DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
                     break;
+                case UAGTheme.Dark:
+                    BackColor = Color.FromArgb(46, 46, 46);
+                    ButtonBackColor = Color.FromArgb(61, 61, 61);
+                    ForeColor = Color.White;
+                    HighlightBackColor = Color.FromArgb(250, 148, 46);
+                    HighlightForeColor = BackColor;
+                    InactiveColor = Color.FromArgb(45, 45, 45);
+                    DataGridViewActiveColor = Color.FromArgb(35, 35, 35);
+                    break;
             }
 
             frm.Icon = Properties.Resources.icon;
@@ -108,6 +144,13 @@ namespace UAssetGUI
                         }
                     }
                 }
+
+                frm1.jsonView.ForeColor = UAGPalette.ForeColor;
+                frm1.jsonView.BackColor = UAGPalette.BackColor;
+
+                // ByteViewer has no support for changing the background color
+                frm1.byteView1.ForeColor = Color.Black;
+                frm1.byteView1.BackColor = Color.White;
 
                 AdjustDGV(frm1.dataGridView1);
             }

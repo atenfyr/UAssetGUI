@@ -66,10 +66,6 @@ namespace UAssetGUI
         {
             CheckIfMapStructTypeOverrideIsNull();
 
-            if (this.Owner is Form1 parentForm)
-            {
-                this.Text = parentForm.Text;
-            }
             UAGPalette.RefreshTheme(this);
             ForceResize();
             this.AdjustFormPosition();

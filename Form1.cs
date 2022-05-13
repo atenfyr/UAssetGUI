@@ -17,7 +17,7 @@ namespace UAssetGUI
     {
         internal UE4Version ParsingVersion = UE4Version.UNKNOWN;
         internal DataGridView dataGridView1;
-        internal TreeView listView1;
+        internal ColorfulTreeView listView1;
         internal MenuStrip menuStrip1;
 
         public TableHandler tableEditor;
@@ -115,6 +115,26 @@ namespace UAssetGUI
             DragDrop += new DragEventHandler(frm_DragDrop);
 
             dataGridView1.MouseWheel += dataGridView1_MouseWheel;
+
+            menuStrip1.Renderer = new UAGMenuStripRenderer();
+            foreach (ToolStripMenuItem entry in menuStrip1.Items)
+            {
+                entry.DropDownOpened += (sender, args) =>
+                {
+                    isDropDownOpened[entry] = true;
+                };
+                entry.DropDownClosed += (sender, args) =>
+                {
+                    isDropDownOpened[entry] = false;
+                };
+            }
+        }
+
+        private static Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();
+        public static bool IsDropDownOpened(ToolStripItem item)
+        {
+            if (!isDropDownOpened.ContainsKey(item)) return false;
+            return isDropDownOpened[item];
         }
 
         private string[] versionOptionsKeys = new string[]
@@ -633,6 +653,7 @@ namespace UAssetGUI
         private void dataGridView1_MouseWheel(object sender, MouseEventArgs e)
         {
             if (dataGridView1.SelectedCells.Count < 1) return;
+            if (!Properties.Settings.Default.ChangeValuesOnScroll) return;
             var selectedCell = dataGridView1.SelectedCells[0];
 
             int deltaDir = e.Delta > 0 ? -1 : 1;
@@ -707,7 +728,7 @@ namespace UAssetGUI
 
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
             listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
-            comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 3);
+            comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
         }
 
         private void frm_sizeChanged(object sender, EventArgs e)
@@ -772,35 +793,6 @@ namespace UAssetGUI
         private void apiLinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/atenfyr/uassetapi");
-        }
-
-        private static string AboutText;
-
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            AboutText = DisplayVersion + "\n" +
-            "By Atenfyr\n" +
-            "\nThanks to the Astro-Techies club for the help\n" +
-            "\nThanks to David Hill (Kaiheilos) for early assistance with the package summary format\n" +
-            "\n(Here's where a soppy monologue goes)\n";
-
-            var formPopup = new Form
-            {
-                Text = "About",
-                Size = new Size(350, 300)
-            };
-            formPopup.StartPosition = FormStartPosition.CenterParent;
-
-            formPopup.Controls.Add(new Label()
-            {
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill,
-                Text = AboutText,
-                Font = new Font(this.Font.FontFamily, 10)
-            });
-
-            formPopup.ShowDialog(this);
         }
 
         public void SetParsingVersion(UE4Version ver)
@@ -912,6 +904,8 @@ namespace UAssetGUI
                 DisplayText = "Enter a string to replace references of this name with"
             };
 
+            replacementPrompt.StartPosition = FormStartPosition.CenterParent;
+
             if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
             {
                 FString newTxt = FString.FromString(replacementPrompt.OutputText);
@@ -927,8 +921,35 @@ namespace UAssetGUI
         private void mapStructTypeOverridesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var mstoForm = new MapStructTypeOverrideForm();
+            mstoForm.StartPosition = FormStartPosition.CenterParent;
             mstoForm.ShowDialog();
             mstoForm.Dispose();
+        }
+
+        private void comboSpecifyVersion_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var combo = sender as ComboBox;
+
+            Color fontColor = UAGPalette.ForeColor;
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e.Graphics.FillRectangle(new SolidBrush(UAGPalette.HighlightBackColor), e.Bounds);
+                fontColor = UAGPalette.BackColor;
+            }
+            else
+            {
+                e.Graphics.FillRectangle(new SolidBrush(UAGPalette.ButtonBackColor), e.Bounds);
+            }
+
+            e.Graphics.DrawString(combo.Items[e.Index].ToString(), e.Font, new SolidBrush(fontColor), new Point(e.Bounds.X, e.Bounds.Y));
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var ajustesForm = new SettingsForm();
+            ajustesForm.StartPosition = FormStartPosition.CenterParent;
+            ajustesForm.ShowDialog(this);
+            ajustesForm.Dispose();
         }
     }
 }

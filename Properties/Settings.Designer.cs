@@ -58,5 +58,29 @@ namespace UAssetGUI.Properties {
                 this["MapStructTypeOverride"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FavoriteThing {
+            get {
+                return ((string)(this["FavoriteThing"]));
+            }
+            set {
+                this["FavoriteThing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ChangeValuesOnScroll {
+            get {
+                return ((bool)(this["ChangeValuesOnScroll"]));
+            }
+            set {
+                this["ChangeValuesOnScroll"] = value;
+            }
+        }
     }
 }

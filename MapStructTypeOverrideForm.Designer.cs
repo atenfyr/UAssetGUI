@@ -29,7 +29,7 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.mstoDataGridView = new System.Windows.Forms.DataGridView();
             this.infoLabel = new System.Windows.Forms.Label();
             this.refreshButton = new System.Windows.Forms.Button();
@@ -47,19 +47,21 @@ namespace UAssetGUI
             this.mstoDataGridView.BackgroundColor = System.Drawing.Color.LightGray;
             this.mstoDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.mstoDataGridView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.mstoDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            this.mstoDataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.mstoDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.mstoDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.mstoDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.mstoDataGridView.EnableHeadersVisualStyles = false;
             this.mstoDataGridView.Location = new System.Drawing.Point(12, 52);
             this.mstoDataGridView.Name = "mstoDataGridView";
+            this.mstoDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             this.mstoDataGridView.RowHeadersWidth = 60;
             this.mstoDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.mstoDataGridView.Size = new System.Drawing.Size(545, 289);
@@ -143,7 +145,7 @@ namespace UAssetGUI
             this.Controls.Add(this.infoLabel);
             this.Controls.Add(this.mstoDataGridView);
             this.Name = "MapStructTypeOverrideForm";
-            this.Text = "Map Struct Type Override";
+            this.Text = "Map Struct Type Overrides";
             this.Load += new System.EventHandler(this.MapStructTypeOverrideForm_Load);
             this.Resize += new System.EventHandler(this.MapStructTypeOverrideForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.mstoDataGridView)).EndInit();

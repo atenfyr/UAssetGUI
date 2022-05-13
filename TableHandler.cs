@@ -2000,6 +2000,7 @@ namespace UAssetGUI
                     }
                     break;
             }
+
             if (forceNewLoad)
             {
                 Load();

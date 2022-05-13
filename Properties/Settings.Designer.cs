@@ -82,5 +82,17 @@ namespace UAssetGUI.Properties {
                 this["ChangeValuesOnScroll"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DataZoom {
+            get {
+                return ((int)(this["DataZoom"]));
+            }
+            set {
+                this["DataZoom"] = value;
+            }
+        }
     }
 }

@@ -37,6 +37,9 @@ namespace UAssetGUI
             this.themeComboBox = new System.Windows.Forms.ComboBox();
             this.favoriteThingBox = new System.Windows.Forms.TextBox();
             this.valuesOnScroll = new System.Windows.Forms.CheckBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // infoLabel
@@ -57,7 +60,7 @@ namespace UAssetGUI
             this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(195, 148);
+            this.closeButton.Location = new System.Drawing.Point(195, 169);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
             this.closeButton.TabIndex = 4;
@@ -91,7 +94,7 @@ namespace UAssetGUI
             this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.aboutButton.Location = new System.Drawing.Point(12, 148);
+            this.aboutButton.Location = new System.Drawing.Point(12, 169);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
             this.aboutButton.TabIndex = 7;
@@ -120,7 +123,7 @@ namespace UAssetGUI
             // valuesOnScroll
             // 
             this.valuesOnScroll.AutoSize = true;
-            this.valuesOnScroll.Location = new System.Drawing.Point(115, 113);
+            this.valuesOnScroll.Location = new System.Drawing.Point(116, 139);
             this.valuesOnScroll.Name = "valuesOnScroll";
             this.valuesOnScroll.Size = new System.Drawing.Size(139, 17);
             this.valuesOnScroll.TabIndex = 10;
@@ -128,11 +131,31 @@ namespace UAssetGUI
             this.valuesOnScroll.UseVisualStyleBackColor = true;
             this.valuesOnScroll.CheckedChanged += new System.EventHandler(this.valuesOnScroll_CheckedChanged);
             // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(116, 113);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDown1.TabIndex = 11;
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            this.label3.Location = new System.Drawing.Point(64, 113);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(46, 16);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "Zoom:";
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 180);
+            this.ClientSize = new System.Drawing.Size(282, 201);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.valuesOnScroll);
             this.Controls.Add(this.favoriteThingBox);
             this.Controls.Add(this.themeComboBox);
@@ -146,6 +169,7 @@ namespace UAssetGUI
             this.Text = "Settings";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
             this.Load += new System.EventHandler(this.SettingsForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -161,5 +185,7 @@ namespace UAssetGUI
         private System.Windows.Forms.ComboBox themeComboBox;
         private System.Windows.Forms.TextBox favoriteThingBox;
         private System.Windows.Forms.CheckBox valuesOnScroll;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label3;
     }
 }

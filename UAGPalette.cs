@@ -104,12 +104,17 @@ namespace UAssetGUI
         {
             Color selectedDGVBackColor = dgv.Columns.Count > 0 ? UAGPalette.DataGridViewActiveColor : UAGPalette.InactiveColor;
             dgv.BackgroundColor = selectedDGVBackColor;
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font(dgv.ColumnHeadersDefaultCellStyle.Font.FontFamily, 8.25f + (float)Properties.Settings.Default.DataZoom, dgv.ColumnHeadersDefaultCellStyle.Font.Style);
             dgv.ColumnHeadersDefaultCellStyle.BackColor = UAGPalette.BackColor; // intentional
             dgv.ColumnHeadersDefaultCellStyle.ForeColor = UAGPalette.ForeColor;
             dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = UAGPalette.HighlightBackColor;
             dgv.ColumnHeadersDefaultCellStyle.SelectionForeColor = UAGPalette.HighlightForeColor;
             dgv.RowHeadersDefaultCellStyle = dgv.ColumnHeadersDefaultCellStyle;
             dgv.DefaultCellStyle = dgv.ColumnHeadersDefaultCellStyle;
+
+            int defaultNeededRowHeight = (int)(dgv.ColumnHeadersDefaultCellStyle.Font.Height * 1.5f);
+            dgv.RowTemplate.MinimumHeight = defaultNeededRowHeight > 22 ? defaultNeededRowHeight : 22;
+            dgv.RowTemplate.Height = dgv.RowTemplate.MinimumHeight;
         }
 
         private static void RefreshThemeInternal(Form frm)
@@ -144,6 +149,7 @@ namespace UAssetGUI
                 Color selectedListViewBackColor = frm1.listView1.Nodes.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
                 frm1.listView1.BackColor = selectedListViewBackColor;
                 frm1.listView1.ForeColor = UAGPalette.ForeColor;
+                frm1.listView1.Font = new Font(frm1.listView1.Font.FontFamily, 8.25f + (float)Properties.Settings.Default.DataZoom, frm1.listView1.Font.Style);
 
                 frm1.menuStrip1.BackColor = UAGPalette.BackColor;
                 frm1.menuStrip1.ForeColor = UAGPalette.ForeColor;

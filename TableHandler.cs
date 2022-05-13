@@ -1415,6 +1415,15 @@ namespace UAssetGUI
                     break;
             }
 
+            // go through each row and make sure it's a good height
+            if (dataGridView1.Rows?.Count > 0)
+            {
+                foreach (DataGridViewRow entry in dataGridView1.Rows)
+                {
+                    if (entry.Height < dataGridView1.RowTemplate.MinimumHeight) entry.Height = dataGridView1.RowTemplate.MinimumHeight;
+                }
+            }
+
             readyToSave = true;
             dataGridView1.ClearSelection();
             dataGridView1.CurrentCell = null;

@@ -20,6 +20,7 @@ namespace UAssetGUI
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
             valuesOnScroll.Checked = Properties.Settings.Default.ChangeValuesOnScroll;
             favoriteThingBox.Text = Properties.Settings.Default.FavoriteThing;
+            numericUpDown1.Value = Properties.Settings.Default.DataZoom;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -99,6 +100,22 @@ namespace UAssetGUI
             Properties.Settings.Default.Save();
             UAGPalette.RefreshTheme(BaseForm);
             UAGPalette.RefreshTheme(this);
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.DataZoom = (int)numericUpDown1.Value;
+            UAGPalette.RefreshTheme(BaseForm);
+            UAGPalette.RefreshTheme(this);
+
+            // Refresh dgv row heights
+            UAGUtils.InvokeUI(() =>
+            {
+                if (BaseForm.tableEditor != null)
+                {
+                    BaseForm.tableEditor.Save(true);
+                }
+            });
         }
     }
 }

@@ -115,6 +115,7 @@ namespace UAssetGUI
             this.favoriteThingBox.Name = "favoriteThingBox";
             this.favoriteThingBox.Size = new System.Drawing.Size(121, 20);
             this.favoriteThingBox.TabIndex = 9;
+            this.favoriteThingBox.TextChanged += new System.EventHandler(this.favoriteThingBox_TextChanged);
             // 
             // valuesOnScroll
             // 

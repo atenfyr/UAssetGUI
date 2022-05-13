@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -61,6 +62,8 @@ namespace UAssetGUI
             });
         }
 
+
+        private static Dictionary<Control, Font> oldFontSettings = null;
         private static void RefreshAllButtonsInControl(this Control ctrl)
         {
             foreach (Control ctrl2 in ctrl.Controls)
@@ -80,6 +83,19 @@ namespace UAssetGUI
                     combo.BackColor = UAGPalette.ButtonBackColor;
                     combo.FlatStyle = CurrentTheme == UAGTheme.Light ? FlatStyle.Standard : FlatStyle.Flat;
                 }
+
+                if (Properties.Settings.Default.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
+                {
+                    if (oldFontSettings == null) oldFontSettings = new Dictionary<Control, Font>();
+                    if (ctrl2.Font.FontFamily.Name != "Comic Sans MS") oldFontSettings[ctrl2] = ctrl2.Font;
+                    ctrl2.Font = new Font("Comic Sans MS", ctrl2.Font.Size, ctrl2.Font.Style);
+                }
+                else if (oldFontSettings != null)
+                {
+                    if (oldFontSettings.ContainsKey(ctrl2) && oldFontSettings[ctrl2] != null) ctrl2.Font = oldFontSettings[ctrl2];
+                    oldFontSettings[ctrl2] = null;
+                }
+
                 RefreshAllButtonsInControl(ctrl2);
             }
         }

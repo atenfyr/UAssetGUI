@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace UAssetGUI
@@ -42,7 +36,7 @@ namespace UAssetGUI
         private void aboutButton_Click(object sender, EventArgs e)
         {
             AboutText = (this.Owner as Form1).DisplayVersion + "\n" +
-            "By Atenfyr\n" +
+            "By atenfyr\n" +
             "\nThanks to the Astroneer Modding club for the help\n" +
             "\nThanks to David Hill (Kaiheilos) for early assistance with the package summary format\n" +
             "\n(Here's where a soppy monologue goes)\n";
@@ -82,10 +76,29 @@ namespace UAssetGUI
             Properties.Settings.Default.ChangeValuesOnScroll = valuesOnScroll.Checked;
         }
 
-        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
+        private bool isCurrentlyComicSans = false;
+        private void favoriteThingBox_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.FavoriteThing = favoriteThingBox.Text;
+            if (Properties.Settings.Default.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
+            {
+                isCurrentlyComicSans = true;
+                UAGPalette.RefreshTheme(BaseForm);
+                UAGPalette.RefreshTheme(this);
+            }
+            else if (isCurrentlyComicSans)
+            {
+                isCurrentlyComicSans = false;
+                UAGPalette.RefreshTheme(BaseForm);
+                UAGPalette.RefreshTheme(this);
+            }
+        }
+
+        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
             Properties.Settings.Default.Save();
+            UAGPalette.RefreshTheme(BaseForm);
+            UAGPalette.RefreshTheme(this);
         }
     }
 }

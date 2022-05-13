@@ -100,11 +100,19 @@ namespace UAssetGUI
             }
         }
 
+        private static float RecommendedFontSize
+        {
+            get
+            {
+                return 8.25f + (float)Properties.Settings.Default.DataZoom;
+            }
+        }
+
         private static void AdjustDGV(DataGridView dgv)
         {
             Color selectedDGVBackColor = dgv.Columns.Count > 0 ? UAGPalette.DataGridViewActiveColor : UAGPalette.InactiveColor;
             dgv.BackgroundColor = selectedDGVBackColor;
-            dgv.ColumnHeadersDefaultCellStyle.Font = new Font(dgv.ColumnHeadersDefaultCellStyle.Font.FontFamily, 8.25f + (float)Properties.Settings.Default.DataZoom, dgv.ColumnHeadersDefaultCellStyle.Font.Style);
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font(dgv.ColumnHeadersDefaultCellStyle.Font.FontFamily, RecommendedFontSize, dgv.ColumnHeadersDefaultCellStyle.Font.Style);
             dgv.ColumnHeadersDefaultCellStyle.BackColor = UAGPalette.BackColor; // intentional
             dgv.ColumnHeadersDefaultCellStyle.ForeColor = UAGPalette.ForeColor;
             dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = UAGPalette.HighlightBackColor;
@@ -169,6 +177,7 @@ namespace UAssetGUI
 
                 frm1.jsonView.ForeColor = UAGPalette.ForeColor;
                 frm1.jsonView.BackColor = UAGPalette.BackColor;
+                frm1.jsonView.Font = new Font(frm1.jsonView.Font.FontFamily, RecommendedFontSize, frm1.jsonView.Font.Style);
 
                 // ByteViewer has no support for changing the background color
                 frm1.byteView1.ForeColor = Color.Black;

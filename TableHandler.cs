@@ -1028,7 +1028,7 @@ namespace UAssetGUI
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName(asset, asset.GetNameReference(1)));
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(FName.DefineDummy(asset, "Super Struct"));
                                             testProperty.Value = strucCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
@@ -1117,7 +1117,7 @@ namespace UAssetGUI
                                         List<DataGridViewRow> classRows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName(asset, asset.GetNameReference(1)));
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(FName.DefineDummy(asset, "Super Struct"));
                                             testProperty.Value = bgcCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();

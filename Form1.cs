@@ -466,34 +466,15 @@ namespace UAssetGUI
                 tableEditor.Save(true);
 
                 bool isLooping = true;
-                int numIters = 0;
                 while (isLooping)
                 {
-                    numIters++;
-
-                    if (numIters > 15)
-                    {
-                        MessageBox.Show("Failed to save! Infinite saving loop detected and aborted", "Uh oh!");
-                        break;
-                    }
-
                     isLooping = false;
                     try
                     {
-                        int nameMapSize1 = tableEditor.asset.GetNameMapIndexList().Count;
                         tableEditor.asset.Write(path);
-                        int nameMapSize2 = tableEditor.asset.GetNameMapIndexList().Count;
-
-                        if (nameMapSize1 == nameMapSize2)
-                        {
-                            SetUnsavedChanges(false);
-                            tableEditor.Load();
-                            return true;
-                        }
-                        else
-                        {
-                            isLooping = true;
-                        }
+                        SetUnsavedChanges(false);
+                        tableEditor.Load();
+                        return true;
                     }
                     catch (NameMapOutOfRangeException ex)
                     {

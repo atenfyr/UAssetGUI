@@ -261,7 +261,7 @@ namespace UAssetGUI
 
             if (dat is UnknownPropertyData unknownDat)
             {
-                string serializingType = unknownDat?.SerializingPropertyType?.Value?.Value;
+                string serializingType = unknownDat?.SerializingPropertyType?.Value;
                 if (!string.IsNullOrEmpty(serializingType) && !unknownTypes.Contains(serializingType))
                 {
                     unknownTypes.Add(serializingType);

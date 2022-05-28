@@ -217,7 +217,7 @@ namespace UAssetGUI
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode)
         {
             if (me == null) return;
-            switch (me.PropertyType.Value.Value)
+            switch (me.PropertyType.Value)
             {
                 case "StructProperty":
                     var struc = (StructPropertyData)me;
@@ -257,8 +257,8 @@ namespace UAssetGUI
 
                     foreach (var entry in mapp.Value)
                     {
-                        entry.Key.Name = new FName("Key");
-                        entry.Value.Name = new FName("Value");
+                        entry.Key.Name = FName.DefineDummy(asset, "Key");
+                        entry.Value.Name = FName.DefineDummy(asset, "Value");
 
                         var softEntryNode = new PointingTreeNode(mapp.Name.Value.Value + " (2)", new PointingDictionaryEntry(entry, mapp));
                         mapNode.Nodes.Add(softEntryNode);
@@ -303,7 +303,7 @@ namespace UAssetGUI
                     }
                     else
                     {
-                        switch (thisPD.PropertyType.Value.Value)
+                        switch (thisPD.PropertyType.Value)
                         {
                             case "BoolProperty":
                                 row.Cells[2].Value = string.Empty;
@@ -576,7 +576,7 @@ namespace UAssetGUI
             dataGridView1.Rows.AddRange(rows.ToArray());
         }
 
-        private PropertyData RowToPD(int rowNum, PropertyData original)
+        private PropertyData RowToPD(int rowNum, PropertyData original, bool namesAreDummies = false)
         {
             try
             {
@@ -597,17 +597,19 @@ namespace UAssetGUI
                 string type = (string)typeB;
                 if (name.Equals(string.Empty) || type.Equals(string.Empty)) return null;
 
+                FName nameName = namesAreDummies ? FName.DefineDummy(asset, name) : FName.FromString(asset, name);
+
                 if (value1B != null && value1B is string && transformB != null && transformB is string && (string)transformB == "Unknown ser.")
                 {
-                    var res = new UnknownPropertyData(FName.FromString(name))
+                    var res = new UnknownPropertyData(nameName)
                     {
                         Value = ((string)value1B).ConvertStringToByteArray()
                     };
-                    res.SetSerializingPropertyType(FName.FromString(type));
+                    res.SetSerializingPropertyType(new FString(type));
                     return res;
                 }
 
-                switch (FName.FromString(type).Value.Value)
+                switch (FName.FromString(asset, type).Value.Value)
                 {
                     case "TextProperty":
                         TextPropertyData decidedTextData = null;
@@ -617,7 +619,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedTextData = new TextPropertyData(FName.FromString(name));
+                            decidedTextData = new TextPropertyData(nameName);
                         }
 
                         TextHistoryType histType = TextHistoryType.Base;
@@ -640,7 +642,7 @@ namespace UAssetGUI
                             case TextHistoryType.StringTableEntry:
                                 if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
 
-                                decidedTextData.TableId = FName.FromString((string)value1B);
+                                decidedTextData.TableId = FName.FromString(asset, (string)value1B);
                                 decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
                                 break;
                             default:
@@ -658,7 +660,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedObjData = new ObjectPropertyData(FName.FromString(name));
+                            decidedObjData = new ObjectPropertyData(nameName);
                         }
 
                         int objValue = int.MinValue;
@@ -678,7 +680,7 @@ namespace UAssetGUI
                         }
                         else
                         {
-                            decidedRCKProperty = new RichCurveKeyPropertyData(FName.FromString(name));
+                            decidedRCKProperty = new RichCurveKeyPropertyData(nameName);
                         }
 
                         if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
@@ -699,11 +701,11 @@ namespace UAssetGUI
 
                         return decidedRCKProperty;
                     default:
-                        PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(type), FName.FromString(name), asset);
+                        PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(asset, type), nameName, asset);
                         if (original != null && original.GetType() == newThing.GetType())
                         {
                             newThing = original;
-                            newThing.Name = FName.FromString(name);
+                            newThing.Name = nameName;
                         }
 
                         string[] existingStrings = new string[5];
@@ -1026,7 +1028,7 @@ namespace UAssetGUI
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"));
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName(asset, asset.GetNameReference(1)));
                                             testProperty.Value = strucCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
@@ -1115,7 +1117,7 @@ namespace UAssetGUI
                                         List<DataGridViewRow> classRows = new List<DataGridViewRow>();
 
                                         {
-                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName("Super Struct"));
+                                            ObjectPropertyData testProperty = new ObjectPropertyData(new FName(asset, asset.GetNameReference(1)));
                                             testProperty.Value = bgcCat.SuperStruct;
 
                                             DataGridViewRow row = new DataGridViewRow();
@@ -1304,8 +1306,8 @@ namespace UAssetGUI
                                         FName mapValueType = usMap.ValueType;
                                         if (usMap.Value.Count != 0)
                                         {
-                                            mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
-                                            mapValueType = usMap.Value[0].PropertyType;
+                                            mapKeyType = new FName(asset, usMap.Value.Keys.ElementAt(0).PropertyType);
+                                            mapValueType = new FName(asset, usMap.Value[0].PropertyType);
                                         }
 
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
@@ -1359,8 +1361,8 @@ namespace UAssetGUI
                                 dataGridView1.AllowUserToAddRows = false;
                                 var ourKey = usDictEntry.Entry.Key;
                                 var ourValue = usDictEntry.Entry.Value;
-                                if (ourKey != null) ourKey.Name = new FName("Key");
-                                if (ourValue != null) ourValue.Name = new FName("Value");
+                                if (ourKey != null) ourKey.Name = FName.DefineDummy(asset, "Key");
+                                if (ourValue != null) ourValue.Name = FName.DefineDummy(asset, "Value");
                                 renderingArr = new PropertyData[2] { ourKey, ourValue };
                                 break;
                             case FMulticastDelegate[] usRealMDArr:
@@ -1504,9 +1506,9 @@ namespace UAssetGUI
                         string realVal4 = (string)val4;
                         if (string.IsNullOrWhiteSpace(realVal1) || string.IsNullOrWhiteSpace(realVal2) || string.IsNullOrWhiteSpace(realVal4)) continue;
 
-                        FName parsedVal1 = FName.FromString(realVal1);
-                        FName parsedVal2 = FName.FromString(realVal2);
-                        FName parsedVal4 = FName.FromString(realVal4);
+                        FName parsedVal1 = FName.FromString(asset, realVal1);
+                        FName parsedVal2 = FName.FromString(asset, realVal2);
+                        FName parsedVal4 = FName.FromString(asset, realVal4);
                         asset.AddNameReference(parsedVal1.Value);
                         asset.AddNameReference(parsedVal2.Value);
                         asset.AddNameReference(parsedVal4.Value);
@@ -1590,10 +1592,10 @@ namespace UAssetGUI
                                     }
                                     break;
                                 case ExportDetailsParseType.FName:
-                                    settingVal = new FName();
+                                    settingVal = new FName(asset);
                                     if (currentVal is string rawFName) // blah(0)
                                     {
-                                        settingVal = FName.FromString(rawFName);
+                                        settingVal = FName.FromString(asset, rawFName);
                                     }
                                     else
                                     {
@@ -1799,8 +1801,8 @@ namespace UAssetGUI
                             FName mapValueType = usMap.ValueType;
                             if (usMap.Value.Count != 0)
                             {
-                                mapKeyType = usMap.Value.Keys.ElementAt(0).PropertyType;
-                                mapValueType = usMap.Value[0].PropertyType;
+                                mapKeyType = new FName(asset, usMap.Value.Keys.ElementAt(0).PropertyType);
+                                mapValueType = new FName(asset, usMap.Value[0].PropertyType);
                             }
 
                             if (dataGridView1.Rows.Count > 0)
@@ -1808,16 +1810,16 @@ namespace UAssetGUI
                                 DataGridViewRow row = dataGridView1.Rows[0];
                                 if (row.Cells.Count >= 6 && row.Cells[1].Value != null && row.Cells[4].Value != null && row.Cells[5].Value != null && row.Cells[1].Value.Equals("MapEntry"))
                                 {
-                                    FName newKey = FName.FromString(row.Cells[4].Value as string);
-                                    FName newVal = FName.FromString(row.Cells[5].Value as string);
+                                    FName newKey = FName.FromString(asset, row.Cells[4].Value as string);
+                                    FName newVal = FName.FromString(asset, row.Cells[5].Value as string);
                                     if (newKey != null) mapKeyType = newKey;
                                     if (newVal != null) mapValueType = newVal;
                                 }
                             }
 
                             // Failsafe
-                            if (mapKeyType == null) mapKeyType = FName.FromString("IntProperty");
-                            if (mapValueType == null) mapValueType = FName.FromString("IntProperty");
+                            if (mapKeyType == null) mapKeyType = FName.FromString(asset, "IntProperty");
+                            if (mapValueType == null) mapValueType = FName.FromString(asset, "IntProperty");
 
                             var newData = new TMap<PropertyData, PropertyData>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
@@ -1825,7 +1827,7 @@ namespace UAssetGUI
                                 DataGridViewRow row = dataGridView1.Rows[i];
                                 if (row.Cells.Count <= 1 || row.Cells[1].Value == null || !row.Cells[1].Value.Equals("MapEntry")) continue;
 
-                                if (row.Tag is KeyValuePair<PropertyData, PropertyData> dictBit && dictBit.Key.PropertyType == mapKeyType && dictBit.Value.PropertyType == mapValueType)
+                                if (row.Tag is KeyValuePair<PropertyData, PropertyData> dictBit && dictBit.Key.PropertyType == mapKeyType.Value && dictBit.Value.PropertyType == mapValueType.Value)
                                 {
                                     newData.Add(dictBit.Key, dictBit.Value);
                                 }
@@ -1833,8 +1835,8 @@ namespace UAssetGUI
                                 {
                                     var newKeyProp = MainSerializer.TypeToClass(mapKeyType, usMap.Name, asset);
                                     var newValProp = MainSerializer.TypeToClass(mapValueType, usMap.Name, asset);
-                                    if (newKeyProp is StructPropertyData) ((StructPropertyData)newKeyProp).StructType = new FName("Generic");
-                                    if (newValProp is StructPropertyData) ((StructPropertyData)newValProp).StructType = new FName("Generic");
+                                    if (newKeyProp is StructPropertyData) ((StructPropertyData)newKeyProp).StructType = FName.DefineDummy(asset, "Generic");
+                                    if (newValProp is StructPropertyData) ((StructPropertyData)newValProp).StructType = FName.DefineDummy(asset, "Generic");
                                     newData.Add(newKeyProp, newValProp);
                                 }
                             }
@@ -1900,7 +1902,7 @@ namespace UAssetGUI
                                             else
                                             {
                                                 long.TryParse(enumValueValue, out long enumValue);
-                                                FName enumEntryName = FName.FromString(enumFrontValue);
+                                                FName enumEntryName = FName.FromString(asset, enumFrontValue);
                                                 if (enumEntryName != null) enumCat.Enum.Names.Add(new Tuple<FName, long>(enumEntryName, enumValue));
                                             }
                                         }
@@ -1947,7 +1949,7 @@ namespace UAssetGUI
                             List<PropertyData> origArr = usArr.Value.ToList();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), true);
                                 if (val != null) count++;
                                 newData.Add(val);
                             }
@@ -1961,7 +1963,7 @@ namespace UAssetGUI
                             {
                                 object val = dataGridView1.Rows[i].Cells[0].Value;
                                 if (val == null || !(val is string)) continue;
-                                newData.Add(FName.FromString((string)val));
+                                newData.Add(FName.FromString(asset, (string)val));
                             }
                             usArr2.Value = newData.ToArray();
                             pointerNode.Text = usArr2.Name.Value.Value + " (" + usArr2.Value.Length + ")";
@@ -1981,8 +1983,8 @@ namespace UAssetGUI
                                 }
                             }
 
-                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key);
-                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value);
+                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key, true);
+                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value, true);
 
                             if (currentEntry >= 0)
                             {

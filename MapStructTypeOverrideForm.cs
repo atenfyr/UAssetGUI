@@ -11,7 +11,7 @@ namespace UAssetGUI
 {
     public partial class MapStructTypeOverrideForm : Form
     {
-        public static Dictionary<string, Tuple<FName, FName>> MapStructTypeOverride = null;
+        public static Dictionary<string, Tuple<FString, FString>> MapStructTypeOverride = null;
 
         public MapStructTypeOverrideForm()
         {
@@ -84,7 +84,7 @@ namespace UAssetGUI
                 string keyName = row.Cells[1].Value as string;
                 string valueName = row.Cells[2].Value as string;
                 if (mapName == null || keyName == null || valueName == null) continue;
-                MapStructTypeOverride.Add(mapName, new Tuple<FName, FName>(FName.FromString(keyName), FName.FromString(valueName)));
+                MapStructTypeOverride.Add(mapName, new Tuple<FString, FString>(FString.FromString(keyName), FString.FromString(valueName)));
             }
             SaveToConfig();
         }
@@ -101,7 +101,7 @@ namespace UAssetGUI
             mstoDataGridView.BackgroundColor = UAGPalette.DataGridViewActiveColor;
             AddColumns(new string[] { "Map Name", "Key Struct Type Name", "Value Struct Type Name" });
 
-            foreach (KeyValuePair<string, Tuple<FName, FName>> entry in MapStructTypeOverride)
+            foreach (KeyValuePair<string, Tuple<FString, FString>> entry in MapStructTypeOverride)
             {
                 mstoDataGridView.Rows.Add(new object[] { entry.Key.ToString(), entry.Value.Item1?.ToString() ?? FString.NullCase, entry.Value.Item2?.ToString() ?? FString.NullCase });
             }
@@ -133,7 +133,7 @@ namespace UAssetGUI
             MapStructTypeOverride.Clear();
             foreach (KeyValuePair<string, string[]> entry in temp)
             {
-                MapStructTypeOverride.Add(entry.Key, new Tuple<FName, FName>(FName.FromString(entry.Value[0]), FName.FromString(entry.Value[1])));
+                MapStructTypeOverride.Add(entry.Key, new Tuple<FString, FString>(FString.FromString(entry.Value[0]), FString.FromString(entry.Value[1])));
             }
         }
 
@@ -149,7 +149,7 @@ namespace UAssetGUI
                 writer.Formatting = Formatting.Indented;
 
                 writer.WriteStartObject();
-                foreach (KeyValuePair<string, Tuple<FName, FName>> entry in MapStructTypeOverride)
+                foreach (KeyValuePair<string, Tuple<FString, FString>> entry in MapStructTypeOverride)
                 {
                     writer.WritePropertyName(entry.Key.ToString());
                     writer.WriteStartArray();

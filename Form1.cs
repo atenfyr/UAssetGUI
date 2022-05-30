@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
@@ -687,9 +688,9 @@ namespace UAssetGUI
                 {
                     selectedCell.Value = (rawValLower == "true" ? false : true).ToString();
                 }
-                else if (rawValLower == "us-ascii" || rawValLower == "utf-16")
+                else if (rawValLower == Encoding.ASCII.HeaderName || rawValLower == Encoding.Unicode.HeaderName)
                 {
-                    selectedCell.Value = rawValLower == "us-ascii" ? "utf-16" : "us-ascii";
+                    selectedCell.Value = rawValLower == Encoding.ASCII.HeaderName ? Encoding.Unicode.HeaderName : Encoding.ASCII.HeaderName;
                 }
                 else
                 {

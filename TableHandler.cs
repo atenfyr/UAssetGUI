@@ -1482,7 +1482,7 @@ namespace UAssetGUI
                         string ourValue = (string)row.Cells[0].Value;
                         string encoding = (string)row.Cells[1].Value;
                         if (string.IsNullOrWhiteSpace(encoding)) encoding = "ascii";
-                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.AddNameReference(FString.FromString(ourValue, encoding.Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII), true);
+                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.AddNameReference(FString.FromString(ourValue, encoding.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.ASCII), true);
                     }
                     break;
                 case TableHandlerMode.Imports:

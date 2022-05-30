@@ -145,7 +145,7 @@ namespace UAssetGUI
 
                             if (us is StringTableExport us2)
                             {
-                                var parentNode2 = new PointingTreeNode(us2.Table.TableNamespace + " (" + us2.Table.Count + ")", us2.Table);
+                                var parentNode2 = new PointingTreeNode((us2.Table?.TableNamespace?.ToString() ?? FString.NullCase) + " (" + us2.Table.Count + ")", us2.Table);
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
@@ -1289,9 +1289,9 @@ namespace UAssetGUI
                                         DataGridViewRow row = new DataGridViewRow();
                                         row.CreateCells(dataGridView1);
                                         row.Cells[0].Value = key.FEncode();
-                                        row.Cells[1].Value = key.Encoding.HeaderName;
+                                        row.Cells[1].Value = key?.Encoding?.HeaderName ?? Encoding.ASCII.HeaderName;
                                         row.Cells[2].Value = value.FEncode();
-                                        row.Cells[3].Value = value.Encoding.HeaderName;
+                                        row.Cells[3].Value = value?.Encoding?.HeaderName ?? Encoding.ASCII.HeaderName;
                                         row.HeaderCell.Value = Convert.ToString(i);
                                         rows.Add(row);
                                     }
@@ -1798,7 +1798,7 @@ namespace UAssetGUI
                                 usStrTable.Add(key, value);
                             }
 
-                            pointerNode.Text = usStrTable.TableNamespace + " (" + usStrTable.Count + ")";
+                            pointerNode.Text = (usStrTable.TableNamespace?.ToString() ?? FString.NullCase) + " (" + usStrTable.Count + ")";
                         }
                         else if (pointerNode.Pointer is MapPropertyData usMap)
                         {

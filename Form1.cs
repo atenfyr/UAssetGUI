@@ -687,6 +687,10 @@ namespace UAssetGUI
                 {
                     selectedCell.Value = (rawValLower == "true" ? false : true).ToString();
                 }
+                else if (rawValLower == "us-ascii" || rawValLower == "utf-16")
+                {
+                    selectedCell.Value = rawValLower == "us-ascii" ? "utf-16" : "us-ascii";
+                }
                 else
                 {
                     didSomething = false;

@@ -151,11 +151,13 @@ namespace UAssetGUI
 
         public static string FEncode(this FString val)
         {
+            if (val == null) return FString.NullCase;
             return val.Value.Replace("\n", "\\n").Replace("\r", "\\r");
         }
 
         public static FString FDecode(this string val, string encodingHeaderName)
         {
+            if (val == FString.NullCase) return null;
             return FString.FromString(val.Replace("\\n", "\n").Replace("\\r", "\r"), encodingHeaderName.Equals("utf-16") ? Encoding.Unicode : Encoding.ASCII);
         }
 

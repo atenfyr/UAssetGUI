@@ -220,6 +220,7 @@ namespace UAssetGUI
             switch (me.PropertyType.Value)
             {
                 case "StructProperty":
+                case "ClothLODData":
                     var struc = (StructPropertyData)me;
 
                     string decidedName = struc.Name.Value.Value;
@@ -291,118 +292,121 @@ namespace UAssetGUI
 
                 //try
                 {
+                    int columnIndexer = -1;
+                    int absoluteColumnIndexer = columnIndexer;
                     DataGridViewRow row = new DataGridViewRow();
                     row.CreateCells(dataGridView1);
-                    row.Cells[0].Value = thisPD.Name.ToString();
-                    row.Cells[1].Value = thisPD.PropertyType.ToString();
+                    row.Cells[++columnIndexer].Value = thisPD.Name.ToString();
+                    row.Cells[++columnIndexer].Value = thisPD.PropertyType.ToString();
                     if (thisPD is UnknownPropertyData)
                     {
-                        row.Cells[1].Value = ((UnknownPropertyData)thisPD).SerializingPropertyType.ToString();
-                        row.Cells[2].Value = "Unknown ser.";
-                        row.Cells[3].Value = ((UnknownPropertyData)thisPD).Value.ConvertByteArrayToString();
+                        row.Cells[columnIndexer].Value = ((UnknownPropertyData)thisPD).SerializingPropertyType.ToString();
+                        row.Cells[++columnIndexer].Value = "Unknown ser.";
+                        row.Cells[++columnIndexer].Value = ((UnknownPropertyData)thisPD).Value.ConvertByteArrayToString();
                     }
                     else
                     {
                         switch (thisPD.PropertyType.Value)
                         {
                             case "BoolProperty":
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = ((BoolPropertyData)thisPD).Value.ToString();
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = ((BoolPropertyData)thisPD).Value.ToString();
                                 break;
                             case "FloatProperty":
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = ((FloatPropertyData)thisPD).Value.ToString();
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = ((FloatPropertyData)thisPD).Value.ToString();
                                 break;
                             case "DoubleProperty":
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = ((DoublePropertyData)thisPD).Value.ToString();
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = ((DoublePropertyData)thisPD).Value.ToString();
                                 break;
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;
                                 int decidedIndex = objData.Value?.Index ?? 0;
-                                row.Cells[2].Value = decidedIndex;
+                                row.Cells[++columnIndexer].Value = decidedIndex;
                                 if (decidedIndex != 0) UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, objData.Value);
                                 break;
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = objData2.Value;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = objData2.Value;
                                 break;
                             case "RichCurveKey":
                                 var curveData = (RichCurveKeyPropertyData)thisPD;
-                                row.Cells[2].Value = curveData.InterpMode;
-                                row.Cells[3].Value = curveData.TangentMode;
-                                row.Cells[4].Value = curveData.Time;
-                                row.Cells[5].Value = curveData.Value;
-                                row.Cells[6].Value = curveData.ArriveTangent;
-                                row.Cells[7].Value = curveData.LeaveTangent;
+                                row.Cells[++columnIndexer].Value = curveData.InterpMode;
+                                row.Cells[++columnIndexer].Value = curveData.TangentMode;
+                                row.Cells[++columnIndexer].Value = curveData.Time;
+                                row.Cells[++columnIndexer].Value = curveData.Value;
+                                row.Cells[++columnIndexer].Value = curveData.ArriveTangent;
+                                row.Cells[++columnIndexer].Value = curveData.LeaveTangent;
                                 break;
                             case "TextProperty":
                                 var txtData = (TextPropertyData)thisPD;
-                                row.Cells[2].Value = txtData.HistoryType.ToString();
-                                row.Cells[2].ToolTipText = "HistoryType";
+                                row.Cells[++columnIndexer].Value = txtData.HistoryType.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "HistoryType";
                                 switch (txtData.HistoryType)
                                 {
                                     case TextHistoryType.None:
-                                        row.Cells[3].Value = txtData?.CultureInvariantString == null ? FString.NullCase : txtData.CultureInvariantString.ToString();
-                                        row.Cells[3].ToolTipText = "CultureInvariantString";
+                                        row.Cells[++columnIndexer].Value = txtData?.CultureInvariantString == null ? FString.NullCase : txtData.CultureInvariantString.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "CultureInvariantString";
                                         break;
                                     case TextHistoryType.Base:
-                                        row.Cells[3].Value = txtData?.Namespace == null ? FString.NullCase : txtData.Namespace.ToString();
-                                        row.Cells[3].ToolTipText = "Namespace";
-                                        row.Cells[4].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
-                                        row.Cells[4].ToolTipText = "Key";
-                                        row.Cells[5].Value = txtData?.CultureInvariantString == null ? FString.NullCase : txtData.CultureInvariantString.ToString();
-                                        row.Cells[5].ToolTipText = "CultureInvariantString";
+                                        row.Cells[++columnIndexer].Value = txtData?.Namespace == null ? FString.NullCase : txtData.Namespace.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "Namespace";
+                                        row.Cells[++columnIndexer].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "Key";
+                                        row.Cells[++columnIndexer].Value = txtData?.CultureInvariantString == null ? FString.NullCase : txtData.CultureInvariantString.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "CultureInvariantString";
                                         break;
                                     case TextHistoryType.StringTableEntry:
-                                        row.Cells[3].Value = txtData?.TableId == null ? FString.NullCase : txtData.TableId.ToString();
-                                        row.Cells[3].ToolTipText = "TableId";
-                                        row.Cells[4].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
-                                        row.Cells[4].ToolTipText = "Key";
+                                        row.Cells[++columnIndexer].Value = txtData?.TableId == null ? FString.NullCase : txtData.TableId.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "TableId";
+                                        row.Cells[++columnIndexer].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "Key";
                                         break;
                                     default:
                                         throw new NotImplementedException("Unimplemented display for " + txtData.HistoryType.ToString());
                                 }
                                 break;
                             case "NameProperty":
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = ((NamePropertyData)thisPD).ToString();
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = ((NamePropertyData)thisPD).ToString();
                                 break;
                             case "ViewTargetBlendParams":
                                 var viewTargetBlendParamsData = (ViewTargetBlendParamsPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = viewTargetBlendParamsData.BlendTime;
-                                row.Cells[4].Value = viewTargetBlendParamsData.BlendFunction;
-                                row.Cells[5].Value = viewTargetBlendParamsData.BlendExp;
-                                row.Cells[6].Value = viewTargetBlendParamsData.bLockOutgoing;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = viewTargetBlendParamsData.BlendTime;
+                                row.Cells[++columnIndexer].Value = viewTargetBlendParamsData.BlendFunction;
+                                row.Cells[++columnIndexer].Value = viewTargetBlendParamsData.BlendExp;
+                                row.Cells[++columnIndexer].Value = viewTargetBlendParamsData.bLockOutgoing;
                                 break;
                             case "EnumProperty":
                                 var enumData = (EnumPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = enumData.EnumType?.Value?.Value == null ? FString.NullCase : enumData.EnumType.ToString();
-                                row.Cells[4].Value = enumData.Value?.Value?.Value == null ? FString.NullCase : enumData.Value.ToString();
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = enumData.EnumType?.Value?.Value == null ? FString.NullCase : enumData.EnumType.ToString();
+                                row.Cells[++columnIndexer].Value = enumData.Value?.Value?.Value == null ? FString.NullCase : enumData.Value.ToString();
                                 //row.Cells[5].Value = enumData.Extra;
                                 break;
                             case "ByteProperty":
                                 var byteData = (BytePropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = byteData.GetEnumBase()?.Value.Value == null ? FString.NullCase : byteData.GetEnumBase()?.Value.Value;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = byteData.GetEnumBase()?.Value.Value == null ? FString.NullCase : byteData.GetEnumBase()?.Value.Value;
                                 if (byteData.ByteType == BytePropertyType.Byte)
                                 {
-                                    row.Cells[4].Value = byteData.Value;
+                                    row.Cells[++columnIndexer].Value = byteData.Value;
                                 }
                                 else
                                 {
-                                    row.Cells[4].Value = byteData.GetEnumFull()?.Value.Value == null ? FString.NullCase : byteData.GetEnumFull()?.Value.Value;
+                                    row.Cells[++columnIndexer].Value = byteData.GetEnumFull()?.Value.Value == null ? FString.NullCase : byteData.GetEnumFull()?.Value.Value;
                                 }
                                 break;
                             case "StructProperty":
-                                row.Cells[2].Value = ((StructPropertyData)thisPD).StructType.ToString();
+                            case "ClothLODData":
+                                row.Cells[++columnIndexer].Value = ((StructPropertyData)thisPD).StructType.ToString();
                                 break;
                             case "ArrayProperty":
                             case "SetProperty":
-                                row.Cells[2].Value = ((ArrayPropertyData)thisPD).ArrayType.ToString();
+                                row.Cells[++columnIndexer].Value = ((ArrayPropertyData)thisPD).ArrayType.ToString();
                                 break;
                             case "GameplayTagContainer":
                             case "MapProperty":
@@ -410,161 +414,161 @@ namespace UAssetGUI
                                 break;
                             case "Box":
                                 var boxData = (BoxPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = boxData.IsValid;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = boxData.IsValid;
                                 break;
                             case "MulticastDelegateProperty":
                                 var mdpData = (MulticastDelegatePropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = string.Empty;
                                 break;
                             case "LinearColor":
                                 var colorData = (LinearColorPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[2].ReadOnly = true;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[columnIndexer].ReadOnly = true;
                                 if (colorData.RawValue != null)
                                 {
-                                    row.Cells[2].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
-                                    row.Cells[2].ToolTipText = "Preview";
+                                    row.Cells[columnIndexer].Style.BackColor = ARGBtoRGB(LinearHelpers.Convert(colorData.Value));
+                                    row.Cells[columnIndexer].ToolTipText = "Preview";
                                 }
-                                row.Cells[3].Value = colorData.Value.R;
-                                row.Cells[3].ToolTipText = "Red";
-                                row.Cells[4].Value = colorData.Value.G;
-                                row.Cells[4].ToolTipText = "Green";
-                                row.Cells[5].Value = colorData.Value.B;
-                                row.Cells[5].ToolTipText = "Blue";
-                                row.Cells[6].Value = colorData.Value.A;
-                                row.Cells[6].ToolTipText = "Alpha";
+                                row.Cells[++columnIndexer].Value = colorData.Value.R;
+                                row.Cells[columnIndexer].ToolTipText = "Red";
+                                row.Cells[++columnIndexer].Value = colorData.Value.G;
+                                row.Cells[columnIndexer].ToolTipText = "Green";
+                                row.Cells[++columnIndexer].Value = colorData.Value.B;
+                                row.Cells[columnIndexer].ToolTipText = "Blue";
+                                row.Cells[++columnIndexer].Value = colorData.Value.A;
+                                row.Cells[columnIndexer].ToolTipText = "Alpha";
                                 break;
                             case "Color":
                                 var colorData2 = (ColorPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[2].ReadOnly = true;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[columnIndexer].ReadOnly = true;
                                 if (colorData2.RawValue != null)
                                 {
-                                    row.Cells[2].Style.BackColor = colorData2.Value;
-                                    row.Cells[2].ToolTipText = "Preview";
+                                    row.Cells[columnIndexer].Style.BackColor = colorData2.Value;
+                                    row.Cells[columnIndexer].ToolTipText = "Preview";
                                 }
-                                row.Cells[3].Value = colorData2.Value.R;
-                                row.Cells[3].ToolTipText = "Red";
-                                row.Cells[4].Value = colorData2.Value.G;
-                                row.Cells[4].ToolTipText = "Green";
-                                row.Cells[5].Value = colorData2.Value.B;
-                                row.Cells[5].ToolTipText = "Blue";
-                                row.Cells[6].Value = colorData2.Value.A;
-                                row.Cells[6].ToolTipText = "Alpha";
+                                row.Cells[++columnIndexer].Value = colorData2.Value.R;
+                                row.Cells[columnIndexer].ToolTipText = "Red";
+                                row.Cells[++columnIndexer].Value = colorData2.Value.G;
+                                row.Cells[columnIndexer].ToolTipText = "Green";
+                                row.Cells[++columnIndexer].Value = colorData2.Value.B;
+                                row.Cells[columnIndexer].ToolTipText = "Blue";
+                                row.Cells[++columnIndexer].Value = colorData2.Value.A;
+                                row.Cells[columnIndexer].ToolTipText = "Alpha";
                                 break;
                             case "Vector":
                                 var vectorData = (VectorPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vectorData.Value.X;
-                                row.Cells[3].ToolTipText = "X";
-                                row.Cells[4].Value = vectorData.Value.Y;
-                                row.Cells[4].ToolTipText = "Y";
-                                row.Cells[5].Value = vectorData.Value.Z;
-                                row.Cells[5].ToolTipText = "Z";
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = vectorData.Value.X;
+                                row.Cells[columnIndexer].ToolTipText = "X";
+                                row.Cells[++columnIndexer].Value = vectorData.Value.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                row.Cells[++columnIndexer].Value = vectorData.Value.Z;
+                                row.Cells[columnIndexer].ToolTipText = "Z";
                                 break;
                             case "Vector2D":
                                 var vector2DData = (Vector2DPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vector2DData.X;
-                                row.Cells[3].ToolTipText = "X";
-                                row.Cells[4].Value = vector2DData.Y;
-                                row.Cells[4].ToolTipText = "Y";
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = vector2DData.X;
+                                row.Cells[columnIndexer].ToolTipText = "X";
+                                row.Cells[++columnIndexer].Value = vector2DData.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
                                 break;
                             case "Vector4":
                                 var vector4DData = (Vector4PropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = vector4DData.X;
-                                row.Cells[3].ToolTipText = "X";
-                                row.Cells[4].Value = vector4DData.Y;
-                                row.Cells[4].ToolTipText = "Y";
-                                row.Cells[5].Value = vector4DData.Z;
-                                row.Cells[5].ToolTipText = "Y";
-                                row.Cells[6].Value = vector4DData.W;
-                                row.Cells[6].ToolTipText = "W";
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = vector4DData.X;
+                                row.Cells[columnIndexer].ToolTipText = "X";
+                                row.Cells[++columnIndexer].Value = vector4DData.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                row.Cells[++columnIndexer].Value = vector4DData.Z;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                row.Cells[++columnIndexer].Value = vector4DData.W;
+                                row.Cells[columnIndexer].ToolTipText = "W";
                                 break;
                             case "IntPoint":
                                 var intPointData = (IntPointPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = intPointData.Value[0];
-                                row.Cells[4].Value = intPointData.Value[1];
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = intPointData.Value[0];
+                                row.Cells[++columnIndexer].Value = intPointData.Value[1];
                                 break;
                             case "Guid":
                                 var guidData = (GuidPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = guidData.Value.ConvertToString();
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = guidData.Value.ConvertToString();
                                 break;
                             case "Rotator":
                                 var rotatorData = (RotatorPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = rotatorData.Value.Pitch;
-                                row.Cells[3].ToolTipText = "Pitch";
-                                row.Cells[4].Value = rotatorData.Value.Yaw;
-                                row.Cells[4].ToolTipText = "Yaw";
-                                row.Cells[5].Value = rotatorData.Value.Roll;
-                                row.Cells[5].ToolTipText = "Roll";
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = rotatorData.Value.Pitch;
+                                row.Cells[columnIndexer].ToolTipText = "Pitch";
+                                row.Cells[++columnIndexer].Value = rotatorData.Value.Yaw;
+                                row.Cells[columnIndexer].ToolTipText = "Yaw";
+                                row.Cells[++columnIndexer].Value = rotatorData.Value.Roll;
+                                row.Cells[columnIndexer].ToolTipText = "Roll";
                                 break;
                             case "Quat":
                                 var quatData = (QuatPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = quatData.Value.X;
-                                row.Cells[3].ToolTipText = "X";
-                                row.Cells[4].Value = quatData.Value.Y;
-                                row.Cells[4].ToolTipText = "Y";
-                                row.Cells[5].Value = quatData.Value.Z;
-                                row.Cells[5].ToolTipText = "Z";
-                                row.Cells[6].Value = quatData.Value.W;
-                                row.Cells[6].ToolTipText = "W";
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = quatData.Value.X;
+                                row.Cells[columnIndexer].ToolTipText = "X";
+                                row.Cells[++columnIndexer].Value = quatData.Value.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                row.Cells[++columnIndexer].Value = quatData.Value.Z;
+                                row.Cells[columnIndexer].ToolTipText = "Z";
+                                row.Cells[++columnIndexer].Value = quatData.Value.W;
+                                row.Cells[columnIndexer].ToolTipText = "W";
                                 break;
                             case "SmartName":
                                 var smartNameData = (SmartNamePropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = smartNameData.DisplayName == null ? FString.NullCase : smartNameData.DisplayName.ToString();
-                                row.Cells[3].ToolTipText = "DisplayName";
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = smartNameData.DisplayName == null ? FString.NullCase : smartNameData.DisplayName.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "DisplayName";
                                 if (asset.GetCustomVersion<FAnimPhysObjectVersion>() < FAnimPhysObjectVersion.RemoveUIDFromSmartNameSerialize)
                                 {
-                                    row.Cells[4].Value = smartNameData.SmartNameID;
-                                    row.Cells[4].ToolTipText = "SmartNameID";
+                                    row.Cells[++columnIndexer].Value = smartNameData.SmartNameID;
+                                    row.Cells[columnIndexer].ToolTipText = "SmartNameID";
                                 }
                                 if (asset.GetCustomVersion<FAnimPhysObjectVersion>() < FAnimPhysObjectVersion.SmartNameRefactorForDeterministicCooking)
                                 {
-                                    row.Cells[5].Value = smartNameData.TempGUID == null ? FString.NullCase : smartNameData.TempGUID.ConvertToString();
-                                    row.Cells[5].ToolTipText = "TempGUID";
+                                    row.Cells[++columnIndexer].Value = smartNameData.TempGUID == null ? FString.NullCase : smartNameData.TempGUID.ConvertToString();
+                                    row.Cells[columnIndexer].ToolTipText = "TempGUID";
                                 }
                                 break;
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
-                                row.Cells[2].Value = (strPropData.Value?.Encoding ?? Encoding.ASCII).HeaderName;
-                                row.Cells[3].Value = strPropData.Value?.Value == null ? FString.NullCase : Convert.ToString(strPropData.Value.Value);
+                                row.Cells[++columnIndexer].Value = (strPropData.Value?.Encoding ?? Encoding.ASCII).HeaderName;
+                                row.Cells[++columnIndexer].Value = strPropData.Value?.Value == null ? FString.NullCase : Convert.ToString(strPropData.Value.Value);
                                 break;
                             case "SoftObjectPath":
                             case "SoftAssetPath":
                             case "SoftClassPath":
                                 var sopPropData = (SoftObjectPathPropertyData)thisPD;
-                                row.Cells[2].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = string.Empty;
                                 if (asset.EngineVersion < UE4Version.VER_UE4_ADDED_SOFT_OBJECT_PATH)
                                 {
-                                    row.Cells[3].Value = sopPropData.Path.ToString();
-                                    row.Cells[3].ToolTipText = "Path";
+                                    row.Cells[++columnIndexer].Value = sopPropData.Path.ToString();
+                                    row.Cells[columnIndexer].ToolTipText = "Path";
                                 }
                                 else
                                 {
-                                    row.Cells[3].Value = sopPropData.AssetPathName == null ? FString.NullCase : sopPropData.AssetPathName.ToString();
-                                    row.Cells[3].ToolTipText = "AssetPathName";
-                                    row.Cells[4].Value = sopPropData.SubPathString == null ? FString.NullCase : sopPropData.SubPathString.ToString();
-                                    row.Cells[3].ToolTipText = "SubPathString";
+                                    row.Cells[++columnIndexer].Value = sopPropData.AssetPathName == null ? FString.NullCase : sopPropData.AssetPathName.ToString();
+                                    row.Cells[columnIndexer].ToolTipText = "AssetPathName";
+                                    row.Cells[++columnIndexer].Value = sopPropData.SubPathString == null ? FString.NullCase : sopPropData.SubPathString.ToString();
+                                    row.Cells[columnIndexer].ToolTipText = "SubPathString";
                                 }
                                 break;
                             default:
-                                row.Cells[2].Value = string.Empty;
-                                row.Cells[3].Value = Convert.ToString(thisPD.RawValue);
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = Convert.ToString(thisPD.RawValue);
                                 break;
                         }
                     }
 
-                    row.Cells[8].Value = thisPD.DuplicationIndex;
-                    row.Cells[9].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
-                    row.Cells[9].ReadOnly = true;
+                    row.Cells[absoluteColumnIndexer + 9].Value = thisPD.DuplicationIndex;
+                    row.Cells[absoluteColumnIndexer + 10].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
+                    row.Cells[absoluteColumnIndexer + 10].ReadOnly = true;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -581,14 +585,15 @@ namespace UAssetGUI
             try
             {
                 DataGridViewRow row = dataGridView1.Rows[rowNum];
-                object nameB = row.Cells[0].Value;
-                object typeB = row.Cells[1].Value;
-                object transformB = row.Cells[2].Value;
-                object value1B = row.Cells[3].Value;
-                object value2B = row.Cells[4].Value;
-                object value3B = row.Cells[5].Value;
-                object value4B = row.Cells[6].Value;
-                object value5B = row.Cells[7].Value;
+                int columnIndexer = -1;
+                object nameB = row.Cells[++columnIndexer].Value;
+                object typeB = row.Cells[++columnIndexer].Value;
+                object transformB = row.Cells[++columnIndexer].Value;
+                object value1B = row.Cells[++columnIndexer].Value;
+                object value2B = row.Cells[++columnIndexer].Value;
+                object value3B = row.Cells[++columnIndexer].Value;
+                object value4B = row.Cells[++columnIndexer].Value;
+                object value5B = row.Cells[++columnIndexer].Value;
 
                 if (nameB == null || typeB == null) return null;
                 if (!(nameB is string) || !(typeB is string)) return null;
@@ -1949,7 +1954,7 @@ namespace UAssetGUI
                             List<PropertyData> origArr = usArr.Value.ToList();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), true);
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), !(origArr.ElementAtOrDefault(i) is StructPropertyData));
                                 if (val != null) count++;
                                 newData.Add(val);
                             }

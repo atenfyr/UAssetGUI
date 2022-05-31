@@ -9,8 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
-using UAssetAPI.PropertyTypes;
-using UAssetAPI.StructTypes;
+using UAssetAPI.PropertyTypes.Objects;
+using UAssetAPI.PropertyTypes.Structs;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
@@ -98,6 +99,10 @@ namespace UAssetGUI
                 ScrollBars = ScrollBars.Both
             };
             Controls.Add(jsonView);
+
+            importBinaryData.Visible = false;
+            exportBinaryData.Visible = false;
+            setBinaryData.Visible = false;
 
             // Enable double buffering to look nicer
             if (!SystemInformation.TerminalServerSession)
@@ -734,6 +739,12 @@ namespace UAssetGUI
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
             listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
             comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
+            importBinaryData.Location = new Point(dataGridView1.Location.X, comboSpecifyVersion.Location.Y);
+            exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
+            setBinaryData.Location = new Point(exportBinaryData.Location.X + exportBinaryData.Size.Width + 5, importBinaryData.Location.Y);
+            importBinaryData.Size = new Size(importBinaryData.Width, comboSpecifyVersion.Height); importBinaryData.Font = new Font(importBinaryData.Font.FontFamily, 6.75f, importBinaryData.Font.Style);
+            exportBinaryData.Size = new Size(exportBinaryData.Width, comboSpecifyVersion.Height); exportBinaryData.Font = importBinaryData.Font;
+            setBinaryData.Size = new Size(setBinaryData.Width, comboSpecifyVersion.Height); setBinaryData.Font = importBinaryData.Font;
         }
 
         private void frm_sizeChanged(object sender, EventArgs e)
@@ -955,6 +966,71 @@ namespace UAssetGUI
             ajustesForm.StartPosition = FormStartPosition.CenterParent;
             ajustesForm.ShowDialog(this);
             ajustesForm.Dispose();
+        }
+
+        private void importBinaryData_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Binary data (*.dat)|*.dat|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    {
+                        usCategory.Extras = File.ReadAllBytes(openFileDialog.FileName);
+                        if (tableEditor != null)
+                        {
+                            tableEditor.Save(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void exportBinaryData_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "Binary data (*.dat)|*.dat|All files (*.*)|*.*";
+                dialog.FilterIndex = 1;
+                dialog.RestoreDirectory = true;
+
+                DialogResult res = dialog.ShowDialog();
+                if (res == DialogResult.OK)
+                {
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    {
+                        File.WriteAllBytes(dialog.FileName, usCategory.Extras);
+                    }
+                }
+            }
+        }
+
+        private void setBinaryData_Click(object sender, EventArgs e)
+        {
+            TextPrompt replacementPrompt = new TextPrompt()
+            {
+                DisplayText = "How many null bytes?"
+            };
+
+            replacementPrompt.StartPosition = FormStartPosition.CenterParent;
+
+            if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
+            {
+                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                {
+                    usCategory.Extras = new byte[numBytes];
+                    if (tableEditor != null)
+                    {
+                        tableEditor.Save(true);
+                    }
+                }
+            }
+            replacementPrompt.Dispose();
+
         }
     }
 }

@@ -8,8 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.Kismet.Bytecode;
-using UAssetAPI.PropertyTypes;
-using UAssetAPI.StructTypes;
+using UAssetAPI.PropertyTypes.Objects;
+using UAssetAPI.PropertyTypes.Structs;
+using UAssetAPI.UnrealTypes;
 using static UAssetAPI.Kismet.KismetSerializer;
 
 namespace UAssetGUI
@@ -48,7 +49,8 @@ namespace UAssetGUI
         StructData,
         ClassData,
         EnumData,
-        UPropertyData
+        UPropertyData,
+        ByteArray
     }
 
     public class PointingTreeNode : TreeNode
@@ -201,7 +203,7 @@ namespace UAssetGUI
                             }
 
                             {
-                                var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us.Extras);
+                                var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us, PointingTreeNodeType.ByteArray);
                                 categoryNode.Nodes.Add(parentNode3);
                             }
 
@@ -815,6 +817,9 @@ namespace UAssetGUI
             Form1 origForm = (Form1)dataGridView1.Parent;
             var byteView1 = origForm.byteView1;
             byteView1.Visible = false;
+            origForm.importBinaryData.Visible = false;
+            origForm.exportBinaryData.Visible = false;
+            origForm.setBinaryData.Visible = false;
             var jsonView = origForm.jsonView;
             jsonView.Visible = false;
             dataGridView1.Visible = true;
@@ -1273,6 +1278,19 @@ namespace UAssetGUI
                                         dataGridView1.AllowUserToAddRows = false;
                                         standardRendering = false;
                                         break;
+                                    case PointingTreeNodeType.ByteArray:
+                                        Control currentlyFocusedControl = ((Form1)dataGridView1.Parent).ActiveControl;
+                                        dataGridView1.Visible = false;
+                                        byteView1.SetBytes(new byte[] { });
+                                        byteView1.SetBytes(usCategory.Extras);
+                                        byteView1.Visible = true;
+                                        origForm.importBinaryData.Visible = true;
+                                        origForm.exportBinaryData.Visible = true;
+                                        origForm.setBinaryData.Visible = true;
+                                        currentlyFocusedControl.Focus();
+                                        origForm.ForceResize();
+                                        standardRendering = false;
+                                        break;
                                 }
 
                                 break;
@@ -1380,16 +1398,6 @@ namespace UAssetGUI
                             case PropertyData[] usRealArr:
                                 renderingArr = usRealArr;
                                 dataGridView1.AllowUserToAddRows = false;
-                                break;
-                            case byte[] bytes:
-                                Control currentlyFocusedControl = ((Form1)dataGridView1.Parent).ActiveControl;
-                                dataGridView1.Visible = false;
-                                byteView1.SetBytes(new byte[] { });
-                                byteView1.SetBytes(bytes);
-                                byteView1.Visible = true;
-                                currentlyFocusedControl.Focus();
-                                origForm.ForceResize();
-                                standardRendering = false;
                                 break;
                             case KismetExpression[] bytecode:
                                 UAssetAPI.Kismet.KismetSerializer.asset = asset;

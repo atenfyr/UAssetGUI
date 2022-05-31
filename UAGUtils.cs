@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
-using UAssetAPI.PropertyTypes;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {

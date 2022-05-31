@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
@@ -75,7 +76,7 @@ namespace UAssetGUI
                     butto.FlatAppearance.BorderColor = UAGPalette.ForeColor;
                     butto.FlatAppearance.BorderSize = 1;
                     butto.BackColor = UAGPalette.ButtonBackColor;
-                    butto.MinimumSize = new Size(0, 26);
+                    butto.MinimumSize = new Size(0, 10);
                 }
                 if (ctrl2 is ComboBox combo)
                 {

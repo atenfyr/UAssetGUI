@@ -1,4 +1,5 @@
-﻿
+﻿using UAssetAPI.UnrealTypes;
+
 namespace UAssetGUI
 {
     partial class MapStructTypeOverrideForm

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
@@ -57,6 +58,9 @@ namespace UAssetGUI
             this.nameMapContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.replaceAllReferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listView1 = new UAssetGUI.ColorfulTreeView();
+            this.importBinaryData = new System.Windows.Forms.Button();
+            this.exportBinaryData = new System.Windows.Forms.Button();
+            this.setBinaryData = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.nameMapContext.SuspendLayout();
@@ -303,11 +307,47 @@ namespace UAssetGUI
             this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
             // 
+            // importBinaryData
+            // 
+            this.importBinaryData.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.importBinaryData.Location = new System.Drawing.Point(381, 1);
+            this.importBinaryData.Name = "importBinaryData";
+            this.importBinaryData.Size = new System.Drawing.Size(75, 23);
+            this.importBinaryData.TabIndex = 4;
+            this.importBinaryData.Text = "Import";
+            this.importBinaryData.UseVisualStyleBackColor = true;
+            this.importBinaryData.Click += new System.EventHandler(this.importBinaryData_Click);
+            // 
+            // exportBinaryData
+            // 
+            this.exportBinaryData.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.exportBinaryData.Location = new System.Drawing.Point(462, 1);
+            this.exportBinaryData.Name = "exportBinaryData";
+            this.exportBinaryData.Size = new System.Drawing.Size(75, 23);
+            this.exportBinaryData.TabIndex = 5;
+            this.exportBinaryData.Text = "Export";
+            this.exportBinaryData.UseVisualStyleBackColor = true;
+            this.exportBinaryData.Click += new System.EventHandler(this.exportBinaryData_Click);
+            // 
+            // setBinaryData
+            // 
+            this.setBinaryData.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.setBinaryData.Location = new System.Drawing.Point(543, 1);
+            this.setBinaryData.Name = "setBinaryData";
+            this.setBinaryData.Size = new System.Drawing.Size(75, 23);
+            this.setBinaryData.TabIndex = 6;
+            this.setBinaryData.Text = "Set null...";
+            this.setBinaryData.UseVisualStyleBackColor = true;
+            this.setBinaryData.Click += new System.EventHandler(this.setBinaryData_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.setBinaryData);
+            this.Controls.Add(this.exportBinaryData);
+            this.Controls.Add(this.importBinaryData);
             this.Controls.Add(this.comboSpecifyVersion);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.dataGridView1);
@@ -349,6 +389,9 @@ namespace UAssetGUI
         private ToolStripMenuItem mapStructTypeOverridesToolStripMenuItem;
         public ComboBox comboSpecifyVersion;
         private ToolStripMenuItem settingsToolStripMenuItem;
+        public Button importBinaryData;
+        public Button exportBinaryData;
+        public Button setBinaryData;
     }
 }
 

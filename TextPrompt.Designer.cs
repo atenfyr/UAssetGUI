@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {

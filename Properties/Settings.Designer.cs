@@ -7,6 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI.Properties {
     

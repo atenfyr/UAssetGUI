@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {

@@ -739,6 +739,7 @@ namespace UAssetGUI
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
             listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
             comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
+
             importBinaryData.Location = new Point(dataGridView1.Location.X, comboSpecifyVersion.Location.Y);
             exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
             setBinaryData.Location = new Point(exportBinaryData.Location.X + exportBinaryData.Size.Width + 5, importBinaryData.Location.Y);
@@ -981,6 +982,7 @@ namespace UAssetGUI
                     if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
                     {
                         usCategory.Extras = File.ReadAllBytes(openFileDialog.FileName);
+                        SetUnsavedChanges(true);
                         if (tableEditor != null)
                         {
                             tableEditor.Save(true);
@@ -1023,6 +1025,7 @@ namespace UAssetGUI
                 if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
                 {
                     usCategory.Extras = new byte[numBytes];
+                    SetUnsavedChanges(true);
                     if (tableEditor != null)
                     {
                         tableEditor.Save(true);

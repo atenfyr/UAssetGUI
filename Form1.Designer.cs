@@ -336,7 +336,7 @@ namespace UAssetGUI
             this.setBinaryData.Name = "setBinaryData";
             this.setBinaryData.Size = new System.Drawing.Size(75, 23);
             this.setBinaryData.TabIndex = 6;
-            this.setBinaryData.Text = "Set null...";
+            this.setBinaryData.Text = "Set to null...";
             this.setBinaryData.UseVisualStyleBackColor = true;
             this.setBinaryData.Click += new System.EventHandler(this.setBinaryData_Click);
             // 

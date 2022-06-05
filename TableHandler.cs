@@ -1605,7 +1605,7 @@ namespace UAssetGUI
                                     }
                                     break;
                                 case ExportDetailsParseType.FName:
-                                    settingVal = new FName(asset);
+                                    settingVal = null;
                                     if (currentVal is string rawFName) // blah(0)
                                     {
                                         settingVal = FName.FromString(asset, rawFName);

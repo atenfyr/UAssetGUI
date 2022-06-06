@@ -979,9 +979,18 @@ namespace UAssetGUI
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
                     {
-                        usCategory.Extras = File.ReadAllBytes(openFileDialog.FileName);
+                        byte[] rawData = File.ReadAllBytes(openFileDialog.FileName);
+                        if (pointerNode.Pointer is NormalExport usCategory)
+                        {
+                            usCategory.Extras = rawData;
+                        }
+                        else if (pointerNode.Pointer is RawExport usRawCategory)
+                        {
+                            usRawCategory.Data = rawData;
+                        }
+
                         SetUnsavedChanges(true);
                         if (tableEditor != null)
                         {
@@ -1003,9 +1012,19 @@ namespace UAssetGUI
                 DialogResult res = dialog.ShowDialog();
                 if (res == DialogResult.OK)
                 {
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
                     {
-                        File.WriteAllBytes(dialog.FileName, usCategory.Extras);
+                        byte[] rawData = new byte[0];
+                        if (pointerNode.Pointer is NormalExport usCategory)
+                        {
+                            rawData = usCategory.Extras;
+                        }
+                        else if (pointerNode.Pointer is RawExport usRawCategory)
+                        {
+                            rawData = usRawCategory.Data;
+                        }
+
+                        File.WriteAllBytes(dialog.FileName, rawData);
                     }
                 }
             }
@@ -1022,9 +1041,17 @@ namespace UAssetGUI
 
             if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
             {
-                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Pointer is NormalExport usCategory && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
                 {
-                    usCategory.Extras = new byte[numBytes];
+                    if (pointerNode.Pointer is NormalExport usCategory)
+                    {
+                        usCategory.Extras = new byte[numBytes];
+                    }
+                    else if (pointerNode.Pointer is RawExport usRawCategory)
+                    {
+                        usRawCategory.Data = new byte[numBytes];
+                    }
+                    
                     SetUnsavedChanges(true);
                     if (tableEditor != null)
                     {

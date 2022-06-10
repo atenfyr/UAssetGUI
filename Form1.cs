@@ -256,6 +256,12 @@ namespace UAssetGUI
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
+                UE4Version selectedVer = UE4Version.UNKNOWN;
+                if (args.Length > 2 && !Enum.TryParse(args[2], out selectedVer))
+                {
+                    if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = (UE4Version)selectedVerRaw;
+                }
+                if (selectedVer > UE4Version.UNKNOWN) SetParsingVersion(selectedVer);
                 LoadFileAt(args[1]);
             }
         }

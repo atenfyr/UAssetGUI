@@ -21,6 +21,7 @@ namespace UAssetGUI
         internal DataGridView dataGridView1;
         internal ColorfulTreeView listView1;
         internal MenuStrip menuStrip1;
+        internal AC7Decrypt ac7decrypt;
 
         public TableHandler tableEditor;
         public ByteViewer byteView1;
@@ -134,6 +135,8 @@ namespace UAssetGUI
                     isDropDownOpened[entry] = false;
                 };
             }
+
+            ac7decrypt = new AC7Decrypt();
         }
 
         private static Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();
@@ -305,11 +308,24 @@ namespace UAssetGUI
             }
         }
 
+        public uint GetFileSignature(string path)
+        {
+            byte[] buffer = new byte[4];
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                var bytes_read = fs.Read(buffer, 0, buffer.Length);
+                fs.Close();
+            }
+            return BitConverter.ToUInt32(buffer, 0);
+        }
+
         public void LoadFileAt(string filePath)
         {
             dataGridView1.Visible = true;
             byteView1.Visible = false;
             jsonView.Visible = false;
+
+            bool didACE7Decrypt = false;
 
             try
             {
@@ -330,6 +346,13 @@ namespace UAssetGUI
                     default:
                         MapStructTypeOverrideForm.LoadFromConfig();
 
+                        uint sig = GetFileSignature(filePath);
+                        if (sig == UAsset.ACE7_MAGIC)
+                        {
+                            // Decrypt file in-situ
+                            ac7decrypt.Decrypt(filePath, filePath);
+                            didACE7Decrypt = true;
+                        }
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
@@ -375,6 +398,11 @@ namespace UAssetGUI
                 }
 
                 bool failedToMaintainBinaryEquality = !string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.VerifyBinaryEquality();
+
+                if (didACE7Decrypt)
+                {
+                    MessageBox.Show("This file uses Ace Combat 7 encryption and was decrypted in-situ.", "Notice");
+                }
 
                 if (failedCategoryCount > 0)
                 {

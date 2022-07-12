@@ -189,10 +189,10 @@ namespace UAssetGUI
 
                 AdjustDGV(frm1.dataGridView1);
 
-                if (frm1.tableEditor != null)
+                /*if (frm1.tableEditor != null)
                 {
                     frm1.tableEditor.Save(true);
-                }
+                }*/
             }
             if (frm is MapStructTypeOverrideForm frm2)
             {

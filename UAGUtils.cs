@@ -84,7 +84,7 @@ namespace UAssetGUI
             {
                 Font styFont = new Font(dgv.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                 sty.Font = styFont;
-                sty.ForeColor = Color.Blue;
+                sty.ForeColor = UAGPalette.LinkColor;
             }
             row.Cells[column].Style = sty;
         }

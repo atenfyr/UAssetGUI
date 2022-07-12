@@ -1187,7 +1187,7 @@ namespace UAssetGUI
                                                 DataGridViewCellStyle sty = new DataGridViewCellStyle();
                                                 Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                                                 sty.Font = styFont;
-                                                sty.ForeColor = Color.Blue;
+                                                sty.ForeColor = UAGPalette.LinkColor;
                                                 row.Cells[3].Style = sty;
                                                 classRows.Add(row);
                                             }
@@ -1215,7 +1215,7 @@ namespace UAssetGUI
                                                     DataGridViewCellStyle sty = new DataGridViewCellStyle();
                                                     Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                                                     sty.Font = styFont;
-                                                    sty.ForeColor = Color.Blue;
+                                                    sty.ForeColor = UAGPalette.LinkColor;
                                                     row.Cells[3].Style = sty;
                                                 }
                                                 classRows.Add(row);
@@ -1351,7 +1351,7 @@ namespace UAssetGUI
                                                 DataGridViewCellStyle sty = new DataGridViewCellStyle();
                                                 Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
                                                 sty.Font = styFont;
-                                                sty.ForeColor = Color.Blue;
+                                                sty.ForeColor = UAGPalette.LinkColor;
                                                 row.Cells[3].Style = sty;
 
                                                 row.Cells[4].Value = mapKeyType.ToString();

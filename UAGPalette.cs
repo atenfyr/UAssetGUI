@@ -36,6 +36,7 @@ namespace UAssetGUI
         public static Color HighlightForeColor = SystemColors.HighlightText;
         public static Color InactiveColor = Color.FromArgb(211, 211, 211);
         public static Color DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
+        public static Color LinkColor = Color.Blue;
         private static UAGTheme CurrentTheme = UAGTheme.Light;
 
         public static void InitializeTheme()
@@ -138,6 +139,7 @@ namespace UAssetGUI
                     HighlightForeColor = SystemColors.HighlightText;
                     InactiveColor = Color.FromArgb(211, 211, 211);
                     DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
+                    LinkColor = Color.Blue;
                     break;
                 case UAGTheme.Dark:
                     BackColor = Color.FromArgb(46, 46, 46);
@@ -147,6 +149,7 @@ namespace UAssetGUI
                     HighlightForeColor = BackColor;
                     InactiveColor = Color.FromArgb(45, 45, 45);
                     DataGridViewActiveColor = Color.FromArgb(35, 35, 35);
+                    LinkColor = Color.FromArgb(250, 148, 46);
                     break;
             }
 
@@ -185,6 +188,11 @@ namespace UAssetGUI
                 frm1.byteView1.BackColor = Color.White;
 
                 AdjustDGV(frm1.dataGridView1);
+
+                if (frm1.tableEditor != null)
+                {
+                    frm1.tableEditor.Save(true);
+                }
             }
             if (frm is MapStructTypeOverrideForm frm2)
             {

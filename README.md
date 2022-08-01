@@ -1,9 +1,12 @@
 # UAssetGUI
-This is a work-in-progress .NET GUI to facilitate reading and modifying Unreal Engine 4 game assets using [my UAssetAPI](https://github.com/atenfyr/UAssetAPI).
+Open-source software for viewing and modifying Unreal Engine 4 game assets by hand.
 
-## Getting Started
+<img src="https://i.imgur.com/G31NzYA.png" align="center">
+
+## Installation
 You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository](https://github.com/atenfyr/UAssetGUI/releases).
 
+## Compilation
 If you'd like to compile UAssetGUI for yourself, read on:
 
 ### Prerequisites
@@ -36,12 +39,9 @@ git clone https://github.com/atenfyr/UAssetGUI.git
 6. Press the "Start" button or press F5 to compile and open UAssetGUI.
 
 ## Contributing
-Contributions are always welcome to this repository, and they're what make the open source community so great. Any contributions, whether through pull requests or issues, that you make are greatly appreciated.
+Any contributions, whether through pull requests or issues, that you make are greatly appreciated.
 
 If you find an Unreal Engine 4 .uasset that display "failed to maintain binary equality," feel free to submit an issue on [the UAssetAPI issues page](https://github.com/atenfyr/UAssetAPI/issues) with a copy of the asset in question along with the name of the game and the Unreal version that it was cooked with.
 
 ## License
 UAssetAPI and UAssetGUI are distributed under the MIT license, which you can view in detail in the [LICENSE file](LICENSE).
-
-## Sample image
-![Screenshot](https://i.imgur.com/MYRTXuM.png)

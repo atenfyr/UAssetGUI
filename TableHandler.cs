@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.ExportTypes;
 using UAssetAPI.Kismet.Bytecode;
 using UAssetAPI.PropertyTypes.Objects;
 using UAssetAPI.PropertyTypes.Structs;
@@ -321,6 +322,10 @@ namespace UAssetGUI
                             case "DoubleProperty":
                                 row.Cells[++columnIndexer].Value = string.Empty;
                                 row.Cells[++columnIndexer].Value = ((DoublePropertyData)thisPD).Value.ToString();
+                                break;
+                            case "FrameNumber":
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = ((FrameNumberPropertyData)thisPD).Value.Value.ToString();
                                 break;
                             case "ObjectProperty":
                                 var objData = (ObjectPropertyData)thisPD;

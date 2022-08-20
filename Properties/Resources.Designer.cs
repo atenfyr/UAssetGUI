@@ -7,12 +7,11 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-using UAssetAPI.UnrealTypes;
 
-namespace UAssetGUI.Properties {
-    using System;
-    
-    
+namespace UAssetGUI.Properties
+{
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

@@ -594,6 +594,12 @@ namespace UAssetGUI
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (tableEditor == null) return;
+            if (dataGridView1.IsCurrentCellInEditMode)
+            {
+                // fallback to normal operating system buffer
+                SendKeys.Send("^C");
+                return;
+            }
 
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
             object objectToCopy = null;
@@ -666,7 +672,11 @@ namespace UAssetGUI
                     newClipboardText[i] = currentRow.Cells[i].Value?.ToString() ?? string.Empty;
                 }
                 Clipboard.SetText(JsonConvert.SerializeObject(newClipboardText, Formatting.None));
+                return;
             }
+
+            // fallback to normal operating system buffer
+            SendKeys.Send("^C");
         }
 
         private TreeNode SearchForTreeNode(TreeView node, int expNum)
@@ -693,6 +703,13 @@ namespace UAssetGUI
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.IsCurrentCellInEditMode)
+            {
+                // fallback to normal operating system buffer
+                SendKeys.Send("^V");
+                return;
+            }
+
             if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) return;
             if (tableEditor == null) return;
 
@@ -818,12 +835,16 @@ namespace UAssetGUI
                     string[] rawData = JsonConvert.DeserializeObject<string[]>(Clipboard.GetText());
                     dataGridView1.Rows.Insert(rowIndex, rawData);
                     SetUnsavedChanges(true);
+                    return;
                 }
                 catch (Exception)
                 {
                     // the thing we're trying to paste probably isn't a string array
                 }
             }
+
+            // fallback to normal operating system buffer
+            SendKeys.Send("^V");
         }
 
         private void dataGridEditCell(object sender, EventArgs e)
@@ -1323,6 +1344,11 @@ namespace UAssetGUI
             }
             replacementPrompt.Dispose();
 
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            dataGridView1.BeginEdit(true);
         }
     }
 }

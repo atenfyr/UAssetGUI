@@ -847,6 +847,121 @@ namespace UAssetGUI
             SendKeys.Send("^V");
         }
 
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.IsCurrentCellInEditMode)
+            {
+                // fallback to normal operating system buffer
+                SendKeys.Send("{DEL}");
+                return;
+            }
+
+            if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) return;
+            if (tableEditor == null) return;
+
+            int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
+
+            switch (tableEditor.mode)
+            {
+                case TableHandlerMode.ExportData:
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    {
+                        if (pointerNode.Type == PointingTreeNodeType.ByteArray)
+                        {
+                            if (pointerNode.Pointer is RawExport)
+                            {
+                                ((RawExport)pointerNode.Pointer).Data = new byte[0];
+                            }
+                            else if (pointerNode.Pointer is NormalExport)
+                            {
+                                ((NormalExport)pointerNode.Pointer).Extras = new byte[0];
+                            }
+
+                            return;
+                        }
+                        else if (pointerNode.Pointer is StructPropertyData copyingDat1)
+                        {
+                            if (rowIndex < 0) return;
+                            copyingDat1.Value.RemoveAt(rowIndex);
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else if (pointerNode.Pointer is ArrayPropertyData copyingDat2)
+                        {
+                            if (rowIndex < 0) return;
+                            List<PropertyData> origArr = copyingDat2.Value.ToList();
+                            origArr.RemoveAt(rowIndex);
+                            copyingDat2.Value = origArr.ToArray();
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else if (pointerNode.Pointer is Export || (listView1.Focused && pointerNode.WillCopyWholeExport))
+                        {
+                            switch (pointerNode.Type)
+                            {
+                                case PointingTreeNodeType.Normal:
+                                    if (listView1.Focused)
+                                    {
+                                        DialogResult res = MessageBox.Show("Are you sure you want to delete this export?\nTHIS OPERATION CANNOT BE UNDONE!", DisplayVersion, MessageBoxButtons.OKCancel);
+                                        if (res != DialogResult.OK) break;
+
+                                        tableEditor.asset.Exports.RemoveAt(pointerNode.ExportNum);
+
+                                        SetUnsavedChanges(true);
+                                        tableEditor.Save(true);
+                                        tableEditor.FillOutTree();
+
+                                        TreeNode newNode = SearchForTreeNode(listView1, pointerNode.ExportNum);
+                                        if (newNode != null)
+                                        {
+                                            newNode.EnsureVisible();
+                                            newNode.Expand();
+                                        }
+                                    }
+                                    else if (pointerNode.Pointer is NormalExport copyingDat3)
+                                    {
+                                        if (rowIndex < 0) return;
+                                        copyingDat3.Data.RemoveAt(rowIndex);
+
+                                        SetUnsavedChanges(true);
+                                        if (tableEditor != null)
+                                        {
+                                            tableEditor.Load();
+                                        }
+                                    }
+
+                                    return;
+                            }
+
+                            return;
+                        }
+
+                    }
+                    break;
+            }
+
+            // fallback to just deleting the whole row and refreshing
+            if (rowIndex >= 0)
+            {
+                foreach (DataGridViewCell cell in dataGridView1.Rows[rowIndex].Cells) cell.Value = null;
+                SetUnsavedChanges(true);
+                if (tableEditor != null)
+                {
+                    tableEditor.Save(true);
+                }
+            }
+        }
+
         private void dataGridEditCell(object sender, EventArgs e)
         {
             if (tableEditor != null && tableEditor.readyToSave)

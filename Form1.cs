@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -591,12 +593,237 @@ namespace UAssetGUI
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SendKeys.Send("^C");
+            if (tableEditor == null) return;
+
+            int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
+            object objectToCopy = null;
+
+            switch (tableEditor.mode)
+            {
+                case TableHandlerMode.ExportData:
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    {
+                        if (pointerNode.Type == PointingTreeNodeType.ByteArray)
+                        {
+                            string parsedData = BitConverter.ToString(pointerNode.Pointer is RawExport ? ((RawExport)pointerNode.Pointer).Data : ((NormalExport)pointerNode.Pointer).Extras)?.Replace("-", " ");
+                            Clipboard.SetText(string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData);
+                            return;
+                        }
+                        else if (pointerNode.Pointer is StructPropertyData copyingDat1)
+                        {
+                            if (listView1.Focused) objectToCopy = copyingDat1;
+                            if (rowIndex >= 0 && !listView1.Focused && copyingDat1.Value.Count > rowIndex) objectToCopy = copyingDat1.Value[rowIndex];
+                        }
+                        else if (pointerNode.Pointer is ArrayPropertyData copyingDat2)
+                        {
+                            if (listView1.Focused) objectToCopy = copyingDat2;
+                            if (rowIndex >= 0 && !listView1.Focused && copyingDat2.Value.Length > rowIndex) objectToCopy = copyingDat2.Value[rowIndex];
+                        }
+                        else if (pointerNode.Pointer is PointingDictionaryEntry copyingDat3)
+                        {
+                            // don't allow copying the dictionary entry itself
+                            if (rowIndex >= 0) objectToCopy = listView1.ContainsFocus ? null : (rowIndex == 0 ? copyingDat3.Entry.Key : copyingDat3.Entry.Value);
+                        }
+                        else if (pointerNode.Pointer is PropertyData[] copyingDat4)
+                        {
+                            if (listView1.Focused) objectToCopy = copyingDat4;
+                            if (rowIndex >= 0 && !listView1.Focused && copyingDat4.Length > rowIndex) objectToCopy = copyingDat4[rowIndex];
+                        }
+                        else if (pointerNode.Pointer is Export || (listView1.Focused && pointerNode.WillCopyWholeExport))
+                        {
+                            switch (pointerNode.Type)
+                            {
+                                case PointingTreeNodeType.Normal:
+                                    var copyingDat5 = tableEditor.asset.Exports[pointerNode.ExportNum];
+                                    if (listView1.Focused)
+                                    {
+                                        objectToCopy = copyingDat5;
+                                    }
+                                    else if (copyingDat5 is NormalExport copyingDat6)
+                                    {
+                                        if (rowIndex >= 0 && !listView1.Focused && copyingDat6.Data.Count > rowIndex) objectToCopy = copyingDat6.Data[rowIndex];
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            if (objectToCopy != null)
+            {
+                Clipboard.SetText(tableEditor.asset.SerializeJsonObject(objectToCopy, Newtonsoft.Json.Formatting.None));
+                return;
+            }
+
+            // fallback to copying raw row data
+            if (rowIndex >= 0)
+            {
+                var currentRow = dataGridView1.Rows[rowIndex];
+                string[] newClipboardText = new string[currentRow.Cells.Count];
+                for (int i = 0; i < currentRow.Cells.Count; i++)
+                {
+                    newClipboardText[i] = currentRow.Cells[i].Value?.ToString() ?? string.Empty;
+                }
+                Clipboard.SetText(JsonConvert.SerializeObject(newClipboardText, Formatting.None));
+            }
+        }
+
+        private TreeNode SearchForTreeNode(TreeView node, int expNum)
+        {
+            foreach (TreeNode entry in node.Nodes)
+            {
+                TreeNode res = SearchForTreeNode(entry, expNum);
+                if (res != null) return res;
+            }
+            return null;
+        }
+
+        private TreeNode SearchForTreeNode(TreeNode node, int expNum)
+        {
+            foreach (TreeNode entry in node.Nodes)
+            {
+                if (node is PointingTreeNode pointerNode2 && pointerNode2.ExportNum == expNum) return pointerNode2;
+                
+                TreeNode res = SearchForTreeNode(entry, expNum);
+                if (res != null) return res;
+            }
+            return null;
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SendKeys.Send("^V");
+            if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) return;
+            if (tableEditor == null) return;
+
+            int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
+
+            PropertyData deserializedClipboard = null;
+            try
+            {
+                deserializedClipboard = tableEditor.asset.DeserializeJsonObject(Clipboard.GetText()) as PropertyData;
+            }
+            catch (Exception)
+            {
+                // the thing we're trying to paste probably isn't a PropertyData
+            }
+
+            switch (tableEditor.mode)
+            {
+                case TableHandlerMode.ExportData:
+                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    {
+                        if (pointerNode.Type == PointingTreeNodeType.ByteArray)
+                        {
+                            try
+                            {
+                                if (pointerNode.Pointer is RawExport)
+                                {
+                                    ((RawExport)pointerNode.Pointer).Data = Clipboard.GetText() == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(Clipboard.GetText());
+                                }
+                                else if (pointerNode.Pointer is NormalExport)
+                                {
+                                    ((NormalExport)pointerNode.Pointer).Extras = Clipboard.GetText() == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(Clipboard.GetText());
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                // the thing we're trying to paste probably isn't a byte array
+                            }
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else if (pointerNode.Pointer is StructPropertyData copyingDat1 && deserializedClipboard != null)
+                        {
+                            if (rowIndex < 0) return;
+                            copyingDat1.Value.Insert(rowIndex, deserializedClipboard);
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else if (pointerNode.Pointer is ArrayPropertyData copyingDat2 && deserializedClipboard != null)
+                        {
+                            if (rowIndex < 0) return;
+                            List<PropertyData> origArr = copyingDat2.Value.ToList();
+                            origArr.Insert(rowIndex, deserializedClipboard);
+                            copyingDat2.Value = origArr.ToArray();
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else if (pointerNode.Pointer is NormalExport copyingDat3 && deserializedClipboard != null)
+                        {
+                            if (rowIndex < 0) return;
+                            copyingDat3.Data.Insert(rowIndex, deserializedClipboard);
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else
+                        {
+                            // check if we're pasting a whole export
+                            Export deserExport = null;
+                            try
+                            {
+                                deserExport = tableEditor.asset.DeserializeJsonObject(Clipboard.GetText()) as Export;
+                            }
+                            catch (Exception)
+                            {
+                                // the thing we're trying to paste probably isn't an Export
+                            }
+
+                            if (deserExport != null)
+                            {
+                                // add a new export after the current one
+                                tableEditor.asset.Exports.Insert(pointerNode.ExportNum + 1, deserExport);
+
+                                if (tableEditor != null)
+                                {
+                                    SetUnsavedChanges(true);
+                                    tableEditor.Save(true);
+                                    tableEditor.FillOutTree();
+
+                                    TreeNode newNode = SearchForTreeNode(listView1, pointerNode.ExportNum + 1);
+                                    newNode.EnsureVisible();
+                                    newNode.ExpandAll();
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            // fallback to pasting raw row data
+            if (rowIndex >= 0)
+            {
+                try
+                {
+                    string[] rawData = JsonConvert.DeserializeObject<string[]>(Clipboard.GetText());
+                    dataGridView1.Rows.Insert(rowIndex, rawData);
+                    SetUnsavedChanges(true);
+                }
+                catch (Exception)
+                {
+                    // the thing we're trying to paste probably isn't a string array
+                }
+            }
         }
 
         private void dataGridEditCell(object sender, EventArgs e)

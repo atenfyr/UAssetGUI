@@ -70,6 +70,7 @@ namespace UAssetGUI
                 progressBar1.Value = 0;
                 progressBar1.Maximum = BaseForm.listView1.GetNodeCount(true);
                 BaseForm.dataGridView1.SuspendLayout();
+                BaseForm.listView1.SuspendLayout();
                 BaseForm.listView1.BeginUpdate();
 
                 originalNode = BaseForm.listView1.SelectedNode;
@@ -149,6 +150,7 @@ namespace UAssetGUI
             {
                 progressBar1.Value = progressBar1.Maximum;
                 BaseForm.dataGridView1.ResumeLayout();
+                BaseForm.listView1.ResumeLayout();
                 BaseForm.listView1.EndUpdate();
 
                 if (!foundSomething)

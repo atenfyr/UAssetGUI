@@ -370,6 +370,7 @@ namespace UAssetGUI
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
+                findToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree();
                 tableEditor.Load();
@@ -438,6 +439,7 @@ namespace UAssetGUI
                 tableEditor = null;
                 saveToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
+                findToolStripMenuItem.Enabled = false;
 
                 listView1.Nodes.Clear();
                 dataGridView1.Columns.Clear();
@@ -881,7 +883,7 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is StructPropertyData copyingDat1)
                         {
-                            if (rowIndex < 0) return;
+                            if (rowIndex < 0 || rowIndex >= copyingDat1.Value.Count) return;
                             copyingDat1.Value.RemoveAt(rowIndex);
 
                             SetUnsavedChanges(true);
@@ -893,7 +895,7 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData copyingDat2)
                         {
-                            if (rowIndex < 0) return;
+                            if (rowIndex < 0 || rowIndex >= copyingDat2.Value.Length) return;
                             List<PropertyData> origArr = copyingDat2.Value.ToList();
                             origArr.RemoveAt(rowIndex);
                             copyingDat2.Value = origArr.ToArray();
@@ -930,7 +932,7 @@ namespace UAssetGUI
                                     }
                                     else if (pointerNode.Pointer is NormalExport copyingDat3)
                                     {
-                                        if (rowIndex < 0) return;
+                                        if (rowIndex < 0 || rowIndex >= copyingDat3.Data.Count) return;
                                         copyingDat3.Data.RemoveAt(rowIndex);
 
                                         SetUnsavedChanges(true);
@@ -1011,12 +1013,12 @@ namespace UAssetGUI
             }
         }
 
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        public void UpdateModeFromSelectedNode(TreeNode e)
         {
-            if (e.Node == null) return;
+            if (e == null) return;
 
-            string selectedNodeText = e.Node.Text;
-            string parentSelectedNodeText = e.Node.Parent?.Text;
+            string selectedNodeText = e.Text;
+            string parentSelectedNodeText = e.Parent?.Text;
             if (tableEditor != null)
             {
                 tableEditor.mode = TableHandlerMode.ExportData;
@@ -1052,6 +1054,11 @@ namespace UAssetGUI
 
                 tableEditor.Load();
             }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            UpdateModeFromSelectedNode(e.Node);
         }
 
         private void dataGridView1_MouseWheel(object sender, MouseEventArgs e)
@@ -1457,8 +1464,16 @@ namespace UAssetGUI
                     }
                 }
             }
-            replacementPrompt.Dispose();
 
+            replacementPrompt.Dispose();
+        }
+
+        private void findToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var findForm = new FindForm();
+            findForm.StartPosition = FormStartPosition.CenterParent;
+            findForm.Owner = this;
+            findForm.Show();
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)

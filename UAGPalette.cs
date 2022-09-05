@@ -84,6 +84,10 @@ namespace UAssetGUI
                     combo.BackColor = UAGPalette.ButtonBackColor;
                     combo.FlatStyle = CurrentTheme == UAGTheme.Light ? FlatStyle.Standard : FlatStyle.Flat;
                 }
+                if (ctrl2 is GroupBox gp)
+                {
+                    gp.ForeColor = UAGPalette.ForeColor;
+                }
 
                 if (Properties.Settings.Default.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
                 {

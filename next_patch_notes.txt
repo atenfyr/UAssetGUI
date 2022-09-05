@@ -4,6 +4,7 @@
 * Added support for displaying JSON for Kismet bytecode scripts (implemented by LongerWarrior).
 * Added the ability to directly modify export preload dependencies for assets from games that use the event driven loader.
 * Added many new shortcut keys.
+* Added improved data search functionality.
 * Added improved copy/paste/delete functionality.
 * Added support for versioned assets.
 * Added a new tab containing information about the CustomVersionContainer.

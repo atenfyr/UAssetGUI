@@ -504,6 +504,14 @@ namespace UAssetGUI
                                 row.Cells[++columnIndexer].Value = intPointData.Value[0];
                                 row.Cells[++columnIndexer].Value = intPointData.Value[1];
                                 break;
+                            case "FloatRange":
+                                var floatRangeData = (FloatRangePropertyData)thisPD;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = floatRangeData.LowerBound;
+                                row.Cells[columnIndexer].ToolTipText = "LowerBound";
+                                row.Cells[++columnIndexer].Value = floatRangeData.UpperBound;
+                                row.Cells[columnIndexer].ToolTipText = "UpperBound";
+                                break;
                             case "Guid":
                                 var guidData = (GuidPropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;

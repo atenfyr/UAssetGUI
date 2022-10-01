@@ -520,12 +520,12 @@ namespace UAssetGUI
                             case "Rotator":
                                 var rotatorData = (RotatorPropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                row.Cells[++columnIndexer].Value = rotatorData.Value.Pitch;
-                                row.Cells[columnIndexer].ToolTipText = "Pitch";
-                                row.Cells[++columnIndexer].Value = rotatorData.Value.Yaw;
-                                row.Cells[columnIndexer].ToolTipText = "Yaw";
                                 row.Cells[++columnIndexer].Value = rotatorData.Value.Roll;
-                                row.Cells[columnIndexer].ToolTipText = "Roll";
+                                row.Cells[columnIndexer].ToolTipText = "Roll (X)";
+                                row.Cells[++columnIndexer].Value = rotatorData.Value.Pitch;
+                                row.Cells[columnIndexer].ToolTipText = "Pitch (Y)";
+                                row.Cells[++columnIndexer].Value = rotatorData.Value.Yaw;
+                                row.Cells[columnIndexer].ToolTipText = "Yaw (Z)";
                                 break;
                             case "Quat":
                                 var quatData = (QuatPropertyData)thisPD;

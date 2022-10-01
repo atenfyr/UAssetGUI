@@ -39,7 +39,7 @@ namespace UAssetGUI
             AboutText = (this.Owner as Form1).DisplayVersion + "\n" +
             "By atenfyr\n" +
             "\nThanks to the Astroneer Modding club for the help\n" +
-            "\nThanks to David Hill (Kaiheilos) for early assistance with the package summary format\n" +
+            "\nThanks to Kaiheilos for early assistance with the package summary format\n" +
             "\n(Here's where a soppy monologue goes)\n";
 
             var formPopup = new Form

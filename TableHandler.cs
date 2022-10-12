@@ -340,7 +340,10 @@ namespace UAssetGUI
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                row.Cells[++columnIndexer].Value = objData2.Value;
+                                row.Cells[++columnIndexer].Value = objData2.Value.AssetPathName == null ? FString.NullCase : objData2.Value.AssetPathName.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "AssetPathName";
+                                row.Cells[++columnIndexer].Value = objData2.Value.SubPathString == null ? FString.NullCase : objData2.Value.SubPathString.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "SubPathString";
                                 break;
                             case "RichCurveKey":
                                 var curveData = (RichCurveKeyPropertyData)thisPD;
@@ -374,6 +377,10 @@ namespace UAssetGUI
                                         row.Cells[columnIndexer].ToolTipText = "TableId";
                                         row.Cells[++columnIndexer].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
                                         row.Cells[columnIndexer].ToolTipText = "Key";
+                                        break;
+                                    case TextHistoryType.RawText:
+                                        row.Cells[++columnIndexer].Value = txtData?.Value == null ? FString.NullCase : txtData.Value.ToString();
+                                        row.Cells[columnIndexer].ToolTipText = "Value";
                                         break;
                                     default:
                                         throw new NotImplementedException("Unimplemented display for " + txtData.HistoryType.ToString());
@@ -668,6 +675,10 @@ namespace UAssetGUI
 
                                 decidedTextData.TableId = FName.FromString(asset, (string)value1B);
                                 decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
+                                break;
+                            case TextHistoryType.RawText:
+                                if (value1B == null || !(value1B is string)) return null;
+                                decidedTextData.Value = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
                                 break;
                             default:
                                 throw new FormatException("Unimplemented text history type " + histType);

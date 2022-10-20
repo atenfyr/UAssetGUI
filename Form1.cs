@@ -428,7 +428,11 @@ namespace UAssetGUI
                     MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
                 }
 
-                SetParsingVersion(tableEditor.asset.EngineVersion);
+                if (!tableEditor.asset.IsUnversioned)
+                {
+                    UE4Version calculatedVer = tableEditor.asset.GetEngineVersion();
+                    if (calculatedVer != UE4Version.UNKNOWN) SetParsingVersion(calculatedVer);
+                }
                 if (desiredSetUnsavedChanges) SetUnsavedChanges(desiredSetUnsavedChanges);
             }
             catch (Exception ex)

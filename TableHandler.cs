@@ -572,7 +572,7 @@ namespace UAssetGUI
                             case "SoftClassPath":
                                 var sopPropData = (SoftObjectPathPropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                if (asset.EngineVersion < UE4Version.VER_UE4_ADDED_SOFT_OBJECT_PATH)
+                                if (asset.ObjectVersion < ObjectVersion.VER_UE4_ADDED_SOFT_OBJECT_PATH)
                                 {
                                     row.Cells[++columnIndexer].Value = sopPropData.Path.ToString();
                                     row.Cells[columnIndexer].ToolTipText = "Path";

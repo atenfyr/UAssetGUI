@@ -1466,9 +1466,9 @@ namespace UAssetGUI
             // go through each row and make sure it's a good height
             if (dataGridView1.Rows?.Count > 0)
             {
-                foreach (DataGridViewRow entry in dataGridView1.Rows)
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 {
-                    if (entry.Height < dataGridView1.RowTemplate.MinimumHeight) entry.Height = dataGridView1.RowTemplate.MinimumHeight;
+                    this.dataGridView1.AutoResizeRow(i);
                 }
             }
 

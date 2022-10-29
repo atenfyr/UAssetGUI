@@ -1472,6 +1472,8 @@ namespace UAssetGUI
                 }
             }
 
+            origForm.UpdateRPC();
+
             readyToSave = true;
             dataGridView1.ClearSelection();
             dataGridView1.CurrentCell = null;
@@ -2075,6 +2077,7 @@ namespace UAssetGUI
             }
             else
             {
+                ((Form1)dataGridView1.Parent).UpdateRPC();
                 ((Form1)dataGridView1.Parent).SetUnsavedChanges(true);
             }
         }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DiscordRPC;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -140,6 +141,8 @@ namespace UAssetGUI
             }
 
             ac7decrypt = new AC7Decrypt();
+
+            UpdateRPC();
         }
 
         private static Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();
@@ -322,6 +325,7 @@ namespace UAssetGUI
             return BitConverter.ToUInt32(buffer, 0);
         }
 
+        public DateTime LastLoadTimestamp = DateTime.UtcNow;
         public void LoadFileAt(string filePath)
         {
             dataGridView1.Visible = true;
@@ -465,6 +469,11 @@ namespace UAssetGUI
                         break;
                 }
             }
+            finally
+            {
+                LastLoadTimestamp = DateTime.UtcNow;
+                UpdateRPC();
+            }
         }
 
         public bool existsUnsavedChanges = false;
@@ -503,7 +512,7 @@ namespace UAssetGUI
             }
         }
 
-        private string currentSavingPath = "";
+        internal string currentSavingPath = "";
 
         private bool ForceSave(string path)
         {
@@ -1164,18 +1173,22 @@ namespace UAssetGUI
 
         private void frm_closing(object sender, FormClosingEventArgs e)
         {
-            if (!existsUnsavedChanges) return;
-
-            DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);
-            switch (res)
+            if (existsUnsavedChanges)
             {
-                case DialogResult.Yes:
-                    if (!ForceSave(currentSavingPath)) e.Cancel = true;
-                    break;
-                case DialogResult.Cancel:
-                    e.Cancel = true;
-                    break;
+                DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);
+                switch (res)
+                {
+                    case DialogResult.Yes:
+                        if (!ForceSave(currentSavingPath)) e.Cancel = true;
+                        break;
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                }
             }
+
+            Program.DiscordRPC.ClearPresence();
+            Program.DiscordRPC.Dispose();
         }
 
         private void frm_DragEnter(object sender, DragEventArgs e)
@@ -1483,6 +1496,66 @@ namespace UAssetGUI
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             dataGridView1.BeginEdit(true);
+        }
+
+
+        private readonly HashSet<string> invalidBaseFolders = new HashSet<string>() { "AIModule", "ALAudio", "AVEncoder", "AVIWriter", "Advertising", "Analytics", "Android", "AnimGraphRuntime", "AnimationCore", "AppFramework", "Apple", "ApplicationCore", "AssetRegistry", "AudioAnalyzer", "AudioCaptureCore", "AudioCaptureImplementations", "AudioExtensions", "AudioMixer", "AudioMixerCore", "AudioPlatformConfiguration", "AugmentedReality", "AutomationMessages", "AutomationWorker", "BlueprintRuntime", "BuildSettings", "CEF3Utils", "CUDA/Source", "Cbor", "CinematicCamera", "ClientPilot", "ClothingSystemRuntimeCommon", "ClothingSystemRuntimeInterface", "ClothingSystemRuntimeNv", "CookedIterativeFile", "Core", "CoreUObject", "CrashReportCore", "CrunchCompression", "D3D12RHI", "Datasmith", "DeveloperSettings", "EmptyRHI", "Engine", "EngineMessages", "EngineSettings", "Experimental", "ExternalRPCRegistry", "EyeTracker", "Foliage", "FriendsAndChat", "GameMenuBuilder", "GameplayMediaEncoder", "GameplayTags", "GameplayTasks", "HardwareSurvey", "HeadMountedDisplay", "IESFile", "IOS", "IPC", "ImageCore", "ImageWrapper", "ImageWriteQueue", "InputCore", "InputDevice", "InstallBundleManager", "Json", "JsonUtilities", "Landscape", "Launch", "LevelSequence", "Linux/AudioMixerSDL", "LiveLinkInterface", "LiveLinkMessageBusFramework", "Lumin/LuminRuntimeSettings", "MRMesh", "Mac", "MaterialShaderQualitySettings", "Media", "MediaAssets", "MediaInfo", "MediaUtils", "MeshDescription", "MeshUtilitiesCommon", "Messaging", "MessagingCommon", "MessagingRpc", "MoviePlayer", "MovieScene", "MovieSceneCapture", "MovieSceneTracks", "NVidia/GeForceNOW", "NavigationSystem", "Navmesh", "Net", "NetworkFile", "NetworkFileSystem", "NetworkReplayStreaming", "Networking", "NonRealtimeAudioRenderer", "NullDrv", "NullInstallBundleManager", "Online", "OpenGLDrv", "Overlay", "PacketHandlers", "PakFile", "PerfCounters", "PhysXCooking", "PhysicsCore", "PlatformThirdPartyHelpers/PosixShim", "Portal", "PreLoadScreen", "Projects", "PropertyAccess", "PropertyPath", "RHI", "RSA", "RawMesh", "RenderCore", "Renderer", "RigVM", "RuntimeAssetCache", "SandboxFile", "Serialization", "SessionMessages", "SessionServices", "SignalProcessing", "Slate", "SlateCore", "SlateNullRenderer", "SlateRHIRenderer", "Sockets", "SoundFieldRendering", "StaticMeshDescription", "StreamingFile", "StreamingPauseRendering", "SynthBenchmark", "TimeManagement", "Toolbox", "TraceLog", "UE4Game", "UELibrary", "UMG", "Unix/UnixCommonStartup", "UnrealAudio", "VectorVM", "VirtualProduction/StageDataCore", "VulkanRHI", "WebBrowser", "WebBrowserTexture", "WidgetCarousel", "Windows", "XmlParser" };
+        private readonly HashSet<string> invalidExtraFolders = new HashSet<string>() { "AkAudio" };
+        private readonly string PROJECT_NAME_PREFIX = "/Script/";
+        private string GetProjectName()
+        {
+            if (tableEditor?.asset == null) return null;
+
+            List<string> validPossibleProjectNames = new List<string>();
+            var allPossibleFNames = tableEditor.asset.GetNameMapIndexList();
+            foreach (FString n in allPossibleFNames)
+            {
+                string pkg = n.ToString();
+                if (!pkg.StartsWith(PROJECT_NAME_PREFIX)) continue;
+                string pkg_inside = pkg.Substring(PROJECT_NAME_PREFIX.Length, pkg.Length - PROJECT_NAME_PREFIX.Length);
+                if (invalidBaseFolders.Contains(pkg_inside)) continue;
+                if (invalidExtraFolders.Contains(pkg_inside)) continue;
+                return pkg_inside;
+            }
+
+            if (validPossibleProjectNames.Count != 1) return "Unknown";
+            return validPossibleProjectNames[1];
+        }
+
+        private RichPresence rp;
+        public void UpdateRPC()
+        {
+            if (Program.DiscordRPC == null) return;
+
+            UAGUtils.InvokeUI(() =>
+            {
+                if (dataGridView1 == null) return;
+
+                string currPath = currentSavingPath;
+                DateTime lastOpenedTime = LastLoadTimestamp;
+
+                bool isEditingAsset = saveToolStripMenuItem?.Enabled ?? false;
+                if (string.IsNullOrEmpty(currPath)) isEditingAsset = false;
+
+                if (rp == null)
+                {
+                    rp = new RichPresence
+                    {
+                        Timestamps = new Timestamps(),
+                        Assets = new Assets()
+                        {
+                            LargeImageKey = "main_logo"
+                        }
+                    };
+                }
+
+                string projName = GetProjectName();
+                rp.Details = projName == null ? string.Empty : ("Project: " + projName + " (" + Properties.Settings.Default.PreferredVersion + ")");
+                rp.State = isEditingAsset ? ("File: " + Path.GetFileName(currPath)) : "Idling";
+                rp.Timestamps.Start = lastOpenedTime;
+
+                Program.DiscordRPC.SetPresence(rp);
+            });
         }
     }
 }

@@ -390,7 +390,6 @@ namespace UAssetGUI
 
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
@@ -415,6 +414,7 @@ namespace UAssetGUI
         public Button importBinaryData;
         public Button exportBinaryData;
         public Button setBinaryData;
+        internal ToolStripMenuItem saveToolStripMenuItem;
     }
 }
 

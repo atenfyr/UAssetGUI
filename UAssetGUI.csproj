@@ -146,6 +146,9 @@
     <PackageReference Include="Costura.Fody">
       <Version>3.3.3</Version>
     </PackageReference>
+    <PackageReference Include="DiscordRichPresence">
+      <Version>1.1.1.14</Version>
+    </PackageReference>
     <PackageReference Include="Fody">
       <Version>4.0.2</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

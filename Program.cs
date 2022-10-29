@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DiscordRPC;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -11,6 +12,8 @@ namespace UAssetGUI
     {
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
+
+        internal static DiscordRpcClient DiscordRPC;
 
         /// <summary>
         /// The main entry point for the application.
@@ -57,6 +60,9 @@ namespace UAssetGUI
                         return;
                 }
             }
+
+            DiscordRPC = new DiscordRpcClient("1035701531342811156");
+            DiscordRPC.Initialize();
 
             Form1 f1 = new Form1
             {

@@ -19,6 +19,7 @@ namespace UAssetGUI
             themeComboBox.DataSource = Enum.GetValues(typeof(UAGTheme));
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
             valuesOnScroll.Checked = Properties.Settings.Default.ChangeValuesOnScroll;
+            enableDiscordRpc.Checked = Properties.Settings.Default.EnableDiscordRPC;
             favoriteThingBox.Text = Properties.Settings.Default.FavoriteThing;
             numericUpDown1.Value = Properties.Settings.Default.DataZoom;
 
@@ -75,6 +76,19 @@ namespace UAssetGUI
         private void valuesOnScroll_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.ChangeValuesOnScroll = valuesOnScroll.Checked;
+        }
+
+        private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.EnableDiscordRPC = enableDiscordRpc.Checked;
+            if (Properties.Settings.Default.EnableDiscordRPC)
+            {
+                BaseForm.UpdateRPC();
+            }
+            else
+            {
+                Program.DiscordRPC.ClearPresence();
+            }
         }
 
         private bool isCurrentlyComicSans = false;

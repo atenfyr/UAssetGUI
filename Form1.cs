@@ -1526,6 +1526,7 @@ namespace UAssetGUI
         public void UpdateRPC()
         {
             if (Program.DiscordRPC == null) return;
+            if (!Properties.Settings.Default.EnableDiscordRPC) return;
 
             UAGUtils.InvokeUI(() =>
             {

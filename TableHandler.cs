@@ -1468,7 +1468,7 @@ namespace UAssetGUI
             {
                 for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 {
-                    this.dataGridView1.AutoResizeRow(i);
+                    if (dataGridView1.Rows[i].Height < dataGridView1.RowTemplate.MinimumHeight) this.dataGridView1.AutoResizeRow(i);
                 }
             }
 

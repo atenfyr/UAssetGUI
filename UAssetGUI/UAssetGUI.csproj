@@ -20,12 +20,12 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
-  <Target Name="BeforeBuildMigrated" BeforeTargets="Build">
+  <Target Name="BeforeBuildMigrated" BeforeTargets="PreBuildEvent">
     <Exec ContinueOnError="true" Command="git rev-parse --short HEAD &gt; &quot;$(ProjectDir)\git_commit.txt&quot;" />
   </Target>
   <Target Name="AfterBuildMigrated" AfterTargets="Build">
-    <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)\LICENSE&quot; &quot;$(TargetDir)\LICENSE*&quot;" />
-    <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)\NOTICE.md&quot; &quot;$(TargetDir)\NOTICE.md*&quot;" />
+    <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)\..\LICENSE&quot; &quot;$(TargetDir)\LICENSE*&quot;" />
+    <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)\..\NOTICE.md&quot; &quot;$(TargetDir)\NOTICE.md*&quot;" />
     <Exec ContinueOnError="true" Command="del &quot;$(TargetDir)\git_commit.txt&quot;" />
   </Target>
   <ItemGroup>
@@ -114,7 +114,7 @@
     <Content Include="next_patch_notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UAssetAPI\UAssetAPI.csproj" />
+    <ProjectReference Include="..\UAssetAPI\UAssetAPI\UAssetAPI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="3.3.3" />

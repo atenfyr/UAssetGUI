@@ -31,6 +31,32 @@ namespace UAssetGUI
         public ByteViewer byteView1;
         public TextBox jsonView;
 
+        private DiscordRpcClient _discordRpc = null;
+
+        private void DisposeDiscordRpc()
+        {
+            if (_discordRpc == null || _discordRpc.IsDisposed) return;
+            _discordRpc.ClearPresence();
+            _discordRpc.Dispose();
+        }
+
+        internal DiscordRpcClient DiscordRPC
+        {
+            get
+            {
+                if (_discordRpc == null || _discordRpc.IsDisposed)
+                {
+                    _discordRpc = new DiscordRpcClient("1035701531342811156");
+                    _discordRpc.Initialize();
+                }
+                else if (!_discordRpc.IsInitialized)
+                {
+                    _discordRpc.Initialize();
+                }
+                return _discordRpc;
+            }
+        }
+
         public string DisplayVersion
         {
             get
@@ -1187,8 +1213,7 @@ namespace UAssetGUI
                 }
             }
 
-            Program.DiscordRPC.ClearPresence();
-            Program.DiscordRPC.Dispose();
+            if (!e.Cancel) DisposeDiscordRpc();
         }
 
         private void frm_DragEnter(object sender, DragEventArgs e)
@@ -1525,7 +1550,7 @@ namespace UAssetGUI
         private RichPresence rp;
         public void UpdateRPC()
         {
-            if (Program.DiscordRPC == null || !Program.DiscordRPC.IsInitialized || Program.DiscordRPC.IsDisposed) return;
+            if (DiscordRPC == null || !DiscordRPC.IsInitialized || DiscordRPC.IsDisposed) return;
             if (!Properties.Settings.Default.EnableDiscordRPC) return;
 
             UAGUtils.InvokeUI(() =>
@@ -1555,7 +1580,7 @@ namespace UAssetGUI
                 rp.State = isEditingAsset ? ("File: " + Path.GetFileName(currPath)) : "Idling";
                 rp.Timestamps.Start = lastOpenedTime;
 
-                Program.DiscordRPC.SetPresence(rp);
+                DiscordRPC.SetPresence(rp);
             });
         }
     }

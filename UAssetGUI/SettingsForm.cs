@@ -87,7 +87,7 @@ namespace UAssetGUI
             }
             else
             {
-                Program.DiscordRPC.ClearPresence();
+                BaseForm.DiscordRPC.ClearPresence();
             }
         }
 

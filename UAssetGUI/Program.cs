@@ -13,7 +13,24 @@ namespace UAssetGUI
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
-        internal static DiscordRpcClient DiscordRPC;
+        private static DiscordRpcClient _discordRpc = null;
+
+        internal static DiscordRpcClient DiscordRPC
+        {
+            get
+            {
+                if (_discordRpc == null || _discordRpc.IsDisposed)
+                {
+                    _discordRpc = new DiscordRpcClient("1035701531342811156");
+                    _discordRpc.Initialize();
+                }
+                else if (!_discordRpc.IsInitialized)
+                {
+                    _discordRpc.Initialize();
+                }
+                return _discordRpc;
+            }
+        }
 
         /// <summary>
         /// The main entry point for the application.
@@ -60,9 +77,6 @@ namespace UAssetGUI
                         return;
                 }
             }
-
-            DiscordRPC = new DiscordRpcClient("1035701531342811156");
-            DiscordRPC.Initialize();
 
             Form1 f1 = new Form1
             {

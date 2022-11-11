@@ -1525,7 +1525,7 @@ namespace UAssetGUI
         private RichPresence rp;
         public void UpdateRPC()
         {
-            if (Program.DiscordRPC == null) return;
+            if (Program.DiscordRPC == null || !Program.DiscordRPC.IsInitialized || Program.DiscordRPC.IsDisposed) return;
             if (!Properties.Settings.Default.EnableDiscordRPC) return;
 
             UAGUtils.InvokeUI(() =>

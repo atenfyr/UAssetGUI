@@ -32,10 +32,10 @@ namespace UAssetGUI
                     // UAssetGUI tojson A.umap B.json 514
                     case "tojson":
                         if (args.Length < 5) break;
-                        UE4Version selectedVer = UE4Version.UNKNOWN;
+                        EngineVersion selectedVer = EngineVersion.UNKNOWN;
                         if (!Enum.TryParse(args[4], out selectedVer))
                         {
-                            if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = UE4Version.VER_UE4_0 + selectedVerRaw;
+                            if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
                         }
 
                         string jsonSerializedAsset = new UAsset(args[2], selectedVer).SerializeJson(Newtonsoft.Json.Formatting.Indented);

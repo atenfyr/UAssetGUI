@@ -21,7 +21,7 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
-        internal UE4Version ParsingVersion = UE4Version.UNKNOWN;
+        internal EngineVersion ParsingVersion = EngineVersion.UNKNOWN;
         internal DataGridView dataGridView1;
         internal ColorfulTreeView listView1;
         internal MenuStrip menuStrip1;
@@ -208,40 +208,42 @@ namespace UAssetGUI
             "4.24",
             "4.25",
             "4.26",
-            "4.27"
+            "4.27",
+            //"5.0"
         };
 
-        private UE4Version[] versionOptionsValues = new UE4Version[]
+        private EngineVersion[] versionOptionsValues = new EngineVersion[]
         {
-            UE4Version.UNKNOWN,
-            UE4Version.VER_UE4_0,
-            UE4Version.VER_UE4_1,
-            UE4Version.VER_UE4_2,
-            UE4Version.VER_UE4_3,
-            UE4Version.VER_UE4_4,
-            UE4Version.VER_UE4_5,
-            UE4Version.VER_UE4_6,
-            UE4Version.VER_UE4_7,
-            UE4Version.VER_UE4_8,
-            UE4Version.VER_UE4_9,
-            UE4Version.VER_UE4_10,
-            UE4Version.VER_UE4_11,
-            UE4Version.VER_UE4_12,
-            UE4Version.VER_UE4_13,
-            UE4Version.VER_UE4_14,
-            UE4Version.VER_UE4_15,
-            UE4Version.VER_UE4_16,
-            UE4Version.VER_UE4_17,
-            UE4Version.VER_UE4_18,
-            UE4Version.VER_UE4_19,
-            UE4Version.VER_UE4_20,
-            UE4Version.VER_UE4_21,
-            UE4Version.VER_UE4_22,
-            UE4Version.VER_UE4_23,
-            UE4Version.VER_UE4_24,
-            UE4Version.VER_UE4_25,
-            UE4Version.VER_UE4_26,
-            UE4Version.VER_UE4_27,
+            EngineVersion.UNKNOWN,
+            EngineVersion.VER_UE4_0,
+            EngineVersion.VER_UE4_1,
+            EngineVersion.VER_UE4_2,
+            EngineVersion.VER_UE4_3,
+            EngineVersion.VER_UE4_4,
+            EngineVersion.VER_UE4_5,
+            EngineVersion.VER_UE4_6,
+            EngineVersion.VER_UE4_7,
+            EngineVersion.VER_UE4_8,
+            EngineVersion.VER_UE4_9,
+            EngineVersion.VER_UE4_10,
+            EngineVersion.VER_UE4_11,
+            EngineVersion.VER_UE4_12,
+            EngineVersion.VER_UE4_13,
+            EngineVersion.VER_UE4_14,
+            EngineVersion.VER_UE4_15,
+            EngineVersion.VER_UE4_16,
+            EngineVersion.VER_UE4_17,
+            EngineVersion.VER_UE4_18,
+            EngineVersion.VER_UE4_19,
+            EngineVersion.VER_UE4_20,
+            EngineVersion.VER_UE4_21,
+            EngineVersion.VER_UE4_22,
+            EngineVersion.VER_UE4_23,
+            EngineVersion.VER_UE4_24,
+            EngineVersion.VER_UE4_25,
+            EngineVersion.VER_UE4_26,
+            EngineVersion.VER_UE4_27,
+            //EngineVersion.VER_UE5_0,
         };
 
         public static readonly string GitHubRepo = "atenfyr/UAssetGUI";
@@ -291,12 +293,12 @@ namespace UAssetGUI
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
-                UE4Version selectedVer = UE4Version.UNKNOWN;
+                EngineVersion selectedVer = EngineVersion.UNKNOWN;
                 if (args.Length > 2 && !Enum.TryParse(args[2], out selectedVer))
                 {
-                    if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = (UE4Version)selectedVerRaw;
+                    if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = (EngineVersion)selectedVerRaw;
                 }
-                if (selectedVer > UE4Version.UNKNOWN) SetParsingVersion(selectedVer);
+                if (selectedVer > EngineVersion.UNKNOWN) SetParsingVersion(selectedVer);
                 LoadFileAt(args[1]);
             }
         }
@@ -460,8 +462,8 @@ namespace UAssetGUI
 
                 if (!tableEditor.asset.IsUnversioned)
                 {
-                    UE4Version calculatedVer = tableEditor.asset.GetEngineVersion();
-                    if (calculatedVer != UE4Version.UNKNOWN) SetParsingVersion(calculatedVer);
+                    EngineVersion calculatedVer = tableEditor.asset.GetEngineVersion();
+                    if (calculatedVer != EngineVersion.UNKNOWN) SetParsingVersion(calculatedVer);
                 }
                 if (desiredSetUnsavedChanges) SetUnsavedChanges(desiredSetUnsavedChanges);
             }
@@ -1259,7 +1261,7 @@ namespace UAssetGUI
             Process.Start("https://github.com/atenfyr/uassetapi");
         }
 
-        public void SetParsingVersion(UE4Version ver)
+        public void SetParsingVersion(EngineVersion ver)
         {
             if (ver == ParsingVersion) return;
 

@@ -112,15 +112,15 @@ namespace UAssetGUI
         {
             CheckIfMapStructTypeOverrideIsNull();
 
-            Properties.Settings.Default.MapStructTypeOverride = ExportData();
-            Properties.Settings.Default.Save();
+            UAGConfig.Data.MapStructTypeOverride = ExportData();
+            UAGConfig.Save();
         }
 
         internal static void LoadFromConfig()
         {
             CheckIfMapStructTypeOverrideIsNull();
 
-            ImportData(Properties.Settings.Default.MapStructTypeOverride);
+            ImportData(UAGConfig.Data.MapStructTypeOverride);
         }
 
         private static void ImportData(string data)

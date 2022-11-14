@@ -40,7 +40,7 @@ namespace UAssetGUI
 
         public static void InitializeTheme()
         {
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.Theme)) Enum.TryParse(Properties.Settings.Default.Theme, out CurrentTheme);
+            if (!string.IsNullOrEmpty(UAGConfig.Data.Theme)) Enum.TryParse(UAGConfig.Data.Theme, out CurrentTheme);
         }
 
         public static UAGTheme GetCurrentTheme()
@@ -51,8 +51,8 @@ namespace UAssetGUI
         public static void SetCurrentTheme(UAGTheme newTheme)
         {
             CurrentTheme = newTheme;
-            Properties.Settings.Default.Theme = CurrentTheme.ToString();
-            Properties.Settings.Default.Save();
+            UAGConfig.Data.Theme = CurrentTheme.ToString();
+            UAGConfig.Save();
         }
 
         public static void RefreshTheme(Form frm)
@@ -89,7 +89,7 @@ namespace UAssetGUI
                     gp.ForeColor = UAGPalette.ForeColor;
                 }
 
-                if (Properties.Settings.Default.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
+                if (UAGConfig.Data.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
                 {
                     if (oldFontSettings == null) oldFontSettings = new Dictionary<Control, Font>();
                     if (ctrl2.Font.FontFamily.Name != "Comic Sans MS") oldFontSettings[ctrl2] = ctrl2.Font;
@@ -109,7 +109,7 @@ namespace UAssetGUI
         {
             get
             {
-                return 8.25f + (float)Properties.Settings.Default.DataZoom;
+                return 8.25f + (float)UAGConfig.Data.DataZoom;
             }
         }
 
@@ -164,7 +164,7 @@ namespace UAssetGUI
                 Color selectedListViewBackColor = frm1.listView1.Nodes.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
                 frm1.listView1.BackColor = selectedListViewBackColor;
                 frm1.listView1.ForeColor = UAGPalette.ForeColor;
-                frm1.listView1.Font = new Font(frm1.listView1.Font.FontFamily, 8.25f + (float)Properties.Settings.Default.DataZoom, frm1.listView1.Font.Style);
+                frm1.listView1.Font = new Font(frm1.listView1.Font.FontFamily, 8.25f + (float)UAGConfig.Data.DataZoom, frm1.listView1.Font.Style);
 
                 frm1.menuStrip1.BackColor = UAGPalette.BackColor;
                 frm1.menuStrip1.ForeColor = UAGPalette.ForeColor;

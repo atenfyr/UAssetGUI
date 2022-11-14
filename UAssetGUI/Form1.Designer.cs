@@ -31,7 +31,7 @@ namespace UAssetGUI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,10 +58,11 @@ namespace UAssetGUI
             this.comboSpecifyVersion = new System.Windows.Forms.ComboBox();
             this.nameMapContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.replaceAllReferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.listView1 = new UAssetGUI.ColorfulTreeView();
             this.importBinaryData = new System.Windows.Forms.Button();
             this.exportBinaryData = new System.Windows.Forms.Button();
             this.setBinaryData = new System.Windows.Forms.Button();
+            this.comboSpecifyMappings = new System.Windows.Forms.ComboBox();
+            this.listView1 = new UAssetGUI.ColorfulTreeView();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.nameMapContext.SuspendLayout();
@@ -258,14 +259,14 @@ namespace UAssetGUI
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridView1.EnableHeadersVisualStyles = false;
@@ -293,9 +294,9 @@ namespace UAssetGUI
             this.comboSpecifyVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboSpecifyVersion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboSpecifyVersion.FormattingEnabled = true;
-            this.comboSpecifyVersion.Location = new System.Drawing.Point(679, 3);
+            this.comboSpecifyVersion.Location = new System.Drawing.Point(723, 3);
             this.comboSpecifyVersion.Name = "comboSpecifyVersion";
-            this.comboSpecifyVersion.Size = new System.Drawing.Size(121, 21);
+            this.comboSpecifyVersion.Size = new System.Drawing.Size(77, 21);
             this.comboSpecifyVersion.TabIndex = 3;
             this.comboSpecifyVersion.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboSpecifyVersion_DrawItem);
             this.comboSpecifyVersion.SelectedIndexChanged += new System.EventHandler(this.comboSpecifyVersion_SelectedIndexChanged);
@@ -313,20 +314,6 @@ namespace UAssetGUI
             this.replaceAllReferencesToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.replaceAllReferencesToolStripMenuItem.Text = "Replace all references...";
             this.replaceAllReferencesToolStripMenuItem.Click += new System.EventHandler(this.replaceAllReferencesToolStripMenuItem_Click);
-            // 
-            // listView1
-            // 
-            this.listView1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
-            this.listView1.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(12, 27);
-            this.listView1.Name = "listView1";
-            this.listView1.ShowLines = false;
-            this.listView1.ShowNodeToolTips = true;
-            this.listView1.Size = new System.Drawing.Size(344, 411);
-            this.listView1.TabIndex = 1;
-            this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
-            this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
             // 
             // importBinaryData
             // 
@@ -361,11 +348,39 @@ namespace UAssetGUI
             this.setBinaryData.UseVisualStyleBackColor = true;
             this.setBinaryData.Click += new System.EventHandler(this.setBinaryData_Click);
             // 
+            // comboSpecifyMappings
+            // 
+            this.comboSpecifyMappings.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboSpecifyMappings.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSpecifyMappings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboSpecifyMappings.FormattingEnabled = true;
+            this.comboSpecifyMappings.Location = new System.Drawing.Point(624, 3);
+            this.comboSpecifyMappings.Name = "comboSpecifyMappings";
+            this.comboSpecifyMappings.Size = new System.Drawing.Size(93, 21);
+            this.comboSpecifyMappings.TabIndex = 3;
+            this.comboSpecifyMappings.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboSpecifyVersion_DrawItem);
+            this.comboSpecifyMappings.SelectedIndexChanged += new System.EventHandler(this.comboSpecifyMappings_SelectedIndexChanged);
+            // 
+            // listView1
+            // 
+            this.listView1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
+            this.listView1.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            this.listView1.HideSelection = false;
+            this.listView1.Location = new System.Drawing.Point(12, 27);
+            this.listView1.Name = "listView1";
+            this.listView1.ShowLines = false;
+            this.listView1.ShowNodeToolTips = true;
+            this.listView1.Size = new System.Drawing.Size(344, 411);
+            this.listView1.TabIndex = 1;
+            this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.comboSpecifyMappings);
             this.Controls.Add(this.setBinaryData);
             this.Controls.Add(this.exportBinaryData);
             this.Controls.Add(this.importBinaryData);
@@ -415,6 +430,7 @@ namespace UAssetGUI
         public Button exportBinaryData;
         public Button setBinaryData;
         internal ToolStripMenuItem saveToolStripMenuItem;
+        public ComboBox comboSpecifyMappings;
     }
 }
 

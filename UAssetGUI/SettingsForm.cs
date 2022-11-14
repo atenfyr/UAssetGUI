@@ -18,10 +18,10 @@ namespace UAssetGUI
             if (this.Owner is Form1) BaseForm = (Form1)this.Owner;
             themeComboBox.DataSource = Enum.GetValues(typeof(UAGTheme));
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
-            valuesOnScroll.Checked = Properties.Settings.Default.ChangeValuesOnScroll;
-            enableDiscordRpc.Checked = Properties.Settings.Default.EnableDiscordRPC;
-            favoriteThingBox.Text = Properties.Settings.Default.FavoriteThing;
-            numericUpDown1.Value = Properties.Settings.Default.DataZoom;
+            valuesOnScroll.Checked = UAGConfig.Data.ChangeValuesOnScroll;
+            enableDiscordRpc.Checked = UAGConfig.Data.EnableDiscordRPC;
+            favoriteThingBox.Text = UAGConfig.Data.FavoriteThing;
+            numericUpDown1.Value = UAGConfig.Data.DataZoom;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -75,13 +75,13 @@ namespace UAssetGUI
 
         private void valuesOnScroll_CheckedChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.ChangeValuesOnScroll = valuesOnScroll.Checked;
+            UAGConfig.Data.ChangeValuesOnScroll = valuesOnScroll.Checked;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.EnableDiscordRPC = enableDiscordRpc.Checked;
-            if (Properties.Settings.Default.EnableDiscordRPC)
+            UAGConfig.Data.EnableDiscordRPC = enableDiscordRpc.Checked;
+            if (UAGConfig.Data.EnableDiscordRPC)
             {
                 BaseForm.UpdateRPC();
             }
@@ -94,8 +94,8 @@ namespace UAssetGUI
         private bool isCurrentlyComicSans = false;
         private void favoriteThingBox_TextChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.FavoriteThing = favoriteThingBox.Text;
-            if (Properties.Settings.Default.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
+            UAGConfig.Data.FavoriteThing = favoriteThingBox.Text;
+            if (UAGConfig.Data.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
             {
                 isCurrentlyComicSans = true;
                 UAGPalette.RefreshTheme(BaseForm);
@@ -111,14 +111,14 @@ namespace UAssetGUI
 
         private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Properties.Settings.Default.Save();
+            UAGConfig.Save();
             UAGPalette.RefreshTheme(BaseForm);
             UAGPalette.RefreshTheme(this);
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.DataZoom = (int)numericUpDown1.Value;
+            UAGConfig.Data.DataZoom = (int)numericUpDown1.Value;
             UAGPalette.RefreshTheme(BaseForm);
             UAGPalette.RefreshTheme(this);
 

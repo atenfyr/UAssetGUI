@@ -16,12 +16,14 @@ using UAssetAPI.ExportTypes;
 using UAssetAPI.PropertyTypes.Objects;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
+using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
         internal EngineVersion ParsingVersion = EngineVersion.UNKNOWN;
+        internal Usmap ParsingMappings = null;
         internal DataGridView dataGridView1;
         internal ColorfulTreeView listView1;
         internal MenuStrip menuStrip1;
@@ -68,6 +70,8 @@ namespace UAssetGUI
         public Form1()
         {
             InitializeComponent();
+            UAGConfig.Load();
+
             Assembly assembly = Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             UAGUtils._displayVersion = fvi.FileVersion;
@@ -178,9 +182,37 @@ namespace UAssetGUI
             return isDropDownOpened[item];
         }
 
+        private List<string> allMappingsKeys = new List<string>();
+
+        private void UpdateMappings()
+        {
+            UAGConfig.LoadMappings();
+            UAGUtils.InvokeUI(() =>
+            {
+                allMappingsKeys.Clear();
+                allMappingsKeys.Add("No mappings");
+                allMappingsKeys.AddRange(UAGConfig.AllMappings.Keys.OrderBy(s => s).ToArray());
+                comboSpecifyMappings.Items.Clear();
+                comboSpecifyMappings.Items.AddRange(allMappingsKeys.ToArray());
+
+                string initialSelection = allMappingsKeys.Contains(UAGConfig.Data.PreferredMappings) ? UAGConfig.Data.PreferredMappings : allMappingsKeys[0];
+
+                for (int i = 0; i < allMappingsKeys.Count; i++)
+                {
+                    if (allMappingsKeys[i] == initialSelection)
+                    {
+                        comboSpecifyMappings.SelectedIndex = i;
+                        break;
+                    }
+                }
+
+                UpdateComboSpecifyMappings();
+            });
+        }
+
         private string[] versionOptionsKeys = new string[]
         {
-            "Unknown version",
+            "Unknown",
             "4.0",
             "4.1",
             "4.2",
@@ -253,10 +285,14 @@ namespace UAssetGUI
             UAGPalette.InitializeTheme();
             UAGPalette.RefreshTheme(this);
 
+            // update mappings combo box
+            UpdateMappings();
+
+            // update version combo box
             string initialSelection = versionOptionsKeys[0];
             try
             {
-                initialSelection = Properties.Settings.Default.PreferredVersion;
+                initialSelection = UAGConfig.Data.PreferredVersion;
             }
             catch
             {
@@ -390,6 +426,7 @@ namespace UAssetGUI
                         }
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
+                        targetAsset.Mappings = ParsingMappings;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
                         targetAsset.Read(targetAsset.PathToReader(targetAsset.FilePath));
                         break;
@@ -1105,7 +1142,7 @@ namespace UAssetGUI
         private void dataGridView1_MouseWheel(object sender, MouseEventArgs e)
         {
             if (dataGridView1.SelectedCells.Count < 1) return;
-            if (!Properties.Settings.Default.ChangeValuesOnScroll) return;
+            if (!UAGConfig.Data.ChangeValuesOnScroll) return;
             var selectedCell = dataGridView1.SelectedCells[0];
 
             int deltaDir = e.Delta > 0 ? -1 : 1;
@@ -1185,6 +1222,7 @@ namespace UAssetGUI
             listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
             listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
             comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
+            comboSpecifyMappings.Location = new Point(comboSpecifyVersion.Location.X - 5 - comboSpecifyMappings.Width, comboSpecifyVersion.Location.Y);
 
             importBinaryData.Location = new Point(dataGridView1.Location.X, comboSpecifyVersion.Location.Y);
             exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
@@ -1288,13 +1326,26 @@ namespace UAssetGUI
         private void UpdateComboSpecifyVersion()
         {
             ParsingVersion = versionOptionsValues[comboSpecifyVersion.SelectedIndex];
-            Properties.Settings.Default.PreferredVersion = versionOptionsKeys[comboSpecifyVersion.SelectedIndex];
-            Properties.Settings.Default.Save();
+            UAGConfig.Data.PreferredVersion = versionOptionsKeys[comboSpecifyVersion.SelectedIndex];
+            UAGConfig.Save();
+        }
+
+        private void UpdateComboSpecifyMappings()
+        {
+            ParsingMappings = UAGConfig.AllMappings.ContainsKey(allMappingsKeys[comboSpecifyMappings.SelectedIndex]) ? UAGConfig.AllMappings[allMappingsKeys[comboSpecifyMappings.SelectedIndex]] : null;
+            if (tableEditor?.asset != null) tableEditor.asset.Mappings = ParsingMappings;
+            UAGConfig.Data.PreferredMappings = allMappingsKeys[comboSpecifyMappings.SelectedIndex];
+            UAGConfig.Save();
         }
 
         private void comboSpecifyVersion_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateComboSpecifyVersion();
+        }
+
+        private void comboSpecifyMappings_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateComboSpecifyMappings();
         }
 
         private void listView1_KeyDown(object sender, KeyEventArgs e)
@@ -1409,7 +1460,6 @@ namespace UAssetGUI
 
             e.Graphics.DrawString(combo.Items[e.Index].ToString(), e.Font, new SolidBrush(fontColor), new Point(e.Bounds.X, e.Bounds.Y));
         }
-
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var ajustesForm = new SettingsForm();
@@ -1553,7 +1603,7 @@ namespace UAssetGUI
         public void UpdateRPC()
         {
             if (DiscordRPC == null || !DiscordRPC.IsInitialized || DiscordRPC.IsDisposed) return;
-            if (!Properties.Settings.Default.EnableDiscordRPC) return;
+            if (!UAGConfig.Data.EnableDiscordRPC) return;
 
             UAGUtils.InvokeUI(() =>
             {
@@ -1578,7 +1628,7 @@ namespace UAssetGUI
                 }
 
                 string projName = GetProjectName();
-                rp.Details = projName == null ? string.Empty : ("Project: " + projName + " (" + Properties.Settings.Default.PreferredVersion + ")");
+                rp.Details = projName == null ? string.Empty : ("Project: " + projName + " (" + UAGConfig.Data.PreferredVersion + ")");
                 rp.State = isEditingAsset ? ("File: " + Path.GetFileName(currPath)) : "Idling";
                 rp.Timestamps.Start = lastOpenedTime;
 

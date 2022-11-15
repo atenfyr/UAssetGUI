@@ -166,9 +166,9 @@
             this.enableDynamicTree.AutoSize = true;
             this.enableDynamicTree.Location = new System.Drawing.Point(116, 162);
             this.enableDynamicTree.Name = "enableDynamicTree";
-            this.enableDynamicTree.Size = new System.Drawing.Size(128, 17);
+            this.enableDynamicTree.Size = new System.Drawing.Size(122, 17);
             this.enableDynamicTree.TabIndex = 14;
-            this.enableDynamicTree.Text = "Enable Dynamic Tree";
+            this.enableDynamicTree.Text = "Enable dynamic tree";
             this.enableDynamicTree.UseVisualStyleBackColor = true;
             this.enableDynamicTree.CheckedChanged += new System.EventHandler(this.enableDynamicTree_CheckedChanged);
             // 

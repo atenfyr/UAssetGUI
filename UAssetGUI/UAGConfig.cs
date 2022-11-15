@@ -26,7 +26,7 @@ namespace UAssetGUI
             FavoriteThing = string.Empty;
             DataZoom = 0;
             ChangeValuesOnScroll = true;
-            EnableDynamicTree = false;
+            EnableDynamicTree = true;
             EnableDiscordRPC = true;
         }
     }

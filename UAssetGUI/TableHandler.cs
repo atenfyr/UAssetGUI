@@ -149,12 +149,9 @@ namespace UAssetGUI
                     case "ArrayProperty":
                         var arr = (ArrayPropertyData)me;
 
-                        if (fillAllSubNodes)
+                        for (int j = 0; j < arr.Value.Length; j++)
                         {
-                            for (int j = 0; j < arr.Value.Length; j++)
-                            {
-                                InterpretThing(arr.Value[j], topNode, topNode.ExportNum, fillAllSubNodes);
-                            }
+                            InterpretThing(arr.Value[j], topNode, topNode.ExportNum, fillAllSubNodes);
                         }
                         break;
                     case "MapProperty":
@@ -225,7 +222,17 @@ namespace UAssetGUI
                             {
                                 for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode, i, fillAllSubNodes);
                             }
-                            if (us.Data.Count == 0) parentNode.ChildrenInitialized = true;
+
+                            bool hasChildren = false;
+                            for (int j = 0; j < us.Data.Count; j++)
+                            {
+                                if (hasChildrenProperties.Contains(us.Data[j].PropertyType.Value))
+                                {
+                                    hasChildren = true;
+                                    break;
+                                }
+                            }
+                            if (!hasChildren) parentNode.ChildrenInitialized = true;
 
                             if (us is StringTableExport us2)
                             {
@@ -308,6 +315,18 @@ namespace UAssetGUI
             listView1.EndUpdate();
         }
 
+        private HashSet<string> hasChildrenProperties = new HashSet<string>()
+        {
+            "StructProperty",
+            "ClothLODData",
+            "SetProperty",
+            "ArrayProperty",
+            "GameplayTagContainer",
+            "MapProperty",
+            "MulticastDelegateProperty",
+            "Box"
+        };
+
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode, int exportNum, bool fillAllSubNodes)
         {
             ourNode.ChildrenInitialized = true;
@@ -323,6 +342,8 @@ namespace UAssetGUI
 
                     var structNode = new PointingTreeNode(decidedName + " (" + struc.Value.Count + ")", struc, 0, exportNum);
                     ourNode.Nodes.Add(structNode);
+
+                    bool hasChildren = false;
                     if (fillAllSubNodes)
                     {
                         for (int j = 0; j < struc.Value.Count; j++)
@@ -330,8 +351,20 @@ namespace UAssetGUI
                             InterpretThing(struc.Value[j], structNode, exportNum, fillAllSubNodes);
                         }
                     }
+                    else
+                    {
+                        // check if there is children
+                        for (int j = 0; j < struc.Value.Count; j++)
+                        {
+                            if (hasChildrenProperties.Contains(struc.Value[j].PropertyType.Value))
+                            {
+                                hasChildren = true;
+                                break;
+                            }
+                        }
+                    }
 
-                    if (struc.Value.Count == 0) structNode.ChildrenInitialized = true;
+                    if (!hasChildren) structNode.ChildrenInitialized = true;
                     break;
                 case "SetProperty":
                 case "ArrayProperty":
@@ -339,6 +372,8 @@ namespace UAssetGUI
 
                     var arrNode = new PointingTreeNode(arr.Name.Value.Value + " (" + arr.Value.Length + ")", arr, 0, exportNum);
                     ourNode.Nodes.Add(arrNode);
+
+                    bool hasChildren2 = false;
                     if (fillAllSubNodes)
                     {
                         for (int j = 0; j < arr.Value.Length; j++)
@@ -346,8 +381,20 @@ namespace UAssetGUI
                             InterpretThing(arr.Value[j], arrNode, exportNum, fillAllSubNodes);
                         }
                     }
+                    else
+                    {
+                        // check if there is children
+                        for (int j = 0; j < arr.Value.Length; j++)
+                        {
+                            if (hasChildrenProperties.Contains(arr.Value[j].PropertyType.Value))
+                            {
+                                hasChildren2 = true;
+                                break;
+                            }
+                        }
+                    }
 
-                    if (arr.Value.Length == 0) arrNode.ChildrenInitialized = true;
+                    if (!hasChildren2) arrNode.ChildrenInitialized = true;
                     break;
                 case "GameplayTagContainer":
                     var arr2 = (GameplayTagContainerPropertyData)me;

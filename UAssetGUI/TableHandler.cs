@@ -249,11 +249,13 @@ namespace UAssetGUI
                                 if (structUs.ScriptBytecode == null)
                                 {
                                     var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs.ScriptBytecodeRaw, PointingTreeNodeType.Normal, i);
+                                    bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
                                 else
                                 {
                                     var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs.ScriptBytecode, PointingTreeNodeType.Normal, i);
+                                    bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
                             }

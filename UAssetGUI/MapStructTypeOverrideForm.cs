@@ -112,7 +112,7 @@ namespace UAssetGUI
         {
             CheckIfMapStructTypeOverrideIsNull();
 
-            UAGConfig.Data.MapStructTypeOverride = ExportData();
+            UAGConfig.Data.MapStructTypeOverride = ExportData(Formatting.None);
             UAGConfig.Save();
         }
 
@@ -138,7 +138,7 @@ namespace UAssetGUI
             }
         }
 
-        private static string ExportData()
+        private static string ExportData(Formatting formatting = Formatting.Indented)
         {
             CheckIfMapStructTypeOverrideIsNull();
 
@@ -147,7 +147,7 @@ namespace UAssetGUI
 
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                writer.Formatting = Formatting.Indented;
+                writer.Formatting = formatting;
 
                 writer.WriteStartObject();
                 foreach (KeyValuePair<string, Tuple<FString, FString>> entry in MapStructTypeOverride)
@@ -211,6 +211,17 @@ namespace UAssetGUI
                     File.WriteAllText(dialog.FileName, ExportData());
                 }
             }
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            DialogResult res = MessageBox.Show("Are you sure you want to reset the table to its defaults?", this.Text, MessageBoxButtons.OKCancel);
+            if (res != DialogResult.OK) return;
+
+            MapStructTypeOverride = null;
+            CheckIfMapStructTypeOverrideIsNull();
+            LoadOntoDGV();
+            SaveToConfig();
         }
     }
 }

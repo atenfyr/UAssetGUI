@@ -441,7 +441,7 @@ namespace UAssetGUI
                 saveAsToolStripMenuItem.Enabled = true;
                 findToolStripMenuItem.Enabled = true;
 
-                tableEditor.FillOutTree();
+                tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
                 tableEditor.Load();
 
                 UAGPalette.RefreshTheme(this);
@@ -895,7 +895,7 @@ namespace UAssetGUI
                                 {
                                     SetUnsavedChanges(true);
                                     tableEditor.Save(true);
-                                    tableEditor.FillOutTree();
+                                    tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
 
                                     TreeNode newNode = SearchForTreeNode(listView1, pointerNode.ExportNum + 1);
                                     newNode.EnsureVisible();
@@ -999,7 +999,7 @@ namespace UAssetGUI
 
                                         SetUnsavedChanges(true);
                                         tableEditor.Save(true);
-                                        tableEditor.FillOutTree();
+                                        tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
 
                                         TreeNode newNode = SearchForTreeNode(listView1, pointerNode.ExportNum);
                                         if (newNode != null)
@@ -1280,7 +1280,7 @@ namespace UAssetGUI
             if (tableEditor != null)
             {
                 tableEditor.Save(true);
-                tableEditor.FillOutTree();
+                tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
             }
         }
 
@@ -1634,6 +1634,19 @@ namespace UAssetGUI
 
                 DiscordRPC.SetPresence(rp);
             });
+        }
+
+        private void listView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (tableEditor?.asset == null) return;
+
+            if (e.Node is PointingTreeNode ptn)
+            {
+                if (!ptn.ChildrenInitialized)
+                {
+                    tableEditor.FillOutSubnodes(ptn, false);
+                }
+            }
         }
     }
 }

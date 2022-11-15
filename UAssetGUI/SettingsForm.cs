@@ -20,6 +20,7 @@ namespace UAssetGUI
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
             valuesOnScroll.Checked = UAGConfig.Data.ChangeValuesOnScroll;
             enableDiscordRpc.Checked = UAGConfig.Data.EnableDiscordRPC;
+            enableDynamicTree.Checked = UAGConfig.Data.EnableDynamicTree;
             favoriteThingBox.Text = UAGConfig.Data.FavoriteThing;
             numericUpDown1.Value = UAGConfig.Data.DataZoom;
 
@@ -76,6 +77,11 @@ namespace UAssetGUI
         private void valuesOnScroll_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.ChangeValuesOnScroll = valuesOnScroll.Checked;
+        }
+
+        private void enableDynamicTree_CheckedChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.EnableDynamicTree = enableDynamicTree.Checked;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

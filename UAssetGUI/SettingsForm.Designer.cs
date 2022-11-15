@@ -39,6 +39,7 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.enableDiscordRpc = new System.Windows.Forms.CheckBox();
+            this.enableDynamicTree = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,7 +61,7 @@
             this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(195, 193);
+            this.closeButton.Location = new System.Drawing.Point(195, 221);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
             this.closeButton.TabIndex = 4;
@@ -74,7 +75,7 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
             this.label1.Location = new System.Drawing.Point(56, 62);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(54, 16);
+            this.label1.Size = new System.Drawing.Size(53, 16);
             this.label1.TabIndex = 5;
             this.label1.Text = "Theme:";
             // 
@@ -84,7 +85,7 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
             this.label2.Location = new System.Drawing.Point(13, 88);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(97, 16);
+            this.label2.Size = new System.Drawing.Size(96, 16);
             this.label2.TabIndex = 6;
             this.label2.Text = "Favorite Thing:";
             // 
@@ -94,7 +95,7 @@
             this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.aboutButton.Location = new System.Drawing.Point(12, 193);
+            this.aboutButton.Location = new System.Drawing.Point(12, 221);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
             this.aboutButton.TabIndex = 7;
@@ -145,14 +146,14 @@
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
             this.label3.Location = new System.Drawing.Point(64, 113);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(46, 16);
+            this.label3.Size = new System.Drawing.Size(45, 16);
             this.label3.TabIndex = 12;
             this.label3.Text = "Zoom:";
             // 
             // enableDiscordRpc
             // 
             this.enableDiscordRpc.AutoSize = true;
-            this.enableDiscordRpc.Location = new System.Drawing.Point(116, 162);
+            this.enableDiscordRpc.Location = new System.Drawing.Point(116, 185);
             this.enableDiscordRpc.Name = "enableDiscordRpc";
             this.enableDiscordRpc.Size = new System.Drawing.Size(123, 17);
             this.enableDiscordRpc.TabIndex = 13;
@@ -160,11 +161,23 @@
             this.enableDiscordRpc.UseVisualStyleBackColor = true;
             this.enableDiscordRpc.CheckedChanged += new System.EventHandler(this.enableDiscordRpc_CheckedChanged);
             // 
+            // enableDynamicTree
+            // 
+            this.enableDynamicTree.AutoSize = true;
+            this.enableDynamicTree.Location = new System.Drawing.Point(116, 162);
+            this.enableDynamicTree.Name = "enableDynamicTree";
+            this.enableDynamicTree.Size = new System.Drawing.Size(128, 17);
+            this.enableDynamicTree.TabIndex = 14;
+            this.enableDynamicTree.Text = "Enable Dynamic Tree";
+            this.enableDynamicTree.UseVisualStyleBackColor = true;
+            this.enableDynamicTree.CheckedChanged += new System.EventHandler(this.enableDynamicTree_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 225);
+            this.ClientSize = new System.Drawing.Size(282, 253);
+            this.Controls.Add(this.enableDynamicTree);
             this.Controls.Add(this.enableDiscordRpc);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.numericUpDown1);
@@ -200,5 +213,6 @@
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox enableDiscordRpc;
+        private System.Windows.Forms.CheckBox enableDynamicTree;
     }
 }

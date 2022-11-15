@@ -13,8 +13,9 @@ namespace UAssetGUI
         public string Theme;
         public string MapStructTypeOverride;
         public string FavoriteThing;
-        public bool ChangeValuesOnScroll;
         public int DataZoom;
+        public bool ChangeValuesOnScroll;
+        public bool EnableDynamicTree;
         public bool EnableDiscordRPC;
 
         public UAGConfigData()
@@ -23,8 +24,9 @@ namespace UAssetGUI
             Theme = string.Empty;
             MapStructTypeOverride = string.Empty;
             FavoriteThing = string.Empty;
-            ChangeValuesOnScroll = true;
             DataZoom = 0;
+            ChangeValuesOnScroll = true;
+            EnableDynamicTree = false;
             EnableDiscordRPC = true;
         }
     }

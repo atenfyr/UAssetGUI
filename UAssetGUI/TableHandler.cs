@@ -51,7 +51,8 @@ namespace UAssetGUI
         ClassData,
         EnumData,
         UPropertyData,
-        ByteArray
+        ByteArray,
+        Dummy
     }
 
     public class PointingTreeNode : TreeNode
@@ -61,6 +62,20 @@ namespace UAssetGUI
         public int ExportNum;
         public bool WillCopyWholeExport;
 
+        private bool _childrenInitialized = false;
+        public bool ChildrenInitialized
+        {
+            get
+            {
+                return _childrenInitialized;
+            }
+            set
+            {
+                if (UAGConfig.Data.EnableDynamicTree && Type != PointingTreeNodeType.Dummy && !_childrenInitialized && value && this.Nodes.Count > 0 && this.Nodes[0] is PointingTreeNode m && m.Type == PointingTreeNodeType.Dummy) this.Nodes.RemoveAt(0);
+                _childrenInitialized = value;
+            }
+        }
+
         public PointingTreeNode(string label, object pointer, PointingTreeNodeType type = 0, int exportNum = -1, bool willCopyWholeExport = false)
         {
             Pointer = pointer;
@@ -68,6 +83,12 @@ namespace UAssetGUI
             this.Text = label;
             ExportNum = exportNum;
             WillCopyWholeExport = willCopyWholeExport;
+
+            if (UAGConfig.Data.EnableDynamicTree && Type != PointingTreeNodeType.Dummy && pointer != null)
+            {
+                this.Nodes.Clear();
+                this.Nodes.Add(new PointingTreeNode("", null, PointingTreeNodeType.Dummy, -1, false));
+            }
         }
     }
 
@@ -103,7 +124,58 @@ namespace UAssetGUI
             );
         }
 
-        public void FillOutTree()
+        public void FillOutSubnodes(PointingTreeNode topNode, bool fillAllSubNodes)
+        {
+            if (topNode.ChildrenInitialized) return;
+
+            topNode.ChildrenInitialized = true;
+            if (topNode.Pointer is NormalExport me1)
+            {
+                for (int j = 0; j < me1.Data.Count; j++) InterpretThing(me1.Data[j], topNode, topNode.ExportNum, fillAllSubNodes);
+            }
+            else if (topNode.Pointer is PropertyData me)
+            {
+                switch (me.PropertyType.Value)
+                {
+                    case "StructProperty":
+                    case "ClothLODData":
+                        var struc = (StructPropertyData)me;
+                        for (int j = 0; j < struc.Value.Count; j++)
+                        {
+                            InterpretThing(struc.Value[j], topNode, topNode.ExportNum, fillAllSubNodes);
+                        }
+                        break;
+                    case "SetProperty":
+                    case "ArrayProperty":
+                        var arr = (ArrayPropertyData)me;
+
+                        if (fillAllSubNodes)
+                        {
+                            for (int j = 0; j < arr.Value.Length; j++)
+                            {
+                                InterpretThing(arr.Value[j], topNode, topNode.ExportNum, fillAllSubNodes);
+                            }
+                        }
+                        break;
+                    case "MapProperty":
+                        var mapp = (MapPropertyData)me;
+
+                        foreach (var entry in mapp.Value)
+                        {
+                            entry.Key.Name = FName.DefineDummy(asset, "Key");
+                            entry.Value.Name = FName.DefineDummy(asset, "Value");
+
+                            var softEntryNode = new PointingTreeNode(mapp.Name.Value.Value + " (2)", new PointingDictionaryEntry(entry, mapp), 0, topNode.ExportNum);
+                            topNode.Nodes.Add(softEntryNode);
+                            InterpretThing(entry.Key, softEntryNode, topNode.ExportNum, fillAllSubNodes);
+                            InterpretThing(entry.Value, softEntryNode, topNode.ExportNum, fillAllSubNodes);
+                        }
+                        break;
+                }
+            }
+        }
+
+        public void FillOutTree(bool fillAllSubNodes)
         {
             listView1.BeginUpdate();
             listView1.Nodes.Clear();
@@ -140,6 +212,7 @@ namespace UAssetGUI
                     case RawExport us3:
                         {
                             var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3, PointingTreeNodeType.ByteArray, i);
+                            parentNode.ChildrenInitialized = true;
                             categoryNode.Nodes.Add(parentNode);
                             break;
                         }
@@ -148,17 +221,23 @@ namespace UAssetGUI
                             var parentNode = new PointingTreeNode((baseUs.ClassIndex.IsImport() ? baseUs.ClassIndex.ToImport(asset).ObjectName.Value.Value : baseUs.ClassIndex.Index.ToString()) + " (" + us.Data.Count + ")", us, 0, i);
                             categoryNode.Nodes.Add(parentNode);
 
-                            for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode, i);
+                            if (fillAllSubNodes)
+                            {
+                                for (int j = 0; j < us.Data.Count; j++) InterpretThing(us.Data[j], parentNode, i, fillAllSubNodes);
+                            }
+                            if (us.Data.Count == 0) parentNode.ChildrenInitialized = true;
 
                             if (us is StringTableExport us2)
                             {
                                 var parentNode2 = new PointingTreeNode((us2.Table?.TableNamespace?.ToString() ?? FString.NullCase) + " (" + us2.Table.Count + ")", us2.Table, 0, i);
+                                parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             if (us is StructExport structUs)
                             {
                                 var parentNode2 = new PointingTreeNode("UStruct Data", structUs, PointingTreeNodeType.StructData, i);
+                                parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                                 if (structUs.ScriptBytecode == null)
                                 {
@@ -175,18 +254,21 @@ namespace UAssetGUI
                             if (us is ClassExport)
                             {
                                 var parentNode2 = new PointingTreeNode("UClass Data", (ClassExport)us, PointingTreeNodeType.ClassData, i);
+                                parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             if (us is PropertyExport)
                             {
                                 var parentNode2 = new PointingTreeNode("UProperty Data", (PropertyExport)us, PointingTreeNodeType.UPropertyData, i);
+                                parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             if (us is DataTableExport us4)
                             {
                                 var parentNode2 = new PointingTreeNode("Table Info (" + us4.Table.Data.Count + ")", us4.Table, 0, i);
+                                parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                                 foreach (StructPropertyData entry in us4.Table.Data)
                                 {
@@ -194,9 +276,12 @@ namespace UAssetGUI
 
                                     var structNode = new PointingTreeNode(decidedName + " (" + entry.Value.Count + ")", entry, 0, i);
                                     parentNode2.Nodes.Add(structNode);
-                                    for (int j = 0; j < entry.Value.Count; j++)
+                                    if (fillAllSubNodes)
                                     {
-                                        InterpretThing(entry.Value[j], structNode, i);
+                                        for (int j = 0; j < entry.Value.Count; j++)
+                                        {
+                                            InterpretThing(entry.Value[j], structNode, i, fillAllSubNodes);
+                                        }
                                     }
                                 }
                             }
@@ -204,11 +289,13 @@ namespace UAssetGUI
                             if (us is EnumExport us5)
                             {
                                 var parentNode2 = new PointingTreeNode("Enum Data", us5, PointingTreeNodeType.EnumData, i);
+                                parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             {
                                 var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us, PointingTreeNodeType.ByteArray, i);
+                                parentNode3.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode3);
                             }
 
@@ -221,8 +308,9 @@ namespace UAssetGUI
             listView1.EndUpdate();
         }
 
-        private void InterpretThing(PropertyData me, PointingTreeNode ourNode, int exportNum)
+        private void InterpretThing(PropertyData me, PointingTreeNode ourNode, int exportNum, bool fillAllSubNodes)
         {
+            ourNode.ChildrenInitialized = true;
             if (me == null) return;
             switch (me.PropertyType.Value)
             {
@@ -235,10 +323,15 @@ namespace UAssetGUI
 
                     var structNode = new PointingTreeNode(decidedName + " (" + struc.Value.Count + ")", struc, 0, exportNum);
                     ourNode.Nodes.Add(structNode);
-                    for (int j = 0; j < struc.Value.Count; j++)
+                    if (fillAllSubNodes)
                     {
-                        InterpretThing(struc.Value[j], structNode, exportNum);
+                        for (int j = 0; j < struc.Value.Count; j++)
+                        {
+                            InterpretThing(struc.Value[j], structNode, exportNum, fillAllSubNodes);
+                        }
                     }
+
+                    if (struc.Value.Count == 0) structNode.ChildrenInitialized = true;
                     break;
                 case "SetProperty":
                 case "ArrayProperty":
@@ -246,10 +339,15 @@ namespace UAssetGUI
 
                     var arrNode = new PointingTreeNode(arr.Name.Value.Value + " (" + arr.Value.Length + ")", arr, 0, exportNum);
                     ourNode.Nodes.Add(arrNode);
-                    for (int j = 0; j < arr.Value.Length; j++)
+                    if (fillAllSubNodes)
                     {
-                        InterpretThing(arr.Value[j], arrNode, exportNum);
+                        for (int j = 0; j < arr.Value.Length; j++)
+                        {
+                            InterpretThing(arr.Value[j], arrNode, exportNum, fillAllSubNodes);
+                        }
                     }
+
+                    if (arr.Value.Length == 0) arrNode.ChildrenInitialized = true;
                     break;
                 case "GameplayTagContainer":
                     var arr2 = (GameplayTagContainerPropertyData)me;
@@ -270,8 +368,8 @@ namespace UAssetGUI
 
                         var softEntryNode = new PointingTreeNode(mapp.Name.Value.Value + " (2)", new PointingDictionaryEntry(entry, mapp), 0, exportNum);
                         mapNode.Nodes.Add(softEntryNode);
-                        InterpretThing(entry.Key, softEntryNode, exportNum);
-                        InterpretThing(entry.Value, softEntryNode, exportNum);
+                        InterpretThing(entry.Key, softEntryNode, exportNum, fillAllSubNodes);
+                        InterpretThing(entry.Value, softEntryNode, exportNum, fillAllSubNodes);
                     }
                     break;
                 case "MulticastDelegateProperty":

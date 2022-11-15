@@ -12,6 +12,9 @@ namespace UAssetGUI
 
         protected override void OnDrawNode(DrawTreeNodeEventArgs e)
         {
+            if (!e.Node.IsVisible) return;
+            if (e.Node.Bounds.IsEmpty) return;
+
             Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
             Color fore = e.Node.ForeColor;
             if (fore == Color.Empty) fore = e.Node.TreeView.ForeColor;

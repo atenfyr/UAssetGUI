@@ -1568,10 +1568,10 @@ namespace UAssetGUI
                                     if (ourValue != null) ourValue.Name = FName.DefineDummy(asset, "Value");
                                     renderingArr = new PropertyData[2] { ourKey, ourValue };
                                     break;
-                                case FMulticastDelegate[] usRealMDArr:
+                                case FDelegate[] usRealMDArr:
                                     for (int i = 0; i < usRealMDArr.Length; i++)
                                     {
-                                        dataGridView1.Rows.Add(usRealMDArr[i].Delegate, "FMulticastDelegate", usRealMDArr[i].Number);
+                                        dataGridView1.Rows.Add(usRealMDArr[i].Delegate, "FDelegate", usRealMDArr[i].Object.Index);
                                     }
                                     standardRendering = false;
                                     break;

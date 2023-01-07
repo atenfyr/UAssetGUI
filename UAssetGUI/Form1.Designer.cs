@@ -50,6 +50,8 @@ namespace UAssetGUI
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recalculateNodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.configDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mappingsDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.issuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.githubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.apiLinkToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -224,6 +226,8 @@ namespace UAssetGUI
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.configDirToolStripMenuItem,
+            this.mappingsDirToolStripMenuItem,
             this.issuesToolStripMenuItem,
             this.githubToolStripMenuItem,
             this.apiLinkToolStripMenuItem1});
@@ -231,24 +235,38 @@ namespace UAssetGUI
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
+            // configDirToolStripMenuItem
+            // 
+            this.configDirToolStripMenuItem.Name = "configDirToolStripMenuItem";
+            this.configDirToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.configDirToolStripMenuItem.Text = "Open config directory...";
+            this.configDirToolStripMenuItem.Click += new System.EventHandler(this.configDirToolStripMenuItem_Click);
+            // 
+            // mappingsDirToolStripMenuItem
+            // 
+            this.mappingsDirToolStripMenuItem.Name = "mappingsDirToolStripMenuItem";
+            this.mappingsDirToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.mappingsDirToolStripMenuItem.Text = "Open mappings directory...";
+            this.mappingsDirToolStripMenuItem.Click += new System.EventHandler(this.mappingsDirToolStripMenuItem_Click);
+            // 
             // issuesToolStripMenuItem
             // 
             this.issuesToolStripMenuItem.Name = "issuesToolStripMenuItem";
-            this.issuesToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.issuesToolStripMenuItem.Text = "Give Feedback";
+            this.issuesToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
+            this.issuesToolStripMenuItem.Text = "Give feedback";
             this.issuesToolStripMenuItem.Click += new System.EventHandler(this.issuesToolStripMenuItem_Click);
             // 
             // githubToolStripMenuItem
             // 
             this.githubToolStripMenuItem.Name = "githubToolStripMenuItem";
-            this.githubToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.githubToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
             this.githubToolStripMenuItem.Text = "UAssetGUI on GitHub";
             this.githubToolStripMenuItem.Click += new System.EventHandler(this.githubToolStripMenuItem_Click);
             // 
             // apiLinkToolStripMenuItem1
             // 
             this.apiLinkToolStripMenuItem1.Name = "apiLinkToolStripMenuItem1";
-            this.apiLinkToolStripMenuItem1.Size = new System.Drawing.Size(187, 22);
+            this.apiLinkToolStripMenuItem1.Size = new System.Drawing.Size(218, 22);
             this.apiLinkToolStripMenuItem1.Text = "UAssetAPI on GitHub";
             this.apiLinkToolStripMenuItem1.Click += new System.EventHandler(this.apiLinkToolStripMenuItem_Click);
             // 
@@ -424,6 +442,8 @@ namespace UAssetGUI
         private ToolStripMenuItem replaceAllReferencesToolStripMenuItem;
         public ContextMenuStrip nameMapContext;
         private ToolStripMenuItem issuesToolStripMenuItem;
+        private ToolStripMenuItem configDirToolStripMenuItem;
+        private ToolStripMenuItem mappingsDirToolStripMenuItem;
         private ToolStripMenuItem mapStructTypeOverridesToolStripMenuItem;
         public ComboBox comboSpecifyVersion;
         private ToolStripMenuItem settingsToolStripMenuItem;

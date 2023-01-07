@@ -492,6 +492,11 @@ namespace UAssetGUI
                     MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes) + (failedToMaintainBinaryEquality ? "" : "\n\nThis is not a cause for alarm. The asset will still parse normally."), "Notice");
                 }
 
+                if (tableEditor.asset.HasUnversionedProperties && tableEditor.asset.Mappings == null)
+                {
+                    MessageBox.Show("Failed to parse unversioned properties! Exports cannot be parsed for this asset unless a valid set of mappings is provided. If you have a .usmap file for this game, go to Help --> Open mappings directory..., place your .usmap file in there, restart UAssetGUI, and select the file in the top-right corner of this window.", "Notice");
+                }
+
                 if (failedToMaintainBinaryEquality)
                 {
                     MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
@@ -1647,6 +1652,26 @@ namespace UAssetGUI
                     tableEditor.FillOutSubnodes(ptn, false);
                 }
             }
+        }
+
+        private void OpenDirectory(string dir)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = dir,
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+
+        private void configDirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenDirectory(UAGConfig.ConfigFolder);
+        }
+
+        private void mappingsDirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenDirectory(UAGConfig.MappingsFolder);
         }
     }
 }

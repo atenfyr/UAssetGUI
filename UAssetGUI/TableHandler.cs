@@ -1732,6 +1732,7 @@ namespace UAssetGUI
                         ExportDetailsParseType.UInt,
                         ExportDetailsParseType.Bool,
                         ExportDetailsParseType.Bool,
+                        ExportDetailsParseType.Bool,
 
                         ExportDetailsParseType.FPackageIndexList,
                         ExportDetailsParseType.FPackageIndexList,

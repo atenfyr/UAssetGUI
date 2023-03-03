@@ -41,7 +41,6 @@ namespace UAssetGUI
         {
             AboutText = (this.Owner as Form1).DisplayVersion + "\n" +
             "By atenfyr\n" +
-            "\nThanks to the Astroneer Modding club for the help\n" +
             "\nThanks to Kaiheilos for early assistance with the package file summary format\n" +
             "\n(Here's where a soppy monologue goes)\n";
 

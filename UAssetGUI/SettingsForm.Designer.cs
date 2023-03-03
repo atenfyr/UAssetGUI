@@ -40,6 +40,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.enableDiscordRpc = new System.Windows.Forms.CheckBox();
             this.enableDynamicTree = new System.Windows.Forms.CheckBox();
+            this.doubleClickToEdit = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -61,7 +62,7 @@
             this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(195, 221);
+            this.closeButton.Location = new System.Drawing.Point(195, 240);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
             this.closeButton.TabIndex = 4;
@@ -95,7 +96,7 @@
             this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.aboutButton.Location = new System.Drawing.Point(12, 221);
+            this.aboutButton.Location = new System.Drawing.Point(12, 240);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
             this.aboutButton.TabIndex = 7;
@@ -153,7 +154,7 @@
             // enableDiscordRpc
             // 
             this.enableDiscordRpc.AutoSize = true;
-            this.enableDiscordRpc.Location = new System.Drawing.Point(116, 185);
+            this.enableDiscordRpc.Location = new System.Drawing.Point(116, 208);
             this.enableDiscordRpc.Name = "enableDiscordRpc";
             this.enableDiscordRpc.Size = new System.Drawing.Size(123, 17);
             this.enableDiscordRpc.TabIndex = 13;
@@ -164,7 +165,7 @@
             // enableDynamicTree
             // 
             this.enableDynamicTree.AutoSize = true;
-            this.enableDynamicTree.Location = new System.Drawing.Point(116, 162);
+            this.enableDynamicTree.Location = new System.Drawing.Point(116, 185);
             this.enableDynamicTree.Name = "enableDynamicTree";
             this.enableDynamicTree.Size = new System.Drawing.Size(122, 17);
             this.enableDynamicTree.TabIndex = 14;
@@ -172,11 +173,23 @@
             this.enableDynamicTree.UseVisualStyleBackColor = true;
             this.enableDynamicTree.CheckedChanged += new System.EventHandler(this.enableDynamicTree_CheckedChanged);
             // 
+            // doubleClickToEdit
+            // 
+            this.doubleClickToEdit.AutoSize = true;
+            this.doubleClickToEdit.Location = new System.Drawing.Point(116, 162);
+            this.doubleClickToEdit.Name = "doubleClickToEdit";
+            this.doubleClickToEdit.Size = new System.Drawing.Size(117, 17);
+            this.doubleClickToEdit.TabIndex = 15;
+            this.doubleClickToEdit.Text = "Double click to edit";
+            this.doubleClickToEdit.UseVisualStyleBackColor = true;
+            this.doubleClickToEdit.CheckedChanged += new System.EventHandler(this.doubleClickToEdit_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 253);
+            this.ClientSize = new System.Drawing.Size(282, 272);
+            this.Controls.Add(this.doubleClickToEdit);
             this.Controls.Add(this.enableDynamicTree);
             this.Controls.Add(this.enableDiscordRpc);
             this.Controls.Add(this.label3);
@@ -214,5 +227,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox enableDiscordRpc;
         private System.Windows.Forms.CheckBox enableDynamicTree;
+        private System.Windows.Forms.CheckBox doubleClickToEdit;
     }
 }

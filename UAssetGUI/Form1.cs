@@ -156,6 +156,7 @@ namespace UAssetGUI
             DragDrop += new DragEventHandler(frm_DragDrop);
 
             dataGridView1.MouseWheel += dataGridView1_MouseWheel;
+            dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
 
             menuStrip1.Renderer = new UAGMenuStripRenderer();
             foreach (ToolStripMenuItem entry in menuStrip1.Items)
@@ -1577,9 +1578,8 @@ namespace UAssetGUI
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            dataGridView1.BeginEdit(true);
+            if (UAGConfig.Data.DoubleClickToEdit) dataGridView1.BeginEdit(true);
         }
-
 
         private readonly HashSet<string> invalidBaseFolders = new HashSet<string>() { "AIModule", "ALAudio", "AVEncoder", "AVIWriter", "Advertising", "Analytics", "Android", "AnimGraphRuntime", "AnimationCore", "AppFramework", "Apple", "ApplicationCore", "AssetRegistry", "AudioAnalyzer", "AudioCaptureCore", "AudioCaptureImplementations", "AudioExtensions", "AudioMixer", "AudioMixerCore", "AudioPlatformConfiguration", "AugmentedReality", "AutomationMessages", "AutomationWorker", "BlueprintRuntime", "BuildSettings", "CEF3Utils", "CUDA/Source", "Cbor", "CinematicCamera", "ClientPilot", "ClothingSystemRuntimeCommon", "ClothingSystemRuntimeInterface", "ClothingSystemRuntimeNv", "CookedIterativeFile", "Core", "CoreUObject", "CrashReportCore", "CrunchCompression", "D3D12RHI", "Datasmith", "DeveloperSettings", "EmptyRHI", "Engine", "EngineMessages", "EngineSettings", "Experimental", "ExternalRPCRegistry", "EyeTracker", "Foliage", "FriendsAndChat", "GameMenuBuilder", "GameplayMediaEncoder", "GameplayTags", "GameplayTasks", "HardwareSurvey", "HeadMountedDisplay", "IESFile", "IOS", "IPC", "ImageCore", "ImageWrapper", "ImageWriteQueue", "InputCore", "InputDevice", "InstallBundleManager", "Json", "JsonUtilities", "Landscape", "Launch", "LevelSequence", "Linux/AudioMixerSDL", "LiveLinkInterface", "LiveLinkMessageBusFramework", "Lumin/LuminRuntimeSettings", "MRMesh", "Mac", "MaterialShaderQualitySettings", "Media", "MediaAssets", "MediaInfo", "MediaUtils", "MeshDescription", "MeshUtilitiesCommon", "Messaging", "MessagingCommon", "MessagingRpc", "MoviePlayer", "MovieScene", "MovieSceneCapture", "MovieSceneTracks", "NVidia/GeForceNOW", "NavigationSystem", "Navmesh", "Net", "NetworkFile", "NetworkFileSystem", "NetworkReplayStreaming", "Networking", "NonRealtimeAudioRenderer", "NullDrv", "NullInstallBundleManager", "Online", "OpenGLDrv", "Overlay", "PacketHandlers", "PakFile", "PerfCounters", "PhysXCooking", "PhysicsCore", "PlatformThirdPartyHelpers/PosixShim", "Portal", "PreLoadScreen", "Projects", "PropertyAccess", "PropertyPath", "RHI", "RSA", "RawMesh", "RenderCore", "Renderer", "RigVM", "RuntimeAssetCache", "SandboxFile", "Serialization", "SessionMessages", "SessionServices", "SignalProcessing", "Slate", "SlateCore", "SlateNullRenderer", "SlateRHIRenderer", "Sockets", "SoundFieldRendering", "StaticMeshDescription", "StreamingFile", "StreamingPauseRendering", "SynthBenchmark", "TimeManagement", "Toolbox", "TraceLog", "UE4Game", "UELibrary", "UMG", "Unix/UnixCommonStartup", "UnrealAudio", "VectorVM", "VirtualProduction/StageDataCore", "VulkanRHI", "WebBrowser", "WebBrowserTexture", "WidgetCarousel", "Windows", "XmlParser" };
         private readonly HashSet<string> invalidExtraFolders = new HashSet<string>() { "AkAudio", "ClothingSystemRuntime" };

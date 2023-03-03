@@ -17,6 +17,7 @@ namespace UAssetGUI
         public bool ChangeValuesOnScroll;
         public bool EnableDynamicTree;
         public bool EnableDiscordRPC;
+        public bool DoubleClickToEdit;
 
         public UAGConfigData()
         {
@@ -28,6 +29,7 @@ namespace UAssetGUI
             ChangeValuesOnScroll = true;
             EnableDynamicTree = true;
             EnableDiscordRPC = true;
+            DoubleClickToEdit = true;
         }
     }
 

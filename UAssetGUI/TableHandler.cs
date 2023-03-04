@@ -884,7 +884,7 @@ namespace UAssetGUI
 
                         return decidedRCKProperty;
                     default:
-                        PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(asset, type), nameName, null, asset);
+                        PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(asset, type), nameName, null, null, asset);
                         if (original != null && original.GetType() == newThing.GetType())
                         {
                             newThing = original;
@@ -2042,8 +2042,8 @@ namespace UAssetGUI
                                 }
                                 else
                                 {
-                                    var newKeyProp = MainSerializer.TypeToClass(mapKeyType, usMap.Name, null, asset);
-                                    var newValProp = MainSerializer.TypeToClass(mapValueType, usMap.Name, null, asset);
+                                    var newKeyProp = MainSerializer.TypeToClass(mapKeyType, usMap.Name, null, null, asset);
+                                    var newValProp = MainSerializer.TypeToClass(mapValueType, usMap.Name, null, null, asset);
                                     if (newKeyProp is StructPropertyData) ((StructPropertyData)newKeyProp).StructType = FName.DefineDummy(asset, "Generic");
                                     if (newValProp is StructPropertyData) ((StructPropertyData)newValProp).StructType = FName.DefineDummy(asset, "Generic");
                                     newData.Add(newKeyProp, newValProp);

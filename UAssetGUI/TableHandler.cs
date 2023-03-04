@@ -795,6 +795,7 @@ namespace UAssetGUI
                         if (original != null && original is TextPropertyData)
                         {
                             decidedTextData = (TextPropertyData)original;
+                            decidedTextData.IsZero = false;
                         }
                         else
                         {
@@ -840,6 +841,7 @@ namespace UAssetGUI
                         if (original != null && original is ObjectPropertyData)
                         {
                             decidedObjData = (ObjectPropertyData)original;
+                            decidedObjData.IsZero = false;
                         }
                         else
                         {
@@ -860,6 +862,7 @@ namespace UAssetGUI
                         if (original != null && original is RichCurveKeyPropertyData)
                         {
                             decidedRCKProperty = (RichCurveKeyPropertyData)original;
+                            decidedRCKProperty.IsZero = false;
                         }
                         else
                         {
@@ -888,6 +891,7 @@ namespace UAssetGUI
                         if (original != null && original.GetType() == newThing.GetType())
                         {
                             newThing = original;
+                            newThing.IsZero = false;
                             newThing.Name = nameName;
                         }
 

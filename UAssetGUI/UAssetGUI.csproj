@@ -6,7 +6,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>UAssetGUI</AssemblyTitle>
     <Product>UAssetGUI</Product>
-    <Copyright>Copyright © Atenfyr 2022</Copyright>
+    <Copyright>Copyright © Atenfyr 2023</Copyright>
     <AssemblyVersion>1.0.0.7</AssemblyVersion>
     <FileVersion>1.0.0.7</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>

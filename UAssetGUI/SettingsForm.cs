@@ -87,7 +87,7 @@ namespace UAssetGUI
         private void doubleClickToEdit_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.DoubleClickToEdit = doubleClickToEdit.Checked;
-            BaseForm.dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
+            //BaseForm.dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

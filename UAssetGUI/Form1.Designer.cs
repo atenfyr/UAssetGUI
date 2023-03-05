@@ -43,6 +43,7 @@ namespace UAssetGUI
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapStructTypeOverridesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.listValidPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.expandAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -128,6 +129,7 @@ namespace UAssetGUI
             this.deleteToolStripMenuItem,
             this.findToolStripMenuItem,
             this.mapStructTypeOverridesToolStripMenuItem,
+            this.listValidPropertiesToolStripMenuItem,
             this.settingsToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
@@ -172,6 +174,13 @@ namespace UAssetGUI
             this.mapStructTypeOverridesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.mapStructTypeOverridesToolStripMenuItem.Text = "Edit map struct type overrides...";
             this.mapStructTypeOverridesToolStripMenuItem.Click += new System.EventHandler(this.mapStructTypeOverridesToolStripMenuItem_Click);
+            // 
+            // listValidPropertiesToolStripMenuItem
+            // 
+            this.listValidPropertiesToolStripMenuItem.Name = "listValidPropertiesToolStripMenuItem";
+            this.listValidPropertiesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.listValidPropertiesToolStripMenuItem.Text = "Dump serializable properties...";
+            this.listValidPropertiesToolStripMenuItem.Click += new System.EventHandler(this.listValidPropertiesToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -454,6 +463,7 @@ namespace UAssetGUI
         public Button setBinaryData;
         internal ToolStripMenuItem saveToolStripMenuItem;
         public ComboBox comboSpecifyMappings;
+        private ToolStripMenuItem listValidPropertiesToolStripMenuItem;
     }
 }
 

@@ -59,8 +59,18 @@ namespace UAssetGUI
 
         public static void Save()
         {
-            Directory.CreateDirectory(ConfigFolder);
-            File.WriteAllText(Path.Combine(ConfigFolder, "config.json"), JsonConvert.SerializeObject(Data, Formatting.Indented));
+            SaveCustomFile("config.json", JsonConvert.SerializeObject(Data, Formatting.Indented));
+        }
+
+        public static string SaveCustomFile(string name, string text, string subFolder = null)
+        {
+            string outPath = Path.Combine(ConfigFolder, name);
+            if (!string.IsNullOrEmpty(subFolder)) outPath = Path.Combine(ConfigFolder, subFolder, name);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+            File.WriteAllText(outPath, text);
+
+            return outPath;
         }
 
         public static void Load()

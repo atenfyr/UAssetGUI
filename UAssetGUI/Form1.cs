@@ -35,6 +35,8 @@ namespace UAssetGUI
 
         private DiscordRpcClient _discordRpc = null;
 
+        public static readonly string UsmapInstructionsNotice = "If you have a .usmap file for this game, go to Help --> Open mappings directory..., place your .usmap file in there, restart UAssetGUI, and select the file in the top-right corner of this window.";
+
         private void DisposeDiscordRpc()
         {
             if (_discordRpc == null || _discordRpc.IsDisposed) return;
@@ -495,7 +497,7 @@ namespace UAssetGUI
 
                 if (tableEditor.asset.HasUnversionedProperties && tableEditor.asset.Mappings == null)
                 {
-                    MessageBox.Show("Failed to parse unversioned properties! Exports cannot be parsed for this asset unless a valid set of mappings is provided. If you have a .usmap file for this game, go to Help --> Open mappings directory..., place your .usmap file in there, restart UAssetGUI, and select the file in the top-right corner of this window.", "Notice");
+                    MessageBox.Show("Failed to parse unversioned properties! Exports cannot be parsed for this asset unless a valid set of mappings is provided. " + UsmapInstructionsNotice, "Notice");
                 }
 
                 if (failedToMaintainBinaryEquality)
@@ -1669,7 +1671,7 @@ namespace UAssetGUI
 
         private void OpenDirectory(string dir)
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+            Process.Start(new ProcessStartInfo()
             {
                 FileName = dir,
                 UseShellExecute = true,
@@ -1685,6 +1687,83 @@ namespace UAssetGUI
         private void mappingsDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenDirectory(UAGConfig.MappingsFolder);
+        }
+
+        private string DumpMappings(string searchName, bool recursive, Dictionary<string, string> customAnnotations = null)
+        {
+            string annotatedOutput = ParsingMappings.GetAllPropertiesAnnotated(searchName, customAnnotations, recursive);
+            return UAGConfig.SaveCustomFile(searchName + ".txt", annotatedOutput, Path.Combine("ClassDumps", UAGConfig.Data.PreferredMappings));
+        }
+
+        private bool TryDumpParticular()
+        {
+            var selectedNode = listView1.SelectedNode as PointingTreeNode;
+            if (selectedNode == null) return false;
+            
+            FName searchName = null;
+            Dictionary<string, string> customAnnotations = new Dictionary<string, string>();
+            if (selectedNode?.Pointer != null && selectedNode.Pointer is Export exp)
+            {
+                searchName = exp.GetClassTypeForAncestry();
+                if (selectedNode.Pointer is NormalExport nExp)
+                {
+                    foreach (var entry in nExp.Data)
+                    {
+                        customAnnotations[entry.Name?.Value?.Value ?? FString.NullCase] = "!";
+                    }
+                }
+                else if (selectedNode.Pointer is DataTableExport datExp && datExp.Table?.Data != null)
+                {
+                    foreach (var entry in datExp.Table.Data)
+                    {
+                        customAnnotations[entry.Name?.Value?.Value ?? FString.NullCase] = "!";
+                    }
+                }
+            }
+            else if (selectedNode?.Pointer != null && selectedNode.Pointer is StructPropertyData strucDat)
+            {
+                searchName = strucDat.StructType;
+            }
+
+            if (searchName?.Value?.Value == null) return false;
+
+            Process.Start(DumpMappings(searchName.Value.Value, true, customAnnotations));
+
+            return true;
+        }
+
+        // if mappings are provided, give list of valid props
+        private void listValidPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                if (ParsingMappings == null)
+                {
+                    MessageBox.Show("No mappings found. " + UsmapInstructionsNotice, Text);
+                    return;
+                }
+
+                if (TryDumpParticular()) return;
+
+                DialogResult res = MessageBox.Show("This operation will dump ALL classes in the mappings file to text. This may take a while. Proceed?", DisplayVersion, MessageBoxButtons.OKCancel);
+                switch (res)
+                {
+                    case DialogResult.OK:
+                        var timer = new Stopwatch();
+                        string outputPath = null;
+                        int numDumped = 0;
+                        timer.Start();
+                        foreach (var schema in ParsingMappings.Schemas)
+                        {
+                            outputPath = DumpMappings(schema.Key, false);
+                            numDumped++;
+                        }
+                        timer.Stop();
+                        if (outputPath != null) OpenDirectory(Path.GetDirectoryName(outputPath));
+                        MessageBox.Show(numDumped + " " + (numDumped == 1 ? "class" : "classes") + " successfully dumped in " + timer.Elapsed.TotalMilliseconds + " ms.", Name);
+                        break;
+                }
+            });
         }
     }
 }

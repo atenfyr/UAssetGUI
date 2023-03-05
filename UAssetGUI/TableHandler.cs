@@ -796,6 +796,7 @@ namespace UAssetGUI
                         {
                             decidedTextData = (TextPropertyData)original;
                             decidedTextData.IsZero = false;
+                            decidedTextData.Name = nameName;
                         }
                         else
                         {
@@ -842,6 +843,7 @@ namespace UAssetGUI
                         {
                             decidedObjData = (ObjectPropertyData)original;
                             decidedObjData.IsZero = false;
+                            decidedObjData.Name = nameName;
                         }
                         else
                         {
@@ -863,6 +865,7 @@ namespace UAssetGUI
                         {
                             decidedRCKProperty = (RichCurveKeyPropertyData)original;
                             decidedRCKProperty.IsZero = false;
+                            decidedRCKProperty.Name = nameName;
                         }
                         else
                         {

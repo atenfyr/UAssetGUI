@@ -482,7 +482,7 @@ namespace UAssetGUI
 
                 if (failedCategoryCount > 0)
                 {
-                    MessageBox.Show("Failed to parse " + failedCategoryCount + " exports!", "Notice");
+                    MessageBox.Show("Failed to parse " + failedCategoryCount + " export" + (failedCategoryCount == 1 ? "" : "s") + "!", "Notice");
                 }
 
                 if (hasDuplicates)

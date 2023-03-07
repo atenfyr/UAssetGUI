@@ -3,7 +3,7 @@ The following is a list of applicable licensing information for all the third-pa
 
 ## UAssetAPI
 https://github.com/atenfyr/UAssetAPI
-
+```
 MIT License
 
 Copyright (c) 2023 Atenfyr
@@ -25,10 +25,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 
 ## Json.NET
 https://github.com/JamesNK/Newtonsoft.Json
-
+```
 The MIT License (MIT)
 
 Copyright (c) 2007 James Newton-King
@@ -49,10 +50,11 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
 ## dotmore
 https://github.com/mattmc3/dotmore
-
+```
 The MIT License (MIT)
 
 Copyright (c) 2014 mattmc3
@@ -74,12 +76,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 
 ## UEAssetToolkitGenerator
 https://github.com/LongerWarrior/UEAssetToolkitGenerator
 
 ### License
-
+```
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -281,7 +284,7 @@ https://github.com/LongerWarrior/UEAssetToolkitGenerator
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
+```
 ### Statement of Modification
 Major portions of the source code that is adapted from UEAssetToolkitGenerator have been modified for usage in UAssetAPI through changes in code formatting, nomenclature, and serialization specifics in order to improve the effectiveness of the serialization across different engine versions and assets and to improve integration with newer versions of UAssetAPI. The relevant portions of source code have been sufficiently adapted such that no improper serialization or other unexpected behavior should be construed as having originated from any portion of the original work or any of its contributors.
 
@@ -290,7 +293,7 @@ The NOTICE text file bundled with the referenced project is not included in this
 
 ## DiscordRichPresence
 https://github.com/Lachee/discord-rpc-csharp
-
+```
 MIT License
 
 Copyright (c) 2021 Lachee
@@ -312,10 +315,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 
 ## Fody
 https://github.com/Fody/Home
-
+```
 Copyright (c) Simon Cropp and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -335,10 +339,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+```
 
 ## Costura
 https://github.com/Fody/Costura
-
+```
 Copyright (c) 2012 Simon Cropp and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -358,3 +363,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+```

@@ -386,8 +386,7 @@ namespace UAssetGUI
             byte[] buffer = new byte[4];
             using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                var bytes_read = fs.Read(buffer, 0, buffer.Length);
-                fs.Close();
+                fs.Read(buffer, 0, buffer.Length);
             }
             return BitConverter.ToUInt32(buffer, 0);
         }
@@ -450,15 +449,15 @@ namespace UAssetGUI
                 UAGPalette.RefreshTheme(this);
 
                 bool hasDuplicates = false;
-                Dictionary<string, bool> nameMapRefs = new Dictionary<string, bool>();
+                HashSet<string> nameMapRefs = new HashSet<string>();
                 foreach (FString x in tableEditor.asset.GetNameMapIndexList())
                 {
-                    if (nameMapRefs.ContainsKey(x.Value))
+                    if (nameMapRefs.Contains(x.Value))
                     {
                         hasDuplicates = true;
                         break;
                     }
-                    nameMapRefs.Add(x.Value, true);
+                    nameMapRefs.Add(x.Value);
                 }
                 nameMapRefs = null;
 
@@ -492,7 +491,7 @@ namespace UAssetGUI
 
                 if (unknownTypes.Count > 0)
                 {
-                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes) + (failedToMaintainBinaryEquality ? "" : "\n\nThis is not a cause for alarm. The asset will still parse normally."), "Notice");
+                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property types:\n" + string.Join(", ", unknownTypes) + (failedToMaintainBinaryEquality ? "" : "\n\nThe asset will still parse normally."), "Notice");
                 }
 
                 if (tableEditor.asset.HasUnversionedProperties && tableEditor.asset.Mappings == null)

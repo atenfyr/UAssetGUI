@@ -1023,7 +1023,7 @@ namespace UAssetGUI
 
                     dataGridView1.Rows.Add(new object[] { "LegacyFileVersion", asset.LegacyFileVersion.ToString() });
                     dataGridView1.Rows.Add(new object[] { "IsUnversioned", asset.IsUnversioned.ToString() });
-                    dataGridView1.Rows.Add(new object[] { "FileVersionLicenseeUE4", asset.FileVersionLicenseeUE4.ToString() });
+                    dataGridView1.Rows.Add(new object[] { "FileVersionLicenseeUE", asset.FileVersionLicenseeUE.ToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageGuid", asset.PackageGuid.ConvertToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageFlags", asset.PackageFlags.ToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageSource", asset.PackageSource.ToString() });
@@ -1653,8 +1653,8 @@ namespace UAssetGUI
                             case "IsUnversioned":
                                 asset.IsUnversioned = propertyValue.ToLowerInvariant() == "true" || propertyValue == "1";
                                 break;
-                            case "FileVersionLicenseeUE4":
-                                asset.FileVersionLicenseeUE4 = Convert.ToInt32(propertyValue);
+                            case "FileVersionLicenseeUE":
+                                asset.FileVersionLicenseeUE = Convert.ToInt32(propertyValue);
                                 break;
                             case "PackageGuid":
                                 Guid newPackageGuid = propertyValue.ConvertToGUID();

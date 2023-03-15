@@ -1065,7 +1065,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.ExportInformation:
-                    string[] allExportDetailsFields = Export.GetAllFieldNames();
+                    string[] allExportDetailsFields = Export.GetAllFieldNames(asset);
                     string[] allExportDetailsFields2 = new string[allExportDetailsFields.Length + 1];
                     allExportDetailsFields.CopyTo(allExportDetailsFields2, 0);
                     allExportDetailsFields2[allExportDetailsFields2.Length - 1] = "";
@@ -1720,7 +1720,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.ExportInformation:
-                    FieldInfo[] allExportDetailsFields = Export.GetAllObjectExportFields();
+                    FieldInfo[] allExportDetailsFields = Export.GetAllObjectExportFields(asset);
                     ExportDetailsParseType[] parsingTypes = new ExportDetailsParseType[]
                     {
                         ExportDetailsParseType.FName,

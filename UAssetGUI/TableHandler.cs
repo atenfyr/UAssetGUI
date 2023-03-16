@@ -1720,7 +1720,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.ExportInformation:
-                    FieldInfo[] allExportDetailsFields = Export.GetAllObjectExportFields(asset);
+                    MemberInfo[] allExportDetailsFields = Export.GetAllObjectExportFields(asset);
                     ExportDetailsParseType[] parsingTypes = new ExportDetailsParseType[]
                     {
                         ExportDetailsParseType.FName,

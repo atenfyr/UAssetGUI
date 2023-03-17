@@ -36,7 +36,7 @@ namespace UAssetGUI
     public static class UAGConfig
     {
         public static UAGConfigData Data;
-        public static Dictionary<string, Usmap> AllMappings;
+        public static Dictionary<string, Usmap> AllMappings = new Dictionary<string, Usmap>();
         public readonly static string ConfigFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
         public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
 
@@ -45,7 +45,7 @@ namespace UAssetGUI
             Directory.CreateDirectory(ConfigFolder);
             Directory.CreateDirectory(MappingsFolder);
 
-            AllMappings = new Dictionary<string, Usmap>();
+            AllMappings.Clear();
             string[] allMappingFiles = Directory.GetFiles(MappingsFolder, "*.usmap", SearchOption.TopDirectoryOnly);
             foreach (string mappingPath in allMappingFiles)
             {

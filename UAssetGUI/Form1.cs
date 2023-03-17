@@ -36,7 +36,7 @@ namespace UAssetGUI
 
         private DiscordRpcClient _discordRpc = null;
 
-        public static readonly string UsmapInstructionsNotice = "If you have a .usmap file for this game, go to Help --> Open mappings directory..., place your .usmap file in there, restart UAssetGUI, and select the file in the top-right corner of this window.";
+        public static readonly string UsmapInstructionsNotice = "If you have a .usmap file for this game, go to Utils --> Import Mappings... and select your .usmap file to import.";
 
         private void DisposeDiscordRpc()
         {
@@ -188,7 +188,7 @@ namespace UAssetGUI
 
         private List<string> allMappingsKeys = new List<string>();
 
-        private void UpdateMappings()
+        private void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
         {
             UAGConfig.LoadMappings();
             UAGUtils.InvokeUI(() =>
@@ -199,7 +199,7 @@ namespace UAssetGUI
                 comboSpecifyMappings.Items.Clear();
                 comboSpecifyMappings.Items.AddRange(allMappingsKeys.ToArray());
 
-                string initialSelection = allMappingsKeys.Contains(UAGConfig.Data.PreferredMappings) ? UAGConfig.Data.PreferredMappings : allMappingsKeys[0];
+                string initialSelection = newSelection == null ? (allMappingsKeys.Contains(UAGConfig.Data.PreferredMappings) ? UAGConfig.Data.PreferredMappings : allMappingsKeys[0]) : newSelection;
 
                 for (int i = 0; i < allMappingsKeys.Count; i++)
                 {
@@ -210,7 +210,7 @@ namespace UAssetGUI
                     }
                 }
 
-                UpdateComboSpecifyMappings();
+                UpdateComboSpecifyMappings(alsoCheckVersion);
             });
         }
 
@@ -245,7 +245,9 @@ namespace UAssetGUI
             "4.25",
             "4.26",
             "4.27",
-            //"5.0"
+            "5.0",
+            "5.1",
+            "5.2"
         };
 
         private EngineVersion[] versionOptionsValues = new EngineVersion[]
@@ -279,7 +281,9 @@ namespace UAssetGUI
             EngineVersion.VER_UE4_25,
             EngineVersion.VER_UE4_26,
             EngineVersion.VER_UE4_27,
-            //EngineVersion.VER_UE5_0,
+            EngineVersion.VER_UE5_0,
+            EngineVersion.VER_UE5_1,
+            EngineVersion.VER_UE5_2
         };
 
         public static readonly string GitHubRepo = "atenfyr/UAssetGUI";
@@ -290,7 +294,7 @@ namespace UAssetGUI
             UAGPalette.RefreshTheme(this);
 
             // update mappings combo box
-            UpdateMappings();
+            UpdateMappings(null, false);
 
             // update version combo box
             string initialSelection = versionOptionsKeys[0];
@@ -328,6 +332,8 @@ namespace UAssetGUI
                     MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!");
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            UpdateVersionFromMappings();
 
             // Command line parameter support
             string[] args = Environment.GetCommandLineArgs();
@@ -1338,12 +1344,36 @@ namespace UAssetGUI
             UAGConfig.Save();
         }
 
-        private void UpdateComboSpecifyMappings()
+        private void UpdateComboSpecifyMappings(bool alsoCheckVersion = true)
         {
             ParsingMappings = UAGConfig.AllMappings.ContainsKey(allMappingsKeys[comboSpecifyMappings.SelectedIndex]) ? UAGConfig.AllMappings[allMappingsKeys[comboSpecifyMappings.SelectedIndex]] : null;
             if (tableEditor?.asset != null) tableEditor.asset.Mappings = ParsingMappings;
             UAGConfig.Data.PreferredMappings = allMappingsKeys[comboSpecifyMappings.SelectedIndex];
             UAGConfig.Save();
+
+            if (alsoCheckVersion) UpdateVersionFromMappings();
+        }
+
+        private void UpdateVersionFromMappings()
+        {
+            comboSpecifyVersion.Enabled = !_UpdateVersionFromMappings();
+        }
+
+        private bool _UpdateVersionFromMappings()
+        {
+            if (comboSpecifyVersion.Items.Count == 0) return false;
+
+            // update version information if we have it
+            if (ParsingMappings != null)
+            {
+                var detVer = UnrealPackage.GetEngineVersion(ParsingMappings.FileVersionUE4, ParsingMappings.FileVersionUE5, ParsingMappings.CustomVersionContainer);
+                if (detVer != EngineVersion.UNKNOWN)
+                {
+                    SetParsingVersion(detVer);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void comboSpecifyVersion_SelectedIndexChanged(object sender, EventArgs e)
@@ -1353,7 +1383,10 @@ namespace UAssetGUI
 
         private void comboSpecifyMappings_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateComboSpecifyMappings();
+            UAGUtils.InvokeUI(() =>
+            {
+                UpdateComboSpecifyMappings();
+            });
         }
 
         private void listView1_KeyDown(object sender, KeyEventArgs e)
@@ -1454,6 +1487,7 @@ namespace UAssetGUI
         private void comboSpecifyVersion_DrawItem(object sender, DrawItemEventArgs e)
         {
             var combo = sender as ComboBox;
+            if (e.Index < 0 || e.Index >= combo.Items.Count) return;
 
             Color fontColor = UAGPalette.ForeColor;
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
@@ -1684,10 +1718,10 @@ namespace UAssetGUI
             OpenDirectory(UAGConfig.ConfigFolder);
         }
 
-        private void mappingsDirToolStripMenuItem_Click(object sender, EventArgs e)
+        /*private void mappingsDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenDirectory(UAGConfig.MappingsFolder);
-        }
+        }*/
 
         private string DumpMappings(string searchName, bool recursive, Dictionary<string, string> customAnnotations = null)
         {
@@ -1810,6 +1844,68 @@ namespace UAssetGUI
             timer.Stop();
 
             MessageBox.Show("Extracted " + numExtracted + " files in " + timer.ElapsedMilliseconds + " ms.", this.Text);
+        }
+
+        private string SelectMappings()
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Unreal mappings file (*.usmap)|*.usmap|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    return openFileDialog.FileName;
+                }
+            }
+
+            return null;
+        }
+
+        private void patchusmapWithsavVersionInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                string patchPath = SelectMappings();
+                if (patchPath == null) return;
+
+                string inPath = null;
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Filter = "Unreal save game (*.sav, *.savegame)|*.sav;*.savegame|All files (*.*)|*.*";
+                    openFileDialog.FilterIndex = 1;
+                    openFileDialog.RestoreDirectory = true;
+
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        inPath = openFileDialog.FileName;
+                    }
+                }
+
+                if (inPath == null) return;
+
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+                var thing = new SaveGame(inPath);
+                thing.PatchUsmap(patchPath);
+                timer.Stop();
+
+                MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
+            });
+        }
+
+        private void importMappingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                string importPath = SelectMappings();
+                if (importPath == null) return;
+
+                string newFileName = Path.GetFileNameWithoutExtension(importPath);
+                File.Copy(importPath, Path.ChangeExtension(Path.Combine(UAGConfig.MappingsFolder, newFileName), ".usmap"));
+                UpdateMappings(newFileName);
+            });
         }
     }
 }

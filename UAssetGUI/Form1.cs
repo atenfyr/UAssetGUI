@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.ExportTypes;
+using UAssetAPI.IO;
 using UAssetAPI.PropertyTypes.Objects;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
@@ -1763,6 +1764,51 @@ namespace UAssetGUI
                         break;
                 }
             });
+        }
+
+        private void ExtractIOStore(string inPath, string outPath)
+        {
+            var test = new IOStoreContainer(inPath);
+            test.BeginRead();
+            test.Extract(outPath);
+            test.EndRead();
+        }
+
+        private void extractIOStoreToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string inPath = null;
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "IO Store Container (*.utoc)|*.utoc|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    inPath = openFileDialog.FileName;
+                }
+            }
+
+            if (inPath == null) return;
+
+            string outPath = null;
+            FolderBrowserEx.FolderBrowserDialog outputFolderDialog = new FolderBrowserEx.FolderBrowserDialog();
+            outputFolderDialog.Title = "Select a folder to extract to";
+
+            if (outputFolderDialog.ShowDialog() == DialogResult.OK)
+            {
+                outPath = outputFolderDialog.SelectedFolder;
+            }
+            outputFolderDialog.Dispose();
+
+            if (outPath == null) return;
+
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            ExtractIOStore(inPath, outPath);
+            timer.Stop();
+
+            MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
         }
     }
 }

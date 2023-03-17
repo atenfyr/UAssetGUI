@@ -118,6 +118,7 @@
     <PackageReference Include="Fody" Version="4.0.2">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="FolderBrowserEx" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Resources.Extensions" Version="7.0.0" />
   </ItemGroup>

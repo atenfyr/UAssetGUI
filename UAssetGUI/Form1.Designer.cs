@@ -43,13 +43,14 @@ namespace UAssetGUI
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapStructTypeOverridesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.listValidPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.expandAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.collapseAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.recalculateNodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.utilsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.listValidPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mappingsDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,6 +67,7 @@ namespace UAssetGUI
             this.setBinaryData = new System.Windows.Forms.Button();
             this.comboSpecifyMappings = new System.Windows.Forms.ComboBox();
             this.listView1 = new UAssetGUI.ColorfulTreeView();
+            this.extractIOStoreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.nameMapContext.SuspendLayout();
@@ -77,6 +79,7 @@ namespace UAssetGUI
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
             this.viewToolStripMenuItem,
+            this.utilsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -129,7 +132,6 @@ namespace UAssetGUI
             this.deleteToolStripMenuItem,
             this.findToolStripMenuItem,
             this.mapStructTypeOverridesToolStripMenuItem,
-            this.listValidPropertiesToolStripMenuItem,
             this.settingsToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
@@ -174,13 +176,6 @@ namespace UAssetGUI
             this.mapStructTypeOverridesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
             this.mapStructTypeOverridesToolStripMenuItem.Text = "Edit map struct type overrides...";
             this.mapStructTypeOverridesToolStripMenuItem.Click += new System.EventHandler(this.mapStructTypeOverridesToolStripMenuItem_Click);
-            // 
-            // listValidPropertiesToolStripMenuItem
-            // 
-            this.listValidPropertiesToolStripMenuItem.Name = "listValidPropertiesToolStripMenuItem";
-            this.listValidPropertiesToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
-            this.listValidPropertiesToolStripMenuItem.Text = "Dump serializable properties...";
-            this.listValidPropertiesToolStripMenuItem.Click += new System.EventHandler(this.listValidPropertiesToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -231,6 +226,22 @@ namespace UAssetGUI
             this.recalculateNodesToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
             this.recalculateNodesToolStripMenuItem.Text = "Recalculate Nodes";
             this.recalculateNodesToolStripMenuItem.Click += new System.EventHandler(this.refreshFullToolStripMenuItem_Click);
+            // 
+            // utilsToolStripMenuItem
+            // 
+            this.utilsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extractIOStoreToolStripMenuItem,
+            this.listValidPropertiesToolStripMenuItem});
+            this.utilsToolStripMenuItem.Name = "utilsToolStripMenuItem";
+            this.utilsToolStripMenuItem.Size = new System.Drawing.Size(42, 20);
+            this.utilsToolStripMenuItem.Text = "Utils";
+            // 
+            // listValidPropertiesToolStripMenuItem
+            // 
+            this.listValidPropertiesToolStripMenuItem.Name = "listValidPropertiesToolStripMenuItem";
+            this.listValidPropertiesToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.listValidPropertiesToolStripMenuItem.Text = "Dump serializable properties...";
+            this.listValidPropertiesToolStripMenuItem.Click += new System.EventHandler(this.listValidPropertiesToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -405,6 +416,13 @@ namespace UAssetGUI
             this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
             // 
+            // extractIOStoreToolStripMenuItem
+            // 
+            this.extractIOStoreToolStripMenuItem.Name = "extractIOStoreToolStripMenuItem";
+            this.extractIOStoreToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.extractIOStoreToolStripMenuItem.Text = "Extract IO store container...";
+            this.extractIOStoreToolStripMenuItem.Click += new System.EventHandler(this.extractIOStoreToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -464,6 +482,8 @@ namespace UAssetGUI
         internal ToolStripMenuItem saveToolStripMenuItem;
         public ComboBox comboSpecifyMappings;
         private ToolStripMenuItem listValidPropertiesToolStripMenuItem;
+        private ToolStripMenuItem utilsToolStripMenuItem;
+        private ToolStripMenuItem extractIOStoreToolStripMenuItem;
     }
 }
 

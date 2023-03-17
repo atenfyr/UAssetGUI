@@ -1890,6 +1890,7 @@ namespace UAssetGUI
                 var thing = new SaveGame(inPath);
                 thing.PatchUsmap(patchPath);
                 timer.Stop();
+                UpdateMappings();
 
                 MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
             });

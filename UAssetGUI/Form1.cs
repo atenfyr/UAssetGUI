@@ -1766,12 +1766,13 @@ namespace UAssetGUI
             });
         }
 
-        private void ExtractIOStore(string inPath, string outPath)
+        private int ExtractIOStore(string inPath, string outPath)
         {
             var test = new IOStoreContainer(inPath);
             test.BeginRead();
-            test.Extract(outPath);
+            int numExtracted = test.Extract(outPath);
             test.EndRead();
+            return numExtracted;
         }
 
         private void extractIOStoreToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1805,10 +1806,10 @@ namespace UAssetGUI
 
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            ExtractIOStore(inPath, outPath);
+            int numExtracted = ExtractIOStore(inPath, outPath);
             timer.Stop();
 
-            MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
+            MessageBox.Show("Extracted " + numExtracted + " files in " + timer.ElapsedMilliseconds + " ms.", this.Text);
         }
     }
 }

@@ -1080,7 +1080,7 @@ namespace UAssetGUI
                         {
                             string cellTooltip = null;
 
-                            object printingVal = refer.GetType().GetField(allExportDetailsFields[num2]).GetValue(refer);
+                            object printingVal = refer.GetType().GetMember(allExportDetailsFields[num2])[0].GetValue(refer);
                             if (printingVal is FName parsingName)
                             {
                                 string actualName = parsingName?.ToString();
@@ -1618,9 +1618,10 @@ namespace UAssetGUI
                     break;
             }
 
-            // go through each row and make sure it's a good height
+            // go through each row and make sure it's a good height and width
             if (dataGridView1.Rows?.Count > 0)
             {
+                dataGridView1.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders);
                 for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 {
                     if (dataGridView1.Rows[i].Height < dataGridView1.RowTemplate.MinimumHeight) this.dataGridView1.AutoResizeRow(i);

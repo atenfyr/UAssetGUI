@@ -1725,7 +1725,7 @@ namespace UAssetGUI
 
         private string DumpMappings(string searchName, bool recursive, Dictionary<string, string> customAnnotations = null)
         {
-            string annotatedOutput = ParsingMappings.GetAllPropertiesAnnotated(searchName, customAnnotations, recursive);
+            string annotatedOutput = ParsingMappings.GetAllPropertiesAnnotated(searchName, tableEditor?.asset, customAnnotations, recursive);
             return UAGConfig.SaveCustomFile(searchName + ".txt", annotatedOutput, Path.Combine("ClassDumps", UAGConfig.Data.PreferredMappings));
         }
 

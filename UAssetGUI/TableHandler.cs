@@ -567,11 +567,11 @@ namespace UAssetGUI
                                 break;
                             case "StructProperty":
                             case "ClothLODData":
-                                row.Cells[++columnIndexer].Value = ((StructPropertyData)thisPD).StructType.ToString();
+                                row.Cells[++columnIndexer].Value = ((StructPropertyData)thisPD).StructType?.ToString() ?? FString.NullCase;
                                 break;
                             case "ArrayProperty":
                             case "SetProperty":
-                                row.Cells[++columnIndexer].Value = ((ArrayPropertyData)thisPD).ArrayType.ToString();
+                                row.Cells[++columnIndexer].Value = ((ArrayPropertyData)thisPD).ArrayType?.ToString() ?? FString.NullCase;
                                 break;
                             case "GameplayTagContainer":
                             case "MapProperty":
@@ -741,8 +741,9 @@ namespace UAssetGUI
                     }
 
                     row.Cells[absoluteColumnIndexer + 9].Value = thisPD.DuplicationIndex;
-                    row.Cells[absoluteColumnIndexer + 10].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
-                    row.Cells[absoluteColumnIndexer + 10].ReadOnly = true;
+                    row.Cells[absoluteColumnIndexer + 10].Value = thisPD.IsZero.ToString();
+                    row.Cells[absoluteColumnIndexer + 11].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
+                    row.Cells[absoluteColumnIndexer + 11].ReadOnly = true;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -777,137 +778,150 @@ namespace UAssetGUI
                 if (name.Equals(string.Empty) || type.Equals(string.Empty)) return null;
 
                 FName nameName = namesAreDummies ? FName.DefineDummy(asset, name) : FName.FromString(asset, name);
+                PropertyData finalProp = null;
 
                 if (value1B != null && value1B is string && transformB != null && transformB is string && (string)transformB == "Unknown ser.")
                 {
-                    var res = new UnknownPropertyData(nameName)
+                    finalProp = new UnknownPropertyData(nameName)
                     {
                         Value = ((string)value1B).ConvertStringToByteArray()
                     };
-                    res.SetSerializingPropertyType(new FString(type));
-                    return res;
+                    ((UnknownPropertyData)finalProp).SetSerializingPropertyType(new FString(type));
                 }
-
-                switch (FName.FromString(asset, type).Value.Value)
+                else
                 {
-                    case "TextProperty":
-                        TextPropertyData decidedTextData = null;
-                        if (original != null && original is TextPropertyData)
-                        {
-                            decidedTextData = (TextPropertyData)original;
-                            decidedTextData.IsZero = false;
-                            decidedTextData.Name = nameName;
-                        }
-                        else
-                        {
-                            decidedTextData = new TextPropertyData(nameName);
-                        }
+                    switch (FName.FromString(asset, type).Value.Value)
+                    {
+                        case "TextProperty":
+                            TextPropertyData decidedTextData = null;
+                            if (original != null && original is TextPropertyData)
+                            {
+                                decidedTextData = (TextPropertyData)original;
+                                decidedTextData.IsZero = false;
+                                decidedTextData.Name = nameName;
+                            }
+                            else
+                            {
+                                decidedTextData = new TextPropertyData(nameName);
+                            }
 
-                        TextHistoryType histType = TextHistoryType.Base;
-                        if (transformB == null || value1B == null || !(value1B is string)) return null;
-                        if (transformB is string) Enum.TryParse((string)transformB, out histType);
+                            TextHistoryType histType = TextHistoryType.Base;
+                            if (transformB == null || value1B == null || !(value1B is string)) return null;
+                            if (transformB is string) Enum.TryParse((string)transformB, out histType);
 
-                        decidedTextData.HistoryType = histType;
-                        switch (histType)
-                        {
-                            case TextHistoryType.None:
-                                decidedTextData.Value = null;
-                                if (value1B != null && value1B is string) decidedTextData.CultureInvariantString = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
-                                break;
-                            case TextHistoryType.Base:
-                                if (value1B == null || value2B == null || value3B == null || !(value1B is string) || !(value2B is string) || !(value3B is string)) return null;
-                                decidedTextData.Namespace = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
-                                decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
-                                decidedTextData.CultureInvariantString = (string)value3B == FString.NullCase ? null : FString.FromString((string)value3B);
-                                break;
-                            case TextHistoryType.StringTableEntry:
-                                if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
+                            decidedTextData.HistoryType = histType;
+                            switch (histType)
+                            {
+                                case TextHistoryType.None:
+                                    decidedTextData.Value = null;
+                                    if (value1B != null && value1B is string) decidedTextData.CultureInvariantString = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
+                                    break;
+                                case TextHistoryType.Base:
+                                    if (value1B == null || value2B == null || value3B == null || !(value1B is string) || !(value2B is string) || !(value3B is string)) return null;
+                                    decidedTextData.Namespace = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
+                                    decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
+                                    decidedTextData.CultureInvariantString = (string)value3B == FString.NullCase ? null : FString.FromString((string)value3B);
+                                    break;
+                                case TextHistoryType.StringTableEntry:
+                                    if (value1B == null || !(value1B is string) || !(value2B is string)) return null;
 
-                                decidedTextData.TableId = FName.FromString(asset, (string)value1B);
-                                decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
-                                break;
-                            case TextHistoryType.RawText:
-                                if (value1B == null || !(value1B is string)) return null;
-                                decidedTextData.Value = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
-                                break;
-                            default:
-                                throw new FormatException("Unimplemented text history type " + histType);
-                        }
+                                    decidedTextData.TableId = FName.FromString(asset, (string)value1B);
+                                    decidedTextData.Value = (string)value2B == FString.NullCase ? null : FString.FromString((string)value2B);
+                                    break;
+                                case TextHistoryType.RawText:
+                                    if (value1B == null || !(value1B is string)) return null;
+                                    decidedTextData.Value = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
+                                    break;
+                                default:
+                                    throw new FormatException("Unimplemented text history type " + histType);
+                            }
 
-                        if (value4B != null && value4B is string) Enum.TryParse((string)value4B, out decidedTextData.Flags);
+                            if (value4B != null && value4B is string) Enum.TryParse((string)value4B, out decidedTextData.Flags);
 
-                        return decidedTextData;
-                    case "ObjectProperty":
-                        ObjectPropertyData decidedObjData = null;
-                        if (original != null && original is ObjectPropertyData)
-                        {
-                            decidedObjData = (ObjectPropertyData)original;
-                            decidedObjData.IsZero = false;
-                            decidedObjData.Name = nameName;
-                        }
-                        else
-                        {
-                            decidedObjData = new ObjectPropertyData(nameName);
-                        }
+                            finalProp = decidedTextData;
+                            break;
+                        case "ObjectProperty":
+                            ObjectPropertyData decidedObjData = null;
+                            if (original != null && original is ObjectPropertyData)
+                            {
+                                decidedObjData = (ObjectPropertyData)original;
+                                decidedObjData.IsZero = false;
+                                decidedObjData.Name = nameName;
+                            }
+                            else
+                            {
+                                decidedObjData = new ObjectPropertyData(nameName);
+                            }
 
-                        int objValue = int.MinValue;
-                        if (transformB == null) return null;
-                        if (transformB is string) int.TryParse((string)transformB, out objValue);
-                        if (transformB is int) objValue = (int)transformB;
-                        if (objValue == int.MinValue) return null;
+                            int objValue = int.MinValue;
+                            if (transformB == null) return null;
+                            if (transformB is string) int.TryParse((string)transformB, out objValue);
+                            if (transformB is int) objValue = (int)transformB;
+                            if (objValue == int.MinValue) return null;
 
-                        decidedObjData.Value = new FPackageIndex(objValue);
-                        UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, decidedObjData.Value);
-                        return decidedObjData;
-                    case "RichCurveKey":
-                        RichCurveKeyPropertyData decidedRCKProperty = null;
-                        if (original != null && original is RichCurveKeyPropertyData)
-                        {
-                            decidedRCKProperty = (RichCurveKeyPropertyData)original;
-                            decidedRCKProperty.IsZero = false;
-                            decidedRCKProperty.Name = nameName;
-                        }
-                        else
-                        {
-                            decidedRCKProperty = new RichCurveKeyPropertyData(nameName);
-                        }
+                            decidedObjData.Value = new FPackageIndex(objValue);
+                            UAGUtils.UpdateObjectPropertyValues(asset, row, dataGridView1, decidedObjData.Value);
+                            finalProp = decidedObjData;
+                            break;
+                        case "RichCurveKey":
+                            RichCurveKeyPropertyData decidedRCKProperty = null;
+                            if (original != null && original is RichCurveKeyPropertyData)
+                            {
+                                decidedRCKProperty = (RichCurveKeyPropertyData)original;
+                                decidedRCKProperty.IsZero = false;
+                                decidedRCKProperty.Name = nameName;
+                            }
+                            else
+                            {
+                                decidedRCKProperty = new RichCurveKeyPropertyData(nameName);
+                            }
 
-                        if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
-                        if (value1B is string) Enum.TryParse((string)value1B, out decidedRCKProperty.TangentMode);
+                            if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
+                            if (value1B is string) Enum.TryParse((string)value1B, out decidedRCKProperty.TangentMode);
 
-                        if (value2B is string) float.TryParse((string)value2B, out decidedRCKProperty.Time);
-                        if (value2B is int) decidedRCKProperty.Time = (float)(int)value2B;
-                        if (value2B is float) decidedRCKProperty.Time = (float)value2B;
-                        if (value3B is string) float.TryParse((string)value3B, out decidedRCKProperty.Value);
-                        if (value3B is int) decidedRCKProperty.Value = (float)(int)value3B;
-                        if (value3B is float) decidedRCKProperty.Value = (float)value3B;
-                        if (value4B is string) float.TryParse((string)value4B, out decidedRCKProperty.ArriveTangent);
-                        if (value4B is int) decidedRCKProperty.ArriveTangent = (float)(int)value4B;
-                        if (value4B is float) decidedRCKProperty.ArriveTangent = (float)value4B;
-                        if (value5B is string) float.TryParse((string)value5B, out decidedRCKProperty.LeaveTangent);
-                        if (value5B is int) decidedRCKProperty.LeaveTangent = (float)(int)value5B;
-                        if (value5B is float) decidedRCKProperty.LeaveTangent = (float)value5B;
+                            if (value2B is string) float.TryParse((string)value2B, out decidedRCKProperty.Time);
+                            if (value2B is int) decidedRCKProperty.Time = (float)(int)value2B;
+                            if (value2B is float) decidedRCKProperty.Time = (float)value2B;
+                            if (value3B is string) float.TryParse((string)value3B, out decidedRCKProperty.Value);
+                            if (value3B is int) decidedRCKProperty.Value = (float)(int)value3B;
+                            if (value3B is float) decidedRCKProperty.Value = (float)value3B;
+                            if (value4B is string) float.TryParse((string)value4B, out decidedRCKProperty.ArriveTangent);
+                            if (value4B is int) decidedRCKProperty.ArriveTangent = (float)(int)value4B;
+                            if (value4B is float) decidedRCKProperty.ArriveTangent = (float)value4B;
+                            if (value5B is string) float.TryParse((string)value5B, out decidedRCKProperty.LeaveTangent);
+                            if (value5B is int) decidedRCKProperty.LeaveTangent = (float)(int)value5B;
+                            if (value5B is float) decidedRCKProperty.LeaveTangent = (float)value5B;
 
-                        return decidedRCKProperty;
-                    default:
-                        PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(asset, type), nameName, null, null, asset);
-                        if (original != null && original.GetType() == newThing.GetType())
-                        {
-                            newThing = original;
-                            newThing.IsZero = false;
-                            newThing.Name = nameName;
-                        }
+                            finalProp = decidedRCKProperty;
+                            break;
+                        default:
+                            PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(asset, type), nameName, null, null, asset);
+                            if (original != null && original.GetType() == newThing.GetType())
+                            {
+                                newThing = original;
+                                newThing.IsZero = false;
+                                newThing.Name = nameName;
+                            }
 
-                        string[] existingStrings = new string[5];
-                        if (value1B != null) existingStrings[0] = Convert.ToString(value1B);
-                        if (value2B != null) existingStrings[1] = Convert.ToString(value2B);
-                        if (value3B != null) existingStrings[2] = Convert.ToString(value3B);
-                        if (value4B != null) existingStrings[3] = Convert.ToString(value4B);
-                        if (transformB != null) existingStrings[4] = Convert.ToString(transformB);
+                            string[] existingStrings = new string[5];
+                            if (value1B != null) existingStrings[0] = Convert.ToString(value1B);
+                            if (value2B != null) existingStrings[1] = Convert.ToString(value2B);
+                            if (value3B != null) existingStrings[2] = Convert.ToString(value3B);
+                            if (value4B != null) existingStrings[3] = Convert.ToString(value4B);
+                            if (transformB != null) existingStrings[4] = Convert.ToString(transformB);
 
-                        newThing.FromString(existingStrings, asset);
-                        return newThing;
+                            newThing.FromString(existingStrings, asset);
+                            finalProp = newThing;
+                            break;
+                    }
                 }
+
+                string duplicationIndex = row.Cells[row.Cells.Count - 4].Value.ToString();
+                string isZero = row.Cells[row.Cells.Count - 3].Value.ToString();
+
+                int.TryParse(duplicationIndex, out finalProp.DuplicationIndex);
+                finalProp.IsZero = (isZero.ToLower() == "true" || isZero == "1");
+                return finalProp;
             }
             catch (Exception)
             {
@@ -1194,7 +1208,7 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "Serial Offset", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "IsZero", "Serial Offset", "" });
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 

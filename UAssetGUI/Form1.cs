@@ -421,6 +421,7 @@ namespace UAssetGUI
                         {
                             targetAsset = UAsset.DeserializeJson(sr);
                         }
+                        targetAsset.Mappings = ParsingMappings;
                         desiredSetUnsavedChanges = true;
                         break;
                     default:
@@ -1158,6 +1159,7 @@ namespace UAssetGUI
             if (dataGridView1.SelectedCells.Count < 1) return;
             if (!UAGConfig.Data.ChangeValuesOnScroll) return;
             var selectedCell = dataGridView1.SelectedCells[0];
+            if (selectedCell.ReadOnly) return;
 
             int deltaDir = e.Delta > 0 ? -1 : 1;
 

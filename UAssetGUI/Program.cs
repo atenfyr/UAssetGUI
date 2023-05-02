@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.UnrealTypes;
+using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
 {
@@ -26,25 +27,35 @@ namespace UAssetGUI
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length >= 2)
             {
+                Usmap selectedMappings = null;
+
                 switch (args[1].ToLowerInvariant())
                 {
-                    // tojson <source> <destination> <engine version>
-                    // UAssetGUI tojson A.umap B.json 514
+                    // tojson <source> <destination> <engine version> [mappings name]
+                    // UAssetGUI tojson A.umap B.json 514 Outriders
                     case "tojson":
+                        UAGConfig.LoadMappings();
+
                         if (args.Length < 5) break;
+                        if (args.Length >= 6) selectedMappings = UAGConfig.AllMappings.ContainsKey(args[5]) ? UAGConfig.AllMappings[args[5]] : null;
+
                         EngineVersion selectedVer = EngineVersion.UNKNOWN;
                         if (!Enum.TryParse(args[4], out selectedVer))
                         {
                             if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
                         }
 
-                        string jsonSerializedAsset = new UAsset(args[2], selectedVer).SerializeJson(Newtonsoft.Json.Formatting.Indented);
+                        string jsonSerializedAsset = new UAsset(args[2], selectedVer, selectedMappings).SerializeJson(Newtonsoft.Json.Formatting.Indented);
                         File.WriteAllText(args[3], jsonSerializedAsset);
                         return;
-                    // fromjson <source> <destination>
-                    // UAssetGUI fromjson B.json A.umap
+                    // fromjson <source> <destination> [mappings name]
+                    // UAssetGUI fromjson B.json A.umap Outriders
                     case "fromjson":
+                        UAGConfig.LoadMappings();
+
                         if (args.Length < 4) break;
+                        if (args.Length >= 5) selectedMappings = UAGConfig.AllMappings.ContainsKey(args[4]) ? UAGConfig.AllMappings[args[4]] : null;
+
                         UAsset jsonDeserializedAsset = null;
                         using (var sr = new FileStream(args[2], FileMode.Open))
                         {
@@ -53,6 +64,7 @@ namespace UAssetGUI
 
                         if (jsonDeserializedAsset != null)
                         {
+                            jsonDeserializedAsset.Mappings = selectedMappings;
                             jsonDeserializedAsset.Write(args[3]);
                         }
                         return;

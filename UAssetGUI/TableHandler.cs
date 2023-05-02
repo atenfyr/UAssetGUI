@@ -741,9 +741,9 @@ namespace UAssetGUI
                     }
 
                     row.Cells[absoluteColumnIndexer + 9].Value = thisPD.DuplicationIndex;
-                    row.Cells[absoluteColumnIndexer + 10].Value = thisPD.IsZero.ToString();
-                    row.Cells[absoluteColumnIndexer + 11].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
-                    row.Cells[absoluteColumnIndexer + 11].ReadOnly = true;
+                    //row.Cells[absoluteColumnIndexer + 10].Value = thisPD.IsZero.ToString();
+                    row.Cells[absoluteColumnIndexer + 10].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
+                    row.Cells[absoluteColumnIndexer + 10].ReadOnly = true;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);
                 }
@@ -797,7 +797,6 @@ namespace UAssetGUI
                             if (original != null && original is TextPropertyData)
                             {
                                 decidedTextData = (TextPropertyData)original;
-                                decidedTextData.IsZero = false;
                                 decidedTextData.Name = nameName;
                             }
                             else
@@ -845,7 +844,6 @@ namespace UAssetGUI
                             if (original != null && original is ObjectPropertyData)
                             {
                                 decidedObjData = (ObjectPropertyData)original;
-                                decidedObjData.IsZero = false;
                                 decidedObjData.Name = nameName;
                             }
                             else
@@ -868,7 +866,6 @@ namespace UAssetGUI
                             if (original != null && original is RichCurveKeyPropertyData)
                             {
                                 decidedRCKProperty = (RichCurveKeyPropertyData)original;
-                                decidedRCKProperty.IsZero = false;
                                 decidedRCKProperty.Name = nameName;
                             }
                             else
@@ -899,7 +896,6 @@ namespace UAssetGUI
                             if (original != null && original.GetType() == newThing.GetType())
                             {
                                 newThing = original;
-                                newThing.IsZero = false;
                                 newThing.Name = nameName;
                             }
 
@@ -916,11 +912,11 @@ namespace UAssetGUI
                     }
                 }
 
-                string duplicationIndex = row.Cells[row.Cells.Count - 4].Value.ToString();
-                string isZero = row.Cells[row.Cells.Count - 3].Value.ToString();
+                string duplicationIndex = row.Cells[row.Cells.Count - 3].Value.ToString();
+                //string isZero = row.Cells[row.Cells.Count - 3].Value.ToString();
 
                 int.TryParse(duplicationIndex, out finalProp.DuplicationIndex);
-                finalProp.IsZero = (isZero.ToLower() == "true" || isZero == "1");
+                //finalProp.IsZero = (isZero.ToLower() == "true" || isZero == "1");
                 return finalProp;
             }
             catch (Exception)
@@ -1208,7 +1204,7 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (listView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "IsZero", "Serial Offset", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "Serial Offset", "" });
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 

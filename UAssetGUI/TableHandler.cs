@@ -740,9 +740,11 @@ namespace UAssetGUI
                         }
                     }
 
+                    long determinedOffset = asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset;
+
                     row.Cells[absoluteColumnIndexer + 9].Value = thisPD.DuplicationIndex;
                     //row.Cells[absoluteColumnIndexer + 10].Value = thisPD.IsZero.ToString();
-                    row.Cells[absoluteColumnIndexer + 10].Value = thisPD.Offset < 0 ? "N/A" : (asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset).ToString();
+                    row.Cells[absoluteColumnIndexer + 10].Value = determinedOffset < 0 ? "N/A" : determinedOffset.ToString();
                     row.Cells[absoluteColumnIndexer + 10].ReadOnly = true;
                     row.HeaderCell.Value = Convert.ToString(i);
                     rows.Add(row);

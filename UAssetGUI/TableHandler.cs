@@ -918,7 +918,7 @@ namespace UAssetGUI
                 //string isZero = row.Cells[row.Cells.Count - 3].Value.ToString();
 
                 int.TryParse(duplicationIndex, out finalProp.DuplicationIndex);
-                //finalProp.IsZero = (isZero.ToLower() == "true" || isZero == "1");
+                //finalProp.IsZero = (isZero.ToLowerInvariant() == "true" || isZero == "1");
                 return finalProp;
             }
             catch (Exception)
@@ -1057,13 +1057,27 @@ namespace UAssetGUI
                     dataGridView1.AllowUserToAddRows = false;
                     break;
                 case TableHandlerMode.NameMap:
-                    AddColumns(new string[] { "Name", "Encoding", "" });
-
-                    IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
-                    for (int num = 0; num < headerIndexList.Count; num++)
+                    if (asset.GetCustomVersion<FReleaseObjectVersion>() < FReleaseObjectVersion.PropertiesSerializeRepCondition)
                     {
-                        dataGridView1.Rows.Add(headerIndexList[num].Value, headerIndexList[num].Encoding.HeaderName);
-                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
+                        AddColumns(new string[] { "Name", "Case Preserving?", "Encoding", "" });
+
+                        IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
+                        for (int num = 0; num < headerIndexList.Count; num++)
+                        {
+                            dataGridView1.Rows.Add(headerIndexList[num].Value, headerIndexList[num].IsCasePreserving, headerIndexList[num].Encoding.HeaderName);
+                            dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
+                        }
+                    }
+                    else
+                    {
+                        AddColumns(new string[] { "Name", "Encoding", "" });
+
+                        IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
+                        for (int num = 0; num < headerIndexList.Count; num++)
+                        {
+                            dataGridView1.Rows.Add(headerIndexList[num].Value, headerIndexList[num].Encoding.HeaderName);
+                            dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
+                        }
                     }
                     //((Form1)dataGridView1.Parent).CurrentDataGridViewStrip = ((Form1)dataGridView1.Parent).nameMapContext;
                     break;
@@ -1687,13 +1701,34 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.NameMap:
+                    bool hasCasePreservingColumn = asset.GetCustomVersion<FReleaseObjectVersion>() < FReleaseObjectVersion.PropertiesSerializeRepCondition;
                     asset.ClearNameIndexList();
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        string ourValue = (string)row.Cells[0].Value;
-                        string encoding = (string)row.Cells[1].Value;
+                        int r = 0; bool isCasePreserving = true;
+
+                        string ourValue = (string)row.Cells[r++].Value;
+                        if (hasCasePreservingColumn)
+                        {
+                            object isCasePreservingTemp = row.Cells[r++].Value;
+                            if (isCasePreservingTemp is string)
+                            {
+                                isCasePreserving = ((string)isCasePreservingTemp).Equals("1") || ((string)isCasePreservingTemp).ToLowerInvariant().Equals("true");
+                            }
+                            else if (isCasePreservingTemp is bool)
+                            {
+                                isCasePreserving = (bool)isCasePreservingTemp;
+                            }
+                        }
+                        string encoding = (string)row.Cells[r++].Value;
+
                         if (string.IsNullOrWhiteSpace(encoding)) encoding = "ascii";
-                        if (!string.IsNullOrWhiteSpace(ourValue)) asset.AddNameReference(FString.FromString(ourValue, encoding.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.ASCII), true);
+                        if (!string.IsNullOrWhiteSpace(ourValue))
+                        {
+                            var finalStr = FString.FromString(ourValue, encoding.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.ASCII);
+                            finalStr.IsCasePreserving = isCasePreserving;
+                            asset.AddNameReference(finalStr, true);
+                        }
                     }
                     break;
                 case TableHandlerMode.Imports:
@@ -1850,7 +1885,7 @@ namespace UAssetGUI
                                     settingVal = false;
                                     if (currentVal is string)
                                     {
-                                        settingVal = ((string)currentVal).Equals("1") || ((string)currentVal).ToLower().Equals("true");
+                                        settingVal = ((string)currentVal).Equals("1") || ((string)currentVal).ToLowerInvariant().Equals("true");
                                     }
                                     else if (currentVal is bool)
                                     {

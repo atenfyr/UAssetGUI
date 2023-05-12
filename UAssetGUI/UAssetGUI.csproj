@@ -112,9 +112,11 @@
     <ProjectReference Include="..\UAssetAPI\UAssetAPI\UAssetAPI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="3.3.3" />
+    <PackageReference Include="Costura.Fody" Version="5.7.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
-    <PackageReference Include="Fody" Version="4.0.2">
+    <PackageReference Include="Fody" Version="6.5.5">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FolderBrowserEx" Version="1.0.1" />

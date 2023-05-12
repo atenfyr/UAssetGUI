@@ -31,7 +31,6 @@
   <Target Name="AfterBuildMigrated" AfterTargets="Build">
     <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)..\LICENSE&quot; &quot;$(TargetDir)\LICENSE*&quot;" />
     <Exec ContinueOnError="true" Command="xcopy /Y &quot;$(ProjectDir)..\NOTICE.md&quot; &quot;$(TargetDir)\NOTICE.md*&quot;" />
-    <Exec ContinueOnError="true" Command="del &quot;$(TargetDir)\git_commit.txt&quot;" />
   </Target>
   <ItemGroup>
     <Reference Include="System.Design" />
@@ -105,7 +104,7 @@
   <ItemGroup>
     <None Include="Resources\icon.ico" />
     <EmbeddedResource Include="git_commit.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <Content Include="next_patch_notes.txt" />
   </ItemGroup>

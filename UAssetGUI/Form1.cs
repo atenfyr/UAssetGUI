@@ -321,6 +321,11 @@ namespace UAssetGUI
 
             UpdateComboSpecifyVersion();
 
+            // set text for copy/paste/delete
+            this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
+            this.pasteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.V);
+            this.deleteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Delete);
+
             // Fetch the latest version from github
             Task.Run(() =>
             {
@@ -686,16 +691,31 @@ namespace UAssetGUI
             tableEditor?.ChangeAllExpansionStatus(false);
         }
 
-        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (tableEditor == null) return;
-            if (dataGridView1.IsCurrentCellInEditMode)
+            switch (keyData)
             {
-                // fallback to normal operating system buffer
-                SendKeys.Send("^C");
-                return;
+                case Keys.Control | Keys.C:
+                    if (tableEditor == null || dataGridView1.IsCurrentCellInEditMode) break;
+                    copyToolStripMenuItem.PerformClick();
+                    return true;
+                case Keys.Control | Keys.V:
+                    if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) break;
+                    if (tableEditor == null || dataGridView1.IsCurrentCellInEditMode) break;
+                    pasteToolStripMenuItem.PerformClick();
+                    return true;
+                case Keys.Delete:
+                    if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) break;
+                    if (tableEditor == null || dataGridView1.IsCurrentCellInEditMode) break;
+                    deleteToolStripMenuItem.PerformClick();
+                    return true;
             }
 
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
             object objectToCopy = null;
 
@@ -769,9 +789,6 @@ namespace UAssetGUI
                 Clipboard.SetText(JsonConvert.SerializeObject(newClipboardText, Formatting.None));
                 return;
             }
-
-            // fallback to normal operating system buffer
-            SendKeys.Send("^C");
         }
 
         private TreeNode SearchForTreeNode(TreeView node, int expNum)
@@ -798,16 +815,6 @@ namespace UAssetGUI
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.IsCurrentCellInEditMode)
-            {
-                // fallback to normal operating system buffer
-                SendKeys.Send("^V");
-                return;
-            }
-
-            if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) return;
-            if (tableEditor == null) return;
-
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
 
             PropertyData deserializedClipboard = null;
@@ -937,23 +944,10 @@ namespace UAssetGUI
                     // the thing we're trying to paste probably isn't a string array
                 }
             }
-
-            // fallback to normal operating system buffer
-            SendKeys.Send("^V");
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.IsCurrentCellInEditMode)
-            {
-                // fallback to normal operating system buffer
-                SendKeys.Send("{DEL}");
-                return;
-            }
-
-            if (dataGridView1.ReadOnly || !dataGridView1.AllowUserToAddRows) return;
-            if (tableEditor == null) return;
-
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
 
             switch (tableEditor.mode)

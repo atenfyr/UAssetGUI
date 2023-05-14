@@ -134,6 +134,11 @@ namespace UAssetGUI
             return byteArr;
         }
 
+        public static string ShortcutToText(Keys shortcutKeys)
+        {
+            return TypeDescriptor.GetConverter(typeof(Keys)).ConvertToString(shortcutKeys);
+        }
+
         /*
             UAssetGUI versions are formatted as follows: MAJOR.MINOR.BUILD.REVISION
             * MAJOR - incremented for very big changes or backwards-incompatible changes

@@ -1637,6 +1637,7 @@ namespace UAssetGUI
                             }
                         }
                     }
+                    dataGridView1.AutoResizeRows();
                     else
                     {
                         ClearScreen();

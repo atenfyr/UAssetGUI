@@ -1001,6 +1001,11 @@ namespace UAssetGUI
             dataGridView1.BackgroundColor = UAGPalette.InactiveColor;
         }
 
+        private Form1 GetParentForm()
+        {
+            return (Form1) dataGridView1.Parent.Parent.Parent;
+        }
+
         public void Load() // Updates the table with selected asset data
         {
             if (mode == TableHandlerMode.None)
@@ -1009,7 +1014,7 @@ namespace UAssetGUI
                 return;
             }
 
-            Form1 origForm = (Form1)dataGridView1.Parent;
+            var origForm = GetParentForm();
             var byteView1 = origForm.byteView1;
             byteView1.Visible = false;
             origForm.importBinaryData.Visible = false;
@@ -1026,7 +1031,7 @@ namespace UAssetGUI
             dataGridView1.BackgroundColor = UAGPalette.DataGridViewActiveColor;
             readyToSave = false;
 
-            ((Form1)dataGridView1.Parent).ResetCurrentDataGridViewStrip();
+            origForm.ResetCurrentDataGridViewStrip();
 
             switch (mode)
             {
@@ -1226,7 +1231,7 @@ namespace UAssetGUI
 
                         if (pointerNode.Type == PointingTreeNodeType.ByteArray)
                         {
-                            Control currentlyFocusedControl = ((Form1)dataGridView1.Parent).ActiveControl;
+                            Control currentlyFocusedControl = origForm.ActiveControl;
                             dataGridView1.Visible = false;
                             byteView1.SetBytes(new byte[] { });
                             byteView1.SetBytes(pointerNode.Pointer is RawExport ? ((RawExport)pointerNode.Pointer).Data : ((NormalExport)pointerNode.Pointer).Extras);
@@ -1614,7 +1619,7 @@ namespace UAssetGUI
                                     break;
                                 case KismetExpression[] bytecode:
                                     UAssetAPI.Kismet.KismetSerializer.asset = asset;
-                                    Control currentlyFocusedControl1 = ((Form1)dataGridView1.Parent).ActiveControl;
+                                    Control currentlyFocusedControl1 = origForm.ActiveControl;
                                     dataGridView1.Visible = false;
                                     jsonView.Text = new JObject(new JProperty("Script", SerializeScript(bytecode))).ToString();
                                     jsonView.Visible = true;
@@ -2282,8 +2287,8 @@ namespace UAssetGUI
             }
             else
             {
-                ((Form1)dataGridView1.Parent).UpdateRPC();
-                ((Form1)dataGridView1.Parent).SetUnsavedChanges(true);
+                GetParentForm().UpdateRPC();
+                GetParentForm().SetUnsavedChanges(true);
             }
         }
 

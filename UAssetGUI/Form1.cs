@@ -27,6 +27,7 @@ namespace UAssetGUI
         internal Usmap ParsingMappings = null;
         internal DataGridView dataGridView1;
         internal ColorfulTreeView treeView1;
+        internal SplitContainer splitContainer1;
         internal MenuStrip menuStrip1;
         internal AC7Decrypt ac7decrypt;
 
@@ -122,21 +123,23 @@ namespace UAssetGUI
             // Extra data viewer
             byteView1 = new ByteViewer
             {
+                Dock = DockStyle.Fill,
                 AutoScroll = true,
                 AutoSize = true,
                 Visible = false
             };
-            Controls.Add(byteView1);
+            splitContainer1.Panel2.Controls.Add(byteView1);
 
             jsonView = new TextBox
             {
+                Dock = DockStyle.Fill,
                 Visible = false,
                 AutoSize = true,
                 Multiline = true,
                 ReadOnly = true,
                 ScrollBars = ScrollBars.Both
             };
-            Controls.Add(jsonView);
+            splitContainer1.Panel2.Controls.Add(jsonView);
 
             importBinaryData.Visible = false;
             exportBinaryData.Visible = false;
@@ -1212,29 +1215,14 @@ namespace UAssetGUI
 
         public void ForceResize()
         {
-            float widthAmount = 0.6f;
-            dataGridView1.Size = new Size((int)(this.Size.Width * widthAmount), this.Size.Height - (this.menuStrip1.Size.Height * 3));
-            dataGridView1.Location = new Point(this.Size.Width - this.dataGridView1.Size.Width - this.menuStrip1.Size.Height, this.menuStrip1.Size.Height);
-            if (byteView1 != null)
-            {
-                byteView1.Size = dataGridView1.Size;
-                byteView1.Location = dataGridView1.Location;
-                byteView1.Refresh();
-            }
+            if (byteView1 != null) byteView1.Refresh();
+            if (jsonView != null) jsonView.Refresh();
 
-            if (jsonView != null)
-            {
-                jsonView.Size = dataGridView1.Size;
-                jsonView.Location = dataGridView1.Location;
-                jsonView.Refresh();
-            }
-
-            treeView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
-            treeView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
-            comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
+            comboSpecifyVersion.Location = new Point(this.splitContainer1.Location.X + this.splitContainer1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
             comboSpecifyMappings.Location = new Point(comboSpecifyVersion.Location.X - 5 - comboSpecifyMappings.Width, comboSpecifyVersion.Location.Y);
 
-            importBinaryData.Location = new Point(dataGridView1.Location.X, comboSpecifyVersion.Location.Y);
+            // :skull_emoji:
+            importBinaryData.Location = new Point(splitContainer1.Location.X, comboSpecifyVersion.Location.Y);
             exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
             setBinaryData.Location = new Point(exportBinaryData.Location.X + exportBinaryData.Size.Width + 5, importBinaryData.Location.Y);
             importBinaryData.Size = new Size(importBinaryData.Width, comboSpecifyVersion.Height); importBinaryData.Font = new Font(importBinaryData.Font.FontFamily, 6.75f, importBinaryData.Font.Style);

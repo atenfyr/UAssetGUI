@@ -161,10 +161,10 @@ namespace UAssetGUI
             frm.ForeColor = UAGPalette.ForeColor;
             if (frm is Form1 frm1)
             {
-                Color selectedListViewBackColor = frm1.listView1.Nodes.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
-                frm1.listView1.BackColor = selectedListViewBackColor;
-                frm1.listView1.ForeColor = UAGPalette.ForeColor;
-                frm1.listView1.Font = new Font(frm1.listView1.Font.FontFamily, 8.25f + (float)UAGConfig.Data.DataZoom, frm1.listView1.Font.Style);
+                Color selectedListViewBackColor = frm1.treeView1.Nodes.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
+                frm1.treeView1.BackColor = selectedListViewBackColor;
+                frm1.treeView1.ForeColor = UAGPalette.ForeColor;
+                frm1.treeView1.Font = new Font(frm1.treeView1.Font.FontFamily, 8.25f + (float)UAGConfig.Data.DataZoom, frm1.treeView1.Font.Style);
 
                 frm1.menuStrip1.BackColor = UAGPalette.BackColor;
                 frm1.menuStrip1.ForeColor = UAGPalette.ForeColor;

@@ -108,7 +108,7 @@ namespace UAssetGUI
     {
         public TableHandlerMode mode;
         public UAsset asset;
-        public TreeView listView1;
+        public TreeView treeView1;
         public DataGridView dataGridView1;
 
         public bool readyToSave = true;
@@ -174,31 +174,31 @@ namespace UAssetGUI
 
         public void FillOutTree(bool fillAllSubNodes)
         {
-            listView1.BeginUpdate();
-            listView1.Nodes.Clear();
-            listView1.BackColor = UAGPalette.BackColor;
-            listView1.Nodes.Add(new PointingTreeNode("General Information", null));
-            listView1.Nodes.Add(new PointingTreeNode("Name Map", null));
-            listView1.Nodes.Add(new PointingTreeNode("Import Data", null));
-            listView1.Nodes.Add(new PointingTreeNode("Export Information", null));
-            listView1.Nodes.Add(new PointingTreeNode("Depends Map", null));
-            listView1.Nodes.Add(new PointingTreeNode("Soft Package References", null));
+            treeView1.BeginUpdate();
+            treeView1.Nodes.Clear();
+            treeView1.BackColor = UAGPalette.BackColor;
+            treeView1.Nodes.Add(new PointingTreeNode("General Information", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Name Map", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Import Data", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Export Information", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Depends Map", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Soft Package References", null));
             if (asset.WorldTileInfo != null)
             {
-                listView1.Nodes.Add(new PointingTreeNode("World Tile Info", null));
-                PointingTreeNode worldInfoNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
+                treeView1.Nodes.Add(new PointingTreeNode("World Tile Info", null));
+                PointingTreeNode worldInfoNode = (PointingTreeNode)treeView1.Nodes[treeView1.Nodes.Count - 1];
                 worldInfoNode.Nodes.Add(new PointingTreeNode("Layer (5)", asset.WorldTileInfo.Layer));
                 worldInfoNode.Nodes.Add(new PointingTreeNode("LODList (" + asset.WorldTileInfo.LODList.Length + ")", asset.WorldTileInfo.LODList));
-                PointingTreeNode lodListNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
+                PointingTreeNode lodListNode = (PointingTreeNode)treeView1.Nodes[treeView1.Nodes.Count - 1];
                 for (int i = 0; i < asset.WorldTileInfo.LODList.Length; i++)
                 {
                     lodListNode.Nodes.Add(new PointingTreeNode("LOD entry #" + (i + 1), asset.WorldTileInfo.LODList[i]));
                 }
             }
-            listView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
-            listView1.Nodes.Add(new PointingTreeNode("Export Data", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
+            treeView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
-            PointingTreeNode superTopNode = (PointingTreeNode)listView1.Nodes[listView1.Nodes.Count - 1];
+            PointingTreeNode superTopNode = (PointingTreeNode)treeView1.Nodes[treeView1.Nodes.Count - 1];
             for (int i = 0; i < asset.Exports.Count; i++)
             {
                 Export baseUs = asset.Exports[i];
@@ -313,8 +313,8 @@ namespace UAssetGUI
                 }
             }
 
-            listView1.SelectedNode = listView1.Nodes[0];
-            listView1.EndUpdate();
+            treeView1.SelectedNode = treeView1.Nodes[0];
+            treeView1.EndUpdate();
         }
 
         private HashSet<string> hasChildrenProperties = new HashSet<string>()
@@ -929,8 +929,8 @@ namespace UAssetGUI
 
         public void ChangeAllExpansionStatus(bool expanding)
         {
-            listView1.BeginUpdate();
-            foreach (TreeNode node in Collect(listView1.Nodes))
+            treeView1.BeginUpdate();
+            foreach (TreeNode node in Collect(treeView1.Nodes))
             {
                 if (expanding)
                 {
@@ -941,9 +941,9 @@ namespace UAssetGUI
                     node.Collapse();
                 }
             }
-            listView1.EndUpdate();
+            treeView1.EndUpdate();
 
-            (listView1.SelectedNode ?? listView1.Nodes[0]).EnsureVisible();
+            (treeView1.SelectedNode ?? treeView1.Nodes[0]).EnsureVisible();
         }
 
         private static IEnumerable<TreeNode> Collect(TreeNodeCollection nodes)
@@ -1169,7 +1169,7 @@ namespace UAssetGUI
                 case TableHandlerMode.WorldTileInfo:
                     AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "" });
 
-                    if (listView1.SelectedNode is PointingTreeNode wtlPointerNode)
+                    if (treeView1.SelectedNode is PointingTreeNode wtlPointerNode)
                     {
                         if (wtlPointerNode.Pointer == null)
                         {
@@ -1218,7 +1218,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.ExportData:
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "Serial Offset", "" });
                         bool standardRendering = true;
@@ -2038,7 +2038,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.ExportData:
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         if (pointerNode.Pointer is FStringTable usStrTable)
                         {
@@ -2287,11 +2287,11 @@ namespace UAssetGUI
             }
         }
 
-        public TableHandler(DataGridView dataGridView1, UAsset asset, TreeView listView1)
+        public TableHandler(DataGridView dataGridView1, UAsset asset, TreeView treeView1)
         {
             this.asset = asset;
             this.dataGridView1 = dataGridView1;
-            this.listView1 = listView1;
+            this.treeView1 = treeView1;
             this.mode = 0;
         }
     }

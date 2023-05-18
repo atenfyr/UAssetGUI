@@ -68,13 +68,13 @@ namespace UAssetGUI
             {
                 progressBar1.Visible = true;
                 progressBar1.Value = 0;
-                progressBar1.Maximum = BaseForm.listView1.GetNodeCount(true);
+                progressBar1.Maximum = BaseForm.treeView1.GetNodeCount(true);
                 BaseForm.dataGridView1.SuspendLayout();
-                BaseForm.listView1.SuspendLayout();
-                BaseForm.listView1.BeginUpdate();
+                BaseForm.treeView1.SuspendLayout();
+                BaseForm.treeView1.BeginUpdate();
 
-                originalNode = BaseForm.listView1.SelectedNode;
-                examiningNode = BaseForm.listView1.SelectedNode;
+                originalNode = BaseForm.treeView1.SelectedNode;
+                examiningNode = BaseForm.treeView1.SelectedNode;
                 minRow = BaseForm.dataGridView1.SelectedRows.Count > 0 ? BaseForm.dataGridView1.SelectedRows[0].Index : (BaseForm.dataGridView1.SelectedCells.Count > 0 ? BaseForm.dataGridView1.SelectedCells[0].RowIndex : -1);
             });
 
@@ -89,7 +89,7 @@ namespace UAssetGUI
 
                 UAGUtils.InvokeUI(() =>
                 {
-                    BaseForm.listView1.SelectedNode = examiningNode;
+                    BaseForm.treeView1.SelectedNode = examiningNode;
                     BaseForm.UpdateModeFromSelectedNode(examiningNode);
 
                     // check node name
@@ -123,7 +123,7 @@ namespace UAssetGUI
                                 if (DoesTextQualify(cell.Value.ToString()))
                                 {
                                     if (!cell.Displayed) BaseForm.dataGridView1.FirstDisplayedScrollingRowIndex = row.Index;
-                                    BaseForm.listView1.SelectedNode.EnsureVisible();
+                                    BaseForm.treeView1.SelectedNode.EnsureVisible();
                                     row.Selected = true;
                                     cell.Selected = true;
                                     foundSomething = true;
@@ -150,12 +150,12 @@ namespace UAssetGUI
             {
                 progressBar1.Value = progressBar1.Maximum;
                 BaseForm.dataGridView1.ResumeLayout();
-                BaseForm.listView1.ResumeLayout();
-                BaseForm.listView1.EndUpdate();
+                BaseForm.treeView1.ResumeLayout();
+                BaseForm.treeView1.EndUpdate();
 
                 if (!foundSomething)
                 {
-                    BaseForm.listView1.SelectedNode = originalNode;
+                    BaseForm.treeView1.SelectedNode = originalNode;
                     BaseForm.UpdateModeFromSelectedNode(originalNode);
                     if (!wasCanceled) MessageBox.Show("0 results found.");
                 }

@@ -26,7 +26,7 @@ namespace UAssetGUI
         internal EngineVersion ParsingVersion = EngineVersion.UNKNOWN;
         internal Usmap ParsingMappings = null;
         internal DataGridView dataGridView1;
-        internal ColorfulTreeView listView1;
+        internal ColorfulTreeView treeView1;
         internal MenuStrip menuStrip1;
         internal AC7Decrypt ac7decrypt;
 
@@ -450,7 +450,7 @@ namespace UAssetGUI
                 currentSavingPath = savingPath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, targetAsset, listView1);
+                tableEditor = new TableHandler(dataGridView1, targetAsset, treeView1);
 
                 saveToolStripMenuItem.Enabled = true;
                 saveAsToolStripMenuItem.Enabled = true;
@@ -534,7 +534,7 @@ namespace UAssetGUI
                 saveAsToolStripMenuItem.Enabled = false;
                 findToolStripMenuItem.Enabled = false;
 
-                listView1.Nodes.Clear();
+                treeView1.Nodes.Clear();
                 dataGridView1.Columns.Clear();
                 dataGridView1.Rows.Clear();
                 UAGPalette.RefreshTheme(this);
@@ -722,7 +722,7 @@ namespace UAssetGUI
             switch (tableEditor.mode)
             {
                 case TableHandlerMode.ExportData:
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         if (pointerNode.Type == PointingTreeNodeType.ByteArray)
                         {
@@ -732,37 +732,37 @@ namespace UAssetGUI
                         }
                         else if (pointerNode.Pointer is StructPropertyData copyingDat1)
                         {
-                            if (listView1.Focused) objectToCopy = copyingDat1;
-                            if (rowIndex >= 0 && !listView1.Focused && copyingDat1.Value.Count > rowIndex) objectToCopy = copyingDat1.Value[rowIndex];
+                            if (treeView1.Focused) objectToCopy = copyingDat1;
+                            if (rowIndex >= 0 && !treeView1.Focused && copyingDat1.Value.Count > rowIndex) objectToCopy = copyingDat1.Value[rowIndex];
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData copyingDat2)
                         {
-                            if (listView1.Focused) objectToCopy = copyingDat2;
-                            if (rowIndex >= 0 && !listView1.Focused && copyingDat2.Value.Length > rowIndex) objectToCopy = copyingDat2.Value[rowIndex];
+                            if (treeView1.Focused) objectToCopy = copyingDat2;
+                            if (rowIndex >= 0 && !treeView1.Focused && copyingDat2.Value.Length > rowIndex) objectToCopy = copyingDat2.Value[rowIndex];
                         }
                         else if (pointerNode.Pointer is PointingDictionaryEntry copyingDat3)
                         {
                             // don't allow copying the dictionary entry itself
-                            if (rowIndex >= 0) objectToCopy = listView1.ContainsFocus ? null : (rowIndex == 0 ? copyingDat3.Entry.Key : copyingDat3.Entry.Value);
+                            if (rowIndex >= 0) objectToCopy = treeView1.ContainsFocus ? null : (rowIndex == 0 ? copyingDat3.Entry.Key : copyingDat3.Entry.Value);
                         }
                         else if (pointerNode.Pointer is PropertyData[] copyingDat4)
                         {
-                            if (listView1.Focused) objectToCopy = copyingDat4;
-                            if (rowIndex >= 0 && !listView1.Focused && copyingDat4.Length > rowIndex) objectToCopy = copyingDat4[rowIndex];
+                            if (treeView1.Focused) objectToCopy = copyingDat4;
+                            if (rowIndex >= 0 && !treeView1.Focused && copyingDat4.Length > rowIndex) objectToCopy = copyingDat4[rowIndex];
                         }
-                        else if (pointerNode.Pointer is Export || (listView1.Focused && pointerNode.WillCopyWholeExport))
+                        else if (pointerNode.Pointer is Export || (treeView1.Focused && pointerNode.WillCopyWholeExport))
                         {
                             switch (pointerNode.Type)
                             {
                                 case PointingTreeNodeType.Normal:
                                     var copyingDat5 = tableEditor.asset.Exports[pointerNode.ExportNum];
-                                    if (listView1.Focused)
+                                    if (treeView1.Focused)
                                     {
                                         objectToCopy = copyingDat5;
                                     }
                                     else if (copyingDat5 is NormalExport copyingDat6)
                                     {
-                                        if (rowIndex >= 0 && !listView1.Focused && copyingDat6.Data.Count > rowIndex) objectToCopy = copyingDat6.Data[rowIndex];
+                                        if (rowIndex >= 0 && !treeView1.Focused && copyingDat6.Data.Count > rowIndex) objectToCopy = copyingDat6.Data[rowIndex];
                                     }
                                     break;
                             }
@@ -830,7 +830,7 @@ namespace UAssetGUI
             switch (tableEditor.mode)
             {
                 case TableHandlerMode.ExportData:
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         if (pointerNode.Type == PointingTreeNodeType.ByteArray)
                         {
@@ -919,7 +919,7 @@ namespace UAssetGUI
                                     tableEditor.Save(true);
                                     tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
 
-                                    TreeNode newNode = SearchForTreeNode(listView1, pointerNode.ExportNum + 1);
+                                    TreeNode newNode = SearchForTreeNode(treeView1, pointerNode.ExportNum + 1);
                                     newNode.EnsureVisible();
                                     newNode.ExpandAll();
                                 }
@@ -953,7 +953,7 @@ namespace UAssetGUI
             switch (tableEditor.mode)
             {
                 case TableHandlerMode.ExportData:
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
                         if (pointerNode.Type == PointingTreeNodeType.ByteArray)
                         {
@@ -994,12 +994,12 @@ namespace UAssetGUI
                             }
                             return;
                         }
-                        else if (pointerNode.Pointer is Export || (listView1.Focused && pointerNode.WillCopyWholeExport))
+                        else if (pointerNode.Pointer is Export || (treeView1.Focused && pointerNode.WillCopyWholeExport))
                         {
                             switch (pointerNode.Type)
                             {
                                 case PointingTreeNodeType.Normal:
-                                    if (listView1.Focused)
+                                    if (treeView1.Focused)
                                     {
                                         DialogResult res = MessageBox.Show("Are you sure you want to delete this export?\nTHIS OPERATION CANNOT BE UNDONE!", DisplayVersion, MessageBoxButtons.OKCancel);
                                         if (res != DialogResult.OK) break;
@@ -1010,7 +1010,7 @@ namespace UAssetGUI
                                         tableEditor.Save(true);
                                         tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
 
-                                        TreeNode newNode = SearchForTreeNode(listView1, pointerNode.ExportNum);
+                                        TreeNode newNode = SearchForTreeNode(treeView1, pointerNode.ExportNum);
                                         if (newNode != null)
                                         {
                                             newNode.EnsureVisible();
@@ -1074,7 +1074,7 @@ namespace UAssetGUI
                         if (previousCell.Value is int) jumpingTo = (int)previousCell.Value;
                         if (jumpingTo < 0) return;
 
-                        TreeNode topSelectingNode = listView1.Nodes[listView1.Nodes.Count - 1];
+                        TreeNode topSelectingNode = treeView1.Nodes[treeView1.Nodes.Count - 1];
                         if (topSelectingNode.Nodes.Count > (jumpingTo - 1))
                         {
                             topSelectingNode = topSelectingNode.Nodes[jumpingTo - 1];
@@ -1083,17 +1083,17 @@ namespace UAssetGUI
                                 topSelectingNode = topSelectingNode.Nodes[0];
                             }
                         }
-                        listView1.SelectedNode = topSelectingNode;
+                        treeView1.SelectedNode = topSelectingNode;
                         break;
                     case "ChildJump":
                         int jumpingIndex = dataGridView1.CurrentCell.RowIndex;
-                        if (jumpingIndex < 0 || jumpingIndex >= listView1.SelectedNode.Nodes.Count)
+                        if (jumpingIndex < 0 || jumpingIndex >= treeView1.SelectedNode.Nodes.Count)
                         {
                             MessageBox.Show("Please select View -> Recalculate Nodes before attempting to jump to this node.", "Notice");
                         }
                         else
                         {
-                            listView1.SelectedNode = listView1.SelectedNode.Nodes[jumpingIndex];
+                            treeView1.SelectedNode = treeView1.SelectedNode.Nodes[jumpingIndex];
                         }
                         break;
                 }
@@ -1229,8 +1229,8 @@ namespace UAssetGUI
                 jsonView.Refresh();
             }
 
-            listView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
-            listView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
+            treeView1.Size = new Size((int)(this.Size.Width * (1 - widthAmount)) - (this.menuStrip1.Size.Height * 2), this.Size.Height - (this.menuStrip1.Size.Height * 3));
+            treeView1.Location = new Point(this.menuStrip1.Size.Height / 2, this.menuStrip1.Size.Height);
             comboSpecifyVersion.Location = new Point(this.dataGridView1.Location.X + this.dataGridView1.Size.Width - this.comboSpecifyVersion.Width, this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2);
             comboSpecifyMappings.Location = new Point(comboSpecifyVersion.Location.X - 5 - comboSpecifyMappings.Width, comboSpecifyVersion.Location.Y);
 
@@ -1385,26 +1385,26 @@ namespace UAssetGUI
             });
         }
 
-        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        private void treeView1_KeyDown(object sender, KeyEventArgs e)
         {
             if (ModifierKeys == Keys.Shift)
             {
                 TreeNode newNode = null;
                 if (e.KeyCode.HasFlag(Keys.Up)) // SHIFT + UP = navigate to previous node @ same level
                 {
-                    newNode = listView1.SelectedNode.PrevNode;
+                    newNode = treeView1.SelectedNode.PrevNode;
                     e.Handled = true;
                 }
                 else if (e.KeyCode.HasFlag(Keys.Down)) // SHIFT + DOWN = navigate to next node @ same level
                 {
-                    newNode = listView1.SelectedNode.NextNode;
+                    newNode = treeView1.SelectedNode.NextNode;
                     e.Handled = true;
                 }
 
                 if (newNode != null)
                 {
-                    listView1.SelectedNode = newNode;
-                    listView1.SelectedNode.EnsureVisible();
+                    treeView1.SelectedNode = newNode;
+                    treeView1.SelectedNode.EnsureVisible();
                 }
             }
         }
@@ -1517,7 +1517,7 @@ namespace UAssetGUI
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
                     {
                         byte[] rawData = File.ReadAllBytes(openFileDialog.FileName);
                         if (pointerNode.Pointer is NormalExport usCategory)
@@ -1550,7 +1550,7 @@ namespace UAssetGUI
                 DialogResult res = dialog.ShowDialog();
                 if (res == DialogResult.OK)
                 {
-                    if (listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
                     {
                         byte[] rawData = new byte[0];
                         if (pointerNode.Pointer is NormalExport usCategory)
@@ -1579,7 +1579,7 @@ namespace UAssetGUI
 
             if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
             {
-                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && listView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
                 {
                     if (pointerNode.Pointer is NormalExport usCategory)
                     {
@@ -1686,7 +1686,7 @@ namespace UAssetGUI
             });
         }
 
-        private void listView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             if (tableEditor?.asset == null) return;
 
@@ -1727,7 +1727,7 @@ namespace UAssetGUI
 
         private bool TryDumpParticular()
         {
-            var selectedNode = listView1.SelectedNode as PointingTreeNode;
+            var selectedNode = treeView1.SelectedNode as PointingTreeNode;
             if (selectedNode == null) return false;
             
             FName searchName = null;

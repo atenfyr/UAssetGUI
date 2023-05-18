@@ -68,7 +68,7 @@ namespace UAssetGUI
             this.exportBinaryData = new System.Windows.Forms.Button();
             this.setBinaryData = new System.Windows.Forms.Button();
             this.comboSpecifyMappings = new System.Windows.Forms.ComboBox();
-            this.listView1 = new UAssetGUI.ColorfulTreeView();
+            this.treeView1 = new UAssetGUI.ColorfulTreeView();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.nameMapContext.SuspendLayout();
@@ -417,20 +417,20 @@ namespace UAssetGUI
             this.comboSpecifyMappings.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboSpecifyVersion_DrawItem);
             this.comboSpecifyMappings.SelectedIndexChanged += new System.EventHandler(this.comboSpecifyMappings_SelectedIndexChanged);
             // 
-            // listView1
+            // treeView1
             // 
-            this.listView1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
-            this.listView1.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(12, 27);
-            this.listView1.Name = "listView1";
-            this.listView1.ShowLines = false;
-            this.listView1.ShowNodeToolTips = true;
-            this.listView1.Size = new System.Drawing.Size(344, 411);
-            this.listView1.TabIndex = 1;
-            this.listView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.listView1_BeforeExpand);
-            this.listView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
-            this.listView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.listView1_KeyDown);
+            this.treeView1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
+            this.treeView1.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            this.treeView1.HideSelection = false;
+            this.treeView1.Location = new System.Drawing.Point(12, 27);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.ShowLines = false;
+            this.treeView1.ShowNodeToolTips = true;
+            this.treeView1.Size = new System.Drawing.Size(344, 411);
+            this.treeView1.TabIndex = 1;
+            this.treeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeExpand);
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            this.treeView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView1_KeyDown);
             // 
             // Form1
             // 
@@ -442,7 +442,7 @@ namespace UAssetGUI
             this.Controls.Add(this.exportBinaryData);
             this.Controls.Add(this.importBinaryData);
             this.Controls.Add(this.comboSpecifyVersion);
-            this.Controls.Add(this.listView1);
+            this.Controls.Add(this.treeView1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;

@@ -157,6 +157,9 @@ namespace UAssetGUI
             SizeChanged += frm_sizeChanged;
             FormClosing += frm_closing;
 
+            // position of ByteViewer buttons depends on splitter location so resize if splitter moves
+            splitContainer1.SplitterMoved += (sender, e) => { ForceResize(); };
+
             // Drag-and-drop support
             DragEnter += new DragEventHandler(frm_DragEnter);
             DragDrop += new DragEventHandler(frm_DragDrop);
@@ -1222,7 +1225,7 @@ namespace UAssetGUI
             comboSpecifyMappings.Location = new Point(comboSpecifyVersion.Location.X - 5 - comboSpecifyMappings.Width, comboSpecifyVersion.Location.Y);
 
             // :skull_emoji:
-            importBinaryData.Location = new Point(splitContainer1.Location.X, comboSpecifyVersion.Location.Y);
+            importBinaryData.Location = new Point(Math.Max(menuStrip1.Left + menuStrip1.GetPreferredSize(Size.Empty).Width, splitContainer1.Location.X + splitContainer1.SplitterDistance + splitContainer1.SplitterWidth), comboSpecifyVersion.Location.Y);
             exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
             setBinaryData.Location = new Point(exportBinaryData.Location.X + exportBinaryData.Size.Width + 5, importBinaryData.Location.Y);
             importBinaryData.Size = new Size(importBinaryData.Width, comboSpecifyVersion.Height); importBinaryData.Font = new Font(importBinaryData.Font.FontFamily, 6.75f, importBinaryData.Font.Style);

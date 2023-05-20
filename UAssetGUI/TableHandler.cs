@@ -648,9 +648,21 @@ namespace UAssetGUI
                                 row.Cells[++columnIndexer].Value = vector4DData.Y;
                                 row.Cells[columnIndexer].ToolTipText = "Y";
                                 row.Cells[++columnIndexer].Value = vector4DData.Z;
-                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                row.Cells[columnIndexer].ToolTipText = "Z";
                                 row.Cells[++columnIndexer].Value = vector4DData.W;
                                 row.Cells[columnIndexer].ToolTipText = "W";
+                                break;
+                            case "Plane":
+                                var planeData = (PlanePropertyData)thisPD;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = planeData.Value.X;
+                                row.Cells[columnIndexer].ToolTipText = "X (Xx)";
+                                row.Cells[++columnIndexer].Value = planeData.Value.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y (+Yy)";
+                                row.Cells[++columnIndexer].Value = planeData.Value.Z;
+                                row.Cells[columnIndexer].ToolTipText = "Z (+Zz)";
+                                row.Cells[++columnIndexer].Value = planeData.Value.W;
+                                row.Cells[columnIndexer].ToolTipText = "W (= W)";
                                 break;
                             case "IntPoint":
                                 var intPointData = (IntPointPropertyData)thisPD;

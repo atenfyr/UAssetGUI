@@ -741,9 +741,11 @@ namespace UAssetGUI
                                 }
                                 else
                                 {
-                                    row.Cells[++columnIndexer].Value = sopPropData.AssetPathName == null ? FString.NullCase : sopPropData.AssetPathName.ToString();
-                                    row.Cells[columnIndexer].ToolTipText = "AssetPathName";
-                                    row.Cells[++columnIndexer].Value = sopPropData.SubPathString == null ? FString.NullCase : sopPropData.SubPathString.ToString();
+                                    row.Cells[++columnIndexer].Value = sopPropData.Value.AssetPath.PackageName == null ? FString.NullCase : sopPropData.Value.AssetPath.PackageName.ToString();
+                                    row.Cells[columnIndexer].ToolTipText = "AssetPath.PackageName";
+                                    row.Cells[++columnIndexer].Value = sopPropData.Value.AssetPath.AssetName == null ? FString.NullCase : sopPropData.Value.AssetPath.AssetName.ToString();
+                                    row.Cells[columnIndexer].ToolTipText = "AssetPath.AssetName";
+                                    row.Cells[++columnIndexer].Value = sopPropData.Value.SubPathString == null ? FString.NullCase : sopPropData.Value.SubPathString.ToString();
                                     row.Cells[columnIndexer].ToolTipText = "SubPathString";
                                 }
                                 break;

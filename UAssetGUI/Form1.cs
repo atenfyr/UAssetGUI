@@ -573,17 +573,17 @@ namespace UAssetGUI
             existsUnsavedChanges = flag;
             if (string.IsNullOrEmpty(currentSavingPath))
             {
-                dataGridView1.Parent.Text = DisplayVersion;
+                this.Text = DisplayVersion;
             }
             else
             {
                 if (existsUnsavedChanges)
                 {
-                    dataGridView1.Parent.Text = DisplayVersion + " - *" + currentSavingPath;
+                    this.Text = DisplayVersion + " - *" + currentSavingPath;
                 }
                 else
                 {
-                    dataGridView1.Parent.Text = DisplayVersion + " - " + currentSavingPath;
+                    this.Text = DisplayVersion + " - " + currentSavingPath;
                 }
             }
         }

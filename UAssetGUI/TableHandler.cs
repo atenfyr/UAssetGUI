@@ -487,8 +487,10 @@ namespace UAssetGUI
                             case "SoftObjectProperty":
                                 var objData2 = (SoftObjectPropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                row.Cells[++columnIndexer].Value = objData2.Value.AssetPathName == null ? FString.NullCase : objData2.Value.AssetPathName.ToString();
-                                row.Cells[columnIndexer].ToolTipText = "AssetPathName";
+                                row.Cells[++columnIndexer].Value = objData2.Value.AssetPath.PackageName == null ? FString.NullCase : objData2.Value.AssetPath.PackageName.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "AssetPath.PackageName";
+                                row.Cells[++columnIndexer].Value = objData2.Value.AssetPath.AssetName == null ? FString.NullCase : objData2.Value.AssetPath.AssetName.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "AssetPath.AssetName";
                                 row.Cells[++columnIndexer].Value = objData2.Value.SubPathString == null ? FString.NullCase : objData2.Value.SubPathString.ToString();
                                 row.Cells[columnIndexer].ToolTipText = "SubPathString";
                                 break;
@@ -1099,11 +1101,11 @@ namespace UAssetGUI
                     //((Form1)dataGridView1.Parent).CurrentDataGridViewStrip = ((Form1)dataGridView1.Parent).nameMapContext;
                     break;
                 case TableHandlerMode.Imports:
-                    AddColumns(new string[] { "ClassPackage", "ClassName", "OuterIndex", "ObjectName", "" });
+                    AddColumns(new string[] { "ClassPackage", "ClassName", "OuterIndex", "ObjectName", "bImportOptional", "" });
 
                     for (int num = 0; num < asset.Imports.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.Imports[num].ClassPackage.ToString(), asset.Imports[num].ClassName.ToString(), asset.Imports[num].OuterIndex.Index, asset.Imports[num].ObjectName.ToString());
+                        dataGridView1.Rows.Add(asset.Imports[num].ClassPackage.ToString(), asset.Imports[num].ClassName.ToString(), asset.Imports[num].OuterIndex.Index, asset.Imports[num].ObjectName.ToString(), asset.Imports[num].bImportOptional);
                         dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(FPackageIndex.FromImport(num));
                     }
                     break;
@@ -1756,6 +1758,12 @@ namespace UAssetGUI
                         object val2 = row.Cells[1].Value;
                         object val3 = row.Cells[2].Value;
                         object val4 = row.Cells[3].Value;
+                        object val5 = row.Cells[4].Value;
+
+                        bool realVal5 = false;
+                        if (val5 is bool) realVal5 = (bool)val5;
+                        if (val5 is string) realVal5 = ((string)val5).Equals("1") || ((string)val5).ToLowerInvariant().Equals("true");
+
                         if (val1 == null || val2 == null || val4 == null) continue;
                         if (!(val1 is string) || !(val2 is string) || !(val4 is string)) continue;
 
@@ -1780,7 +1788,7 @@ namespace UAssetGUI
                         asset.AddNameReference(parsedVal1.Value);
                         asset.AddNameReference(parsedVal2.Value);
                         asset.AddNameReference(parsedVal4.Value);
-                        Import newLink = new Import(parsedVal1, parsedVal2, new FPackageIndex(realVal3), parsedVal4);
+                        Import newLink = new Import(parsedVal1, parsedVal2, new FPackageIndex(realVal3), parsedVal4, realVal5);
                         asset.Imports.Add(newLink);
                     }
                     break;

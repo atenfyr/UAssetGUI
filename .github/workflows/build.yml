@@ -17,6 +17,11 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: .NET Setup
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
+
     - name: Fetch submodules
       run: git submodule update --init --recursive
 
@@ -26,10 +31,10 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.2
 
-    - name: Navigate to Workspace
+    - name: Navigate to workspace
       run: cd $GITHUB_WORKSPACE
 
-    - name: Restore Packages
+    - name: Restore packages
       run: nuget restore UAssetGUI.sln
 
     - name: Build

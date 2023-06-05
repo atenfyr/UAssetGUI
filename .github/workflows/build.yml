@@ -7,6 +7,10 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2

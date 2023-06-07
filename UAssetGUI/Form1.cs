@@ -609,8 +609,8 @@ namespace UAssetGUI
         {
             if (tableEditor != null && !string.IsNullOrEmpty(currentSavingPath))
             {
-                if (File.Exists(path)) File.Copy(path, path + ".bak", true);
-                if (File.Exists(Path.ChangeExtension(path, "uexp"))) File.Copy(Path.ChangeExtension(path, "uexp"), Path.ChangeExtension(path, "uexp") + ".bak", true);
+                if (UAGConfig.Data.EnableBak && File.Exists(path)) File.Copy(path, path + ".bak", true);
+                if (UAGConfig.Data.EnableBak && File.Exists(Path.ChangeExtension(path, "uexp"))) File.Copy(Path.ChangeExtension(path, "uexp"), Path.ChangeExtension(path, "uexp") + ".bak", true);
 
                 tableEditor.Save(true);
 

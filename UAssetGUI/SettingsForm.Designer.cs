@@ -41,6 +41,7 @@
             this.enableDiscordRpc = new System.Windows.Forms.CheckBox();
             this.enableDynamicTree = new System.Windows.Forms.CheckBox();
             this.doubleClickToEdit = new System.Windows.Forms.CheckBox();
+            this.enableBak = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -62,7 +63,7 @@
             this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(195, 240);
+            this.closeButton.Location = new System.Drawing.Point(195, 270);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
             this.closeButton.TabIndex = 4;
@@ -96,7 +97,7 @@
             this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.aboutButton.Location = new System.Drawing.Point(12, 240);
+            this.aboutButton.Location = new System.Drawing.Point(12, 270);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
             this.aboutButton.TabIndex = 7;
@@ -165,7 +166,7 @@
             // enableDynamicTree
             // 
             this.enableDynamicTree.AutoSize = true;
-            this.enableDynamicTree.Location = new System.Drawing.Point(116, 185);
+            this.enableDynamicTree.Location = new System.Drawing.Point(116, 231);
             this.enableDynamicTree.Name = "enableDynamicTree";
             this.enableDynamicTree.Size = new System.Drawing.Size(122, 17);
             this.enableDynamicTree.TabIndex = 14;
@@ -184,11 +185,23 @@
             this.doubleClickToEdit.UseVisualStyleBackColor = true;
             this.doubleClickToEdit.CheckedChanged += new System.EventHandler(this.doubleClickToEdit_CheckedChanged);
             // 
+            // enableBak
+            // 
+            this.enableBak.AutoSize = true;
+            this.enableBak.Location = new System.Drawing.Point(116, 185);
+            this.enableBak.Name = "enableBak";
+            this.enableBak.Size = new System.Drawing.Size(104, 17);
+            this.enableBak.TabIndex = 16;
+            this.enableBak.Text = "Enable .bak files";
+            this.enableBak.UseVisualStyleBackColor = true;
+            this.enableBak.CheckedChanged += new System.EventHandler(this.enableBak_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 272);
+            this.ClientSize = new System.Drawing.Size(282, 302);
+            this.Controls.Add(this.enableBak);
             this.Controls.Add(this.doubleClickToEdit);
             this.Controls.Add(this.enableDynamicTree);
             this.Controls.Add(this.enableDiscordRpc);
@@ -228,5 +241,6 @@
         private System.Windows.Forms.CheckBox enableDiscordRpc;
         private System.Windows.Forms.CheckBox enableDynamicTree;
         private System.Windows.Forms.CheckBox doubleClickToEdit;
+        private System.Windows.Forms.CheckBox enableBak;
     }
 }

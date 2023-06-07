@@ -24,6 +24,7 @@ namespace UAssetGUI
             enableDynamicTree.Checked = UAGConfig.Data.EnableDynamicTree;
             favoriteThingBox.Text = UAGConfig.Data.FavoriteThing;
             numericUpDown1.Value = UAGConfig.Data.DataZoom;
+            enableBak.Checked = UAGConfig.Data.EnableBak;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -88,6 +89,11 @@ namespace UAssetGUI
         {
             UAGConfig.Data.DoubleClickToEdit = doubleClickToEdit.Checked;
             //BaseForm.dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
+        }
+
+        private void enableBak_CheckedChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.EnableBak = enableBak.Checked;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

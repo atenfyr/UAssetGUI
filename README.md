@@ -1,5 +1,9 @@
 # UAssetGUI
-Open-source software for viewing and modifying Unreal Engine 4 game assets by hand.
+[![CI Status](https://img.shields.io/github/actions/workflow/status/atenfyr/UAssetGUI/main.yml?label=CI)](https://github.com/atenfyr/UAssetGUI/actions)
+[![Issues](https://img.shields.io/github/issues/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/issues)
+[![License](https://img.shields.io/github/license/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/blob/master/LICENSE.md)
+
+UAssetGUI is a tool designed for low-level examination and modification of Unreal Engine 4 game assets by hand.
 
 <img src="https://i.imgur.com/G31NzYA.png" align="center">
 

@@ -1,5 +1,5 @@
 # UAssetGUI
-[![CI Status](https://img.shields.io/github/actions/workflow/status/atenfyr/UAssetGUI/main.yml?label=CI)](https://github.com/atenfyr/UAssetGUI/actions)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/atenfyr/UAssetGUI/build.yml?label=CI)](https://github.com/atenfyr/UAssetGUI/actions)
 [![Issues](https://img.shields.io/github/issues/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/issues)
 [![License](https://img.shields.io/github/license/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/blob/master/LICENSE.md)
 

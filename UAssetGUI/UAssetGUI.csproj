@@ -7,8 +7,8 @@
     <AssemblyTitle>UAssetGUI</AssemblyTitle>
     <Product>UAssetGUI</Product>
     <Copyright>Copyright © Atenfyr 2023</Copyright>
-    <AssemblyVersion>1.0.0.7</AssemblyVersion>
-    <FileVersion>1.0.0.7</FileVersion>
+    <AssemblyVersion>1.0.0.8</AssemblyVersion>
+    <FileVersion>1.0.0.8</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <Configurations>Debug;Release;Debug Verbose</Configurations>
   </PropertyGroup>

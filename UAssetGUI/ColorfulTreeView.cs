@@ -8,6 +8,7 @@ namespace UAssetGUI
         public ColorfulTreeView() : base()
         {
             this.DrawMode = TreeViewDrawMode.OwnerDrawText;
+            NodeMouseClick += (sender, args) => { if (args.Button == MouseButtons.Right) SelectedNode = args.Node; };
         }
 
         protected override void OnDrawNode(DrawTreeNodeEventArgs e)

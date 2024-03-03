@@ -1287,7 +1287,7 @@ namespace UAssetGUI
 
                                             {
                                                 ObjectPropertyData testProperty = new ObjectPropertyData(FName.DefineDummy(asset, "Super Struct"));
-                                                testProperty.Value = strucCat.SuperStruct;
+                                                testProperty.Value = strucCat.SuperIndex;
 
                                                 DataGridViewRow row = new DataGridViewRow();
                                                 row.CreateCells(dataGridView1);

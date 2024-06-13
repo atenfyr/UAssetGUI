@@ -93,6 +93,18 @@ namespace UAssetGUI
         }
     }
 
+    public class ExportPointingTreeNode : PointingTreeNode
+    {
+        public string ObjectName;
+
+        public ExportPointingTreeNode(string objectName, object pointer, PointingTreeNodeType type = 0, int exportNum = -1, bool willCopyWholeExport = false)
+            : base("Export " + (exportNum + 1) + " (" + objectName + ")", pointer, type, exportNum, willCopyWholeExport)
+        {
+            ObjectName = objectName;
+            ContextMenu = new ContextMenu(new MenuItem[] { new MenuItem("Copy object name", (sender, args) => Clipboard.SetText(ObjectName)) });
+        }
+    }
+
     public class PointingDictionaryEntry
     {
         public KeyValuePair<PropertyData, PropertyData> Entry;
@@ -203,7 +215,7 @@ namespace UAssetGUI
             for (int i = 0; i < asset.Exports.Count; i++)
             {
                 Export baseUs = asset.Exports[i];
-                var categoryNode = new PointingTreeNode("Export " + (i + 1) + " (" + baseUs.ObjectName.Value.Value + ")", null, 0, i, true);
+                var categoryNode = new ExportPointingTreeNode(baseUs.ObjectName.Value.Value, null, 0, i, true);
                 superTopNode.Nodes.Add(categoryNode);
                 switch (baseUs)
                 {

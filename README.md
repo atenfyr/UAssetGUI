@@ -14,7 +14,7 @@ You can find pre-built binaries of UAssetGUI in the [Releases tab of this reposi
 If you'd like to compile UAssetGUI for yourself, read on:
 
 ### Prerequisites
-* Visual Studio 2019 or later
+* Visual Studio 2022 or later
 * Git
 
 ### Initial Setup

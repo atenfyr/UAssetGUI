@@ -253,7 +253,9 @@ namespace UAssetGUI
             "4.27",
             "5.0",
             "5.1",
-            "5.2"
+            "5.2",
+            "5.3",
+            "5.4"
         };
 
         private EngineVersion[] versionOptionsValues = new EngineVersion[]
@@ -289,7 +291,9 @@ namespace UAssetGUI
             EngineVersion.VER_UE4_27,
             EngineVersion.VER_UE5_0,
             EngineVersion.VER_UE5_1,
-            EngineVersion.VER_UE5_2
+            EngineVersion.VER_UE5_2,
+            EngineVersion.VER_UE5_3,
+            EngineVersion.VER_UE5_4
         };
 
         public static readonly string GitHubRepo = "atenfyr/UAssetGUI";

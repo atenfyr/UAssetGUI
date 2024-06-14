@@ -788,8 +788,18 @@ namespace UAssetGUI
             dataGridView1.Rows.AddRange(rows.ToArray());
         }
 
-        private PropertyData RowToPD(int rowNum, PropertyData original, bool namesAreDummies = false)
+        /// <summary>
+        /// Interpret a specific row in the current data grid view as a PropertyData instance and return it.
+        /// </summary>
+        /// <param name="rowNum">The row number.</param>
+        /// <param name="original">The original PropertyData instance that this row was intended to represent. Used to clone values not represented in the display.</param>
+        /// <param name="namesAreDummies">Whether or not the Name column is not serialized to disk (so shouldn't be appended to the name map).</param>
+        /// <param name="useUnversionedProperties">Whether or not unversioned properties are being used. If true, namesAreDummies is overriden to be true.</param>
+        /// <returns>The interpreted PropertyData instance.</returns>
+        private PropertyData RowToPD(int rowNum, PropertyData original, bool namesAreDummies = false, bool useUnversionedProperties = false)
         {
+            if (useUnversionedProperties) namesAreDummies = true;
+
             try
             {
                 DataGridViewRow row = dataGridView1.Rows[rowNum];
@@ -823,7 +833,7 @@ namespace UAssetGUI
                 }
                 else
                 {
-                    switch (FName.FromString(asset, type).Value.Value)
+                    switch ((useUnversionedProperties ? FName.DefineDummy(asset, type) : FName.FromString(asset, type)).Value.Value)
                     {
                         case "TextProperty":
                             TextPropertyData decidedTextData = null;
@@ -925,7 +935,7 @@ namespace UAssetGUI
                             finalProp = decidedRCKProperty;
                             break;
                         default:
-                            PropertyData newThing = MainSerializer.TypeToClass(FName.FromString(asset, type), nameName, null, null, asset);
+                            PropertyData newThing = MainSerializer.TypeToClass(useUnversionedProperties ? FName.DefineDummy(asset, type) : FName.FromString(asset, type), nameName, null, null, asset);
                             if (original != null && original.GetType() == newThing.GetType())
                             {
                                 newThing = original;
@@ -2158,7 +2168,7 @@ namespace UAssetGUI
                             List<PropertyData> newData = new List<PropertyData>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i));
+                                PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
                                 newData.Add(val);
                                 if (val != null) newCount++;
                             }
@@ -2180,7 +2190,7 @@ namespace UAssetGUI
                                     List<PropertyData> newData = new List<PropertyData>();
                                     for (int i = 0; i < dataGridView1.Rows.Count; i++)
                                     {
-                                        PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i));
+                                        PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
                                         if (val == null)
                                         {
                                             newData.Add(null);
@@ -2226,7 +2236,7 @@ namespace UAssetGUI
                             ///var numTimesNameUses = new Dictionary<string, int>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i));
+                                PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties); // TODO: verify if actually dummies when unversioned
                                 if (val == null || !(val is StructPropertyData))
                                 {
                                     newData.Add(null);
@@ -2257,7 +2267,7 @@ namespace UAssetGUI
                             List<PropertyData> origArr = usArr.Value.ToList();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), !(origArr.ElementAtOrDefault(i) is StructPropertyData));
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), !(origArr.ElementAtOrDefault(i) is StructPropertyData), asset.HasUnversionedProperties);
                                 if (val != null) count++;
                                 newData.Add(val);
                             }
@@ -2291,8 +2301,8 @@ namespace UAssetGUI
                                 }
                             }
 
-                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key, true);
-                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value, true);
+                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key, true, asset.HasUnversionedProperties);
+                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value, true, asset.HasUnversionedProperties);
 
                             if (currentEntry >= 0)
                             {
@@ -2310,7 +2320,7 @@ namespace UAssetGUI
                             List<PropertyData> origArr = usRealArrEntry.ToList();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i));
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
                                 if (val == null) continue;
                                 newData.Add(val);
                             }

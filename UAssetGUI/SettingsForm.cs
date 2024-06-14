@@ -96,6 +96,7 @@ namespace UAssetGUI
         {
             UAGConfig.Data.EnableBak = enableBak.Checked;
         }
+
         private void restoreSize_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.RestoreSize = restoreSize.Checked;

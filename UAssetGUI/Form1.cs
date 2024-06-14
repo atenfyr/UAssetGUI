@@ -300,6 +300,12 @@ namespace UAssetGUI
         private Version latestOnlineVersion = null;
         private void Form1_Load(object sender, EventArgs e)
         {
+            // sync size from config
+            if (UAGConfig.Data.RestoreSize)
+            {
+                this.Size = new Size(UAGConfig.Data.StartupWidth, UAGConfig.Data.StartupHeight);
+            }
+
             UAGPalette.InitializeTheme();
             UAGPalette.RefreshTheme(this);
 
@@ -1244,6 +1250,13 @@ namespace UAssetGUI
 
         private void frm_closing(object sender, FormClosingEventArgs e)
         {
+            if (UAGConfig.Data.RestoreSize)
+            {
+                UAGConfig.Data.StartupWidth = this.Size.Width;
+                UAGConfig.Data.StartupHeight = this.Size.Height;
+                UAGConfig.Save();
+            }
+
             if (existsUnsavedChanges)
             {
                 DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);

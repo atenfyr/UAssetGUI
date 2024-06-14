@@ -25,6 +25,7 @@ namespace UAssetGUI
             favoriteThingBox.Text = UAGConfig.Data.FavoriteThing;
             numericUpDown1.Value = UAGConfig.Data.DataZoom;
             enableBak.Checked = UAGConfig.Data.EnableBak;
+            restoreSize.Checked = UAGConfig.Data.RestoreSize;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -94,6 +95,10 @@ namespace UAssetGUI
         private void enableBak_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.EnableBak = enableBak.Checked;
+        }
+        private void restoreSize_CheckedChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.RestoreSize = restoreSize.Checked;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

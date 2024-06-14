@@ -19,6 +19,9 @@ namespace UAssetGUI
         public bool EnableDiscordRPC;
         public bool DoubleClickToEdit;
         public bool EnableBak;
+        public bool RestoreSize;
+        public int StartupWidth;
+        public int StartupHeight;
 
         public UAGConfigData()
         {
@@ -32,6 +35,9 @@ namespace UAssetGUI
             EnableDiscordRPC = true;
             DoubleClickToEdit = true;
             EnableBak = true;
+            RestoreSize = true;
+            StartupWidth = 1000;
+            StartupHeight = 700;
         }
     }
 

@@ -42,6 +42,7 @@
             this.enableDynamicTree = new System.Windows.Forms.CheckBox();
             this.doubleClickToEdit = new System.Windows.Forms.CheckBox();
             this.enableBak = new System.Windows.Forms.CheckBox();
+            this.restoreSize = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,7 +64,7 @@
             this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(195, 270);
+            this.closeButton.Location = new System.Drawing.Point(195, 291);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
             this.closeButton.TabIndex = 4;
@@ -97,7 +98,7 @@
             this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.aboutButton.Location = new System.Drawing.Point(12, 270);
+            this.aboutButton.Location = new System.Drawing.Point(12, 291);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
             this.aboutButton.TabIndex = 7;
@@ -196,11 +197,23 @@
             this.enableBak.UseVisualStyleBackColor = true;
             this.enableBak.CheckedChanged += new System.EventHandler(this.enableBak_CheckedChanged);
             // 
+            // restoreSize
+            // 
+            this.restoreSize.AutoSize = true;
+            this.restoreSize.Location = new System.Drawing.Point(116, 254);
+            this.restoreSize.Name = "restoreSize";
+            this.restoreSize.Size = new System.Drawing.Size(148, 17);
+            this.restoreSize.TabIndex = 17;
+            this.restoreSize.Text = "Restore GUI size on open";
+            this.restoreSize.UseVisualStyleBackColor = true;
+            this.restoreSize.CheckedChanged += new System.EventHandler(this.restoreSize_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 302);
+            this.ClientSize = new System.Drawing.Size(282, 323);
+            this.Controls.Add(this.restoreSize);
             this.Controls.Add(this.enableBak);
             this.Controls.Add(this.doubleClickToEdit);
             this.Controls.Add(this.enableDynamicTree);
@@ -242,5 +255,6 @@
         private System.Windows.Forms.CheckBox enableDynamicTree;
         private System.Windows.Forms.CheckBox doubleClickToEdit;
         private System.Windows.Forms.CheckBox enableBak;
+        private System.Windows.Forms.CheckBox restoreSize;
     }
 }

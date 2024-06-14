@@ -1148,6 +1148,9 @@ namespace UAssetGUI
                     case "World Tile Info":
                         tableEditor.mode = TableHandlerMode.WorldTileInfo;
                         break;
+                    case "Data Resources":
+                        tableEditor.mode = TableHandlerMode.DataResources;
+                        break;
                     case "Custom Version Container":
                         tableEditor.mode = TableHandlerMode.CustomVersionContainer;
                         break;
@@ -1640,6 +1643,7 @@ namespace UAssetGUI
         private string GetProjectName()
         {
             if (tableEditor?.asset == null) return null;
+            if (UAGConfig.Data.PreferredMappings != "No mappings") return UAGConfig.Data.PreferredMappings;
 
             List<string> validPossibleProjectNames = new List<string>();
             var allPossibleFNames = tableEditor.asset.GetNameMapIndexList();

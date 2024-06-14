@@ -27,6 +27,7 @@ namespace UAssetGUI
         SoftPackageReferences,
         DependsMap,
         WorldTileInfo,
+        DataResources,
         CustomVersionContainer,
         ExportData
     }
@@ -208,6 +209,7 @@ namespace UAssetGUI
                     lodListNode.Nodes.Add(new PointingTreeNode("LOD entry #" + (i + 1), asset.WorldTileInfo.LODList[i]));
                 }
             }
+            treeView1.Nodes.Add(new PointingTreeNode("Data Resources", null));
             treeView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
             treeView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
@@ -1255,6 +1257,15 @@ namespace UAssetGUI
                     dataGridView1.AllowUserToAddRows = false;
                     dataGridView1.ReadOnly = true;
                     break;
+                case TableHandlerMode.DataResources:
+                    AddColumns(new string[] { "Index", "Flags", "SerialOffset", "DuplicateSerialOffset", "SerialSize", "RawSize", "OuterIndex", "LegacyBulkDataFlags", "" });
+
+                    for (int num = 0; num < asset.DataResources.Count; num++)
+                    {
+                        var dataResource = asset.DataResources[num];
+                        dataGridView1.Rows.Add(new object[] { num, dataResource.Flags.ToString(), dataResource.SerialOffset.ToString(), dataResource.DuplicateSerialOffset.ToString(), dataResource.SerialSize.ToString(), dataResource.RawSize.ToString(), dataResource.OuterIndex.ToString(), dataResource.LegacyBulkDataFlags.ToString() });
+                    }
+                    break;
                 case TableHandlerMode.CustomVersionContainer:
                     AddColumns(new string[] { "Name", "Version", "" });
 
@@ -2060,6 +2071,23 @@ namespace UAssetGUI
                 case TableHandlerMode.WorldTileInfo:
                     // Modification is disabled
 
+                    break;
+                case TableHandlerMode.DataResources:
+                    asset.DataResources = new List<FObjectDataResource>();
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        if (row.Cells.Count < 8 || string.IsNullOrWhiteSpace(row.Cells[0]?.Value?.ToString())) continue;
+                        EObjectDataResourceFlags.TryParse(row.Cells[1]?.Value?.ToString(), out EObjectDataResourceFlags flags);
+                        long.TryParse(row.Cells[2]?.Value?.ToString(), out long SerialOffset);
+                        long.TryParse(row.Cells[3]?.Value?.ToString(), out long DuplicateSerialOffset);
+                        long.TryParse(row.Cells[4]?.Value?.ToString(), out long SerialSize);
+                        long.TryParse(row.Cells[5]?.Value?.ToString(), out long RawSize);
+                        int.TryParse(row.Cells[6]?.Value?.ToString(), out int OuterIndex);
+                        uint.TryParse(row.Cells[7]?.Value?.ToString(), out uint LegacyBulkDataFlags);
+
+                        FObjectDataResource nuevo = new FObjectDataResource(flags, SerialOffset, DuplicateSerialOffset, SerialSize, RawSize, new FPackageIndex(OuterIndex), LegacyBulkDataFlags);
+                        asset.DataResources.Add(nuevo);
+                    }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
                     asset.CustomVersionContainer = new List<CustomVersion>();

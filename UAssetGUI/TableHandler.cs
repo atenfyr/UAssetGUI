@@ -433,6 +433,8 @@ namespace UAssetGUI
                         InterpretThing(entry.Key, softEntryNode, exportNum, fillAllSubNodes);
                         InterpretThing(entry.Value, softEntryNode, exportNum, fillAllSubNodes);
                     }
+
+                    mapNode.ChildrenInitialized = true;
                     break;
                 case "MulticastDelegateProperty":
                     var mdp = (MulticastDelegatePropertyData)me;
@@ -1818,6 +1820,8 @@ namespace UAssetGUI
                         ExportDetailsParseType.FPackageIndex,
                         ExportDetailsParseType.FPackageIndex,
                         ExportDetailsParseType.EObjectFlags,
+                        ExportDetailsParseType.Long,
+                        ExportDetailsParseType.Long,
                         ExportDetailsParseType.Long,
                         ExportDetailsParseType.Long,
                         ExportDetailsParseType.Bool,

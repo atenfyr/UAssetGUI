@@ -78,88 +78,102 @@ namespace UAssetGUI
                 minRow = BaseForm.dataGridView1.SelectedRows.Count > 0 ? BaseForm.dataGridView1.SelectedRows[0].Index : (BaseForm.dataGridView1.SelectedCells.Count > 0 ? BaseForm.dataGridView1.SelectedCells[0].RowIndex : -1);
             });
 
-            while (examiningNode != null)
+            try
             {
-                if (cancelToken.IsCancellationRequested)
+                while (examiningNode != null)
                 {
-                    foundSomething = false; wasCanceled = true;
-                    MessageBox.Show("Operation canceled.");
-                    break;
-                }
-
-                UAGUtils.InvokeUI(() =>
-                {
-                    BaseForm.treeView1.SelectedNode = examiningNode;
-                    BaseForm.UpdateModeFromSelectedNode(examiningNode);
-
-                    // check node name
-                    if (DoesTextQualify(examiningNode.Text) && examiningNode != originalNode)
+                    if (cancelToken.IsCancellationRequested)
                     {
-                        foundSomething = true;
-                        return;
+                        foundSomething = false; wasCanceled = true;
+                        MessageBox.Show("Operation canceled.");
+                        break;
                     }
 
-                    // check dgv
-                    if (BaseForm.dataGridView1 != null && BaseForm.dataGridView1.Enabled && BaseForm.dataGridView1.Visible && BaseForm.dataGridView1.Rows.Count > 0)
+                    UAGUtils.InvokeUI(() =>
                     {
-                        int rowNum = CurrentSearchDirection == SearchDirection.Forward ? 0 : BaseForm.dataGridView1.Rows.Count - 1;
-                        bool isSatisfied = false;
-                        while (!isSatisfied)
+                        // if dynamic tree, expand
+                        if (examiningNode is PointingTreeNode ptn)
                         {
-                            int oldRowNum = rowNum;
-
-                            rowNum += CurrentSearchDirection == SearchDirection.Forward ? 1 : -1;
-                            isSatisfied = CurrentSearchDirection == SearchDirection.Forward ? rowNum >= BaseForm.dataGridView1.Rows.Count : rowNum < 0;
-
-                            DataGridViewRow row = BaseForm.dataGridView1.Rows[oldRowNum];
-                            if (minRow >= 0 && CurrentSearchDirection == SearchDirection.Forward && oldRowNum <= minRow) continue;
-                            if (minRow >= 0 && CurrentSearchDirection == SearchDirection.Backward && oldRowNum >= minRow) continue;
-
-                            if (row == null || row.Cells == null) continue;
-                            foreach (DataGridViewCell cell in row.Cells)
+                            if (!ptn.ChildrenInitialized)
                             {
-                                if (cell == null || cell.Value == null) continue;
+                                BaseForm.tableEditor.FillOutSubnodes(ptn, false);
+                            }
+                        }
 
-                                if (DoesTextQualify(cell.Value.ToString()))
+                        BaseForm.treeView1.SelectedNode = examiningNode;
+                        BaseForm.UpdateModeFromSelectedNode(examiningNode);
+
+                        // check node name
+                        if (DoesTextQualify(examiningNode.Text) && examiningNode != originalNode)
+                        {
+                            foundSomething = true;
+                            return;
+                        }
+
+                        // check dgv
+                        if (BaseForm.dataGridView1 != null && BaseForm.dataGridView1.Enabled && BaseForm.dataGridView1.Visible && BaseForm.dataGridView1.Rows.Count > 0)
+                        {
+                            int rowNum = CurrentSearchDirection == SearchDirection.Forward ? 0 : BaseForm.dataGridView1.Rows.Count - 1;
+                            bool isSatisfied = false;
+                            while (!isSatisfied)
+                            {
+                                int oldRowNum = rowNum;
+
+                                rowNum += CurrentSearchDirection == SearchDirection.Forward ? 1 : -1;
+                                isSatisfied = CurrentSearchDirection == SearchDirection.Forward ? rowNum >= BaseForm.dataGridView1.Rows.Count : rowNum < 0;
+
+                                DataGridViewRow row = BaseForm.dataGridView1.Rows[oldRowNum];
+                                if (minRow >= 0 && CurrentSearchDirection == SearchDirection.Forward && oldRowNum <= minRow) continue;
+                                if (minRow >= 0 && CurrentSearchDirection == SearchDirection.Backward && oldRowNum >= minRow) continue;
+
+                                if (row == null || row.Cells == null) continue;
+                                foreach (DataGridViewCell cell in row.Cells)
                                 {
-                                    if (!cell.Displayed) BaseForm.dataGridView1.FirstDisplayedScrollingRowIndex = row.Index;
-                                    BaseForm.treeView1.SelectedNode.EnsureVisible();
-                                    row.Selected = true;
-                                    cell.Selected = true;
-                                    foundSomething = true;
+                                    if (cell == null || cell.Value == null) continue;
+
+                                    if (DoesTextQualify(cell.Value.ToString()))
+                                    {
+                                        if (!cell.Displayed) BaseForm.dataGridView1.FirstDisplayedScrollingRowIndex = row.Index;
+                                        BaseForm.treeView1.SelectedNode.EnsureVisible();
+                                        row.Selected = true;
+                                        cell.Selected = true;
+                                        foundSomething = true;
+                                    }
+
+                                    if (foundSomething) return;
                                 }
 
                                 if (foundSomething) return;
                             }
-
-                            if (foundSomething) return;
                         }
-                    }
 
-                    if (foundSomething) return;
-                    minRow = -1;
+                        if (foundSomething) return;
+                        minRow = -1;
 
-                    if (progressBar1.Value < progressBar1.Maximum) progressBar1.Value++;
-                    examiningNode = UAGFindUtils.GetNextNode(examiningNode, CurrentSearchDirection);
-                });
+                        if (progressBar1.Value < progressBar1.Maximum) progressBar1.Value++;
+                        examiningNode = UAGFindUtils.GetNextNode(examiningNode, CurrentSearchDirection);
+                    });
 
-                if (foundSomething) break;
-            }
-
-            UAGUtils.InvokeUI(() =>
-            {
-                progressBar1.Value = progressBar1.Maximum;
-                BaseForm.dataGridView1.ResumeLayout();
-                BaseForm.treeView1.ResumeLayout();
-                BaseForm.treeView1.EndUpdate();
-
-                if (!foundSomething)
-                {
-                    BaseForm.treeView1.SelectedNode = originalNode;
-                    BaseForm.UpdateModeFromSelectedNode(originalNode);
-                    if (!wasCanceled) MessageBox.Show("0 results found.");
+                    if (foundSomething) break;
                 }
-            });
+            }
+            finally
+            {
+                UAGUtils.InvokeUI(() =>
+                {
+                    progressBar1.Value = progressBar1.Maximum;
+                    BaseForm.dataGridView1.ResumeLayout();
+                    BaseForm.treeView1.ResumeLayout();
+                    BaseForm.treeView1.EndUpdate();
+
+                    if (!foundSomething)
+                    {
+                        BaseForm.treeView1.SelectedNode = originalNode;
+                        BaseForm.UpdateModeFromSelectedNode(originalNode);
+                        if (!wasCanceled) MessageBox.Show("0 results found.");
+                    }
+                });
+            }
         }
 
         private readonly CancellationTokenSource ts = new CancellationTokenSource();

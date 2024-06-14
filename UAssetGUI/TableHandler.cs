@@ -957,7 +957,7 @@ namespace UAssetGUI
                     }
                 }
 
-                string duplicationIndex = row.Cells[row.Cells.Count - 3].Value.ToString();
+                string duplicationIndex = row.Cells[row.Cells.Count - 4].Value.ToString();
                 string isZero = row.Cells[row.Cells.Count - 2].Value.ToString();
 
                 int.TryParse(duplicationIndex, out finalProp.DuplicationIndex);

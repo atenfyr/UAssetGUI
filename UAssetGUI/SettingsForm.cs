@@ -38,8 +38,6 @@ namespace UAssetGUI
             this.Close();
         }
 
-        private static string AboutText;
-
         private void aboutButton_Click(object sender, EventArgs e)
         {
             var softwareAgeInYears = (int.Parse(DateTime.Now.ToString("yyyyMMdd")) - 20200723) / 10000;

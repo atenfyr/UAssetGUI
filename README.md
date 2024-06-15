@@ -3,7 +3,7 @@
 [![Issues](https://img.shields.io/github/issues/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/issues)
 [![License](https://img.shields.io/github/license/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/blob/master/LICENSE.md)
 
-UAssetGUI is a tool designed for low-level examination and modification of Unreal Engine 4 game assets by hand.
+UAssetGUI is a tool designed for low-level examination and modification of Unreal Engine game assets by hand.
 
 <img src="https://i.imgur.com/G31NzYA.png" align="center">
 

@@ -538,6 +538,12 @@ namespace UAssetGUI
                     MessageBox.Show("Failed to parse unversioned properties! Exports cannot be parsed for this asset unless a valid set of mappings is provided. " + UsmapInstructionsNotice, "Notice");
                 }
 
+                if (tableEditor.asset.HasUnversionedProperties && failedCategoryCount > 0 && (tableEditor.asset.OtherAssetsFailedToAccess?.Count ?? 0) > 0)
+                {
+                    string formattedListOfFailedToAccessAssets = string.Join("\n", tableEditor.asset.OtherAssetsFailedToAccess);
+                    MessageBox.Show("UAssetAPI attempted to access the following assets, but failed to do so. Some errors may potentially be resolved by giving it access to these assets. You can either include them in the same directory, or reconstruct the game's Content directory tree.\n\n" + formattedListOfFailedToAccessAssets, "Notice");
+                }
+
                 if (failedToMaintainBinaryEquality)
                 {
                     MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");

@@ -1922,6 +1922,25 @@ namespace UAssetGUI
                 if (importPath == null) return;
 
                 string newFileName = Path.GetFileNameWithoutExtension(importPath);
+
+                // special case if just "Mappings.usmap"
+                if (newFileName == "Mappings")
+                {
+                    TextPrompt replacementPrompt = new TextPrompt()
+                    {
+                        DisplayText = "What is the name of the game these mappings are for?"
+                    };
+
+                    replacementPrompt.StartPosition = FormStartPosition.CenterParent;
+
+                    if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
+                    {
+                        newFileName = string.Join("_", replacementPrompt.OutputText.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+                    }
+
+                    replacementPrompt.Dispose();
+                }
+
                 File.Copy(importPath, Path.ChangeExtension(Path.Combine(UAGConfig.MappingsFolder, newFileName), ".usmap"));
                 UpdateMappings(newFileName);
             });

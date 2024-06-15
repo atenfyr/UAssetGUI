@@ -26,6 +26,7 @@ namespace UAssetGUI
             numericUpDown1.Value = UAGConfig.Data.DataZoom;
             enableBak.Checked = UAGConfig.Data.EnableBak;
             restoreSize.Checked = UAGConfig.Data.RestoreSize;
+            enableUpdateNotice.Checked = UAGConfig.Data.EnableUpdateNotice;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -41,30 +42,21 @@ namespace UAssetGUI
 
         private void aboutButton_Click(object sender, EventArgs e)
         {
-            AboutText = (this.Owner as Form1).DisplayVersion + "\n" +
-            "By atenfyr\n" +
-            "\nThanks to Kaiheilos for early assistance with the package file summary format\n" +
-            "\n(Here's where a soppy monologue goes)\n";
+            var softwareAgeInYears = (int.Parse(DateTime.Now.ToString("yyyyMMdd")) - 20200723) / 10000;
 
-            var formPopup = new Form
+            UAGUtils.InvokeUI(() =>
             {
-                Text = "About",
-                Size = new Size(350, 300)
-            };
+                var formPopup = new AboutForm();
 
-            formPopup.Controls.Add(new Label()
-            {
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill,
-                Text = AboutText,
-                Font = new Font(this.Font.FontFamily, 10)
+                formPopup.AboutText = (this.Owner as Form1).DisplayVersion + "\n" +
+                "By atenfyr\n" +
+                "\nThank you to trumank, LongerWarrior, Kaiheilos, and others for all your generous contributions to this software\n" +
+                "\nThank you to the love of my life for listening to me and supporting me despite not caring at all about any of this\n" +
+                "\nThank you for using this thing even after " + softwareAgeInYears + " years\n";
+
+                formPopup.StartPosition = FormStartPosition.CenterParent;
+                formPopup.ShowDialog(this);
             });
-
-            UAGPalette.RefreshTheme(formPopup);
-
-            formPopup.StartPosition = FormStartPosition.CenterParent;
-            formPopup.ShowDialog(this);
         }
 
         private void themeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -100,6 +92,11 @@ namespace UAssetGUI
         private void restoreSize_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.RestoreSize = restoreSize.Checked;
+        }
+
+        private void enableUpdateNotice_CheckedChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.EnableUpdateNotice = enableUpdateNotice.Checked;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

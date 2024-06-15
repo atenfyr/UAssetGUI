@@ -6,9 +6,9 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>UAssetGUI</AssemblyTitle>
     <Product>UAssetGUI</Product>
-    <Copyright>Copyright © Atenfyr 2023</Copyright>
-    <AssemblyVersion>1.0.0.8</AssemblyVersion>
-    <FileVersion>1.0.0.8</FileVersion>
+    <Copyright>Copyright © Atenfyr 2024</Copyright>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <Configurations>Debug;Release;Debug Verbose</Configurations>
   </PropertyGroup>
@@ -54,6 +54,12 @@
     <Compile Update="FindForm.Designer.cs">
       <DependentUpon>FindForm.cs</DependentUpon>
     </Compile>
+    <Compile Update="AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
     <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,6 +86,9 @@
     </Compile>
     <EmbeddedResource Update="FindForm.resx">
       <DependentUpon>FindForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Update="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

@@ -20,6 +20,7 @@ namespace UAssetGUI
         public bool DoubleClickToEdit;
         public bool EnableBak;
         public bool RestoreSize;
+        public bool EnableUpdateNotice;
         public int StartupWidth;
         public int StartupHeight;
 
@@ -36,6 +37,7 @@ namespace UAssetGUI
             DoubleClickToEdit = true;
             EnableBak = true;
             RestoreSize = true;
+            EnableUpdateNotice = true;
             StartupWidth = 1000;
             StartupHeight = 700;
         }

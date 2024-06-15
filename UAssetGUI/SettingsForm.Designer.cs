@@ -43,6 +43,7 @@
             this.doubleClickToEdit = new System.Windows.Forms.CheckBox();
             this.enableBak = new System.Windows.Forms.CheckBox();
             this.restoreSize = new System.Windows.Forms.CheckBox();
+            this.enableUpdateNotice = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -53,7 +54,7 @@
             this.infoLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
             this.infoLabel.Location = new System.Drawing.Point(13, 9);
             this.infoLabel.Name = "infoLabel";
-            this.infoLabel.Size = new System.Drawing.Size(257, 40);
+            this.infoLabel.Size = new System.Drawing.Size(303, 40);
             this.infoLabel.TabIndex = 1;
             this.infoLabel.Text = "Settings:";
             this.infoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -64,7 +65,7 @@
             this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(195, 291);
+            this.closeButton.Location = new System.Drawing.Point(241, 257);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 26);
             this.closeButton.TabIndex = 4;
@@ -98,7 +99,7 @@
             this.aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.aboutButton.Location = new System.Drawing.Point(12, 291);
+            this.aboutButton.Location = new System.Drawing.Point(12, 257);
             this.aboutButton.Name = "aboutButton";
             this.aboutButton.Size = new System.Drawing.Size(75, 26);
             this.aboutButton.TabIndex = 7;
@@ -112,7 +113,7 @@
             this.themeComboBox.FormattingEnabled = true;
             this.themeComboBox.Location = new System.Drawing.Point(116, 61);
             this.themeComboBox.Name = "themeComboBox";
-            this.themeComboBox.Size = new System.Drawing.Size(121, 21);
+            this.themeComboBox.Size = new System.Drawing.Size(172, 21);
             this.themeComboBox.TabIndex = 8;
             this.themeComboBox.SelectedIndexChanged += new System.EventHandler(this.themeComboBox_SelectedIndexChanged);
             // 
@@ -120,14 +121,14 @@
             // 
             this.favoriteThingBox.Location = new System.Drawing.Point(116, 87);
             this.favoriteThingBox.Name = "favoriteThingBox";
-            this.favoriteThingBox.Size = new System.Drawing.Size(121, 20);
+            this.favoriteThingBox.Size = new System.Drawing.Size(172, 20);
             this.favoriteThingBox.TabIndex = 9;
             this.favoriteThingBox.TextChanged += new System.EventHandler(this.favoriteThingBox_TextChanged);
             // 
             // valuesOnScroll
             // 
             this.valuesOnScroll.AutoSize = true;
-            this.valuesOnScroll.Location = new System.Drawing.Point(116, 139);
+            this.valuesOnScroll.Location = new System.Drawing.Point(167, 150);
             this.valuesOnScroll.Name = "valuesOnScroll";
             this.valuesOnScroll.Size = new System.Drawing.Size(139, 17);
             this.valuesOnScroll.TabIndex = 10;
@@ -139,7 +140,7 @@
             // 
             this.numericUpDown1.Location = new System.Drawing.Point(116, 113);
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDown1.Size = new System.Drawing.Size(172, 20);
             this.numericUpDown1.TabIndex = 11;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
@@ -156,7 +157,7 @@
             // enableDiscordRpc
             // 
             this.enableDiscordRpc.AutoSize = true;
-            this.enableDiscordRpc.Location = new System.Drawing.Point(116, 208);
+            this.enableDiscordRpc.Location = new System.Drawing.Point(25, 150);
             this.enableDiscordRpc.Name = "enableDiscordRpc";
             this.enableDiscordRpc.Size = new System.Drawing.Size(123, 17);
             this.enableDiscordRpc.TabIndex = 13;
@@ -167,7 +168,7 @@
             // enableDynamicTree
             // 
             this.enableDynamicTree.AutoSize = true;
-            this.enableDynamicTree.Location = new System.Drawing.Point(116, 231);
+            this.enableDynamicTree.Location = new System.Drawing.Point(25, 196);
             this.enableDynamicTree.Name = "enableDynamicTree";
             this.enableDynamicTree.Size = new System.Drawing.Size(122, 17);
             this.enableDynamicTree.TabIndex = 14;
@@ -178,7 +179,7 @@
             // doubleClickToEdit
             // 
             this.doubleClickToEdit.AutoSize = true;
-            this.doubleClickToEdit.Location = new System.Drawing.Point(116, 162);
+            this.doubleClickToEdit.Location = new System.Drawing.Point(25, 173);
             this.doubleClickToEdit.Name = "doubleClickToEdit";
             this.doubleClickToEdit.Size = new System.Drawing.Size(117, 17);
             this.doubleClickToEdit.TabIndex = 15;
@@ -189,7 +190,7 @@
             // enableBak
             // 
             this.enableBak.AutoSize = true;
-            this.enableBak.Location = new System.Drawing.Point(116, 185);
+            this.enableBak.Location = new System.Drawing.Point(167, 173);
             this.enableBak.Name = "enableBak";
             this.enableBak.Size = new System.Drawing.Size(104, 17);
             this.enableBak.TabIndex = 16;
@@ -200,7 +201,7 @@
             // restoreSize
             // 
             this.restoreSize.AutoSize = true;
-            this.restoreSize.Location = new System.Drawing.Point(116, 254);
+            this.restoreSize.Location = new System.Drawing.Point(167, 196);
             this.restoreSize.Name = "restoreSize";
             this.restoreSize.Size = new System.Drawing.Size(148, 17);
             this.restoreSize.TabIndex = 17;
@@ -208,11 +209,23 @@
             this.restoreSize.UseVisualStyleBackColor = true;
             this.restoreSize.CheckedChanged += new System.EventHandler(this.restoreSize_CheckedChanged);
             // 
+            // enableUpdateNotice
+            // 
+            this.enableUpdateNotice.AutoSize = true;
+            this.enableUpdateNotice.Location = new System.Drawing.Point(25, 219);
+            this.enableUpdateNotice.Name = "enableUpdateNotice";
+            this.enableUpdateNotice.Size = new System.Drawing.Size(127, 17);
+            this.enableUpdateNotice.TabIndex = 18;
+            this.enableUpdateNotice.Text = "Enable update notice";
+            this.enableUpdateNotice.UseVisualStyleBackColor = true;
+            this.enableUpdateNotice.CheckedChanged += new System.EventHandler(this.enableUpdateNotice_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 323);
+            this.ClientSize = new System.Drawing.Size(328, 289);
+            this.Controls.Add(this.enableUpdateNotice);
             this.Controls.Add(this.restoreSize);
             this.Controls.Add(this.enableBak);
             this.Controls.Add(this.doubleClickToEdit);
@@ -256,5 +269,6 @@
         private System.Windows.Forms.CheckBox doubleClickToEdit;
         private System.Windows.Forms.CheckBox enableBak;
         private System.Windows.Forms.CheckBox restoreSize;
+        private System.Windows.Forms.CheckBox enableUpdateNotice;
     }
 }

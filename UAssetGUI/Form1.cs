@@ -350,9 +350,17 @@ namespace UAssetGUI
                 latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
             }).ContinueWith(res =>
             {
-                if (latestOnlineVersion != null && latestOnlineVersion.IsUAGVersionLower())
+                if (UAGConfig.Data.EnableUpdateNotice && latestOnlineVersion != null && latestOnlineVersion.IsUAGVersionLower())
                 {
-                    MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!");
+                    DialogResult updateBoxRes = MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!\nWould you like to open the webpage in your browser?", "Notice", MessageBoxButtons.YesNo);
+                    switch (updateBoxRes)
+                    {
+                        case DialogResult.Yes:
+                            Process.Start("https://github.com/" + GitHubRepo + "/releases/latest");
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
@@ -1309,17 +1317,17 @@ namespace UAssetGUI
 
         private void issuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/atenfyr/uassetgui/issues");
+            Process.Start("https://github.com/" + GitHubRepo  + "/issues");
         }
 
         private void githubToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/atenfyr/uassetgui");
+            Process.Start("https://github.com/" + GitHubRepo);
         }
 
         private void apiLinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/atenfyr/uassetapi");
+            Process.Start("https://github.com/atenfyr/UAssetAPI");
         }
 
         public void SetParsingVersion(EngineVersion ver)

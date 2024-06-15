@@ -569,6 +569,7 @@ namespace UAssetGUI
                                 row.Cells[++columnIndexer].Value = string.Empty;
                                 row.Cells[++columnIndexer].Value = enumData.EnumType?.Value?.Value == null ? FString.NullCase : enumData.EnumType.ToString();
                                 row.Cells[++columnIndexer].Value = enumData.Value?.Value?.Value == null ? FString.NullCase : enumData.Value.ToString();
+                                row.Cells[++columnIndexer].Value = enumData.ExtraData.ConvertByteArrayToString();
                                 //row.Cells[5].Value = enumData.Extra;
                                 break;
                             case "ByteProperty":

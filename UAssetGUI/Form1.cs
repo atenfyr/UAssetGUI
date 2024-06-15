@@ -1653,7 +1653,7 @@ namespace UAssetGUI
         private string GetProjectName()
         {
             if (tableEditor?.asset == null) return null;
-            if (UAGConfig.Data.PreferredMappings != "No mappings") return UAGConfig.Data.PreferredMappings;
+            if (UAGConfig.Data.PreferredMappings != "No mappings" && UAGConfig.Data.PreferredMappings != "Mappings") return UAGConfig.Data.PreferredMappings;
 
             List<string> validPossibleProjectNames = new List<string>();
             var allPossibleFNames = tableEditor.asset.GetNameMapIndexList();

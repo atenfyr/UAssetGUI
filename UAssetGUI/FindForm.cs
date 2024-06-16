@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -60,9 +61,20 @@ namespace UAssetGUI
             return CaseSensitive ? txt.Contains(SearchTerm) : (txt.IndexOf(SearchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
+        private void TraverseToPopulatePreviouslyExpandedNodes(ISet<TreeNode> previouslyExpandedNodes, TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (node.IsExpanded) previouslyExpandedNodes.Add(node);
+                TraverseToPopulatePreviouslyExpandedNodes(previouslyExpandedNodes, node.Nodes);
+            }
+        }
+
         private void PerformSearch(CancellationToken cancelToken)
         {
             bool foundSomething = false; bool wasCanceled = false; TreeNode originalNode = null; TreeNode examiningNode = null; int minRow = -1;
+
+            ISet<TreeNode> previouslyExpandedNodes = new HashSet<TreeNode>();
 
             UAGUtils.InvokeUI(() =>
             {
@@ -76,6 +88,9 @@ namespace UAssetGUI
                 originalNode = BaseForm.treeView1.SelectedNode;
                 examiningNode = BaseForm.treeView1.SelectedNode;
                 minRow = BaseForm.dataGridView1.SelectedRows.Count > 0 ? BaseForm.dataGridView1.SelectedRows[0].Index : (BaseForm.dataGridView1.SelectedCells.Count > 0 ? BaseForm.dataGridView1.SelectedCells[0].RowIndex : -1);
+
+                // store previously expanded nodes; could take a second
+                TraverseToPopulatePreviouslyExpandedNodes(previouslyExpandedNodes, BaseForm.treeView1.Nodes);
             });
 
             try
@@ -151,7 +166,7 @@ namespace UAssetGUI
                         minRow = -1;
 
                         if (progressBar1.Value < progressBar1.Maximum) progressBar1.Value++;
-                        examiningNode = UAGFindUtils.GetNextNode(examiningNode, CurrentSearchDirection);
+                        examiningNode = UAGFindUtils.GetNextNode(examiningNode, CurrentSearchDirection, previouslyExpandedNodes, BaseForm.tableEditor);
                     });
 
                     if (foundSomething) break;
@@ -197,27 +212,57 @@ namespace UAssetGUI
 
     public static class UAGFindUtils
     {
-        public static TreeNode GetLastNode(TreeNode node)
+        public static TreeNode GetLastNode(TreeNode node, TableHandler handler)
         {
+            // if dynamic tree, expand
+            if (node is PointingTreeNode ptn)
+            {
+                if (!ptn.ChildrenInitialized)
+                {
+                    handler.FillOutSubnodes(ptn, false);
+                }
+            }
+
             if (node.Nodes.Count == 0) return node;
-            return GetLastNode(node.Nodes[node.Nodes.Count - 1]);
+            return GetLastNode(node.Nodes[node.Nodes.Count - 1], handler);
         }
 
-        public static TreeNode GetNextNode(TreeNode node, SearchDirection dir, bool canGoDown = true)
+        public static TreeNode GetNextNode(TreeNode node, SearchDirection dir, ISet<TreeNode> previouslyExpandedNodes, TableHandler handler, bool canGoDown = true)
         {
             if (node == null) return null;
 
             if (dir == SearchDirection.Forward)
             {
                 if (node.Nodes.Count != 0 && canGoDown) return node.Nodes[0]; // go down one
+
+                // we don't need this node anymore
+                if (previouslyExpandedNodes.Contains(node))
+                {
+                    node.Expand();
+                }
+                else
+                {
+                    node.Collapse();
+                }
+
                 if (node.NextNode != null) return node.NextNode; // go forward one
-                return GetNextNode(node.Parent, dir, false); // go up one
+                return GetNextNode(node.Parent, dir, previouslyExpandedNodes, handler, false); // go up one
             }
             else if (dir == SearchDirection.Backward)
             {
-                if (node.PrevNode != null && node.PrevNode.Nodes.Count != 0) return GetLastNode(node.PrevNode); // go backwards one
-                if (node.PrevNode != null) return node.PrevNode; // go backwards one
-                return node.Parent; // go up one
+                // we don't need this node anymore
+                if (previouslyExpandedNodes.Contains(node))
+                {
+                    node.Expand();
+                }
+                else
+                {
+                    node.Collapse();
+                }
+
+                if (node.PrevNode != null && node.PrevNode.Nodes.Count != 0) return GetLastNode(node.PrevNode, handler); // go backwards one (to previous sibling's last descendant)
+                if (node.PrevNode != null) return node.PrevNode; // go backwards one (to previous sibling directly)
+                return node.Parent; // go up one (to parent)
             }
 
             return null;

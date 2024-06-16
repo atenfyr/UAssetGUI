@@ -74,6 +74,9 @@ namespace UAssetGUI
         public Form1()
         {
             InitializeComponent();
+
+            UAGUtils.InitializeInvoke(this);
+
             UAGConfig.Load();
 
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -113,8 +116,6 @@ namespace UAssetGUI
                 }
                 UAGUtils._displayVersion += ")";
             }
-
-            UAGUtils.InitializeInvoke(this);
 
             this.Text = DisplayVersion;
             this.AllowDrop = true;
@@ -196,6 +197,7 @@ namespace UAssetGUI
 
         private void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
         {
+            UAGConfig.MappingsToSuppressWarningsFor.Clear();
             UAGConfig.LoadMappings();
             UAGUtils.InvokeUI(() =>
             {
@@ -311,7 +313,7 @@ namespace UAssetGUI
             UAGPalette.InitializeTheme();
             UAGPalette.RefreshTheme(this);
 
-            // update mappings combo box
+            // load mappings and update combo box
             UpdateMappings(null, false);
 
             // update version combo box

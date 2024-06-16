@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
@@ -49,6 +50,7 @@ namespace UAssetGUI
         public static Dictionary<string, Usmap> AllMappings = new Dictionary<string, Usmap>();
         public readonly static string ConfigFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
         public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
+        public static ISet<string> MappingsToSuppressWarningsFor = new HashSet<string>();
 
         public static void LoadMappings()
         {
@@ -57,13 +59,30 @@ namespace UAssetGUI
 
             AllMappings.Clear();
             string[] allMappingFiles = Directory.GetFiles(MappingsFolder, "*.usmap", SearchOption.TopDirectoryOnly);
+            ISet<string> failedMappings = new HashSet<string>();
             foreach (string mappingPath in allMappingFiles)
             {
+                var mappingsName = Path.GetFileNameWithoutExtension(mappingPath);
                 try
                 {
-                    AllMappings.Add(Path.GetFileNameWithoutExtension(mappingPath), new Usmap(mappingPath));
+                    AllMappings.Add(mappingsName, new Usmap(mappingPath));
                 }
-                catch { }
+                catch
+                {
+                    if (!MappingsToSuppressWarningsFor.Contains(mappingsName))
+                    {
+                        failedMappings.Add(mappingsName);
+                        MappingsToSuppressWarningsFor.Add(mappingsName);
+                    }
+                }
+            }
+
+            if (failedMappings.Count > 0)
+            {
+                UAGUtils.InvokeUI(() =>
+                {
+                    MessageBox.Show("Failed to parse " + failedMappings.Count + " mappings:\n\n" + string.Join(",", failedMappings), "Notice");
+                });
             }
         }
 
@@ -95,8 +114,6 @@ namespace UAssetGUI
                 Data = new UAGConfigData();
                 Save();
             }
-
-            LoadMappings();
         }
     }
 }

@@ -1371,7 +1371,7 @@ namespace UAssetGUI
 
         private void UpdateComboSpecifyMappings(bool alsoCheckVersion = true)
         {
-            ParsingMappings = UAGConfig.AllMappings.ContainsKey(allMappingsKeys[comboSpecifyMappings.SelectedIndex]) ? UAGConfig.AllMappings[allMappingsKeys[comboSpecifyMappings.SelectedIndex]] : null;
+            if (!UAGConfig.TryGetMappings(allMappingsKeys[comboSpecifyMappings.SelectedIndex], out ParsingMappings)) comboSpecifyMappings.SelectedIndex = 0;
             if (tableEditor?.asset != null) tableEditor.asset.Mappings = ParsingMappings;
             UAGConfig.Data.PreferredMappings = allMappingsKeys[comboSpecifyMappings.SelectedIndex];
             UAGConfig.Save();

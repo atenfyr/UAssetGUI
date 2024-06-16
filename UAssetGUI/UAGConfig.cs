@@ -47,7 +47,7 @@ namespace UAssetGUI
     public static class UAGConfig
     {
         public static UAGConfigData Data;
-        public static Dictionary<string, Usmap> AllMappings = new Dictionary<string, Usmap>();
+        public static Dictionary<string, string> AllMappings = new Dictionary<string, string>();
         public readonly static string ConfigFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
         public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
         public static ISet<string> MappingsToSuppressWarningsFor = new HashSet<string>();
@@ -59,31 +59,29 @@ namespace UAssetGUI
 
             AllMappings.Clear();
             string[] allMappingFiles = Directory.GetFiles(MappingsFolder, "*.usmap", SearchOption.TopDirectoryOnly);
-            ISet<string> failedMappings = new HashSet<string>();
             foreach (string mappingPath in allMappingFiles)
             {
-                var mappingsName = Path.GetFileNameWithoutExtension(mappingPath);
+                AllMappings.Add(Path.GetFileNameWithoutExtension(mappingPath), mappingPath);
+            }
+        }
+
+        public static bool TryGetMappings(string name, out Usmap mappings)
+        {
+            if (AllMappings.TryGetValue(name, out string value))
+            {
                 try
                 {
-                    AllMappings.Add(mappingsName, new Usmap(mappingPath));
+                    mappings = new Usmap(value);
+                    return true;
                 }
-                catch
+                catch 
                 {
-                    if (!MappingsToSuppressWarningsFor.Contains(mappingsName))
-                    {
-                        failedMappings.Add(mappingsName);
-                        MappingsToSuppressWarningsFor.Add(mappingsName);
-                    }
+                    UAGUtils.InvokeUI(() => MessageBox.Show("Failed to parse " + name + " mappings", "Notice"));
                 }
             }
 
-            if (failedMappings.Count > 0)
-            {
-                UAGUtils.InvokeUI(() =>
-                {
-                    MessageBox.Show("Failed to parse " + failedMappings.Count + " mappings:\n\n" + string.Join(",", failedMappings), "Notice");
-                });
-            }
+            mappings = null;
+            return false;
         }
 
         public static void Save()

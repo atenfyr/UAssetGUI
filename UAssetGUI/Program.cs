@@ -37,7 +37,7 @@ namespace UAssetGUI
                         UAGConfig.LoadMappings();
 
                         if (args.Length < 5) break;
-                        if (args.Length >= 6) selectedMappings = UAGConfig.AllMappings.ContainsKey(args[5]) ? UAGConfig.AllMappings[args[5]] : null;
+                        if (args.Length >= 6) UAGConfig.TryGetMappings(args[5], out selectedMappings);
 
                         EngineVersion selectedVer = EngineVersion.UNKNOWN;
                         if (!Enum.TryParse(args[4], out selectedVer))
@@ -54,7 +54,7 @@ namespace UAssetGUI
                         UAGConfig.LoadMappings();
 
                         if (args.Length < 4) break;
-                        if (args.Length >= 5) selectedMappings = UAGConfig.AllMappings.ContainsKey(args[4]) ? UAGConfig.AllMappings[args[4]] : null;
+                        if (args.Length >= 5) UAGConfig.TryGetMappings(args[4], out selectedMappings);
 
                         UAsset jsonDeserializedAsset = null;
                         using (var sr = new FileStream(args[2], FileMode.Open))

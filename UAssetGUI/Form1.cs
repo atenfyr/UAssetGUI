@@ -750,6 +750,7 @@ namespace UAssetGUI
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (tableEditor == null) return;
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
             object objectToCopy = null;
 
@@ -849,6 +850,7 @@ namespace UAssetGUI
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (tableEditor == null) return;
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
 
             PropertyData deserializedClipboard = null;
@@ -982,6 +984,7 @@ namespace UAssetGUI
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (tableEditor == null) return;
             int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
 
             switch (tableEditor.mode)

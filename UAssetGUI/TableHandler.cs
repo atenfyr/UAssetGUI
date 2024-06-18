@@ -2257,10 +2257,11 @@ namespace UAssetGUI
                                     pointerNode.Text = (usCat.ClassIndex.IsImport() ? usCat.ClassIndex.ToImport(asset).ObjectName.Value.Value : usCat.ClassIndex.Index.ToString()) + " (" + usCat.Data.Count + ")";
                                     break;
                                 case PointingTreeNodeType.UserDefinedStructData:
+                                    UserDefinedStructExport usCatUDS = (UserDefinedStructExport)usCat;
                                     List<PropertyData> newData2 = new List<PropertyData>();
                                     for (int i = 0; i < dataGridView1.Rows.Count; i++)
                                     {
-                                        PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
+                                        PropertyData val = RowToPD(i, usCatUDS.StructData.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
                                         if (val == null)
                                         {
                                             newData2.Add(null);
@@ -2269,7 +2270,7 @@ namespace UAssetGUI
                                         newData2.Add(val);
                                     }
                                     if (newData2[newData2.Count - 1] == null) newData2.RemoveAt(newData2.Count - 1);
-                                    ((UserDefinedStructExport)usCat).StructData = newData2;
+                                    usCatUDS.StructData = newData2;
                                     pointerNode.Text = "UserDefinedStruct Data (" + newData2.Count + ")";
                                     break;
                                 case PointingTreeNodeType.EnumData:

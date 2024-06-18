@@ -1,5 +1,5 @@
-﻿using DiscordRPC;
-using System;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -23,6 +23,7 @@ namespace UAssetGUI
             if (Environment.OSVersion.Version.Major >= 6) SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetDefaultFont(new Font(new FontFamily("Microsoft Sans Serif"), 8.25f)); // default font changed in .NET Core 3.0
 
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length >= 2)

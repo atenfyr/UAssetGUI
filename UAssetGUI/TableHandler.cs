@@ -102,7 +102,11 @@ namespace UAssetGUI
             : base("Export " + (exportNum + 1) + " (" + objectName + ")", pointer, type, exportNum, willCopyWholeExport)
         {
             ObjectName = objectName;
-            ContextMenu = new ContextMenu(new MenuItem[] { new MenuItem("Copy object name", (sender, args) => Clipboard.SetText(ObjectName)) });
+
+            ToolStripMenuItem tsmItem = new ToolStripMenuItem("Copy object name");
+            tsmItem.Click += (sender, args) => Clipboard.SetText(ObjectName);
+            this.ContextMenuStrip = new ContextMenuStrip();
+            this.ContextMenuStrip.Items.Add(tsmItem);
         }
     }
 

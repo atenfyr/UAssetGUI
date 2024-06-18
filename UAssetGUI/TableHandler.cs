@@ -54,7 +54,8 @@ namespace UAssetGUI
         EnumData,
         UPropertyData,
         ByteArray,
-        Dummy
+        Dummy,
+        UserDefinedStructData
     }
 
     public class PointingTreeNode : TreeNode
@@ -277,6 +278,15 @@ namespace UAssetGUI
                                     bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
+                            }
+
+                            if (us is UserDefinedStructExport us6)
+                            {
+                                var parentNode2 = new PointingTreeNode("UserDefinedStruct Data (" + us6.StructData.Count + ")", us, PointingTreeNodeType.UserDefinedStructData, i);
+                                parentNode2.ChildrenInitialized = true;
+                                categoryNode.Nodes.Add(parentNode2);
+
+                                for (int j = 0; j < us6.StructData.Count; j++) InterpretThing(us6.StructData[j], parentNode2, i, fillAllSubNodes);
                             }
 
                             if (us is ClassExport)
@@ -1317,6 +1327,18 @@ namespace UAssetGUI
                                             }
                                             renderingArr = usCategory.Data.ToArray();
                                             break;
+                                        case PointingTreeNodeType.UserDefinedStructData:
+                                            var usCategoryUDS = (UserDefinedStructExport)usCategory;
+                                            for (int num = 0; num < usCategoryUDS.StructData.Count; num++)
+                                            {
+                                                if (usCategoryUDS.StructData[num] == null)
+                                                {
+                                                    usCategoryUDS.StructData.RemoveAt(num);
+                                                    num--;
+                                                }
+                                            }
+                                            renderingArr = usCategoryUDS.StructData.ToArray();
+                                            break;
                                         case PointingTreeNodeType.StructData:
                                             dataGridView1.Columns.Clear();
                                             AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
@@ -2233,6 +2255,22 @@ namespace UAssetGUI
                                     if (newData[newData.Count - 1] == null) newData.RemoveAt(newData.Count - 1);
                                     usCat.Data = newData;
                                     pointerNode.Text = (usCat.ClassIndex.IsImport() ? usCat.ClassIndex.ToImport(asset).ObjectName.Value.Value : usCat.ClassIndex.Index.ToString()) + " (" + usCat.Data.Count + ")";
+                                    break;
+                                case PointingTreeNodeType.UserDefinedStructData:
+                                    List<PropertyData> newData2 = new List<PropertyData>();
+                                    for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                                    {
+                                        PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
+                                        if (val == null)
+                                        {
+                                            newData2.Add(null);
+                                            continue;
+                                        }
+                                        newData2.Add(val);
+                                    }
+                                    if (newData2[newData2.Count - 1] == null) newData2.RemoveAt(newData2.Count - 1);
+                                    ((UserDefinedStructExport)usCat).StructData = newData2;
+                                    pointerNode.Text = "UserDefinedStruct Data (" + newData2.Count + ")";
                                     break;
                                 case PointingTreeNodeType.EnumData:
                                     if (usCat is EnumExport enumCat)

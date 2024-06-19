@@ -187,6 +187,11 @@ namespace UAssetGUI
                             InterpretThing(entry.Value, softEntryNode, topNode.ExportNum, fillAllSubNodes);
                         }
                         break;
+                    case "NiagaraVariableBase":
+                    case "NiagaraVariable":
+                    case "NiagaraVariableWithOffset":
+                        InterpretThing(((NiagaraVariableBasePropertyData)me).TypeDef, topNode, topNode.ExportNum, fillAllSubNodes);
+                        break;
                 }
             }
         }
@@ -355,7 +360,10 @@ namespace UAssetGUI
             "GameplayTagContainer",
             "MapProperty",
             "MulticastDelegateProperty",
-            "Box"
+            "Box",
+            "NiagaraVariableBase",
+            "NiagaraVariable",
+            "NiagaraVariableWithOffset"
         };
 
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode, int exportNum, bool fillAllSubNodes)
@@ -461,6 +469,11 @@ namespace UAssetGUI
                     var box = (BoxPropertyData)me;
 
                     ourNode.Nodes.Add(new PointingTreeNode(box.Name.Value.Value + " (2)", box.Value, 0, exportNum));
+                    break;
+                case "NiagaraVariableBase":
+                case "NiagaraVariable":
+                case "NiagaraVariableWithOffset":
+                    InterpretThing(((NiagaraVariableBasePropertyData)me).TypeDef, ourNode, exportNum, fillAllSubNodes);
                     break;
             }
         }
@@ -738,6 +751,25 @@ namespace UAssetGUI
                                 row.Cells[++columnIndexer].Value = quatData.Value.W;
                                 row.Cells[columnIndexer].ToolTipText = "W";
                                 break;
+                            case "NiagaraVariableBase":
+                            case "NiagaraVariable":
+                            case "NiagaraVariableWithOffset":
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = ((NiagaraVariableBasePropertyData)thisPD).VariableName;
+                                row.Cells[columnIndexer].ToolTipText = "VariableName";
+                                row.Cells[++columnIndexer].Value = "NiagaraTypeDefinition"; // just for display really
+                                row.Cells[columnIndexer].ToolTipText = "TypeDef";
+                                if (thisPD.PropertyType.Value == "NiagaraVariable")
+                                {
+                                    row.Cells[++columnIndexer].Value = ((NiagaraVariablePropertyData)thisPD).VarData.ConvertByteArrayToString();
+                                    row.Cells[columnIndexer].ToolTipText = "VarData";
+                                }
+                                else if (thisPD.PropertyType.Value == "NiagaraVariableWithOffset")
+                                {
+                                    row.Cells[++columnIndexer].Value = ((NiagaraVariableWithOffsetPropertyData)thisPD).VariableOffset;
+                                    row.Cells[columnIndexer].ToolTipText = "VariableOffset";
+                                }
+                                break;
                             case "SmartName":
                                 var smartNameData = (SmartNamePropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
@@ -750,7 +782,7 @@ namespace UAssetGUI
                                 }
                                 if (asset.GetCustomVersion<FAnimPhysObjectVersion>() < FAnimPhysObjectVersion.SmartNameRefactorForDeterministicCooking)
                                 {
-                                    row.Cells[++columnIndexer].Value = smartNameData.TempGUID == null ? FString.NullCase : smartNameData.TempGUID.ConvertToString();
+                                    row.Cells[++columnIndexer].Value = smartNameData.TempGUID.ConvertToString();
                                     row.Cells[columnIndexer].ToolTipText = "TempGUID";
                                 }
                                 break;
@@ -1625,8 +1657,8 @@ namespace UAssetGUI
                                             FName mapValueType = usMap.ValueType;
                                             if (usMap.Value.Count != 0)
                                             {
-                                                mapKeyType = new FName(asset, usMap.Value.Keys.ElementAt(0).PropertyType);
-                                                mapValueType = new FName(asset, usMap.Value[0].PropertyType);
+                                                mapKeyType = asset.HasUnversionedProperties ? FName.DefineDummy(asset, usMap.Value.Keys.ElementAt(0).PropertyType) : new FName(asset, usMap.Value.Keys.ElementAt(0).PropertyType);
+                                                mapValueType = asset.HasUnversionedProperties ? FName.DefineDummy(asset, usMap.Value[0].PropertyType) : new FName(asset, usMap.Value[0].PropertyType);
                                             }
 
                                             List<DataGridViewRow> rows = new List<DataGridViewRow>();
@@ -2173,8 +2205,8 @@ namespace UAssetGUI
                             FName mapValueType = usMap.ValueType;
                             if (usMap.Value.Count != 0)
                             {
-                                mapKeyType = new FName(asset, usMap.Value.Keys.ElementAt(0).PropertyType);
-                                mapValueType = new FName(asset, usMap.Value[0].PropertyType);
+                                mapKeyType = asset.HasUnversionedProperties ? FName.DefineDummy(asset, usMap.Value.Keys.ElementAt(0).PropertyType) : new FName(asset, usMap.Value.Keys.ElementAt(0).PropertyType);
+                                mapValueType = asset.HasUnversionedProperties ? FName.DefineDummy(asset, usMap.Value[0].PropertyType) : new FName(asset, usMap.Value[0].PropertyType);
                             }
 
                             if (dataGridView1.Rows.Count > 0)

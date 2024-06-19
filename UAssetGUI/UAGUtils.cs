@@ -128,7 +128,7 @@ namespace UAssetGUI
 
         public static byte[] ConvertStringToByteArray(this string val)
         {
-            if (val == null) return new byte[0];
+            if (string.IsNullOrWhiteSpace(val)) return Array.Empty<byte>();
             string[] rawStringArr = val.Split(' ');
             byte[] byteArr = new byte[rawStringArr.Length];
             for (int i = 0; i < rawStringArr.Length; i++) byteArr[i] = Convert.ToByte(rawStringArr[i], 16);

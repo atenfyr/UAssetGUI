@@ -43,12 +43,12 @@ namespace UAssetGUI
 
         private void licenseButton_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/" + Form1.GitHubRepo + "/blob/master/LICENSE");
+            UAGUtils.OpenURL("https://github.com/" + Form1.GitHubRepo + "/blob/master/LICENSE");
         }
 
         private void noticeButton_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/" + Form1.GitHubRepo + "/blob/master/NOTICE.md");
+            UAGUtils.OpenURL("https://github.com/" + Form1.GitHubRepo + "/blob/master/NOTICE.md");
         }
     }
 }

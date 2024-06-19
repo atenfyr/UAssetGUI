@@ -358,7 +358,7 @@ namespace UAssetGUI
                     switch (updateBoxRes)
                     {
                         case DialogResult.Yes:
-                            Process.Start("https://github.com/" + GitHubRepo + "/releases/latest");
+                            UAGUtils.OpenURL("https://github.com/" + GitHubRepo + "/releases/latest");
                             break;
                         default:
                             break;
@@ -421,14 +421,19 @@ namespace UAssetGUI
             }
         }
 
-        public uint GetFileSignature(string path)
+        public uint GetFileSignature(string path, out uint nextFourBytes)
         {
             byte[] buffer = new byte[4];
+            uint res = uint.MaxValue;
+            nextFourBytes = uint.MaxValue;
+
             using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                fs.Read(buffer, 0, buffer.Length);
+                if (fs.Read(buffer, 0, buffer.Length) == buffer.Length) res = BitConverter.ToUInt32(buffer, 0);
+                if (fs.Read(buffer, 0, buffer.Length) == buffer.Length) nextFourBytes = BitConverter.ToUInt32(buffer, 0);
             }
-            return BitConverter.ToUInt32(buffer, 0);
+
+            return res;
         }
 
         public DateTime LastLoadTimestamp = DateTime.UtcNow;
@@ -460,12 +465,34 @@ namespace UAssetGUI
                     default:
                         MapStructTypeOverrideForm.LoadFromConfig();
 
-                        uint sig = GetFileSignature(filePath);
+                        uint sig = GetFileSignature(filePath, out uint nextFourBytes);
                         if (sig == UAsset.ACE7_MAGIC)
                         {
                             // Decrypt file in-situ
                             ac7decrypt.Decrypt(filePath, filePath);
                             didACE7Decrypt = true;
+                        }
+                        else if (sig != UAsset.UASSET_MAGIC)
+                        {
+                            // check if Zen asset for custom popup
+                            // this definitely has potential for false positives, but it will still filter out basically any other file type, if it mattered that much i'd just actually parse the thing
+                            if ((sig == 0 || sig == 1) && nextFourBytes > 40 && nextFourBytes < 1e9)
+                            {
+                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! Zen Loader assets cannot currently be loaded directly into UAssetGUI. You can try extracting traditional cooked assets from IOStore container files by using ZenTools by Archengius, or otherwise try software like FModel or umodel to view the asset.\n\nWould you like to open the GitHub page for ZenTools?", "Uh oh!", MessageBoxButtons.YesNo);
+                                switch (messageBoxRes)
+                                {
+                                    case DialogResult.Yes:
+                                        UAGUtils.OpenURL("https://github.com/Archengius/ZenTools");
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Failed to open this file! File format not recognized", "Uh oh!");
+                            }
+                            return;
                         }
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
@@ -527,7 +554,7 @@ namespace UAssetGUI
 
                 if (hasDuplicates)
                 {
-                    MessageBox.Show("Encountered duplicate name map entries! Serialized FNames will coalesce to one of the entries in the map and binary equality may not be maintained.", "Notice");
+                    MessageBox.Show("Encountered duplicate name map entries. Serialized FNames will coalesce to one of the entries in the map and binary equality may not be maintained.", "Notice");
                 }
 
                 if (unknownTypes.Count > 0)
@@ -1328,17 +1355,17 @@ namespace UAssetGUI
 
         private void issuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/" + GitHubRepo  + "/issues");
+            UAGUtils.OpenURL("https://github.com/" + GitHubRepo  + "/issues");
         }
 
         private void githubToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/" + GitHubRepo);
+            UAGUtils.OpenURL("https://github.com/" + GitHubRepo);
         }
 
         private void apiLinkToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/atenfyr/UAssetAPI");
+            UAGUtils.OpenURL("https://github.com/atenfyr/UAssetAPI");
         }
 
         public void SetParsingVersion(EngineVersion ver)

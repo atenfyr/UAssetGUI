@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Text;
@@ -164,6 +165,11 @@ namespace UAssetGUI
         {
             if (val == FString.NullCase) return null;
             return FString.FromString(val.Replace("\\n", "\n").Replace("\\r", "\r"), encodingHeaderName.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.ASCII);
+        }
+
+        public static void OpenURL(string url)
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
         private static Control internalForm;

@@ -444,6 +444,7 @@ namespace UAssetGUI
             jsonView.Visible = false;
 
             bool didACE7Decrypt = false;
+            string jsonTracingPath = null;
 
             try
             {
@@ -494,11 +495,21 @@ namespace UAssetGUI
                             }
                             return;
                         }
+
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
                         targetAsset.Mappings = ParsingMappings;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
-                        targetAsset.Read(targetAsset.PathToReader(targetAsset.FilePath));
+                        
+                        var strmRaw = targetAsset.PathToStream(filePath);
+#if DEBUGTRACING
+                        var strm = new UAssetAPI.Trace.TraceStream(strmRaw, filePath);
+                        UAssetAPI.Trace.LoggingAspect.Start(strm);
+                        targetAsset.Read(new AssetBinaryReader(strm, targetAsset));
+                        jsonTracingPath = UAssetAPI.Trace.LoggingAspect.Stop();
+#else
+                        targetAsset.Read(new AssetBinaryReader(strmRaw, targetAsset));
+#endif
                         break;
                 }
 
@@ -541,6 +552,14 @@ namespace UAssetGUI
                 }
 
                 bool failedToMaintainBinaryEquality = !string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.VerifyBinaryEquality();
+
+#if DEBUGTRACING
+                if (jsonTracingPath != null && (failedToMaintainBinaryEquality || failedCategoryCount > 0))
+                {
+                    // if ser-hex-viewer available (https://github.com/trumank/ser-hex), run that
+                    Process.Start(new ProcessStartInfo("ser-hex-viewer", "\"" + jsonTracingPath + "\"") { UseShellExecute = false });
+                }
+#endif
 
                 if (didACE7Decrypt)
                 {

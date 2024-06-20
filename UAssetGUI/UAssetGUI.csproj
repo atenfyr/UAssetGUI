@@ -10,12 +10,15 @@
     <AssemblyVersion>1.0.1.0</AssemblyVersion>
     <FileVersion>1.0.1.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <Configurations>Debug;Release;Debug Verbose</Configurations>
+    <Configurations>Debug;Release;DebugVerbose;DebugTracing</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Verbose|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugVerbose|AnyCPU'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTracing|AnyCPU'">
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

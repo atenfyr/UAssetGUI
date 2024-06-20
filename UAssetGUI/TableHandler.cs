@@ -751,6 +751,62 @@ namespace UAssetGUI
                                 row.Cells[++columnIndexer].Value = quatData.Value.W;
                                 row.Cells[columnIndexer].ToolTipText = "W";
                                 break;
+                            case "PerPlatformBool":
+                                {
+                                    var PerPlatformData = (PerPlatformBoolPropertyData)thisPD;
+                                    row.Cells[++columnIndexer].Value = string.Empty;
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 0 ? PerPlatformData.Value[0].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[0]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 1 ? PerPlatformData.Value[1].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[1]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 2 ? PerPlatformData.Value[2].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[2]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 3 ? PerPlatformData.Value[3].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[3]";
+                                }
+                                break;
+                            case "PerPlatformInt":
+                                {
+                                    var PerPlatformData = (PerPlatformIntPropertyData)thisPD;
+                                    row.Cells[++columnIndexer].Value = string.Empty;
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 0 ? PerPlatformData.Value[0].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[0]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 1 ? PerPlatformData.Value[1].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[1]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 2 ? PerPlatformData.Value[2].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[2]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 3 ? PerPlatformData.Value[3].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[3]";
+                                }
+                                break;
+                            case "PerPlatformFloat":
+                                {
+                                    var PerPlatformData = (PerPlatformFloatPropertyData)thisPD;
+                                    row.Cells[++columnIndexer].Value = string.Empty;
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 0 ? PerPlatformData.Value[0].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[0]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 1 ? PerPlatformData.Value[1].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[1]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 2 ? PerPlatformData.Value[2].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[2]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 3 ? PerPlatformData.Value[3].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[3]";
+                                }
+                                break;
+                            case "PerPlatformFrameRate":
+                                {
+                                    var PerPlatformData = (PerPlatformFrameRatePropertyData)thisPD;
+                                    row.Cells[++columnIndexer].Value = string.Empty;
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 0 ? PerPlatformData.Value[0].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[0]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 1 ? PerPlatformData.Value[1].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[1]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 2 ? PerPlatformData.Value[2].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[2]";
+                                    row.Cells[++columnIndexer].Value = PerPlatformData.Value.Length > 3 ? PerPlatformData.Value[3].ToString() : string.Empty;
+                                    row.Cells[columnIndexer].ToolTipText = "[3]";
+                                }
+                                break;
                             case "NiagaraVariableBase":
                             case "NiagaraVariable":
                             case "NiagaraVariableWithOffset":

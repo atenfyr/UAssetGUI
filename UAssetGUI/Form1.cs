@@ -199,6 +199,7 @@ namespace UAssetGUI
         {
             var test = new FileContainerForm();
             test.CurrentContainerPath = path;
+            test.BaseForm = this;
             test.Show();
         }
 
@@ -528,8 +529,8 @@ namespace UAssetGUI
 
                 tableEditor = new TableHandler(dataGridView1, targetAsset, treeView1);
 
-                saveToolStripMenuItem.Enabled = true;
-                saveAsToolStripMenuItem.Enabled = true;
+                saveToolStripMenuItem.Enabled = !IsReadOnly();
+                saveAsToolStripMenuItem.Enabled = !IsReadOnly();
                 findToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
@@ -651,7 +652,14 @@ namespace UAssetGUI
             }
         }
 
+        public bool IsReadOnly()
+        {
+            int idx = currentSavingPath.Replace(Path.DirectorySeparatorChar, '/').LastIndexOf(ReadOnlyPathKeyword);
+            return idx >= 0;
+        }
+
         public bool existsUnsavedChanges = false;
+        public static readonly string ReadOnlyPathKeyword = "UAG_read_only/";
         public void SetUnsavedChanges(bool flag)
         {
             existsUnsavedChanges = flag;
@@ -661,13 +669,20 @@ namespace UAssetGUI
             }
             else
             {
+                string formattedCurrentSavingPath = currentSavingPath;
+                int idx = currentSavingPath.Replace(Path.DirectorySeparatorChar, '/').LastIndexOf(ReadOnlyPathKeyword);
+                if (idx >= 0)
+                {
+                    formattedCurrentSavingPath = formattedCurrentSavingPath.Substring(idx + ReadOnlyPathKeyword.Length);
+                }
+
                 if (existsUnsavedChanges)
                 {
-                    this.Text = DisplayVersion + " - *" + currentSavingPath;
+                    this.Text = DisplayVersion + " - *" + formattedCurrentSavingPath;
                 }
                 else
                 {
-                    this.Text = DisplayVersion + " - " + currentSavingPath;
+                    this.Text = DisplayVersion + " - " + formattedCurrentSavingPath;
                 }
             }
         }

@@ -50,6 +50,8 @@ namespace UAssetGUI
         public static Dictionary<string, string> AllMappings = new Dictionary<string, string>();
         public readonly static string ConfigFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
         public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
+        public readonly static string StagingFolder = Path.Combine(ConfigFolder, "Staging");
+        public readonly static string ExtractedFolder = Path.Combine(ConfigFolder, "Extracted");
         public static ISet<string> MappingsToSuppressWarningsFor = new HashSet<string>();
 
         public static void LoadMappings()
@@ -63,6 +65,45 @@ namespace UAssetGUI
             {
                 AllMappings.Add(Path.GetFileNameWithoutExtension(mappingPath), mappingPath);
             }
+        }
+
+        public static string[] GetStagingFiles(string pakPath, out string[] fixedPathsOnDisk)
+        {
+            string rootDir = Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(pakPath));
+            Directory.CreateDirectory(rootDir);
+
+            fixedPathsOnDisk = Directory.GetFiles(rootDir, "*.*", SearchOption.AllDirectories);
+            string[] res = new string[fixedPathsOnDisk.Length]; Array.Copy(fixedPathsOnDisk, res, fixedPathsOnDisk.Length);
+            for (int i = 0; i < res.Length; i++)
+            {
+                res[i] = res[i].Replace(Path.DirectorySeparatorChar, '/').Substring(rootDir.Length).TrimStart('/');
+            }
+
+            return res;
+        }
+
+        public static void StageFile(DirectoryTreeItem item)
+        {
+            string outputPath = item.SaveFileToTemp();
+            var finalPath = Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), item.FullPath.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
+            
+            File.Copy(outputPath, finalPath, true);
+            try { File.Copy(Path.ChangeExtension(outputPath, ".uexp"), Path.ChangeExtension(finalPath, ".uexp"), true); } catch { }
+            try { File.Delete(outputPath); } catch { }
+            try { File.Delete(Path.ChangeExtension(outputPath, ".uexp")); } catch { }
+        }
+
+        public static void ExtractFile(DirectoryTreeItem item)
+        {
+            string outputPath = item.SaveFileToTemp();
+            var finalPath = Path.Combine(ExtractedFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), item.FullPath.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
+
+            File.Copy(outputPath, finalPath, true);
+            try { File.Copy(Path.ChangeExtension(outputPath, ".uexp"), Path.ChangeExtension(finalPath, ".uexp"), true); } catch { }
+            try { File.Delete(outputPath); } catch { }
+            try { File.Delete(Path.ChangeExtension(outputPath, ".uexp")); } catch { }
         }
 
         public static bool TryGetMappings(string name, out Usmap mappings)

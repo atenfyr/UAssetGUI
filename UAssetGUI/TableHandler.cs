@@ -576,7 +576,7 @@ namespace UAssetGUI
                                         row.Cells[columnIndexer].ToolTipText = "Value";
                                         break;
                                     default:
-                                        throw new NotImplementedException("Unimplemented display for " + txtData.HistoryType.ToString());
+                                        break;
                                 }
                                 break;
                             case "NameProperty":
@@ -952,7 +952,7 @@ namespace UAssetGUI
                             }
 
                             TextHistoryType histType = TextHistoryType.Base;
-                            if (transformB == null || value1B == null || !(value1B is string)) return null;
+                            if (transformB == null) return null;
                             if (transformB is string) Enum.TryParse((string)transformB, out histType);
 
                             decidedTextData.HistoryType = histType;
@@ -979,7 +979,7 @@ namespace UAssetGUI
                                     decidedTextData.Value = (string)value1B == FString.NullCase ? null : FString.FromString((string)value1B);
                                     break;
                                 default:
-                                    throw new FormatException("Unimplemented text history type " + histType);
+                                    break;
                             }
 
                             if (value4B != null && value4B is string) Enum.TryParse((string)value4B, out decidedTextData.Flags);

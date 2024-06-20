@@ -130,6 +130,33 @@ namespace UAssetGUI
             dgv.RowTemplate.Height = dgv.RowTemplate.MinimumHeight;
         }
 
+        private static void AdjustTreeView(ColorfulTreeView treeView1)
+        {
+            Color selectedListViewBackColor = treeView1.Nodes.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
+            treeView1.BackColor = selectedListViewBackColor;
+            treeView1.ForeColor = UAGPalette.ForeColor;
+            treeView1.Font = new Font(treeView1.Font.FontFamily, 8.25f + (float)UAGConfig.Data.DataZoom, treeView1.Font.Style);
+        }
+
+        private static void AdjustMenuStrip(MenuStrip menuStrip1)
+        {
+            menuStrip1.BackColor = UAGPalette.BackColor;
+            menuStrip1.ForeColor = UAGPalette.ForeColor;
+            foreach (ToolStripItem rootItem in menuStrip1.Items)
+            {
+                rootItem.BackColor = UAGPalette.BackColor;
+                rootItem.ForeColor = UAGPalette.ForeColor;
+                if (rootItem is ToolStripMenuItem rootMenuItem)
+                {
+                    foreach (ToolStripItem childItem in rootMenuItem.DropDownItems)
+                    {
+                        childItem.BackColor = UAGPalette.BackColor;
+                        childItem.ForeColor = UAGPalette.ForeColor;
+                    }
+                }
+            }
+        }
+
         private static void RefreshThemeInternal(Form frm)
         {
             switch (CurrentTheme)
@@ -161,26 +188,8 @@ namespace UAssetGUI
             frm.ForeColor = UAGPalette.ForeColor;
             if (frm is Form1 frm1)
             {
-                Color selectedListViewBackColor = frm1.treeView1.Nodes.Count > 0 ? UAGPalette.BackColor : UAGPalette.InactiveColor;
-                frm1.treeView1.BackColor = selectedListViewBackColor;
-                frm1.treeView1.ForeColor = UAGPalette.ForeColor;
-                frm1.treeView1.Font = new Font(frm1.treeView1.Font.FontFamily, 8.25f + (float)UAGConfig.Data.DataZoom, frm1.treeView1.Font.Style);
-
-                frm1.menuStrip1.BackColor = UAGPalette.BackColor;
-                frm1.menuStrip1.ForeColor = UAGPalette.ForeColor;
-                foreach (ToolStripItem rootItem in frm1.menuStrip1.Items)
-                {
-                    rootItem.BackColor = UAGPalette.BackColor;
-                    rootItem.ForeColor = UAGPalette.ForeColor;
-                    if (rootItem is ToolStripMenuItem rootMenuItem)
-                    {
-                        foreach (ToolStripItem childItem in rootMenuItem.DropDownItems)
-                        {
-                            childItem.BackColor = UAGPalette.BackColor;
-                            childItem.ForeColor = UAGPalette.ForeColor;
-                        }
-                    }
-                }
+                AdjustTreeView(frm1.treeView1);
+                AdjustMenuStrip(frm1.menuStrip1);
 
                 frm1.jsonView.ForeColor = UAGPalette.ForeColor;
                 frm1.jsonView.BackColor = UAGPalette.BackColor;
@@ -196,6 +205,12 @@ namespace UAssetGUI
                 {
                     frm1.tableEditor.Save(true);
                 }*/
+            }
+            if (frm is FileContainerForm frm3)
+            {
+                AdjustTreeView(frm3.saveTreeView);
+                AdjustTreeView(frm3.loadTreeView);
+                AdjustMenuStrip(frm3.menuStrip1);
             }
             if (frm is MapStructTypeOverrideForm frm2)
             {

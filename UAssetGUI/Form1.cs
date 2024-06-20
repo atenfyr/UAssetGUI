@@ -195,6 +195,13 @@ namespace UAssetGUI
 
         private List<string> allMappingsKeys = new List<string>();
 
+        private void OpenFileContainerForm(string path = null)
+        {
+            var test = new FileContainerForm();
+            test.CurrentContainerPath = path;
+            test.Show();
+        }
+
         private void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
         {
             UAGConfig.MappingsToSuppressWarningsFor.Clear();
@@ -463,6 +470,9 @@ namespace UAssetGUI
                         targetAsset.Mappings = ParsingMappings;
                         desiredSetUnsavedChanges = true;
                         break;
+                    case ".pak":
+                        OpenFileContainerForm(filePath);
+                        return;
                     default:
                         MapStructTypeOverrideForm.LoadFromConfig();
 

@@ -54,6 +54,8 @@ namespace UAssetGUI
         public readonly static string ExtractedFolder = Path.Combine(ConfigFolder, "Extracted");
         public static ISet<string> MappingsToSuppressWarningsFor = new HashSet<string>();
 
+        private static bool DifferentStagingPerPak = false;
+
         public static void LoadMappings()
         {
             Directory.CreateDirectory(ConfigFolder);
@@ -69,7 +71,7 @@ namespace UAssetGUI
 
         public static string[] GetStagingFiles(string pakPath, out string[] fixedPathsOnDisk)
         {
-            string rootDir = Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(pakPath));
+            string rootDir = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(pakPath)) : StagingFolder;
             Directory.CreateDirectory(rootDir);
 
             fixedPathsOnDisk = Directory.GetFiles(rootDir, "*.*", SearchOption.AllDirectories);
@@ -82,10 +84,27 @@ namespace UAssetGUI
             return res;
         }
 
-        public static void StageFile(DirectoryTreeItem item)
+        public static void StageFile(string rawPathOnDisk, string CurrentContainerPath)
         {
+            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(CurrentContainerPath), Path.GetFileName(rawPathOnDisk)) : Path.Combine(StagingFolder, Path.GetFileName(rawPathOnDisk));
+            Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
+
+            File.Copy(rawPathOnDisk, finalPath, true);
+            try { File.Copy(Path.ChangeExtension(rawPathOnDisk, ".uexp"), Path.ChangeExtension(finalPath, ".uexp"), true); } catch { }
+        }
+
+        public static void StageFile(DirectoryTreeItem item, string newPath = null)
+        {
+            // recursive if we were given a directory
+            if (!item.IsFile)
+            {
+                foreach (var child in item.Children) StageFile(child.Value, newPath == null ? null : Path.Combine(newPath, child.Value.Name));
+                return;
+            }
+
+            if (newPath == null) newPath = item.FullPath;
             string outputPath = item.SaveFileToTemp();
-            var finalPath = Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), item.FullPath.Replace('/', Path.DirectorySeparatorChar));
+            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), newPath.Replace('/', Path.DirectorySeparatorChar)) : Path.Combine(StagingFolder, newPath.Replace('/', Path.DirectorySeparatorChar)); ;
             Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
             
             File.Copy(outputPath, finalPath, true);
@@ -94,16 +113,26 @@ namespace UAssetGUI
             try { File.Delete(Path.ChangeExtension(outputPath, ".uexp")); } catch { }
         }
 
-        public static void ExtractFile(DirectoryTreeItem item)
+        public static string ExtractFile(DirectoryTreeItem item)
         {
+            var finalPath = Path.Combine(ExtractedFolder, item.FullPath.Replace('/', Path.DirectorySeparatorChar));
+
+            // recursive if we were given a directory
+            if (!item.IsFile)
+            {
+                foreach (var child in item.Children) ExtractFile(child.Value);
+                return finalPath;
+            }
+
             string outputPath = item.SaveFileToTemp();
-            var finalPath = Path.Combine(ExtractedFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), item.FullPath.Replace('/', Path.DirectorySeparatorChar));
             Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
 
             File.Copy(outputPath, finalPath, true);
             try { File.Copy(Path.ChangeExtension(outputPath, ".uexp"), Path.ChangeExtension(finalPath, ".uexp"), true); } catch { }
             try { File.Delete(outputPath); } catch { }
             try { File.Delete(Path.ChangeExtension(outputPath, ".uexp")); } catch { }
+
+            return finalPath;
         }
 
         public static bool TryGetMappings(string name, out Usmap mappings)

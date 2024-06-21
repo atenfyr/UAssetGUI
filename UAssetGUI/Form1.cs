@@ -511,7 +511,7 @@ namespace UAssetGUI
                         targetAsset.FilePath = filePath;
                         targetAsset.Mappings = ParsingMappings;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
-                        
+
                         var strmRaw = targetAsset.PathToStream(filePath);
 #if DEBUGTRACING
                         var strm = new UAssetAPI.Trace.TraceStream(strmRaw, filePath);
@@ -912,7 +912,7 @@ namespace UAssetGUI
             foreach (TreeNode entry in node.Nodes)
             {
                 if (node is PointingTreeNode pointerNode2 && pointerNode2.ExportNum == expNum) return pointerNode2;
-                
+
                 TreeNode res = SearchForTreeNode(entry, expNum);
                 if (res != null) return res;
             }
@@ -1367,6 +1367,13 @@ namespace UAssetGUI
             }
 
             if (!e.Cancel) DisposeDiscordRpc();
+
+            // delete temp folder
+            try
+            {
+                Directory.Delete(Path.Combine(Path.GetTempPath(), "UAG_read_only"), true);
+            }
+            catch { }
         }
 
         private void frm_DragEnter(object sender, DragEventArgs e)
@@ -1399,7 +1406,7 @@ namespace UAssetGUI
 
         private void issuesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UAGUtils.OpenURL("https://github.com/" + GitHubRepo  + "/issues");
+            UAGUtils.OpenURL("https://github.com/" + GitHubRepo + "/issues");
         }
 
         private void githubToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1692,7 +1699,7 @@ namespace UAssetGUI
                     {
                         usRawCategory.Data = new byte[numBytes];
                     }
-                    
+
                     SetUnsavedChanges(true);
                     if (tableEditor != null)
                     {
@@ -1803,24 +1810,14 @@ namespace UAssetGUI
             }
         }
 
-        private void OpenDirectory(string dir)
-        {
-            Process.Start(new ProcessStartInfo()
-            {
-                FileName = dir,
-                UseShellExecute = true,
-                Verb = "open"
-            });
-        }
-
         private void configDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenDirectory(UAGConfig.ConfigFolder);
+            UAGUtils.OpenDirectory(UAGConfig.ConfigFolder);
         }
 
         /*private void mappingsDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenDirectory(UAGConfig.MappingsFolder);
+            UAGUtils.OpenDirectory(UAGConfig.MappingsFolder);
         }*/
 
         private string DumpMappings(string searchName, bool recursive, Dictionary<string, string> customAnnotations = null)
@@ -1833,7 +1830,7 @@ namespace UAssetGUI
         {
             var selectedNode = treeView1.SelectedNode as PointingTreeNode;
             if (selectedNode == null) return false;
-            
+
             FName searchName = null;
             Dictionary<string, string> customAnnotations = new Dictionary<string, string>();
             if (selectedNode?.Pointer != null && selectedNode.Pointer is Export exp)
@@ -1893,7 +1890,7 @@ namespace UAssetGUI
                             numDumped++;
                         }
                         timer.Stop();
-                        if (outputPath != null) OpenDirectory(Path.GetDirectoryName(outputPath));
+                        if (outputPath != null) UAGUtils.OpenDirectory(Path.GetDirectoryName(outputPath));
                         MessageBox.Show(numDumped + " " + (numDumped == 1 ? "class" : "classes") + " successfully dumped in " + timer.Elapsed.TotalMilliseconds + " ms.", Name);
                         break;
                 }
@@ -2026,6 +2023,11 @@ namespace UAssetGUI
                 File.Copy(importPath, Path.ChangeExtension(Path.Combine(UAGConfig.MappingsFolder, newFileName), ".usmap"));
                 UpdateMappings(newFileName);
             });
+        }
+
+        private void openContainersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileContainerForm();
         }
     }
 }

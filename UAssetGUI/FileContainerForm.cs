@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -20,12 +21,27 @@ namespace UAssetGUI
         }
 
         public Form1 BaseForm;
+        public TreeView SelectedTreeView;
         private void FileContainerForm_Load(object sender, EventArgs e)
         {
+            this.Text = BaseForm.DisplayVersion;
+
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
 
+            this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
+            this.pasteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.V);
+            this.deleteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Delete);
+
+            this.loadTreeView.AllowDrop = true;
+            this.loadTreeView.DragEnter += new DragEventHandler(event_DragEnter);
+            this.loadTreeView.DragDrop += new DragEventHandler(loadTreeView_DragDrop);
+            this.saveTreeView.AllowDrop = true;
+            this.saveTreeView.DragEnter += new DragEventHandler(event_DragEnter);
+            this.saveTreeView.DragDrop += new DragEventHandler(saveTreeView_DragDrop);
+
             LoadContainer(CurrentContainerPath);
+            RefreshTreeView(saveTreeView);
         }
 
         public void AddDirectoryTreeItemToTreeView(DirectoryTreeItem treeItem, PointingFileTreeNode dad)
@@ -44,22 +60,43 @@ namespace UAssetGUI
             {
                 if (node is PointingFileTreeNode pftNode)
                 {
-                    if (pftNode.IsExpanded) hashSet.Add(pftNode.FullPath);
+                    if (pftNode.IsExpanded) hashSet.Add(pftNode.Pointer.FullPath);
                     ExpandedToHashSet(pftNode.Nodes, hashSet);
                 }
             }
         }
 
+        // this method doesn't collapse already-expanded nodes
         public void HashSetToExpanded(TreeNodeCollection nodes, HashSet<string> hashSet)
         {
             foreach (TreeNode node in nodes)
             {
                 if (node is PointingFileTreeNode pftNode)
                 {
-                    if (hashSet.Contains(pftNode.FullPath)) pftNode.Expand();
+                    if (hashSet.Contains(pftNode.Pointer.FullPath)) pftNode.Expand();
                     HashSetToExpanded(pftNode.Nodes, hashSet);
                 }
             }
+        }
+
+        public PointingFileTreeNode GetSpecificNode(TreeNodeCollection nodes, string fullPath)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (node is PointingFileTreeNode pftNode)
+                {
+                    if (fullPath == pftNode.Pointer.FullPath) return pftNode;
+
+                    var gotten = GetSpecificNode(node.Nodes, fullPath);
+                    if (gotten != null) return gotten;
+                }
+            }
+            return null;
+        }
+
+        public PointingFileTreeNode GetSpecificNode(TreeView treeView, string fullPath)
+        {
+            return GetSpecificNode(treeView.Nodes, fullPath);
         }
 
         public void RefreshTreeView(TreeView treeView)
@@ -111,7 +148,8 @@ namespace UAssetGUI
 
             DirectoryTreeMap[loadTreeView] = new DirectoryTree(this, allFiles);
             RefreshTreeView(loadTreeView);
-            RefreshTreeView(saveTreeView);
+
+            this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
         }
 
         public bool SaveContainer(string path)
@@ -136,6 +174,8 @@ namespace UAssetGUI
         public void ForceResize()
         {
             splitContainer1.Size = new Size(splitContainer1.Size.Width, this.Size.Height - menuStrip1.Size.Height - 50);
+            loadButton.Location = new Point((splitContainer1.Panel1.Size.Width - loadButton.Size.Width) / 2, loadButton.Location.Y);
+            saveButton.Location = new Point((splitContainer1.Panel2.Size.Width - saveButton.Size.Width) / 2, saveButton.Location.Y);
             loadTreeView.Location = new Point(0, loadButton.Location.Y + loadButton.Size.Height + 6);
             loadTreeView.Size = new Size(splitContainer1.Panel1.Size.Width, splitContainer1.Panel1.Size.Height - loadTreeView.Location.Y);
             saveTreeView.Location = new Point(0, saveButton.Location.Y + saveButton.Size.Height + 6);
@@ -157,7 +197,128 @@ namespace UAssetGUI
             ForceResize();
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Control | Keys.C:
+                    copyToolStripMenuItem.PerformClick();
+                    return true;
+                case Keys.Control | Keys.V:
+                    pasteToolStripMenuItem.PerformClick();
+                    return true;
+                case Keys.Delete:
+                    deleteToolStripMenuItem.PerformClick();
+                    return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void expandAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.SelectedTreeView.ExpandAll();
+        }
+
+        private void collapseAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.SelectedTreeView.CollapseAll();
+        }
+
+        private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RefreshTreeView(loadTreeView);
+            RefreshTreeView(saveTreeView);
+        }
+
         private void loadButton_Click(object sender, EventArgs e)
+        {
+            loadToolStripMenuItem.PerformClick();
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            saveToolStripMenuItem.PerformClick();
+        }
+
+        private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e?.Node != null && e.Node is PointingFileTreeNode pftNode)
+            {
+                if (pftNode.Pointer.IsFile) pftNode.Pointer.OpenFile();
+            }
+        }
+
+        private PointingFileTreeNode copiedPftNode = null;
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            {
+                copiedPftNode = pftNode;
+            }
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            {
+                if (copiedPftNode == null || pftNode == null) return;
+                DirectoryTreeItem clipboardNode = copiedPftNode.Pointer;
+
+                if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow pasting into staging
+                DirectoryTreeItem targetDirectory = pftNode.Pointer;
+                if (targetDirectory.IsFile) targetDirectory = targetDirectory.Parent;
+
+                string desiredStagingPath = Path.Combine(targetDirectory?.FullPath ?? string.Empty, clipboardNode.Name);
+                clipboardNode.StageFile(desiredStagingPath);
+            }
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            {
+                if (pftNode == null) return;
+                if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow deleting from staging
+
+                pftNode.Pointer.DeleteFile();
+            }
+        }
+
+        private void event_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
+
+        private void loadTreeView_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length > 0) LoadContainer(files[0]);
+        }
+
+        private void saveTreeView_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length > 0)
+            {
+                UAGConfig.StageFile(files[0], CurrentContainerPath);
+                this.RefreshTreeView(this.saveTreeView);
+            }
+        }
+
+        private void loadTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            saveTreeView.SelectedNode = null;
+            this.SelectedTreeView = loadTreeView;
+        }
+
+        private void saveTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            loadTreeView.SelectedNode = null;
+            this.SelectedTreeView = saveTreeView;
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog())
             {
@@ -172,7 +333,7 @@ namespace UAssetGUI
             }
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (System.Windows.Forms.SaveFileDialog dialog = new System.Windows.Forms.SaveFileDialog())
             {
@@ -192,6 +353,22 @@ namespace UAssetGUI
                 }
             }
         }
+
+        private void stageFromDiskToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog())
+            {
+                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    UAGConfig.StageFile(openFileDialog.FileName, CurrentContainerPath);
+                    this.RefreshTreeView(this.saveTreeView);
+                }
+            }
+        }
     }
 
     public class PointingFileTreeNode : TreeNode
@@ -202,29 +379,37 @@ namespace UAssetGUI
         {
             Pointer = item;
 
+
             this.ContextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem tsmItem = null;
 
             if (Pointer.IsFile)
             {
-                ToolStripMenuItem tsmItem = new ToolStripMenuItem("Open");
+                tsmItem = new ToolStripMenuItem("Open");
                 tsmItem.Click += (sender, args) => Pointer.OpenFile();
                 this.ContextMenuStrip.Items.Add(tsmItem);
-                tsmItem = new ToolStripMenuItem("Extract");
-                tsmItem.Click += (sender, args) => UAGConfig.ExtractFile(Pointer);
-                this.ContextMenuStrip.Items.Add(tsmItem);
+            }
 
-                if (Pointer.FixedPathOnDisk == null)
+            if (Pointer.FixedPathOnDisk == null)
+            {
+                tsmItem = new ToolStripMenuItem("Extract");
+                tsmItem.Click += (sender, args) =>
                 {
-                    tsmItem = new ToolStripMenuItem("Stage");
-                    tsmItem.Click += (sender, args) => Pointer.StageFile();
-                    this.ContextMenuStrip.Items.Add(tsmItem);
-                }
-                else
-                {
-                    tsmItem = new ToolStripMenuItem("Delete");
-                    tsmItem.Click += (sender, args) => Pointer.DeleteFile();
-                    this.ContextMenuStrip.Items.Add(tsmItem);
-                }
+                    string outPath = UAGConfig.ExtractFile(Pointer);
+                    if ((Path.GetExtension(outPath)?.Length ?? 0) > 0) outPath = Path.GetDirectoryName(outPath);
+                    UAGUtils.OpenDirectory(outPath);
+                };
+                this.ContextMenuStrip.Items.Add(tsmItem);
+                tsmItem = new ToolStripMenuItem("Stage");
+                tsmItem.Click += (sender, args) => Pointer.StageFile();
+                this.ContextMenuStrip.Items.Add(tsmItem);
+            }
+
+            if (Pointer.FixedPathOnDisk != null)
+            {
+                tsmItem = new ToolStripMenuItem("Delete");
+                tsmItem.Click += (sender, args) => Pointer.DeleteFile();
+                this.ContextMenuStrip.Items.Add(tsmItem);
             }
         }
     }
@@ -279,28 +464,49 @@ namespace UAssetGUI
             string[] pathComponents = path.Split('/');
             if (pathComponents.Length == 0) return null;
 
+            string[] fixedAssetOnDiskComponents = fixedAssetOnDisk?.Split(Path.DirectorySeparatorChar) ?? Array.Empty<string>();
+            string startingFixedAssetOnDisk = string.Empty;
+            if (fixedAssetOnDiskComponents.Length > pathComponents.Length)
+            {
+                string[] fixedAssetOnDiskComponentsNuevo = new string[fixedAssetOnDiskComponents.Length - pathComponents.Length];
+                Array.Copy(fixedAssetOnDiskComponents, fixedAssetOnDiskComponentsNuevo, fixedAssetOnDiskComponentsNuevo.Length);
+                startingFixedAssetOnDisk = string.Join(Path.DirectorySeparatorChar, fixedAssetOnDiskComponentsNuevo);
+            }
+
             if (!RootNodes.ContainsKey(pathComponents[0]))
             {
                 string ext = Path.GetExtension(pathComponents[0]);
-                if (ext.Length > 1 && ext != ".uasset" && ext != ".umap") return null;
+                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk")) return null;
 
                 RootNodes[pathComponents[0]] = new DirectoryTreeItem(ParentForm, pathComponents[0], pathComponents[0], ext.Length > 1);
             }
 
             DirectoryTreeItem currentItem = RootNodes[pathComponents[0]];
+            if (startingFixedAssetOnDisk.Length > 0)
+            {
+                startingFixedAssetOnDisk = Path.Combine(startingFixedAssetOnDisk, pathComponents[0]);
+                currentItem.FixedPathOnDisk = startingFixedAssetOnDisk;
+            }
+
             for (int i = 1; i < pathComponents.Length; i++)
             {
                 string ext = Path.GetExtension(pathComponents[i]);
-                if (ext.Length > 1 && ext != ".uasset" && ext != ".umap") return null;
+                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk")) return null;
 
                 if (!currentItem.Children.ContainsKey(pathComponents[i]))
                 {
                     currentItem.Children[pathComponents[i]] = new DirectoryTreeItem(ParentForm, pathComponents[i], currentItem.FullPath + "/" + pathComponents[i], ext.Length > 1);
+                    currentItem.Children[pathComponents[i]].Parent = currentItem;
                 }
                 currentItem = currentItem.Children[pathComponents[i]];
+
+                if (startingFixedAssetOnDisk.Length > 0)
+                {
+                    startingFixedAssetOnDisk = Path.Combine(startingFixedAssetOnDisk, pathComponents[i]);
+                    currentItem.FixedPathOnDisk = startingFixedAssetOnDisk;
+                }
             }
 
-            currentItem.FixedPathOnDisk = fixedAssetOnDisk;
             return currentItem;
         }
     }
@@ -312,6 +518,7 @@ namespace UAssetGUI
         public string FullPath;
         public string FixedPathOnDisk;
         public bool IsFile = false;
+        public DirectoryTreeItem Parent;
         public IDictionary<string, DirectoryTreeItem> Children;
 
         public string SaveFileToTemp()
@@ -320,6 +527,14 @@ namespace UAssetGUI
             
             string outputPath1 = Path.Combine(outputPathDirectory, FullPath.Replace('/', Path.DirectorySeparatorChar));
             string outputPath2 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".uexp").Replace('/', Path.DirectorySeparatorChar));
+
+            if (FixedPathOnDisk != null)
+            {
+                File.Copy(FixedPathOnDisk, outputPath1, true);
+                try { File.Copy(Path.ChangeExtension(FixedPathOnDisk, ".uexp"), outputPath2, true); } catch { }
+                return outputPath1;
+            }
+
             using (FileStream stream = new FileStream(ParentForm.CurrentContainerPath, FileMode.Open))
             {
                 var reader = new PakBuilder().Reader(stream);
@@ -339,25 +554,49 @@ namespace UAssetGUI
         public void OpenFile()
         {
             string outputPath = FixedPathOnDisk != null ? FixedPathOnDisk : this.SaveFileToTemp();
-            this.ParentForm.BaseForm.LoadFileAt(outputPath);
-            this.ParentForm.BaseForm.Focus();
-            if (FixedPathOnDisk != null)
+
+            string ext = Path.GetExtension(outputPath);
+            if (ext == ".uasset" || ext == ".umap")
             {
-                try { File.Delete(outputPath); } catch { } // doesnt matter at all if we cant actually delete it
+                this.ParentForm.BaseForm.LoadFileAt(outputPath);
+                this.ParentForm.BaseForm.Focus();
+            }
+            else
+            {
+                new Process
+                {
+                    StartInfo = new ProcessStartInfo(outputPath) { UseShellExecute = true }
+                }.Start(); // open externally
             }
         }
 
-        public void StageFile()
+        public void StageFile(string newPath = null)
         {
-            UAGConfig.StageFile(this);
+            if (newPath == null) newPath = this.FullPath;
+
+            UAGConfig.StageFile(this, newPath);
             this.ParentForm.RefreshTreeView(this.ParentForm.saveTreeView);
+
+            var generatedNode = this.ParentForm.GetSpecificNode(this.ParentForm.saveTreeView, newPath);
+            if (generatedNode == null) return;
+            generatedNode.EnsureVisible();
+            this.ParentForm.saveTreeView.SelectedNode = generatedNode;
         }
 
         public void DeleteFile()
         {
             if (FixedPathOnDisk == null) return;
 
-            File.Delete(FixedPathOnDisk);
+            try
+            {
+                File.Delete(FixedPathOnDisk);
+                try { File.Delete(Path.ChangeExtension(FixedPathOnDisk, ".uexp")); } catch { }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Directory.Delete(FixedPathOnDisk, true);
+            }
+
             FixedPathOnDisk = null;
             this.ParentForm.RefreshTreeView(this.ParentForm.saveTreeView);
         }

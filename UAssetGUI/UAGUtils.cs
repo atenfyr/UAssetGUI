@@ -172,6 +172,16 @@ namespace UAssetGUI
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
         }
 
+        public static void OpenDirectory(string dir)
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = dir,
+                UseShellExecute = true,
+                Verb = "open"
+            });
+        }
+
         private static Control internalForm;
         public static void InitializeInvoke(Control control)
         {

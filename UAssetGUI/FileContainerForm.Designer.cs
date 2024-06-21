@@ -1,4 +1,6 @@
-﻿namespace UAssetGUI
+﻿using System.Windows.Forms;
+
+namespace UAssetGUI
 {
     partial class FileContainerForm
     {
@@ -34,8 +36,18 @@
             saveButton = new System.Windows.Forms.Button();
             saveTreeView = new ColorfulTreeView();
             menuStrip1 = new System.Windows.Forms.MenuStrip();
+            fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            stageFromDiskToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            expandAllToolStripMenuItem = new ToolStripMenuItem();
+            collapseAllToolStripMenuItem = new ToolStripMenuItem();
+            refreshToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -46,8 +58,8 @@
             // splitContainer1
             // 
             splitContainer1.Dock = System.Windows.Forms.DockStyle.Top;
-            splitContainer1.Location = new System.Drawing.Point(9, 45);
-            splitContainer1.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            splitContainer1.Location = new System.Drawing.Point(6, 30);
+            splitContainer1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -59,9 +71,8 @@
             // 
             splitContainer1.Panel2.Controls.Add(saveButton);
             splitContainer1.Panel2.Controls.Add(saveTreeView);
-            splitContainer1.Size = new System.Drawing.Size(1182, 747);
-            splitContainer1.SplitterDistance = 582;
-            splitContainer1.SplitterWidth = 6;
+            splitContainer1.Size = new System.Drawing.Size(828, 448);
+            splitContainer1.SplitterDistance = 406;
             splitContainer1.TabIndex = 1;
             splitContainer1.SplitterMoved += splitContainer1_SplitterMoved;
             // 
@@ -71,10 +82,10 @@
             loadButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             loadButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             loadButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            loadButton.Location = new System.Drawing.Point(207, 5);
-            loadButton.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            loadButton.Location = new System.Drawing.Point(145, 3);
+            loadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             loadButton.Name = "loadButton";
-            loadButton.Size = new System.Drawing.Size(171, 70);
+            loadButton.Size = new System.Drawing.Size(120, 42);
             loadButton.TabIndex = 3;
             loadButton.Text = "Load...";
             loadButton.UseVisualStyleBackColor = true;
@@ -82,13 +93,15 @@
             // 
             // loadTreeView
             // 
+            loadTreeView.AllowDrop = true;
             loadTreeView.BackColor = System.Drawing.Color.LightGray;
             loadTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
-            loadTreeView.Location = new System.Drawing.Point(0, 85);
-            loadTreeView.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            loadTreeView.Location = new System.Drawing.Point(0, 51);
             loadTreeView.Name = "loadTreeView";
-            loadTreeView.Size = new System.Drawing.Size(581, 704);
+            loadTreeView.Size = new System.Drawing.Size(408, 394);
             loadTreeView.TabIndex = 0;
+            loadTreeView.NodeMouseClick += loadTreeView_NodeMouseClick;
+            loadTreeView.NodeMouseDoubleClick += treeView_NodeMouseDoubleClick;
             // 
             // saveButton
             // 
@@ -96,10 +109,10 @@
             saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             saveButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             saveButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            saveButton.Location = new System.Drawing.Point(209, 5);
-            saveButton.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            saveButton.Location = new System.Drawing.Point(147, 3);
+            saveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             saveButton.Name = "saveButton";
-            saveButton.Size = new System.Drawing.Size(171, 70);
+            saveButton.Size = new System.Drawing.Size(120, 42);
             saveButton.TabIndex = 4;
             saveButton.Text = "Save...";
             saveButton.UseVisualStyleBackColor = true;
@@ -107,48 +120,126 @@
             // 
             // saveTreeView
             // 
+            saveTreeView.AllowDrop = true;
             saveTreeView.BackColor = System.Drawing.Color.LightGray;
             saveTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
-            saveTreeView.Location = new System.Drawing.Point(0, 85);
-            saveTreeView.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            saveTreeView.Location = new System.Drawing.Point(0, 51);
             saveTreeView.Name = "saveTreeView";
-            saveTreeView.Size = new System.Drawing.Size(593, 704);
+            saveTreeView.Size = new System.Drawing.Size(416, 397);
             saveTreeView.TabIndex = 0;
+            saveTreeView.NodeMouseClick += saveTreeView_NodeMouseClick;
+            saveTreeView.NodeMouseDoubleClick += treeView_NodeMouseDoubleClick;
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { editToolStripMenuItem, viewToolStripMenuItem });
-            menuStrip1.Location = new System.Drawing.Point(9, 10);
+            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem });
+            menuStrip1.Location = new System.Drawing.Point(6, 6);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new System.Windows.Forms.Padding(10, 3, 0, 3);
-            menuStrip1.Size = new System.Drawing.Size(1182, 35);
+            menuStrip1.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            menuStrip1.Size = new System.Drawing.Size(828, 24);
             menuStrip1.TabIndex = 2;
             menuStrip1.Text = "menuStrip1";
             // 
+            // fileToolStripMenuItem
+            // 
+            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { loadToolStripMenuItem, saveToolStripMenuItem, stageFromDiskToolStripMenuItem });
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            fileToolStripMenuItem.Text = "File";
+            // 
+            // loadToolStripMenuItem
+            // 
+            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            loadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
+            loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            loadToolStripMenuItem.Text = "Open";
+            loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
+            // 
+            // saveToolStripMenuItem
+            // 
+            saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            saveToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
+            saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            saveToolStripMenuItem.Text = "Save";
+            saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
+            // 
+            // stageFromDiskToolStripMenuItem
+            // 
+            stageFromDiskToolStripMenuItem.Name = "stageFromDiskToolStripMenuItem";
+            stageFromDiskToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            stageFromDiskToolStripMenuItem.Text = "Stage from disk";
+            stageFromDiskToolStripMenuItem.Click += stageFromDiskToolStripMenuItem_Click;
+            // 
             // editToolStripMenuItem
             // 
+            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { copyToolStripMenuItem, pasteToolStripMenuItem, deleteToolStripMenuItem });
             editToolStripMenuItem.Name = "editToolStripMenuItem";
-            editToolStripMenuItem.Size = new System.Drawing.Size(58, 29);
+            editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             editToolStripMenuItem.Text = "Edit";
+            // 
+            // copyToolStripMenuItem
+            // 
+            copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            copyToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            copyToolStripMenuItem.Text = "Copy";
+            copyToolStripMenuItem.Click += copyToolStripMenuItem_Click;
+            // 
+            // pasteToolStripMenuItem
+            // 
+            pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+            pasteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            pasteToolStripMenuItem.Text = "Paste";
+            pasteToolStripMenuItem.Click += pasteToolStripMenuItem_Click;
+            // 
+            // deleteToolStripMenuItem
+            // 
+            deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            deleteToolStripMenuItem.Text = "Delete";
+            deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem
             // 
+            viewToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { expandAllToolStripMenuItem, collapseAllToolStripMenuItem, refreshToolStripMenuItem });
             viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            viewToolStripMenuItem.Size = new System.Drawing.Size(65, 29);
+            viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             viewToolStripMenuItem.Text = "View";
+            // 
+            // expandAllToolStripMenuItem
+            // 
+            expandAllToolStripMenuItem.Name = "expandAllToolStripMenuItem";
+            expandAllToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.M;
+            expandAllToolStripMenuItem.Size = new System.Drawing.Size(260, 22);
+            expandAllToolStripMenuItem.Text = "Expand All";
+            expandAllToolStripMenuItem.Click += expandAllToolStripMenuItem_Click;
+            // 
+            // collapseAllToolStripMenuItem
+            // 
+            collapseAllToolStripMenuItem.Name = "collapseAllToolStripMenuItem";
+            collapseAllToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.L;
+            collapseAllToolStripMenuItem.Size = new System.Drawing.Size(260, 22);
+            collapseAllToolStripMenuItem.Text = "Collapse All";
+            collapseAllToolStripMenuItem.Click += collapseAllToolStripMenuItem_Click;
+            // 
+            // refreshToolStripMenuItem
+            // 
+            refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+            refreshToolStripMenuItem.ShortcutKeys = Keys.F5;
+            refreshToolStripMenuItem.Size = new System.Drawing.Size(260, 22);
+            refreshToolStripMenuItem.Text = "Refresh";
+            refreshToolStripMenuItem.Click += refreshToolStripMenuItem_Click;
             // 
             // FileContainerForm
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1200, 812);
+            ClientSize = new System.Drawing.Size(840, 487);
             Controls.Add(splitContainer1);
             Controls.Add(menuStrip1);
-            Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             Name = "FileContainerForm";
-            Padding = new System.Windows.Forms.Padding(9, 10, 9, 10);
-            Text = "FileContainerForm";
+            Padding = new System.Windows.Forms.Padding(6);
+            Text = "UAssetGUI";
             Load += FileContainerForm_Load;
             Shown += FileContainerForm_Shown;
             SizeChanged += FileContainerForm_SizeChanged;
@@ -169,7 +260,17 @@
         private System.Windows.Forms.Button loadButton;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         internal System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stageFromDiskToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem expandAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem collapseAllToolStripMenuItem;
+        private ToolStripMenuItem refreshToolStripMenuItem;
     }
 }

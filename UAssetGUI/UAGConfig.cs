@@ -104,7 +104,8 @@ namespace UAssetGUI
 
             if (newPath == null) newPath = item.FullPath;
             string outputPath = item.SaveFileToTemp();
-            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), newPath.Replace('/', Path.DirectorySeparatorChar)) : Path.Combine(StagingFolder, newPath.Replace('/', Path.DirectorySeparatorChar)); ;
+            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), newPath.Replace('/', Path.DirectorySeparatorChar)) : Path.Combine(StagingFolder, newPath.Replace('/', Path.DirectorySeparatorChar));
+            if (outputPath == null || finalPath == null) return;
             Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
             
             File.Copy(outputPath, finalPath, true);

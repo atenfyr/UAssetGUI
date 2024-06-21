@@ -625,7 +625,14 @@ namespace UAssetGUI
                 var reader = new PakBuilder().Reader(stream);
 
                 byte[] res = reader.Get(stream, FullPath);
-                if (res.Length > 0) File.WriteAllBytes(outputPath1, res);
+                if (res.Length > 0)
+                {
+                    File.WriteAllBytes(outputPath1, res);
+                }
+                else
+                {
+                    return null;
+                }
 
                 res = reader.Get(stream, Path.ChangeExtension(FullPath, ".uexp"));
                 if (res.Length > 0) File.WriteAllBytes(outputPath2, res);
@@ -637,6 +644,11 @@ namespace UAssetGUI
         public void OpenFile()
         {
             string outputPath = FixedPathOnDisk != null ? FixedPathOnDisk : this.SaveFileToTemp();
+            if (outputPath == null)
+            {
+                MessageBox.Show("Unable to open file!", "Uh oh!");
+                return;
+            }
 
             string ext = Path.GetExtension(outputPath);
             if (ext == ".uasset" || ext == ".umap")

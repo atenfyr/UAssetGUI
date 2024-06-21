@@ -163,6 +163,8 @@ namespace UAssetGUI
                 var pakWriter = new PakBuilder().Writer(stream, Version, MountPoint);
                 for (int i = 0; i < stagingFiles.Length; i++)
                 {
+                    string ext = Path.GetExtension(fixedPathsOnDisk[i]);
+                    if (ext == ".bak") continue;
                     pakWriter.WriteFile(stagingFiles[i], File.ReadAllBytes(fixedPathsOnDisk[i]));
                 }
                 pakWriter.WriteIndex();
@@ -476,7 +478,7 @@ namespace UAssetGUI
             if (!RootNodes.ContainsKey(pathComponents[0]))
             {
                 string ext = Path.GetExtension(pathComponents[0]);
-                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk")) return null;
+                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk" || ext == ".bak")) return null;
 
                 RootNodes[pathComponents[0]] = new DirectoryTreeItem(ParentForm, pathComponents[0], pathComponents[0], ext.Length > 1);
             }
@@ -491,7 +493,7 @@ namespace UAssetGUI
             for (int i = 1; i < pathComponents.Length; i++)
             {
                 string ext = Path.GetExtension(pathComponents[i]);
-                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk")) return null;
+                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk" || ext == ".bak")) return null;
 
                 if (!currentItem.Children.ContainsKey(pathComponents[i]))
                 {

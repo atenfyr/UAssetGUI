@@ -89,9 +89,13 @@ namespace UAssetGUI
                 if (node is PointingFileTreeNode pftNode)
                 {
                     if (fullPath == pftNode.Pointer.FullPath) return pftNode;
-
-                    var gotten = GetSpecificNode(node.Nodes, fullPath);
-                    if (gotten != null) return gotten;
+                    if (fullPath.StartsWith(pftNode.Pointer.FullPath)) // we know this is an ancestor node
+                    {
+                        if (!pftNode.ChildrenInitialized) InitializeChildren(pftNode);
+                        var gotten = GetSpecificNode(node.Nodes, fullPath);
+                        if (gotten != null) return gotten;
+                        break; // obviously no sibling node to this node can be also an ancestor node
+                    }
                 }
             }
             return null;
@@ -441,16 +445,18 @@ namespace UAssetGUI
             }
         }
 
+        private void InitializeChildren(PointingFileTreeNode ptn)
+        {
+            if (!ptn.ChildrenInitialized)
+            {
+                ptn.Nodes.Clear();
+                AddDirectoryItemChildrenToTreeView(ptn.Pointer, ptn, true);
+            }
+        }
+
         private void treeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node is PointingFileTreeNode ptn)
-            {
-                if (!ptn.ChildrenInitialized)
-                {
-                    ptn.Nodes.Clear();
-                    AddDirectoryItemChildrenToTreeView(ptn.Pointer, ptn, true);
-                }
-            }
+            if (e.Node is PointingFileTreeNode ptn) InitializeChildren(ptn);
         }
     }
 
@@ -625,7 +631,7 @@ namespace UAssetGUI
                 var reader = new PakBuilder().Reader(stream);
 
                 byte[] res = reader.Get(stream, FullPath);
-                if (res.Length > 0)
+                if (res != null)
                 {
                     File.WriteAllBytes(outputPath1, res);
                 }
@@ -635,7 +641,7 @@ namespace UAssetGUI
                 }
 
                 res = reader.Get(stream, Path.ChangeExtension(FullPath, ".uexp"));
-                if (res.Length > 0) File.WriteAllBytes(outputPath2, res);
+                if (res != null) File.WriteAllBytes(outputPath2, res);
             }
 
             return outputPath1;

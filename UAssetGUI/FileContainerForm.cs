@@ -158,6 +158,7 @@ namespace UAssetGUI
 
             RefreshTreeView(loadTreeView);
             this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
+            SelectedTreeView = saveTreeView;
         }
 
         public void LoadContainer(string path)
@@ -180,6 +181,7 @@ namespace UAssetGUI
                 RefreshTreeView(loadTreeView);
 
                 this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
+                SelectedTreeView = loadTreeView;
             }
             catch (Exception ex)
             {
@@ -212,7 +214,9 @@ namespace UAssetGUI
 
         public void ForceResize()
         {
-            splitContainer1.Size = new Size(splitContainer1.Size.Width, this.Size.Height - menuStrip1.Size.Height - 50);
+            splitContainer1.Size = new Size(this.Size.Width - 28, this.Size.Height - menuStrip1.Size.Height - 50);
+            splitContainer1.Panel1.Size = new Size(splitContainer1.SplitterDistance, splitContainer1.Size.Height);
+            splitContainer1.Panel2.Size = new Size(splitContainer1.Size.Width - splitContainer1.SplitterDistance, splitContainer1.Size.Height);
             loadButton.Location = new Point((splitContainer1.Panel1.Size.Width - loadButton.Size.Width) / 2, loadButton.Location.Y);
             saveButton.Location = new Point((splitContainer1.Panel2.Size.Width - saveButton.Size.Width) / 2, saveButton.Location.Y);
             loadTreeView.Location = new Point(0, loadButton.Location.Y + loadButton.Size.Height + 6);
@@ -233,6 +237,7 @@ namespace UAssetGUI
 
         private void FileContainerForm_Shown(object sender, EventArgs e)
         {
+            splitContainer1.SplitterDistance = (this.Size.Width - 28) / 2;
             ForceResize();
         }
 
@@ -259,12 +264,12 @@ namespace UAssetGUI
 
         private void expandAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.SelectedTreeView.ExpandAll();
+            this.SelectedTreeView?.ExpandAll();
         }
 
         private void collapseAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.SelectedTreeView.CollapseAll();
+            this.SelectedTreeView?.CollapseAll();
         }
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
@@ -295,7 +300,7 @@ namespace UAssetGUI
         private bool shouldDeleteCopiedPftNode = false;
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            if (this.SelectedTreeView?.SelectedNode is PointingFileTreeNode pftNode)
             {
                 if (pftNode == null) return;
 
@@ -306,7 +311,7 @@ namespace UAssetGUI
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            if (this.SelectedTreeView?.SelectedNode is PointingFileTreeNode pftNode)
             {
                 if (copiedPftNode == null || pftNode == null) return;
                 DirectoryTreeItem clipboardNode = copiedPftNode;
@@ -328,7 +333,7 @@ namespace UAssetGUI
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            if (this.SelectedTreeView?.SelectedNode is PointingFileTreeNode pftNode)
             {
                 if (pftNode == null) return;
                 if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow deleting from staging
@@ -339,7 +344,7 @@ namespace UAssetGUI
 
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            if (this.SelectedTreeView?.SelectedNode is PointingFileTreeNode pftNode)
             {
                 if (pftNode == null) return;
                 if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow cutting from staging

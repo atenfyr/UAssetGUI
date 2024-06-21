@@ -54,7 +54,7 @@ namespace UAssetGUI
         public readonly static string ExtractedFolder = Path.Combine(ConfigFolder, "Extracted");
         public static ISet<string> MappingsToSuppressWarningsFor = new HashSet<string>();
 
-        private static bool DifferentStagingPerPak = false;
+        internal static bool DifferentStagingPerPak = false;
 
         public static void LoadMappings()
         {

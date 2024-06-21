@@ -71,6 +71,7 @@ namespace UAssetGUI
             comboSpecifyMappings = new ComboBox();
             splitContainer1 = new SplitContainer();
             treeView1 = new ColorfulTreeView();
+            stageToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             nameMapContext.SuspendLayout();
@@ -93,7 +94,7 @@ namespace UAssetGUI
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, openContainersToolStripMenuItem, saveToolStripMenuItem, saveAsToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, openContainersToolStripMenuItem, saveToolStripMenuItem, saveAsToolStripMenuItem, stageToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             fileToolStripMenuItem.Text = "File";
@@ -446,6 +447,13 @@ namespace UAssetGUI
             treeView1.AfterSelect += treeView1_AfterSelect;
             treeView1.KeyDown += treeView1_KeyDown;
             // 
+            // stageToolStripMenuItem
+            // 
+            stageToolStripMenuItem.Name = "stageToolStripMenuItem";
+            stageToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            stageToolStripMenuItem.Text = "Stage...";
+            stageToolStripMenuItem.Click += stageToolStripMenuItem_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -513,6 +521,7 @@ namespace UAssetGUI
         private ToolStripMenuItem patchusmapWithsavVersionInfoToolStripMenuItem;
         private ToolStripMenuItem importMappingsToolStripMenuItem;
         private ToolStripMenuItem openContainersToolStripMenuItem;
+        private ToolStripMenuItem stageToolStripMenuItem;
     }
 }
 

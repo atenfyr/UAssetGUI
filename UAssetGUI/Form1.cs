@@ -530,7 +530,7 @@ namespace UAssetGUI
                 tableEditor = new TableHandler(dataGridView1, targetAsset, treeView1);
 
                 saveToolStripMenuItem.Enabled = !IsReadOnly();
-                saveAsToolStripMenuItem.Enabled = !IsReadOnly();
+                saveAsToolStripMenuItem.Enabled = true;
                 findToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
@@ -1352,7 +1352,7 @@ namespace UAssetGUI
                 UAGConfig.Save();
             }
 
-            if (existsUnsavedChanges)
+            if (existsUnsavedChanges && !IsReadOnly())
             {
                 DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);
                 switch (res)
@@ -2028,6 +2028,51 @@ namespace UAssetGUI
         private void openContainersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileContainerForm();
+        }
+
+        private void stageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ForceSave(currentSavingPath); // even if read only, let's just save over it anyways here; only purpose of the read only stuff is so the user doesn't get confused
+            // UAGConfig.StageFile(files[0], CurrentContainerPath);
+            // this.RefreshTreeView(this.saveTreeView);
+
+            if (UAGConfig.DifferentStagingPerPak)
+            {
+                // pick first open form we can find to do it with, otherwise we can't do it
+                foreach (var form in Application.OpenForms)
+                {
+                    if (form is FileContainerForm fcForm)
+                    {
+                        UAGConfig.StageFile(currentSavingPath, fcForm.CurrentContainerPath);
+                        fcForm.RefreshTreeView(fcForm.saveTreeView);
+                        return;
+                    }
+                }
+
+                MessageBox.Show("Please open a .pak file first to stage assets.", "Notice");
+            }
+            else
+            {
+                // check if any file container form exists, if not, open one
+                bool needToOpenFileContainerForm = true;
+                foreach (var form in Application.OpenForms)
+                {
+                    if (form is FileContainerForm fcForm)
+                    {
+                        needToOpenFileContainerForm = false;
+                        break;
+                    }
+                }
+
+                if (needToOpenFileContainerForm) OpenFileContainerForm();
+
+                // stage it and refresh all open file container forms
+                UAGConfig.StageFile(currentSavingPath, null);
+                foreach (var form in Application.OpenForms)
+                {
+                    if (form is FileContainerForm fcForm) fcForm.RefreshTreeView(fcForm.saveTreeView);
+                }
+            }
         }
     }
 }

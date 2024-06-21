@@ -29,6 +29,7 @@ namespace UAssetGUI
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
 
+            this.cutToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.X);
             this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
             this.pasteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.V);
             this.deleteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Delete);
@@ -99,6 +100,16 @@ namespace UAssetGUI
             return GetSpecificNode(treeView.Nodes, fullPath);
         }
 
+        public PointingFileTreeNode GetSpecificNode(string fullPath)
+        {
+            var res = GetSpecificNode(loadTreeView, fullPath);
+            if (res != null) return res;
+            res = GetSpecificNode(saveTreeView, fullPath);
+            if (res != null) return res;
+
+            return null;
+        }
+
         public void RefreshTreeView(TreeView treeView)
         {
             // get existing expanded nodes
@@ -114,11 +125,14 @@ namespace UAssetGUI
 
             treeView.Nodes.Clear();
             DirectoryTree currentTree = DirectoryTreeMap[treeView];
-            foreach (KeyValuePair<string, DirectoryTreeItem> directoryItem in currentTree.RootNodes)
+            if (currentTree?.RootNodes != null)
             {
-                var dad = new PointingFileTreeNode(directoryItem.Value.Name, directoryItem.Value);
-                treeView.Nodes.Add(dad);
-                AddDirectoryTreeItemToTreeView(directoryItem.Value, dad);
+                foreach (KeyValuePair<string, DirectoryTreeItem> directoryItem in currentTree.RootNodes)
+                {
+                    var dad = new PointingFileTreeNode(directoryItem.Value.Name, directoryItem.Value);
+                    treeView.Nodes.Add(dad);
+                    AddDirectoryTreeItemToTreeView(directoryItem.Value, dad);
+                }
             }
 
             treeView.Sort();
@@ -135,21 +149,44 @@ namespace UAssetGUI
             }
         }
 
+        public void UnloadContainer()
+        {
+            CurrentContainerPath = null;
+            DirectoryTreeMap[loadTreeView] = null;
+            Version = PakVersion.V4;
+            MountPoint = "../../../";
+
+            RefreshTreeView(loadTreeView);
+            this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
+        }
+
         public void LoadContainer(string path)
         {
             if (path == null) return;
-            CurrentContainerPath = path;
-
-            string[] allFiles = Array.Empty<string>();
-            using (FileStream stream = new FileStream(CurrentContainerPath, FileMode.Open))
+            try
             {
-                allFiles = new PakBuilder().Reader(stream).Files();
+                CurrentContainerPath = path;
+
+                string[] allFiles = Array.Empty<string>();
+                using (FileStream stream = new FileStream(CurrentContainerPath, FileMode.Open))
+                {
+                    var pakReader = new PakBuilder().Reader(stream);
+                    allFiles = pakReader.Files();
+                    Version = pakReader.GetVersion();
+                    MountPoint = pakReader.GetMountPoint();
+                }
+
+                DirectoryTreeMap[loadTreeView] = new DirectoryTree(this, allFiles);
+                RefreshTreeView(loadTreeView);
+
+                this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to open file! " + ex.Message, "Uh oh!");
 
-            DirectoryTreeMap[loadTreeView] = new DirectoryTree(this, allFiles);
-            RefreshTreeView(loadTreeView);
-
-            this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
+                UnloadContainer();
+            }
         }
 
         public bool SaveContainer(string path)
@@ -203,6 +240,9 @@ namespace UAssetGUI
         {
             switch (keyData)
             {
+                case Keys.Control | Keys.X:
+                    cutToolStripMenuItem.PerformClick();
+                    return true;
                 case Keys.Control | Keys.C:
                     copyToolStripMenuItem.PerformClick();
                     return true;
@@ -251,12 +291,16 @@ namespace UAssetGUI
             }
         }
 
-        private PointingFileTreeNode copiedPftNode = null;
+        private DirectoryTreeItem copiedPftNode = null;
+        private bool shouldDeleteCopiedPftNode = false;
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
             {
-                copiedPftNode = pftNode;
+                if (pftNode == null) return;
+
+                copiedPftNode = pftNode.Pointer;
+                shouldDeleteCopiedPftNode = false;
             }
         }
 
@@ -265,7 +309,7 @@ namespace UAssetGUI
             if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
             {
                 if (copiedPftNode == null || pftNode == null) return;
-                DirectoryTreeItem clipboardNode = copiedPftNode.Pointer;
+                DirectoryTreeItem clipboardNode = copiedPftNode;
 
                 if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow pasting into staging
                 DirectoryTreeItem targetDirectory = pftNode.Pointer;
@@ -273,6 +317,12 @@ namespace UAssetGUI
 
                 string desiredStagingPath = Path.Combine(targetDirectory?.FullPath ?? string.Empty, clipboardNode.Name);
                 clipboardNode.StageFile(desiredStagingPath);
+
+                if (shouldDeleteCopiedPftNode)
+                {
+                    clipboardNode.DeleteFile();
+                    shouldDeleteCopiedPftNode = false;
+                }
             }
         }
 
@@ -284,6 +334,18 @@ namespace UAssetGUI
                 if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow deleting from staging
 
                 pftNode.Pointer.DeleteFile();
+            }
+        }
+
+        private void cutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.SelectedTreeView.SelectedNode is PointingFileTreeNode pftNode)
+            {
+                if (pftNode == null) return;
+                if (string.IsNullOrEmpty(pftNode.Pointer.FixedPathOnDisk)) return; // only allow cutting from staging
+
+                copiedPftNode = pftNode.Pointer;
+                shouldDeleteCopiedPftNode = true;
             }
         }
 
@@ -380,7 +442,7 @@ namespace UAssetGUI
         public PointingFileTreeNode(string text, DirectoryTreeItem item) : base(text)
         {
             Pointer = item;
-
+            NodeFont = new Font(new FontFamily("Microsoft Sans Serif"), 8.25f);
 
             this.ContextMenuStrip = new ContextMenuStrip();
             ToolStripMenuItem tsmItem = null;
@@ -529,6 +591,7 @@ namespace UAssetGUI
             
             string outputPath1 = Path.Combine(outputPathDirectory, FullPath.Replace('/', Path.DirectorySeparatorChar));
             string outputPath2 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".uexp").Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath1)); // same directory as outputPath2, no need to create that one too
 
             if (FixedPathOnDisk != null)
             {
@@ -542,11 +605,9 @@ namespace UAssetGUI
                 var reader = new PakBuilder().Reader(stream);
 
                 byte[] res = reader.Get(stream, FullPath);
-                Directory.CreateDirectory(Path.GetDirectoryName(outputPath1));
                 if (res.Length > 0) File.WriteAllBytes(outputPath1, res);
 
                 res = reader.Get(stream, Path.ChangeExtension(FullPath, ".uexp"));
-                Directory.CreateDirectory(Path.GetDirectoryName(outputPath2));
                 if (res.Length > 0) File.WriteAllBytes(outputPath2, res);
             }
 

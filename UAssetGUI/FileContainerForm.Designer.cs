@@ -30,21 +30,22 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
-            splitContainer1 = new System.Windows.Forms.SplitContainer();
-            loadButton = new System.Windows.Forms.Button();
+            splitContainer1 = new SplitContainer();
+            loadButton = new Button();
             loadTreeView = new ColorfulTreeView();
-            saveButton = new System.Windows.Forms.Button();
+            saveButton = new Button();
             saveTreeView = new ColorfulTreeView();
-            menuStrip1 = new System.Windows.Forms.MenuStrip();
-            fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            stageFromDiskToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            menuStrip1 = new MenuStrip();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            loadToolStripMenuItem = new ToolStripMenuItem();
+            saveToolStripMenuItem = new ToolStripMenuItem();
+            stageFromDiskToolStripMenuItem = new ToolStripMenuItem();
+            editToolStripMenuItem = new ToolStripMenuItem();
+            cutToolStripMenuItem = new ToolStripMenuItem();
+            copyToolStripMenuItem = new ToolStripMenuItem();
+            pasteToolStripMenuItem = new ToolStripMenuItem();
+            deleteToolStripMenuItem = new ToolStripMenuItem();
+            viewToolStripMenuItem = new ToolStripMenuItem();
             expandAllToolStripMenuItem = new ToolStripMenuItem();
             collapseAllToolStripMenuItem = new ToolStripMenuItem();
             refreshToolStripMenuItem = new ToolStripMenuItem();
@@ -57,9 +58,9 @@ namespace UAssetGUI
             // 
             // splitContainer1
             // 
-            splitContainer1.Dock = System.Windows.Forms.DockStyle.Top;
+            splitContainer1.Dock = DockStyle.Top;
             splitContainer1.Location = new System.Drawing.Point(6, 30);
-            splitContainer1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            splitContainer1.Margin = new Padding(4, 3, 4, 3);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -78,12 +79,12 @@ namespace UAssetGUI
             // 
             // loadButton
             // 
-            loadButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            loadButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            loadButton.Anchor = AnchorStyles.Top;
+            loadButton.FlatStyle = FlatStyle.Flat;
             loadButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             loadButton.ForeColor = System.Drawing.SystemColors.ControlText;
             loadButton.Location = new System.Drawing.Point(145, 3);
-            loadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            loadButton.Margin = new Padding(4, 3, 4, 3);
             loadButton.Name = "loadButton";
             loadButton.Size = new System.Drawing.Size(120, 42);
             loadButton.TabIndex = 3;
@@ -95,7 +96,7 @@ namespace UAssetGUI
             // 
             loadTreeView.AllowDrop = true;
             loadTreeView.BackColor = System.Drawing.Color.LightGray;
-            loadTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            loadTreeView.DrawMode = TreeViewDrawMode.OwnerDrawText;
             loadTreeView.Location = new System.Drawing.Point(0, 51);
             loadTreeView.Name = "loadTreeView";
             loadTreeView.Size = new System.Drawing.Size(408, 394);
@@ -105,12 +106,12 @@ namespace UAssetGUI
             // 
             // saveButton
             // 
-            saveButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            saveButton.Anchor = AnchorStyles.Top;
+            saveButton.FlatStyle = FlatStyle.Flat;
             saveButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             saveButton.ForeColor = System.Drawing.SystemColors.ControlText;
             saveButton.Location = new System.Drawing.Point(147, 3);
-            saveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            saveButton.Margin = new Padding(4, 3, 4, 3);
             saveButton.Name = "saveButton";
             saveButton.Size = new System.Drawing.Size(120, 42);
             saveButton.TabIndex = 4;
@@ -122,7 +123,7 @@ namespace UAssetGUI
             // 
             saveTreeView.AllowDrop = true;
             saveTreeView.BackColor = System.Drawing.Color.LightGray;
-            saveTreeView.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            saveTreeView.DrawMode = TreeViewDrawMode.OwnerDrawText;
             saveTreeView.Location = new System.Drawing.Point(0, 51);
             saveTreeView.Name = "saveTreeView";
             saveTreeView.Size = new System.Drawing.Size(416, 397);
@@ -133,17 +134,17 @@ namespace UAssetGUI
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem });
             menuStrip1.Location = new System.Drawing.Point(6, 6);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+            menuStrip1.Padding = new Padding(7, 2, 0, 2);
             menuStrip1.Size = new System.Drawing.Size(828, 24);
             menuStrip1.TabIndex = 2;
             menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { loadToolStripMenuItem, saveToolStripMenuItem, stageFromDiskToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadToolStripMenuItem, saveToolStripMenuItem, stageFromDiskToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             fileToolStripMenuItem.Text = "File";
@@ -151,51 +152,58 @@ namespace UAssetGUI
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
-            loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            loadToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.O;
+            loadToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             loadToolStripMenuItem.Text = "Open";
             loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
             // 
             // saveToolStripMenuItem
             // 
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
-            saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            saveToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
+            saveToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
             // stageFromDiskToolStripMenuItem
             // 
             stageFromDiskToolStripMenuItem.Name = "stageFromDiskToolStripMenuItem";
-            stageFromDiskToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            stageFromDiskToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             stageFromDiskToolStripMenuItem.Text = "Stage from disk";
             stageFromDiskToolStripMenuItem.Click += stageFromDiskToolStripMenuItem_Click;
             // 
             // editToolStripMenuItem
             // 
-            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { copyToolStripMenuItem, pasteToolStripMenuItem, deleteToolStripMenuItem });
+            editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { cutToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, deleteToolStripMenuItem });
             editToolStripMenuItem.Name = "editToolStripMenuItem";
             editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             editToolStripMenuItem.Text = "Edit";
             // 
+            // cutToolStripMenuItem
+            // 
+            cutToolStripMenuItem.Name = "cutToolStripMenuItem";
+            cutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            cutToolStripMenuItem.Text = "Cut";
+            cutToolStripMenuItem.Click += cutToolStripMenuItem_Click;
+            // 
             // copyToolStripMenuItem
             // 
             copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            copyToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             copyToolStripMenuItem.Text = "Copy";
             copyToolStripMenuItem.Click += copyToolStripMenuItem_Click;
             // 
             // pasteToolStripMenuItem
             // 
             pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            pasteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             pasteToolStripMenuItem.Text = "Paste";
             pasteToolStripMenuItem.Click += pasteToolStripMenuItem_Click;
             // 
             // deleteToolStripMenuItem
             // 
             deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             deleteToolStripMenuItem.Text = "Delete";
             deleteToolStripMenuItem.Click += deleteToolStripMenuItem_Click;
             // 
@@ -210,7 +218,7 @@ namespace UAssetGUI
             // 
             expandAllToolStripMenuItem.Name = "expandAllToolStripMenuItem";
             expandAllToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.M;
-            expandAllToolStripMenuItem.Size = new System.Drawing.Size(260, 22);
+            expandAllToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             expandAllToolStripMenuItem.Text = "Expand All";
             expandAllToolStripMenuItem.Click += expandAllToolStripMenuItem_Click;
             // 
@@ -218,7 +226,7 @@ namespace UAssetGUI
             // 
             collapseAllToolStripMenuItem.Name = "collapseAllToolStripMenuItem";
             collapseAllToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.L;
-            collapseAllToolStripMenuItem.Size = new System.Drawing.Size(260, 22);
+            collapseAllToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             collapseAllToolStripMenuItem.Text = "Collapse All";
             collapseAllToolStripMenuItem.Click += collapseAllToolStripMenuItem_Click;
             // 
@@ -226,19 +234,19 @@ namespace UAssetGUI
             // 
             refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
             refreshToolStripMenuItem.ShortcutKeys = Keys.F5;
-            refreshToolStripMenuItem.Size = new System.Drawing.Size(260, 22);
+            refreshToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             refreshToolStripMenuItem.Text = "Refresh";
             refreshToolStripMenuItem.Click += refreshToolStripMenuItem_Click;
             // 
             // FileContainerForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(840, 487);
             Controls.Add(splitContainer1);
             Controls.Add(menuStrip1);
             Name = "FileContainerForm";
-            Padding = new System.Windows.Forms.Padding(6);
+            Padding = new Padding(6);
             Text = "UAssetGUI";
             Load += FileContainerForm_Load;
             Shown += FileContainerForm_Shown;
@@ -272,5 +280,6 @@ namespace UAssetGUI
         private System.Windows.Forms.ToolStripMenuItem expandAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem collapseAllToolStripMenuItem;
         private ToolStripMenuItem refreshToolStripMenuItem;
+        private ToolStripMenuItem cutToolStripMenuItem;
     }
 }

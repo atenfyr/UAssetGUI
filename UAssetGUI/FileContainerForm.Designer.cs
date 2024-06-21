@@ -101,6 +101,7 @@ namespace UAssetGUI
             loadTreeView.Name = "loadTreeView";
             loadTreeView.Size = new System.Drawing.Size(408, 394);
             loadTreeView.TabIndex = 0;
+            loadTreeView.BeforeExpand += treeView_BeforeExpand;
             loadTreeView.NodeMouseClick += loadTreeView_NodeMouseClick;
             loadTreeView.NodeMouseDoubleClick += treeView_NodeMouseDoubleClick;
             // 
@@ -128,6 +129,7 @@ namespace UAssetGUI
             saveTreeView.Name = "saveTreeView";
             saveTreeView.Size = new System.Drawing.Size(416, 397);
             saveTreeView.TabIndex = 0;
+            saveTreeView.BeforeExpand += treeView_BeforeExpand;
             saveTreeView.NodeMouseClick += saveTreeView_NodeMouseClick;
             saveTreeView.NodeMouseDoubleClick += treeView_NodeMouseDoubleClick;
             // 

@@ -45,13 +45,15 @@ namespace UAssetGUI
             RefreshTreeView(saveTreeView);
         }
 
-        public void AddDirectoryTreeItemToTreeView(DirectoryTreeItem treeItem, PointingFileTreeNode dad)
+        public void AddDirectoryItemChildrenToTreeView(DirectoryTreeItem treeItem, PointingFileTreeNode dad, bool forceAddChildrenOfChildren = false)
         {
+            dad.ChildrenInitialized = forceAddChildrenOfChildren || !UAGConfig.Data.EnableDynamicTree;
             foreach (KeyValuePair<string, DirectoryTreeItem> directoryItem in treeItem.Children)
             {
                 var newDad = new PointingFileTreeNode(directoryItem.Value.Name, directoryItem.Value);
+                newDad.ChildrenInitialized = false;
                 dad.Nodes.Add(newDad);
-                AddDirectoryTreeItemToTreeView(directoryItem.Value, newDad);
+                if (dad.ChildrenInitialized) AddDirectoryItemChildrenToTreeView(directoryItem.Value, newDad, false);
             }
         }
 
@@ -131,7 +133,7 @@ namespace UAssetGUI
                 {
                     var dad = new PointingFileTreeNode(directoryItem.Value.Name, directoryItem.Value);
                     treeView.Nodes.Add(dad);
-                    AddDirectoryTreeItemToTreeView(directoryItem.Value, dad);
+                    AddDirectoryItemChildrenToTreeView(directoryItem.Value, dad);
                 }
             }
 
@@ -438,11 +440,24 @@ namespace UAssetGUI
                 }
             }
         }
+
+        private void treeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (e.Node is PointingFileTreeNode ptn)
+            {
+                if (!ptn.ChildrenInitialized)
+                {
+                    ptn.Nodes.Clear();
+                    AddDirectoryItemChildrenToTreeView(ptn.Pointer, ptn, true);
+                }
+            }
+        }
     }
 
     public class PointingFileTreeNode : TreeNode
     {
         public DirectoryTreeItem Pointer;
+        public bool ChildrenInitialized = false;
 
         public PointingFileTreeNode(string text, DirectoryTreeItem item) : base(text)
         {

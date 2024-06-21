@@ -442,7 +442,7 @@ namespace UAssetGUI
         public PointingFileTreeNode(string text, DirectoryTreeItem item) : base(text)
         {
             Pointer = item;
-            NodeFont = new Font(new FontFamily("Microsoft Sans Serif"), 8.25f);
+            //NodeFont = new Font(new FontFamily("Microsoft Sans Serif"), 8.25f);
 
             this.ContextMenuStrip = new ContextMenuStrip();
             ToolStripMenuItem tsmItem = null;

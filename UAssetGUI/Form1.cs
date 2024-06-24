@@ -1858,7 +1858,7 @@ namespace UAssetGUI
 
             if (searchName?.Value?.Value == null) return false;
 
-            Process.Start(DumpMappings(searchName.Value.Value, true, customAnnotations));
+            UAGUtils.OpenURL(DumpMappings(searchName.Value.Value, true, customAnnotations));
 
             return true;
         }

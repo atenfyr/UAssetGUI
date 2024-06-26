@@ -1835,7 +1835,7 @@ namespace UAssetGUI
             Dictionary<string, string> customAnnotations = new Dictionary<string, string>();
             if (selectedNode?.Pointer != null && selectedNode.Pointer is Export exp)
             {
-                searchName = exp.GetClassTypeForAncestry();
+                searchName = exp.GetClassTypeForAncestry(null, out _);
                 if (selectedNode.Pointer is NormalExport nExp)
                 {
                     foreach (var entry in nExp.Data)

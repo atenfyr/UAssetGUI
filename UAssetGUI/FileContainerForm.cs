@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -27,7 +28,7 @@ namespace UAssetGUI
             this.Text = BaseForm.DisplayVersion;
 
             UAGPalette.RefreshTheme(this);
-            this.AdjustFormPosition();
+            this.AdjustFormPosition(BaseForm);
 
             this.cutToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.X);
             this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
@@ -41,8 +42,28 @@ namespace UAssetGUI
             this.saveTreeView.DragEnter += new DragEventHandler(event_DragEnter);
             this.saveTreeView.DragDrop += new DragEventHandler(saveTreeView_DragDrop);
 
+            menuStrip1.Renderer = new UAGMenuStripRenderer();
+            foreach (ToolStripMenuItem entry in menuStrip1.Items)
+            {
+                entry.DropDownOpened += (sender, args) =>
+                {
+                    isDropDownOpened[entry] = true;
+                };
+                entry.DropDownClosed += (sender, args) =>
+                {
+                    isDropDownOpened[entry] = false;
+                };
+            }
+
             LoadContainer(CurrentContainerPath);
             RefreshTreeView(saveTreeView);
+        }
+
+        private static volatile Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();
+        public static bool IsDropDownOpened(ToolStripItem item)
+        {
+            if (!isDropDownOpened.ContainsKey(item)) return false;
+            return isDropDownOpened[item];
         }
 
         public void AddDirectoryItemChildrenToTreeView(DirectoryTreeItem treeItem, PointingFileTreeNode dad, bool forceAddChildrenOfChildren = false)
@@ -458,6 +479,90 @@ namespace UAssetGUI
         {
             if (e.Node is PointingFileTreeNode ptn) InitializeChildren(ptn);
         }
+
+        private void ExtractVisit(DirectoryTreeItem processingNode, ProgressBarForm progressBarForm)
+        {
+            if (processingNode.IsFile)
+            {
+                UAGConfig.ExtractFile(processingNode);
+                extractAllBackgroundWorker.ReportProgress(0); // the percentage we pass in is unused
+                return;
+            }
+
+            foreach (var entry in processingNode.Children)
+            {
+                if (extractAllBackgroundWorker.CancellationPending) break;
+                ExtractVisit(entry.Value, progressBarForm);
+            }
+        }
+
+        private ProgressBarForm progressBarForm;
+        private void extractAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null)
+            {
+                MessageBox.Show("Please load a container first to extract it.", "Notice");
+                return;
+            }
+
+            if (extractAllBackgroundWorker.IsBusy) return;
+
+            int numFiles = loadedTree.GetNumFiles();
+
+            UAGUtils.InvokeUI(() =>
+            {
+                progressBarForm = new ProgressBarForm();
+                progressBarForm.Value = 0;
+                progressBarForm.Maximum = numFiles;
+                progressBarForm.Text = this.Text;
+                progressBarForm.BaseForm = this;
+                progressBarForm.Show(this);
+            });
+
+            extractAllBackgroundWorker.RunWorkerAsync();
+        }
+
+        private void extractAllBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null) throw new InvalidOperationException("No container loaded");
+            foreach (var entry in loadedTree.RootNodes)
+            {
+                if (extractAllBackgroundWorker.CancellationPending) break;
+                ExtractVisit(entry.Value, progressBarForm);
+            }
+
+            if (extractAllBackgroundWorker.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+            UAGUtils.OpenDirectory(UAGConfig.ExtractedFolder);
+        }
+
+        private void extractAllBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            UAGUtils.InvokeUI(() => progressBarForm.Progress(1));
+        }
+
+        private void extractAllBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                if (e.Cancelled)
+                {
+                    MessageBox.Show("Operation canceled.", "Notice");
+                }
+                else if (e.Error != null)
+                {
+                    MessageBox.Show("An error occured during extraction! " + e.Error.Message, "Uh oh!");
+                }
+                else
+                {
+                    MessageBox.Show("Extracted " + progressBarForm.Value + " files successfully.", "Notice");
+                }
+                progressBarForm.Close();
+            });
+        }
     }
 
     public class PointingFileTreeNode : TreeNode
@@ -527,6 +632,22 @@ namespace UAssetGUI
             {
                 for (int i = 0; i < paths.Length; i++) this.CreateNode(paths[i]);
             }
+        }
+
+        private static int GetNumFilesVisit(DirectoryTreeItem item)
+        {
+            if (item.IsFile) return 1;
+
+            int numFiles = 0; // to count directories too, set to 1
+            foreach (var entry in item.Children) numFiles += GetNumFilesVisit(entry.Value);
+            return numFiles;
+        }
+
+        public int GetNumFiles()
+        {
+            int numFiles = 0;
+            foreach (var entry in RootNodes) numFiles += GetNumFilesVisit(entry.Value);
+            return numFiles;
         }
 
         public DirectoryTreeItem GetRootNode(string component)

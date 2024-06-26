@@ -49,6 +49,9 @@ namespace UAssetGUI
             expandAllToolStripMenuItem = new ToolStripMenuItem();
             collapseAllToolStripMenuItem = new ToolStripMenuItem();
             refreshToolStripMenuItem = new ToolStripMenuItem();
+            utilsToolStripMenuItem = new ToolStripMenuItem();
+            extractAllToolStripMenuItem = new ToolStripMenuItem();
+            extractAllBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -136,7 +139,7 @@ namespace UAssetGUI
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, viewToolStripMenuItem, utilsToolStripMenuItem });
             menuStrip1.Location = new System.Drawing.Point(6, 6);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 2, 0, 2);
@@ -240,6 +243,28 @@ namespace UAssetGUI
             refreshToolStripMenuItem.Text = "Refresh";
             refreshToolStripMenuItem.Click += refreshToolStripMenuItem_Click;
             // 
+            // utilsToolStripMenuItem
+            // 
+            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { extractAllToolStripMenuItem });
+            utilsToolStripMenuItem.Name = "utilsToolStripMenuItem";
+            utilsToolStripMenuItem.Size = new System.Drawing.Size(42, 20);
+            utilsToolStripMenuItem.Text = "Utils";
+            // 
+            // extractAllToolStripMenuItem
+            // 
+            extractAllToolStripMenuItem.Name = "extractAllToolStripMenuItem";
+            extractAllToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            extractAllToolStripMenuItem.Text = "Extract all...";
+            extractAllToolStripMenuItem.Click += extractAllToolStripMenuItem_Click;
+            // 
+            // extractAllBackgroundWorker
+            // 
+            extractAllBackgroundWorker.WorkerReportsProgress = true;
+            extractAllBackgroundWorker.WorkerSupportsCancellation = true;
+            extractAllBackgroundWorker.DoWork += extractAllBackgroundWorker_DoWork;
+            extractAllBackgroundWorker.ProgressChanged += extractAllBackgroundWorker_ProgressChanged;
+            extractAllBackgroundWorker.RunWorkerCompleted += extractAllBackgroundWorker_RunWorkerCompleted;
+            // 
             // FileContainerForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -283,5 +308,8 @@ namespace UAssetGUI
         private System.Windows.Forms.ToolStripMenuItem collapseAllToolStripMenuItem;
         private ToolStripMenuItem refreshToolStripMenuItem;
         private ToolStripMenuItem cutToolStripMenuItem;
+        private ToolStripMenuItem utilsToolStripMenuItem;
+        private ToolStripMenuItem extractAllToolStripMenuItem;
+        internal System.ComponentModel.BackgroundWorker extractAllBackgroundWorker;
     }
 }

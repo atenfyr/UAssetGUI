@@ -11,7 +11,7 @@ namespace UAssetGUI
         {
             UAGUtils.InvokeUI(() =>
             {
-                if (!e.Item.Selected && !Form1.IsDropDownOpened(e.Item))
+                if (!e.Item.Selected && !Form1.IsDropDownOpened(e.Item) && !FileContainerForm.IsDropDownOpened(e.Item))
                 {
                     e.Item.ForeColor = UAGPalette.ForeColor;
                     base.OnRenderMenuItemBackground(e);

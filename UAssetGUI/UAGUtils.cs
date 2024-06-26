@@ -58,9 +58,10 @@ namespace UAssetGUI
             }
         }
 
-        public static void AdjustFormPosition(this Form frm1)
+        public static void AdjustFormPosition(this Form frm1, Form overrideOwner = null)
         {
-            if (frm1.Owner != null) frm1.Location = new Point((frm1.Owner.Location.X + frm1.Owner.Width / 2) - (frm1.Width / 2), (frm1.Owner.Location.Y + frm1.Owner.Height / 2) - (frm1.Height / 2));
+            if (overrideOwner == null) overrideOwner = frm1.Owner;
+            if (overrideOwner != null) frm1.Location = new Point((overrideOwner.Location.X + overrideOwner.Width / 2) - (frm1.Width / 2), (overrideOwner.Location.Y + overrideOwner.Height / 2) - (frm1.Height / 2));
         }
 
         public static void UpdateObjectPropertyValues(UAsset asset, DataGridViewRow row, DataGridView dgv, FPackageIndex objData, int column = 3)

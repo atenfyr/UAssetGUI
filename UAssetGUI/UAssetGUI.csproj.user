@@ -8,5 +8,8 @@
     <Compile Update="FileContainerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="ProgressBarForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

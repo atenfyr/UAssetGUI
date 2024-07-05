@@ -361,6 +361,8 @@ namespace UAssetGUI
             "MapProperty",
             "MulticastDelegateProperty",
             "Box",
+            "Box2D",
+            "Box2f",
             "NiagaraVariableBase",
             "NiagaraVariable",
             "NiagaraVariableWithOffset"
@@ -466,9 +468,25 @@ namespace UAssetGUI
                     ourNode.Nodes.Add(new PointingTreeNode(mdp.Name.Value.Value + " (" + mdp.Value.Length + ")", mdp.Value, 0, exportNum));
                     break;
                 case "Box":
-                    var box = (BoxPropertyData)me;
+                    {
+                        var box = (BoxPropertyData)me;
 
-                    ourNode.Nodes.Add(new PointingTreeNode(box.Name.Value.Value + " (2)", box.Value, 0, exportNum));
+                        ourNode.Nodes.Add(new PointingTreeNode(box.Name.Value.Value + " (2)", box, 0, exportNum));
+                    }
+                    break;
+                case "Box2D":
+                    {
+                        var box = (Box2DPropertyData)me;
+
+                        ourNode.Nodes.Add(new PointingTreeNode(box.Name.Value.Value + " (2)", box, 0, exportNum));
+                    }
+                    break;
+                case "Box2f":
+                    {
+                        var box = (Box2fPropertyData)me;
+
+                        ourNode.Nodes.Add(new PointingTreeNode(box.Name.Value.Value + " (2)", box, 0, exportNum));
+                    }
                     break;
                 case "NiagaraVariableBase":
                 case "NiagaraVariable":
@@ -540,12 +558,12 @@ namespace UAssetGUI
                                 break;
                             case "RichCurveKey":
                                 var curveData = (RichCurveKeyPropertyData)thisPD;
-                                row.Cells[++columnIndexer].Value = curveData.InterpMode;
-                                row.Cells[++columnIndexer].Value = curveData.TangentMode;
-                                row.Cells[++columnIndexer].Value = curveData.Time;
-                                row.Cells[++columnIndexer].Value = curveData.Value;
-                                row.Cells[++columnIndexer].Value = curveData.ArriveTangent;
-                                row.Cells[++columnIndexer].Value = curveData.LeaveTangent;
+                                row.Cells[++columnIndexer].Value = curveData.Value.InterpMode;
+                                row.Cells[++columnIndexer].Value = curveData.Value.TangentMode;
+                                row.Cells[++columnIndexer].Value = curveData.Value.Time;
+                                row.Cells[++columnIndexer].Value = curveData.Value.Value;
+                                row.Cells[++columnIndexer].Value = curveData.Value.ArriveTangent;
+                                row.Cells[++columnIndexer].Value = curveData.Value.LeaveTangent;
                                 break;
                             case "TextProperty":
                                 var txtData = (TextPropertyData)thisPD;
@@ -624,9 +642,9 @@ namespace UAssetGUI
                             case "SkeletalMeshSamplingLODBuiltData":
                                 break;
                             case "Box":
-                                var boxData = (BoxPropertyData)thisPD;
+                            case "Box2D":
+                            case "Box2f":
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                row.Cells[++columnIndexer].Value = boxData.IsValid;
                                 break;
                             case "MulticastDelegateProperty":
                                 var mdpData = (MulticastDelegatePropertyData)thisPD;
@@ -681,21 +699,21 @@ namespace UAssetGUI
                             case "Vector2D":
                                 var vector2DData = (Vector2DPropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                row.Cells[++columnIndexer].Value = vector2DData.X;
+                                row.Cells[++columnIndexer].Value = vector2DData.Value.X;
                                 row.Cells[columnIndexer].ToolTipText = "X";
-                                row.Cells[++columnIndexer].Value = vector2DData.Y;
+                                row.Cells[++columnIndexer].Value = vector2DData.Value.Y;
                                 row.Cells[columnIndexer].ToolTipText = "Y";
                                 break;
                             case "Vector4":
                                 var vector4DData = (Vector4PropertyData)thisPD;
                                 row.Cells[++columnIndexer].Value = string.Empty;
-                                row.Cells[++columnIndexer].Value = vector4DData.X;
+                                row.Cells[++columnIndexer].Value = vector4DData.Value.X;
                                 row.Cells[columnIndexer].ToolTipText = "X";
-                                row.Cells[++columnIndexer].Value = vector4DData.Y;
+                                row.Cells[++columnIndexer].Value = vector4DData.Value.Y;
                                 row.Cells[columnIndexer].ToolTipText = "Y";
-                                row.Cells[++columnIndexer].Value = vector4DData.Z;
+                                row.Cells[++columnIndexer].Value = vector4DData.Value.Z;
                                 row.Cells[columnIndexer].ToolTipText = "Z";
-                                row.Cells[++columnIndexer].Value = vector4DData.W;
+                                row.Cells[++columnIndexer].Value = vector4DData.Value.W;
                                 row.Cells[columnIndexer].ToolTipText = "W";
                                 break;
                             case "Plane":
@@ -1020,21 +1038,25 @@ namespace UAssetGUI
                                 decidedRCKProperty = new RichCurveKeyPropertyData(nameName);
                             }
 
-                            if (transformB is string) Enum.TryParse((string)transformB, out decidedRCKProperty.InterpMode);
-                            if (value1B is string) Enum.TryParse((string)value1B, out decidedRCKProperty.TangentMode);
+                            FRichCurveKey nuevo = decidedRCKProperty.Value;
 
-                            if (value2B is string) float.TryParse((string)value2B, out decidedRCKProperty.Time);
-                            if (value2B is int) decidedRCKProperty.Time = (float)(int)value2B;
-                            if (value2B is float) decidedRCKProperty.Time = (float)value2B;
-                            if (value3B is string) float.TryParse((string)value3B, out decidedRCKProperty.Value);
-                            if (value3B is int) decidedRCKProperty.Value = (float)(int)value3B;
-                            if (value3B is float) decidedRCKProperty.Value = (float)value3B;
-                            if (value4B is string) float.TryParse((string)value4B, out decidedRCKProperty.ArriveTangent);
-                            if (value4B is int) decidedRCKProperty.ArriveTangent = (float)(int)value4B;
-                            if (value4B is float) decidedRCKProperty.ArriveTangent = (float)value4B;
-                            if (value5B is string) float.TryParse((string)value5B, out decidedRCKProperty.LeaveTangent);
-                            if (value5B is int) decidedRCKProperty.LeaveTangent = (float)(int)value5B;
-                            if (value5B is float) decidedRCKProperty.LeaveTangent = (float)value5B;
+                            if (transformB is string) Enum.TryParse((string)transformB, out nuevo.InterpMode);
+                            if (value1B is string) Enum.TryParse((string)value1B, out nuevo.TangentMode);
+
+                            if (value2B is string) float.TryParse((string)value2B, out nuevo.Time);
+                            if (value2B is int) nuevo.Time = (float)(int)value2B;
+                            if (value2B is float) nuevo.Time = (float)value2B;
+                            if (value3B is string) float.TryParse((string)value3B, out nuevo.Value);
+                            if (value3B is int) nuevo.Value = (float)(int)value3B;
+                            if (value3B is float) nuevo.Value = (float)value3B;
+                            if (value4B is string) float.TryParse((string)value4B, out nuevo.ArriveTangent);
+                            if (value4B is int) nuevo.ArriveTangent = (float)(int)value4B;
+                            if (value4B is float) nuevo.ArriveTangent = (float)value4B;
+                            if (value5B is string) float.TryParse((string)value5B, out nuevo.LeaveTangent);
+                            if (value5B is int) nuevo.LeaveTangent = (float)(int)value5B;
+                            if (value5B is float) nuevo.LeaveTangent = (float)value5B;
+
+                            decidedRCKProperty.Value = nuevo;
 
                             finalProp = decidedRCKProperty;
                             break;
@@ -1764,13 +1786,114 @@ namespace UAssetGUI
                                     }
                                     standardRendering = false;
                                     break;
+                                case BoxPropertyData box1:
+                                    {
+                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
+
+                                        DataGridViewRow row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "Min";
+                                        row.Cells[1].Value = box1.Value.Min.X;
+                                        row.Cells[2].Value = box1.Value.Min.Y;
+                                        row.Cells[3].Value = box1.Value.Min.Z;
+                                        row.HeaderCell.Value = Convert.ToString(0);
+                                        rows.Add(row);
+
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "Max";
+                                        row.Cells[1].Value = box1.Value.Max.X;
+                                        row.Cells[2].Value = box1.Value.Max.Y;
+                                        row.Cells[3].Value = box1.Value.Max.Z;
+                                        row.HeaderCell.Value = Convert.ToString(1);
+                                        rows.Add(row);
+
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "IsValid";
+                                        row.Cells[1].Value = box1.Value.IsValid > 0;
+                                        row.HeaderCell.Value = Convert.ToString(2);
+                                        rows.Add(row);
+
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                    }
+
+                                    dataGridView1.AllowUserToAddRows = false;
+                                    standardRendering = false;
+                                    break;
+                                case Box2DPropertyData box1:
+                                    {
+                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
+
+                                        DataGridViewRow row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "Min";
+                                        row.Cells[1].Value = box1.Value.Min.X;
+                                        row.Cells[2].Value = box1.Value.Min.Y;
+                                        row.HeaderCell.Value = Convert.ToString(0);
+                                        rows.Add(row);
+
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "Max";
+                                        row.Cells[1].Value = box1.Value.Max.X;
+                                        row.Cells[2].Value = box1.Value.Max.Y;
+                                        row.HeaderCell.Value = Convert.ToString(1);
+                                        rows.Add(row);
+
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "IsValid";
+                                        row.Cells[1].Value = box1.Value.IsValid > 0;
+                                        row.HeaderCell.Value = Convert.ToString(2);
+                                        rows.Add(row);
+
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                    }
+
+                                    dataGridView1.AllowUserToAddRows = false;
+                                    standardRendering = false;
+                                    break;
+                                case Box2fPropertyData box1:
+                                    {
+                                        List<DataGridViewRow> rows = new List<DataGridViewRow>();
+
+                                        DataGridViewRow row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "Min";
+                                        row.Cells[1].Value = box1.Value.Min.X;
+                                        row.Cells[2].Value = box1.Value.Min.Y;
+                                        row.HeaderCell.Value = Convert.ToString(0);
+                                        rows.Add(row);
+
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "Max";
+                                        row.Cells[1].Value = box1.Value.Max.X;
+                                        row.Cells[2].Value = box1.Value.Max.Y;
+                                        row.HeaderCell.Value = Convert.ToString(1);
+                                        rows.Add(row);
+
+                                        row = new DataGridViewRow();
+                                        row.CreateCells(dataGridView1);
+                                        row.Cells[0].Value = "IsValid";
+                                        row.Cells[1].Value = box1.Value.IsValid > 0;
+                                        row.HeaderCell.Value = Convert.ToString(2);
+                                        rows.Add(row);
+
+                                        dataGridView1.Rows.AddRange(rows.ToArray());
+                                    }
+
+                                    dataGridView1.AllowUserToAddRows = false;
+                                    standardRendering = false;
+                                    break;
                                 case PointingDictionaryEntry usDictEntry:
                                     dataGridView1.AllowUserToAddRows = false;
                                     var ourKey = usDictEntry.Entry.Key;
                                     var ourValue = usDictEntry.Entry.Value;
                                     if (ourKey != null) ourKey.Name = FName.DefineDummy(asset, "Key");
                                     if (ourValue != null) ourValue.Name = FName.DefineDummy(asset, "Value");
-                                    renderingArr = new PropertyData[2] { ourKey, ourValue };
+                                    renderingArr = [ourKey, ourValue];
                                     break;
                                 case FDelegate[] usRealMDArr:
                                     for (int i = 0; i < usRealMDArr.Length; i++)
@@ -2319,6 +2442,116 @@ namespace UAssetGUI
                             string decidedName = usStruct.Name.Value.Value;
                             if (((PointingTreeNode)pointerNode.Parent).Pointer is PropertyData && ((PropertyData)((PointingTreeNode)pointerNode.Parent).Pointer).Name.Equals(decidedName)) decidedName = usStruct.StructType.Value.Value;
                             pointerNode.Text = decidedName + " (" + newCount + ")";
+                        }
+                        else if (pointerNode.Pointer is BoxPropertyData box1)
+                        {
+                            FVector min = new();
+                            FVector max = new();
+                            byte isValid = 0;
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                if (dataGridView1.Rows[i].Cells.Count < 1) continue;
+                                string name = dataGridView1.Rows[i].Cells[0].Value.ToString().Trim();
+                                switch (name)
+                                {
+                                    case "Min":
+                                        if (dataGridView1.Rows[i].Cells.Count < 4) continue;
+                                        {
+                                            double.TryParse(dataGridView1.Rows[i].Cells[1].Value.ToString(), out double val1);
+                                            double.TryParse(dataGridView1.Rows[i].Cells[2].Value.ToString(), out double val2);
+                                            double.TryParse(dataGridView1.Rows[i].Cells[3].Value.ToString(), out double val3);
+                                            min = new(val1, val2, val3);
+                                        }
+                                        break;
+                                    case "Max":
+                                        if (dataGridView1.Rows[i].Cells.Count < 4) continue;
+                                        {
+                                            double.TryParse(dataGridView1.Rows[i].Cells[1].Value.ToString(), out double val1);
+                                            double.TryParse(dataGridView1.Rows[i].Cells[2].Value.ToString(), out double val2);
+                                            double.TryParse(dataGridView1.Rows[i].Cells[3].Value.ToString(), out double val3);
+                                            max = new(val1, val2, val3);
+                                        }
+                                        break;
+                                    case "IsValid":
+                                        if (dataGridView1.Rows[i].Cells.Count < 2) continue;
+                                        var val = dataGridView1.Rows[i].Cells[1].Value.ToString();
+                                        isValid = (val.Equals("1") || val.ToLowerInvariant().Equals("true")) ? (byte)1 : (byte)0;
+                                        break;
+                                }
+                            }
+                            box1.Value = new TBox<FVector>(min, max, isValid);
+                        }
+                        else if (pointerNode.Pointer is Box2DPropertyData box2)
+                        {
+                            FVector2D min = new();
+                            FVector2D max = new();
+                            byte isValid = 0;
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                if (dataGridView1.Rows[i].Cells.Count < 1) continue;
+                                string name = dataGridView1.Rows[i].Cells[0].Value.ToString().Trim();
+                                switch (name)
+                                {
+                                    case "Min":
+                                        if (dataGridView1.Rows[i].Cells.Count < 3) continue;
+                                        {
+                                            double.TryParse(dataGridView1.Rows[i].Cells[1].Value.ToString(), out double val1);
+                                            double.TryParse(dataGridView1.Rows[i].Cells[2].Value.ToString(), out double val2);
+                                            min = new(val1, val2);
+                                        }
+                                        break;
+                                    case "Max":
+                                        if (dataGridView1.Rows[i].Cells.Count < 3) continue;
+                                        {
+                                            double.TryParse(dataGridView1.Rows[i].Cells[1].Value.ToString(), out double val1);
+                                            double.TryParse(dataGridView1.Rows[i].Cells[2].Value.ToString(), out double val2);
+                                            max = new(val1, val2);
+                                        }
+                                        break;
+                                    case "IsValid":
+                                        if (dataGridView1.Rows[i].Cells.Count < 2) continue;
+                                        var val = dataGridView1.Rows[i].Cells[1].Value.ToString();
+                                        isValid = (val.Equals("1") || val.ToLowerInvariant().Equals("true")) ? (byte)1 : (byte)0;
+                                        break;
+                                }
+                            }
+                            box2.Value = new TBox<FVector2D>(min, max, isValid);
+                        }
+                        else if (pointerNode.Pointer is Box2fPropertyData box3)
+                        {
+                            FVector2f min = new();
+                            FVector2f max = new();
+                            byte isValid = 0;
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                if (dataGridView1.Rows[i].Cells.Count < 1) continue;
+                                string name = dataGridView1.Rows[i].Cells[0].Value.ToString().Trim();
+                                switch (name)
+                                {
+                                    case "Min":
+                                        if (dataGridView1.Rows[i].Cells.Count < 3) continue;
+                                        {
+                                            float.TryParse(dataGridView1.Rows[i].Cells[1].Value.ToString(), out float val1);
+                                            float.TryParse(dataGridView1.Rows[i].Cells[2].Value.ToString(), out float val2);
+                                            min = new(val1, val2);
+                                        }
+                                        break;
+                                    case "Max":
+                                        if (dataGridView1.Rows[i].Cells.Count < 3) continue;
+                                        {
+                                            float.TryParse(dataGridView1.Rows[i].Cells[1].Value.ToString(), out float val1);
+                                            float.TryParse(dataGridView1.Rows[i].Cells[2].Value.ToString(), out float val2);
+                                            max = new(val1, val2);
+                                        }
+                                        break;
+                                    case "IsValid":
+                                        if (dataGridView1.Rows[i].Cells.Count < 2) continue;
+                                        var val = dataGridView1.Rows[i].Cells[1].Value.ToString();
+                                        isValid = (val.Equals("1") || val.ToLowerInvariant().Equals("true")) ? (byte)1 : (byte)0;
+                                        break;
+                                }
+                            }
+                            box3.Value = new TBox<FVector2f>(min, max, isValid);
                         }
                         else if (pointerNode.Pointer is ClassExport usBGCCat)
                         {

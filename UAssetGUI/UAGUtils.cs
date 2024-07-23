@@ -142,17 +142,14 @@ namespace UAssetGUI
         }
 
         /*
-            UAssetGUI versions are formatted as follows: MAJOR.MINOR.BUILD.REVISION
+            UAssetGUI versions are formatted as follows: MAJOR.MINOR.BUILD
             * MAJOR - incremented for very big changes or backwards-incompatible changes
             * MINOR - incremented for notable changes
             * BUILD - incremented for bug fixes or very small improvements
-            * REVISION - incremented for test/alpha builds of the existing version
-            
-            2.0.0.0 > 1.5.0.0 > 1.4.1.0 > 1.4.0.1 > 1.4.0.0
         */
         public static bool IsUAGVersionLower(this Version v1)
         {
-            Version fullUagVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            Version fullUagVersion = new Version(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
             return v1.CompareTo(fullUagVersion) > 0;
         }
 

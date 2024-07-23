@@ -80,8 +80,7 @@ namespace UAssetGUI
             UAGConfig.Load();
 
             Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            UAGUtils._displayVersion = fvi.FileVersion;
+            UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
             string gitVersionGUI = string.Empty;
             using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))

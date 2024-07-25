@@ -531,6 +531,7 @@ namespace UAssetGUI
                 saveToolStripMenuItem.Enabled = !IsReadOnly();
                 saveAsToolStripMenuItem.Enabled = true;
                 findToolStripMenuItem.Enabled = true;
+                stageToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
                 tableEditor.Load();
@@ -623,6 +624,7 @@ namespace UAssetGUI
                 saveToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
                 findToolStripMenuItem.Enabled = false;
+                stageToolStripMenuItem.Enabled = false;
 
                 treeView1.Nodes.Clear();
                 dataGridView1.Columns.Clear();
@@ -2031,6 +2033,8 @@ namespace UAssetGUI
 
         private void stageToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (tableEditor?.asset == null) return;
+
             ForceSave(currentSavingPath); // even if read only, let's just save over it anyways here; only purpose of the read only stuff is so the user doesn't get confused
             // UAGConfig.StageFile(files[0], CurrentContainerPath);
             // this.RefreshTreeView(this.saveTreeView);

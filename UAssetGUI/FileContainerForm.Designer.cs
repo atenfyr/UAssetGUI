@@ -174,7 +174,7 @@ namespace UAssetGUI
             // 
             stageFromDiskToolStripMenuItem.Name = "stageFromDiskToolStripMenuItem";
             stageFromDiskToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            stageFromDiskToolStripMenuItem.Text = "Stage from disk";
+            stageFromDiskToolStripMenuItem.Text = "Stage from disk...";
             stageFromDiskToolStripMenuItem.Click += stageFromDiskToolStripMenuItem_Click;
             // 
             // editToolStripMenuItem

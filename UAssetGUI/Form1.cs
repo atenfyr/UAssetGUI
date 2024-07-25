@@ -2073,7 +2073,11 @@ namespace UAssetGUI
                 UAGConfig.StageFile(currentSavingPath, null);
                 foreach (var form in Application.OpenForms)
                 {
-                    if (form is FileContainerForm fcForm) fcForm.RefreshTreeView(fcForm.saveTreeView);
+                    if (form is FileContainerForm fcForm)
+                    {
+                        fcForm.RefreshTreeView(fcForm.saveTreeView);
+                        fcForm.Activate();
+                    }
                 }
             }
         }

@@ -452,6 +452,7 @@ namespace UAssetGUI
             treeView1.Size = new System.Drawing.Size(408, 483);
             treeView1.TabIndex = 1;
             treeView1.BeforeExpand += treeView1_BeforeExpand;
+            treeView1.BeforeSelect += treeView1_BeforeSelect;
             treeView1.AfterSelect += treeView1_AfterSelect;
             treeView1.KeyDown += treeView1_KeyDown;
             // 

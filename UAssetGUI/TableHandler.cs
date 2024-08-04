@@ -131,6 +131,7 @@ namespace UAssetGUI
         public DataGridView dataGridView1;
 
         public bool readyToSave = true;
+        public bool dirtySinceLastLoad = false; 
 
         public static Color ARGBtoRGB(Color ARGB)
         {
@@ -1197,6 +1198,7 @@ namespace UAssetGUI
 
             dataGridView1.BackgroundColor = UAGPalette.DataGridViewActiveColor;
             readyToSave = false;
+            dirtySinceLastLoad = false;
 
             origForm.ResetCurrentDataGridViewStrip();
 
@@ -1958,6 +1960,7 @@ namespace UAssetGUI
         public void Save(bool forceNewLoad) // Reads from the table and updates the asset data as needed
         {
             if (!readyToSave) return;
+            if (dataGridView1?.Rows == null) return;
 
             switch (mode)
             {
@@ -2148,7 +2151,7 @@ namespace UAssetGUI
                                     break;
                                 case ExportDetailsParseType.FName:
                                     settingVal = null;
-                                    if (currentVal is string rawFName) // blah(0)
+                                    if (currentVal is string rawFName)
                                     {
                                         settingVal = FName.FromString(asset, rawFName);
                                     }
@@ -2434,8 +2437,15 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, usStruct.Value.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
+                                if (val == null)
+                                {
+                                    dirtySinceLastLoad = true;
+                                    newData.Add(null);
+                                    continue;
+                                    // deliberately do not increment newCount
+                                }
                                 newData.Add(val);
-                                if (val != null) newCount++;
+                                newCount++;
                             }
                             usStruct.Value = newData;
 
@@ -2568,6 +2578,7 @@ namespace UAssetGUI
                                         PropertyData val = RowToPD(i, usCat.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
                                         if (val == null)
                                         {
+                                            dirtySinceLastLoad = true;
                                             newData.Add(null);
                                             continue;
                                         }
@@ -2585,6 +2596,7 @@ namespace UAssetGUI
                                         PropertyData val = RowToPD(i, usCatUDS.StructData.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
                                         if (val == null)
                                         {
+                                            dirtySinceLastLoad = true;
                                             newData2.Add(null);
                                             continue;
                                         }
@@ -2631,6 +2643,7 @@ namespace UAssetGUI
                                 PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties); // TODO: verify if actually dummies when unversioned
                                 if (val == null || !(val is StructPropertyData))
                                 {
+                                    dirtySinceLastLoad = true;
                                     newData.Add(null);
                                     continue;
                                 }
@@ -2660,7 +2673,14 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), !(origArr.ElementAtOrDefault(i) is StructPropertyData), asset.HasUnversionedProperties);
-                                if (val != null) count++;
+                                if (val == null)
+                                {
+                                    dirtySinceLastLoad = true;
+                                    newData.Add(null);
+                                    continue;
+                                    // deliberately do not increment count
+                                }
+                                count++;
                                 newData.Add(val);
                             }
                             usArr.Value = newData.ToArray();
@@ -2713,7 +2733,11 @@ namespace UAssetGUI
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
                                 PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), false, asset.HasUnversionedProperties);
-                                if (val == null) continue;
+                                if (val == null)
+                                {
+                                    dirtySinceLastLoad = true;
+                                    continue;
+                                }
                                 newData.Add(val);
                             }
                             pointerNode.Pointer = newData.ToArray();

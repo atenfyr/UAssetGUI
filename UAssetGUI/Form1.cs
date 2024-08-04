@@ -1255,6 +1255,16 @@ namespace UAssetGUI
             }
         }
 
+        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            if (tableEditor.dirtySinceLastLoad)
+            {
+                // force refresh before tabbing out if we need to finalize changes before serialization (typically, when null entries exist to get rid of)
+                // we don't just do this every time for performance reasons
+                tableEditor.Save(true);
+            }
+        }
+
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             UpdateModeFromSelectedNode(e.Node);

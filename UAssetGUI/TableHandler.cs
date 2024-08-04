@@ -2447,6 +2447,7 @@ namespace UAssetGUI
                                 newData.Add(val);
                                 newCount++;
                             }
+                            if (newData[newData.Count - 1] == null) newData.RemoveAt(newData.Count - 1);
                             usStruct.Value = newData;
 
                             string decidedName = usStruct.Name.Value.Value;

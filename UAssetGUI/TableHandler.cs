@@ -2641,7 +2641,7 @@ namespace UAssetGUI
                             ///var numTimesNameUses = new Dictionary<string, int>();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i), false, asset.HasUnversionedProperties); // TODO: verify if actually dummies when unversioned
+                                PropertyData val = RowToPD(i, dtUs.Data.ElementAtOrDefault(i), false, false);
                                 if (val == null || !(val is StructPropertyData))
                                 {
                                     dirtySinceLastLoad = true;

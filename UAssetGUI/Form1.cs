@@ -531,7 +531,7 @@ namespace UAssetGUI
                 saveToolStripMenuItem.Enabled = !IsReadOnly();
                 saveAsToolStripMenuItem.Enabled = true;
                 findToolStripMenuItem.Enabled = true;
-                stageToolStripMenuItem.Enabled = true;
+                //stageToolStripMenuItem.Enabled = true;
 
                 tableEditor.FillOutTree(!UAGConfig.Data.EnableDynamicTree);
                 tableEditor.Load();
@@ -624,7 +624,7 @@ namespace UAssetGUI
                 saveToolStripMenuItem.Enabled = false;
                 saveAsToolStripMenuItem.Enabled = false;
                 findToolStripMenuItem.Enabled = false;
-                stageToolStripMenuItem.Enabled = false;
+                //stageToolStripMenuItem.Enabled = false;
 
                 treeView1.Nodes.Clear();
                 dataGridView1.Columns.Clear();

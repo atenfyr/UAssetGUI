@@ -38,7 +38,6 @@ namespace UAssetGUI
             openContainersToolStripMenuItem = new ToolStripMenuItem();
             saveToolStripMenuItem = new ToolStripMenuItem();
             saveAsToolStripMenuItem = new ToolStripMenuItem();
-            stageToolStripMenuItem = new ToolStripMenuItem();
             editToolStripMenuItem = new ToolStripMenuItem();
             copyToolStripMenuItem = new ToolStripMenuItem();
             pasteToolStripMenuItem = new ToolStripMenuItem();
@@ -94,7 +93,7 @@ namespace UAssetGUI
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, openContainersToolStripMenuItem, saveToolStripMenuItem, saveAsToolStripMenuItem, stageToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem, openContainersToolStripMenuItem, saveToolStripMenuItem, saveAsToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             fileToolStripMenuItem.Text = "File";
@@ -131,14 +130,6 @@ namespace UAssetGUI
             saveAsToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             saveAsToolStripMenuItem.Text = "Save As";
             saveAsToolStripMenuItem.Click += saveAsToolStripMenuItem_Click;
-            // 
-            // stageToolStripMenuItem
-            // 
-            stageToolStripMenuItem.Enabled = false;
-            stageToolStripMenuItem.Name = "stageToolStripMenuItem";
-            stageToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            stageToolStripMenuItem.Text = "Stage...";
-            stageToolStripMenuItem.Click += stageToolStripMenuItem_Click;
             // 
             // editToolStripMenuItem
             // 
@@ -523,7 +514,6 @@ namespace UAssetGUI
         private ToolStripMenuItem patchusmapWithsavVersionInfoToolStripMenuItem;
         private ToolStripMenuItem importMappingsToolStripMenuItem;
         private ToolStripMenuItem openContainersToolStripMenuItem;
-        private ToolStripMenuItem stageToolStripMenuItem;
     }
 }
 

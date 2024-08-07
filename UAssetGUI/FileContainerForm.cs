@@ -466,6 +466,41 @@ namespace UAssetGUI
             }
         }
 
+        private void stageFromDiskToPathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog())
+            {
+                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    TextPrompt replacementPrompt = new TextPrompt()
+                    {
+                        DisplayText = "What path should this object be staged to?"
+                    };
+
+                    replacementPrompt.StartPosition = FormStartPosition.CenterParent;
+                    replacementPrompt.PrefilledText = Path.GetFileName(openFileDialog.FileName) ?? string.Empty;
+
+                    string newFileName = null;
+                    if (replacementPrompt.ShowDialog(ParentForm) == DialogResult.OK)
+                    {
+                        newFileName = string.Join("_", replacementPrompt.OutputText.Replace('\\', '/').Split(Path.GetInvalidPathChars(), StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+                    }
+
+                    replacementPrompt.Dispose();
+
+                    if (newFileName != null)
+                    {
+                        UAGConfig.StageFile(openFileDialog.FileName, CurrentContainerPath, newFileName);
+                        this.RefreshTreeView(this.saveTreeView);
+                    }
+                }
+            }
+        }
+
         private void InitializeChildren(PointingFileTreeNode ptn)
         {
             if (!ptn.ChildrenInitialized)
@@ -501,7 +536,7 @@ namespace UAssetGUI
         {
             if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null)
             {
-                MessageBox.Show("Please load a container first to extract it.", "Notice");
+                MessageBox.Show("Please load a container first to extract it.", "Noticef");
                 return;
             }
 
@@ -597,6 +632,9 @@ namespace UAssetGUI
                 this.ContextMenuStrip.Items.Add(tsmItem);
                 tsmItem = new ToolStripMenuItem("Stage");
                 tsmItem.Click += (sender, args) => Pointer.StageFile();
+                this.ContextMenuStrip.Items.Add(tsmItem);
+                tsmItem = new ToolStripMenuItem("Stage to path...");
+                tsmItem.Click += (sender, args) => Pointer.StageFileToPath();
                 this.ContextMenuStrip.Items.Add(tsmItem);
             }
 
@@ -803,6 +841,33 @@ namespace UAssetGUI
             if (generatedNode == null) return;
             generatedNode.EnsureVisible();
             this.ParentForm.saveTreeView.SelectedNode = generatedNode;
+        }
+
+        public void StageFileToPath()
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                TextPrompt replacementPrompt = new TextPrompt()
+                {
+                    DisplayText = "What path should this object be staged to?"
+                };
+
+                replacementPrompt.StartPosition = FormStartPosition.CenterParent;
+                replacementPrompt.PrefilledText = this.FullPath ?? string.Empty;
+
+                string newFileName = null;
+                if (replacementPrompt.ShowDialog(ParentForm) == DialogResult.OK)
+                {
+                    newFileName = string.Join("_", replacementPrompt.OutputText.Replace('\\', '/').Split(Path.GetInvalidPathChars(), StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+                }
+
+                replacementPrompt.Dispose();
+
+                if (newFileName != null)
+                {
+                    this.StageFile(newFileName);
+                }
+            });
         }
 
         public void DeleteFile()

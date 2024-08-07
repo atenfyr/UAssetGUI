@@ -84,9 +84,12 @@ namespace UAssetGUI
             return res;
         }
 
-        public static void StageFile(string rawPathOnDisk, string CurrentContainerPath)
+        public static void StageFile(string rawPathOnDisk, string CurrentContainerPath, string newPath = null)
         {
-            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(CurrentContainerPath), Path.GetFileName(rawPathOnDisk)) : Path.Combine(StagingFolder, Path.GetFileName(rawPathOnDisk));
+            if (newPath == null) newPath = Path.GetFileName(rawPathOnDisk);
+            newPath = newPath.Replace('/', Path.DirectorySeparatorChar);
+
+            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(CurrentContainerPath), newPath) : Path.Combine(StagingFolder, newPath);
             Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
 
             File.Copy(rawPathOnDisk, finalPath, true);
@@ -103,11 +106,14 @@ namespace UAssetGUI
             }
 
             if (newPath == null) newPath = item.FullPath;
+            newPath = newPath.Replace('/', Path.DirectorySeparatorChar);
+
             string outputPath = item.SaveFileToTemp();
-            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), newPath.Replace('/', Path.DirectorySeparatorChar)) : Path.Combine(StagingFolder, newPath.Replace('/', Path.DirectorySeparatorChar));
+            var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), newPath) : Path.Combine(StagingFolder, newPath);
             if (outputPath == null || finalPath == null) return;
             Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
-            
+
+            try { File.Delete(finalPath); } catch { }
             File.Copy(outputPath, finalPath, true);
             try { File.Copy(Path.ChangeExtension(outputPath, ".uexp"), Path.ChangeExtension(finalPath, ".uexp"), true); } catch { }
             try { File.Delete(outputPath); } catch { }

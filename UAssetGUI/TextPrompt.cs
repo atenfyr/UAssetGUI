@@ -23,6 +23,10 @@ namespace UAssetGUI
             {
                 this.Text = parentForm.Text;
             }
+            if (this.Owner is FileContainerForm parentForm2)
+            {
+                this.Text = parentForm2.Text;
+            }
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
             gamePathBox.Size = new Size(this.ClientSize.Width - 24, gamePathBox.ClientSize.Height);

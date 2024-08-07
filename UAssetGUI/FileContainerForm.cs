@@ -204,7 +204,21 @@ namespace UAssetGUI
                     MountPoint = pakReader.GetMountPoint();
                 }
 
-                DirectoryTreeMap[loadTreeView] = new DirectoryTree(this, allFiles);
+                // if the MountPoint starts with "../../../", then let's adjust all files so we can just change the MountPoint to that
+                string mpPrefix = "../../../";
+                string Prefix = "";
+                if (MountPoint.StartsWith(mpPrefix))
+                {
+                    Prefix = MountPoint.Substring(mpPrefix.Length);
+                    MountPoint = mpPrefix;
+
+                    for (int i = 0; i < allFiles.Length; i++)
+                    {
+                        allFiles[i] = Path.Combine(Prefix, allFiles[i]);
+                    }
+                }
+
+                DirectoryTreeMap[loadTreeView] = new DirectoryTree(this, allFiles, null, Prefix);
                 RefreshTreeView(loadTreeView);
 
                 this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
@@ -626,6 +640,7 @@ namespace UAssetGUI
                 tsmItem.Click += (sender, args) =>
                 {
                     string outPath = UAGConfig.ExtractFile(Pointer);
+                    if (outPath == null) return;
                     if ((Path.GetExtension(outPath)?.Length ?? 0) > 0) outPath = Path.GetDirectoryName(outPath);
                     UAGUtils.OpenDirectory(outPath);
                 };
@@ -658,17 +673,17 @@ namespace UAssetGUI
             ParentForm = parentForm;
         }
 
-        public DirectoryTree(FileContainerForm parentForm, string[] paths, string[] fixedAssetsOnDisk = null)
+        public DirectoryTree(FileContainerForm parentForm, string[] paths, string[] fixedAssetsOnDisk = null, string prefix = null)
         {
             RootNodes = new Dictionary<string, DirectoryTreeItem>();
             ParentForm = parentForm;
             if (fixedAssetsOnDisk != null && fixedAssetsOnDisk.Length == paths.Length)
             {
-                for (int i = 0; i < paths.Length; i++) this.CreateNode(paths[i], fixedAssetsOnDisk[i]);
+                for (int i = 0; i < paths.Length; i++) this.CreateNode(paths[i], fixedAssetsOnDisk[i], prefix);
             }
             else
             {
-                for (int i = 0; i < paths.Length; i++) this.CreateNode(paths[i]);
+                for (int i = 0; i < paths.Length; i++) this.CreateNode(paths[i], null, prefix);
             }
         }
 
@@ -708,7 +723,7 @@ namespace UAssetGUI
             return currentItem;
         }
 
-        public DirectoryTreeItem CreateNode(string path, string fixedAssetOnDisk = null)
+        public DirectoryTreeItem CreateNode(string path, string fixedAssetOnDisk = null, string prefix = null)
         {
             string[] pathComponents = path.Split('/');
             if (pathComponents.Length == 0) return null;
@@ -727,7 +742,7 @@ namespace UAssetGUI
                 string ext = Path.GetExtension(pathComponents[0]);
                 if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk" || ext == ".bak")) return null;
 
-                RootNodes[pathComponents[0]] = new DirectoryTreeItem(ParentForm, pathComponents[0], pathComponents[0], ext.Length > 1);
+                RootNodes[pathComponents[0]] = new DirectoryTreeItem(ParentForm, pathComponents[0], pathComponents[0], ext.Length > 1, prefix);
             }
 
             DirectoryTreeItem currentItem = RootNodes[pathComponents[0]];
@@ -744,7 +759,7 @@ namespace UAssetGUI
 
                 if (!currentItem.Children.ContainsKey(pathComponents[i]))
                 {
-                    currentItem.Children[pathComponents[i]] = new DirectoryTreeItem(ParentForm, pathComponents[i], currentItem.FullPath + "/" + pathComponents[i], ext.Length > 1);
+                    currentItem.Children[pathComponents[i]] = new DirectoryTreeItem(ParentForm, pathComponents[i], currentItem.FullPath + "/" + pathComponents[i], ext.Length > 1, prefix);
                     currentItem.Children[pathComponents[i]].Parent = currentItem;
                 }
                 currentItem = currentItem.Children[pathComponents[i]];
@@ -766,6 +781,7 @@ namespace UAssetGUI
         public string Name;
         public string FullPath;
         public string FixedPathOnDisk;
+        public string Prefix;
         public bool IsFile = false;
         public DirectoryTreeItem Parent;
         public IDictionary<string, DirectoryTreeItem> Children;
@@ -776,12 +792,14 @@ namespace UAssetGUI
             
             string outputPath1 = Path.Combine(outputPathDirectory, FullPath.Replace('/', Path.DirectorySeparatorChar));
             string outputPath2 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".uexp").Replace('/', Path.DirectorySeparatorChar));
+            string outputPath3 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".ubulk").Replace('/', Path.DirectorySeparatorChar));
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath1)); // same directory as outputPath2, no need to create that one too
 
             if (FixedPathOnDisk != null)
             {
                 File.Copy(FixedPathOnDisk, outputPath1, true);
                 try { File.Copy(Path.ChangeExtension(FixedPathOnDisk, ".uexp"), outputPath2, true); } catch { }
+                try { File.Copy(Path.ChangeExtension(FixedPathOnDisk, ".ubulk"), outputPath3, true); } catch { }
                 return outputPath1;
             }
 
@@ -789,7 +807,7 @@ namespace UAssetGUI
             {
                 var reader = new PakBuilder().Reader(stream);
 
-                byte[] res = reader.Get(stream, FullPath);
+                byte[] res = reader.Get(stream, FullPath.Substring(Prefix?.Length ?? 0));
                 if (res != null)
                 {
                     File.WriteAllBytes(outputPath1, res);
@@ -799,7 +817,9 @@ namespace UAssetGUI
                     return null;
                 }
 
-                res = reader.Get(stream, Path.ChangeExtension(FullPath, ".uexp"));
+                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
+                if (res != null) File.WriteAllBytes(outputPath2, res);
+                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
                 if (res != null) File.WriteAllBytes(outputPath2, res);
             }
 
@@ -878,6 +898,7 @@ namespace UAssetGUI
             {
                 File.Delete(FixedPathOnDisk);
                 try { File.Delete(Path.ChangeExtension(FixedPathOnDisk, ".uexp")); } catch { }
+                try { File.Delete(Path.ChangeExtension(FixedPathOnDisk, ".ubulk")); } catch { }
             }
             catch (UnauthorizedAccessException)
             {
@@ -888,12 +909,13 @@ namespace UAssetGUI
             this.ParentForm.RefreshTreeView(this.ParentForm.saveTreeView);
         }
 
-        public DirectoryTreeItem(FileContainerForm parentForm, string name, string fullPath, bool isFile)
+        public DirectoryTreeItem(FileContainerForm parentForm, string name, string fullPath, bool isFile, string prefix)
         {
             ParentForm = parentForm;
             FullPath = fullPath;
             Name = Path.GetFileName(name);
             IsFile = isFile;
+            Prefix = prefix;
             Children = new Dictionary<string, DirectoryTreeItem>();
         }
 

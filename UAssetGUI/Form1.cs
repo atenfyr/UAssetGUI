@@ -669,6 +669,8 @@ namespace UAssetGUI
             {
                 LastLoadTimestamp = DateTime.UtcNow;
                 UpdateRPC();
+
+                UAGUtils.InvokeUI(treeView1.Select);
             }
         }
 
@@ -1287,6 +1289,7 @@ namespace UAssetGUI
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             UpdateModeFromSelectedNode(e.Node);
+            UAGUtils.InvokeUI(treeView1.Select);
         }
 
         private void dataGridView1_MouseWheel(object sender, MouseEventArgs e)

@@ -1337,7 +1337,7 @@ namespace UAssetGUI
 
                     for (int num = 0; num < asset.SoftPackageReferenceList.Count; num++)
                     {
-                        dataGridView1.Rows.Add(asset.SoftPackageReferenceList[num]);
+                        dataGridView1.Rows.Add(asset.SoftPackageReferenceList[num]?.ToString() ?? FString.NullCase);
                     }
                     break;
                 case TableHandlerMode.WorldTileInfo:

@@ -52,7 +52,6 @@ namespace UAssetGUI
         public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
         public readonly static string StagingFolder = Path.Combine(ConfigFolder, "Staging");
         public readonly static string ExtractedFolder = Path.Combine(ConfigFolder, "Extracted");
-        public static ISet<string> MappingsToSuppressWarningsFor = new HashSet<string>();
 
         internal static bool DifferentStagingPerPak = false;
 
@@ -163,7 +162,19 @@ namespace UAssetGUI
                 }
                 catch 
                 {
-                    UAGUtils.InvokeUI(() => MessageBox.Show("Failed to parse " + name + " mappings", "Notice"));
+                    UAGUtils.InvokeUI(() =>
+                    {
+                        MessageBox.Show("Failed to parse mappings: " + name, "Notice");
+
+                        // update list of mappings for good measure
+                        foreach (var form in Application.OpenForms)
+                        {
+                            if (form is Form1 form1)
+                            {
+                                form1.UpdateMappings("No mappings", false);
+                            }
+                        }
+                    });
                 }
             }
 

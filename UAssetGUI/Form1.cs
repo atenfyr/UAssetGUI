@@ -202,9 +202,8 @@ namespace UAssetGUI
             test.Show();
         }
 
-        private void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
+        internal void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
         {
-            UAGConfig.MappingsToSuppressWarningsFor.Clear();
             UAGConfig.LoadMappings();
             UAGUtils.InvokeUI(() =>
             {
@@ -2053,8 +2052,16 @@ namespace UAssetGUI
                     replacementPrompt.Dispose();
                 }
 
-                File.Copy(importPath, Path.ChangeExtension(Path.Combine(UAGConfig.MappingsFolder, newFileName), ".usmap"));
-                UpdateMappings(newFileName);
+                try
+                {
+                    File.Copy(importPath, Path.ChangeExtension(Path.Combine(UAGConfig.MappingsFolder, newFileName), ".usmap"), true);
+                    if (UAGConfig.AllMappings.ContainsKey(newFileName)) UAGConfig.AllMappings.Remove(newFileName);
+                    UpdateMappings(newFileName);
+                }
+                catch
+                {
+                    MessageBox.Show("Failed to import mappings!", "Uh oh!");
+                }
             });
         }
 

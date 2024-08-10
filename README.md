@@ -1,11 +1,13 @@
 # UAssetGUI
-[![CI Status](https://img.shields.io/github/actions/workflow/status/atenfyr/UAssetGUI/build.yml?label=CI)](https://github.com/atenfyr/UAssetGUI/actions)
+[![Release](https://img.shields.io/github/v/release/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/atenfyr/UAssetGUI/total.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/releases)
 [![Issues](https://img.shields.io/github/issues/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/issues)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/atenfyr/UAssetGUI/build.yml?label=CI)](https://github.com/atenfyr/UAssetGUI/actions)
 [![License](https://img.shields.io/github/license/atenfyr/UAssetGUI.svg?style=flat-square)](https://github.com/atenfyr/UAssetGUI/blob/master/LICENSE.md)
 
 UAssetGUI is a tool designed for low-level examination and modification of Unreal Engine game assets by hand.
 
-<img src="https://i.imgur.com/G31NzYA.png" align="center">
+<img src="https://i.imgur.com/cibmlbW.png" align="center">
 
 ## Installation
 You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository](https://github.com/atenfyr/UAssetGUI/releases).
@@ -45,7 +47,7 @@ git submodule update --init
 ## Contributing
 Any contributions, whether through pull requests or issues, that you make are greatly appreciated.
 
-If you find an Unreal Engine 4 .uasset that display "failed to maintain binary equality," feel free to submit an issue on [the UAssetAPI issues page](https://github.com/atenfyr/UAssetAPI/issues) with a copy of the asset in question along with the name of the game and the Unreal version that it was cooked with.
+If you have an Unreal Engine .uasset file that displays "failed to maintain binary equality," feel free to submit an issue on [the UAssetAPI issues page](https://github.com/atenfyr/UAssetAPI/issues) with a copy of the asset in question along with the name of the game, the Unreal version that it was cooked with, and a mappings file for the game, if needed.
 
 ## License
 UAssetAPI and UAssetGUI are distributed under the MIT license, which you can view in detail in the [LICENSE file](LICENSE).

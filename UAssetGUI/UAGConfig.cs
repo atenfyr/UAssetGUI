@@ -22,6 +22,7 @@ namespace UAssetGUI
         public bool EnableBak;
         public bool RestoreSize;
         public bool EnableUpdateNotice;
+        public bool EnablePrettyBytecode;
         public int StartupWidth;
         public int StartupHeight;
 
@@ -39,6 +40,7 @@ namespace UAssetGUI
             EnableBak = true;
             RestoreSize = true;
             EnableUpdateNotice = true;
+            EnablePrettyBytecode = true;
             StartupWidth = 1000;
             StartupHeight = 700;
         }

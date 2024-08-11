@@ -55,7 +55,8 @@ namespace UAssetGUI
         UPropertyData,
         ByteArray,
         Dummy,
-        UserDefinedStructData
+        UserDefinedStructData,
+        Kismet
     }
 
     public class PointingTreeNode : TreeNode
@@ -129,6 +130,7 @@ namespace UAssetGUI
         public UAsset asset;
         public TreeView treeView1;
         public DataGridView dataGridView1;
+        public TextBox jsonView;
 
         public bool readyToSave = true;
         public bool dirtySinceLastLoad = false; 
@@ -280,7 +282,7 @@ namespace UAssetGUI
                                 }
                                 else
                                 {
-                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs.ScriptBytecode, PointingTreeNodeType.Normal, i);
+                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs, PointingTreeNodeType.Kismet, i);
                                     bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
@@ -1421,6 +1423,29 @@ namespace UAssetGUI
                             origForm.ForceResize();
                             standardRendering = false;
                         }
+                        else if (pointerNode.Type == PointingTreeNodeType.Kismet)
+                        {
+                            var bytecode = ((StructExport)pointerNode.Pointer).ScriptBytecode;
+                            Control currentlyFocusedControl1 = origForm.ActiveControl;
+                            if (UAGConfig.Data.EnablePrettyBytecode)
+                            {
+                                UAssetAPI.Kismet.KismetSerializer.asset = asset;
+                                dataGridView1.Visible = false;
+                                jsonView.Text = new JObject(new JProperty("Script", SerializeScript(bytecode))).ToString();
+                                jsonView.Visible = true;
+                                jsonView.ReadOnly = true;
+                            }
+                            else
+                            {
+                                dataGridView1.Visible = false;
+                                jsonView.Text = asset.SerializeJsonObject(bytecode, true);
+                                jsonView.Visible = true;
+                                jsonView.ReadOnly = false;
+                            }
+                            currentlyFocusedControl1.Focus();
+                            origForm.ForceResize();
+                            standardRendering = false;
+                        }
                         else
                         {
                             switch (pointerNode.Pointer)
@@ -1907,16 +1932,6 @@ namespace UAssetGUI
                                 case PropertyData[] usRealArr:
                                     renderingArr = usRealArr;
                                     dataGridView1.AllowUserToAddRows = false;
-                                    break;
-                                case KismetExpression[] bytecode:
-                                    UAssetAPI.Kismet.KismetSerializer.asset = asset;
-                                    Control currentlyFocusedControl1 = origForm.ActiveControl;
-                                    dataGridView1.Visible = false;
-                                    jsonView.Text = new JObject(new JProperty("Script", SerializeScript(bytecode))).ToString();
-                                    jsonView.Visible = true;
-                                    currentlyFocusedControl1.Focus();
-                                    origForm.ForceResize();
-                                    standardRendering = false;
                                     break;
                             }
                         }
@@ -2564,10 +2579,6 @@ namespace UAssetGUI
                             }
                             box3.Value = new TBox<FVector2f>(min, max, isValid);
                         }
-                        else if (pointerNode.Pointer is ClassExport usBGCCat)
-                        {
-                            // No writing here
-                        }
                         else if (pointerNode.Pointer is NormalExport usCat)
                         {
                             switch (pointerNode.Type)
@@ -2631,8 +2642,17 @@ namespace UAssetGUI
                                         }
                                     }
                                     break;
+                                case PointingTreeNodeType.Kismet:
+                                    if (!UAGConfig.Data.EnablePrettyBytecode)
+                                    {
+                                        try
+                                        {
+                                            ((StructExport)pointerNode.Pointer).ScriptBytecode = asset.DeserializeJsonObject<KismetExpression[]>(jsonView.Text);
+                                        }
+                                        catch { }
+                                    }
+                                    break;
                             }
-
                         }
                         else if (pointerNode.Pointer is UDataTable dtUs)
                         {
@@ -2758,11 +2778,12 @@ namespace UAssetGUI
             }
         }
 
-        public TableHandler(DataGridView dataGridView1, UAsset asset, TreeView treeView1)
+        public TableHandler(DataGridView dataGridView1, UAsset asset, TreeView treeView1, TextBox jsonView)
         {
             this.asset = asset;
             this.dataGridView1 = dataGridView1;
             this.treeView1 = treeView1;
+            this.jsonView = jsonView;
             this.mode = 0;
         }
     }

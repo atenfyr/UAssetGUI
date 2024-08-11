@@ -137,9 +137,12 @@ namespace UAssetGUI
                 AutoSize = true,
                 Multiline = true,
                 ReadOnly = true,
-                ScrollBars = ScrollBars.Both
+                MaxLength = int.MaxValue,
+                ScrollBars = ScrollBars.Both,
             };
             splitContainer1.Panel2.Controls.Add(jsonView);
+
+            jsonView.TextChanged += (object sender, EventArgs e) => { if (tableEditor == null) return; tableEditor.dirtySinceLastLoad = true; SetUnsavedChanges(true); };
 
             importBinaryData.Visible = false;
             exportBinaryData.Visible = false;
@@ -537,7 +540,7 @@ namespace UAssetGUI
                 currentSavingPath = savingPath;
                 SetUnsavedChanges(false);
 
-                tableEditor = new TableHandler(dataGridView1, targetAsset, treeView1);
+                tableEditor = new TableHandler(dataGridView1, targetAsset, treeView1, jsonView);
 
                 saveToolStripMenuItem.Enabled = !IsReadOnly();
                 saveAsToolStripMenuItem.Enabled = true;
@@ -819,6 +822,8 @@ namespace UAssetGUI
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if (treeView1?.SelectedNode != null && treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.Kismet) return base.ProcessCmdKey(ref msg, keyData);
+
             switch (keyData)
             {
                 case Keys.Control | Keys.C:
@@ -948,7 +953,7 @@ namespace UAssetGUI
             PropertyData deserializedClipboard = null;
             try
             {
-                deserializedClipboard = tableEditor.asset.DeserializeJsonObject(Clipboard.GetText()) as PropertyData;
+                deserializedClipboard = tableEditor.asset.DeserializeJsonObject<PropertyData>(Clipboard.GetText());
             }
             catch (Exception)
             {
@@ -1029,7 +1034,7 @@ namespace UAssetGUI
                             Export deserExport = null;
                             try
                             {
-                                deserExport = tableEditor.asset.DeserializeJsonObject(Clipboard.GetText()) as Export;
+                                deserExport = tableEditor.asset.DeserializeJsonObject<Export>(Clipboard.GetText());
                             }
                             catch (Exception)
                             {

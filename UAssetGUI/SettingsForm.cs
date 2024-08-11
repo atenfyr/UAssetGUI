@@ -25,6 +25,7 @@ namespace UAssetGUI
             favoriteThingBox.Text = UAGConfig.Data.FavoriteThing;
             numericUpDown1.Value = UAGConfig.Data.DataZoom;
             enableBak.Checked = UAGConfig.Data.EnableBak;
+            enablePrettyBytecode.Checked = UAGConfig.Data.EnablePrettyBytecode;
             restoreSize.Checked = UAGConfig.Data.RestoreSize;
             enableUpdateNotice.Checked = UAGConfig.Data.EnableUpdateNotice;
 
@@ -95,6 +96,11 @@ namespace UAssetGUI
         private void enableUpdateNotice_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.EnableUpdateNotice = enableUpdateNotice.Checked;
+        }
+
+        private void enablePrettyBytecode_CheckedChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.EnablePrettyBytecode = enablePrettyBytecode.Checked;
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

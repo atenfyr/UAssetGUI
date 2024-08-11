@@ -550,7 +550,7 @@ namespace UAssetGUI
         {
             if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null)
             {
-                MessageBox.Show("Please load a container first to extract it.", "Noticef");
+                MessageBox.Show("Please load a container first to extract it.", "Notice");
                 return;
             }
 

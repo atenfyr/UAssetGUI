@@ -94,6 +94,8 @@ namespace UAssetGUI
                 }
             }
 
+            if (!gitVersionGUI.All("0123456789abcdef".Contains)) gitVersionGUI = string.Empty;
+
             string gitVersionAPI = string.Empty;
             using (Stream stream = typeof(PropertyData).Assembly.GetManifestResourceStream("UAssetAPI.git_commit.txt"))
             {
@@ -105,6 +107,8 @@ namespace UAssetGUI
                     }
                 }
             }
+
+            if (!gitVersionAPI.All("0123456789abcdef".Contains)) gitVersionAPI = string.Empty;
 
             if (!string.IsNullOrEmpty(gitVersionGUI))
             {

@@ -898,7 +898,7 @@ namespace UAssetGUI
 
                     long determinedOffset = asset.UseSeparateBulkDataFiles ? (thisPD.Offset - asset.Exports[0].SerialOffset) : thisPD.Offset;
 
-                    row.Cells[absoluteColumnIndexer + 9].Value = thisPD.DuplicationIndex;
+                    row.Cells[absoluteColumnIndexer + 9].Value = thisPD.ArrayIndex;
                     row.Cells[absoluteColumnIndexer + 10].Value = determinedOffset < 0 ? "N/A" : determinedOffset.ToString();
                     row.Cells[absoluteColumnIndexer + 10].ReadOnly = true;
                     row.Cells[absoluteColumnIndexer + 11].Value = thisPD.IsZero.ToString();
@@ -1084,10 +1084,10 @@ namespace UAssetGUI
                     }
                 }
 
-                string duplicationIndex = row.Cells[row.Cells.Count - 4].Value.ToString();
+                string ArrayIndex = row.Cells[row.Cells.Count - 4].Value.ToString();
                 string isZero = row.Cells[row.Cells.Count - 2].Value.ToString();
 
-                int.TryParse(duplicationIndex, out finalProp.DuplicationIndex);
+                int.TryParse(ArrayIndex, out finalProp.ArrayIndex);
                 finalProp.IsZero = (isZero.ToLowerInvariant() == "true" || isZero == "1");
                 return finalProp;
             }
@@ -1405,7 +1405,7 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "DupIndex", "Serial Offset", "Is Zero", "" });
+                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "ArrayIndex", "Serial Offset", "Is Zero", "" });
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 

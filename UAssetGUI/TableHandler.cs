@@ -1222,7 +1222,7 @@ namespace UAssetGUI
                     dataGridView1.Rows.Add(new object[] { "PackageGuid", asset.PackageGuid.ConvertToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageFlags", asset.PackageFlags.ToString() });
                     dataGridView1.Rows.Add(new object[] { "PackageSource", asset.PackageSource.ToString() });
-                    dataGridView1.Rows.Add(new object[] { "FolderName", asset.FolderName.Value });
+                    dataGridView1.Rows.Add(new object[] { asset.ObjectVersionUE5 >= ObjectVersionUE5.ADD_SOFTOBJECTPATH_LIST ? "PackageName" : "FolderName", asset.FolderName.Value });
 
                     dataGridView1.Rows[0].Cells[0].ToolTipText = "The package file version number when this package was saved. Unrelated to imports.";
                     dataGridView1.Rows[1].Cells[0].ToolTipText = "Should this asset not serialize its engine and custom versions?";
@@ -1230,7 +1230,7 @@ namespace UAssetGUI
                     dataGridView1.Rows[3].Cells[0].ToolTipText = "Current ID for this package. Effectively unused.";
                     dataGridView1.Rows[4].Cells[0].ToolTipText = "The flags for this package.";
                     dataGridView1.Rows[5].Cells[0].ToolTipText = "Value that is used to determine if the package was saved by Epic, a licensee, modder, etc.";
-                    dataGridView1.Rows[6].Cells[0].ToolTipText = "The Generic Browser folder name that this package lives in. Usually \"None\" in cooked assets.";
+                    dataGridView1.Rows[6].Cells[0].ToolTipText = asset.ObjectVersionUE5 >= ObjectVersionUE5.ADD_SOFTOBJECTPATH_LIST ? "The package name the file was last saved with." : "The Generic Browser folder name that this package lives in. Usually \"None\" in cooked assets.";
 
                     for (int i = 0; i < dataGridView1.Rows.Count; i++)
                     {

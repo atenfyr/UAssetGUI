@@ -446,16 +446,16 @@ namespace UAssetGUI
             }
         }
 
-        public uint GetFileSignature(string path, out uint nextFourBytes)
+        public uint GetFileSignature(string path, out byte[] nextBytes)
         {
             byte[] buffer = new byte[4];
             uint res = uint.MaxValue;
-            nextFourBytes = uint.MaxValue;
+            nextBytes = new byte[32];
 
             using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 if (fs.Read(buffer, 0, buffer.Length) == buffer.Length) res = BitConverter.ToUInt32(buffer, 0);
-                if (fs.Read(buffer, 0, buffer.Length) == buffer.Length) nextFourBytes = BitConverter.ToUInt32(buffer, 0);
+                fs.Read(nextBytes, 0, nextBytes.Length);
             }
 
             return res;
@@ -494,7 +494,13 @@ namespace UAssetGUI
                     default:
                         MapStructTypeOverrideForm.LoadFromConfig();
 
-                        uint sig = GetFileSignature(filePath, out uint nextFourBytes);
+                        uint sig = GetFileSignature(filePath, out byte[] nextBytes);
+
+                        uint nextFourBytes = uint.MaxValue;
+                        uint ue4CookedHeaderSize = uint.MaxValue;
+                        if (nextBytes.Length >= 4) nextFourBytes = BitConverter.ToUInt32(nextBytes.Take(4).ToArray());
+                        if (nextBytes.Length >= 24) ue4CookedHeaderSize = BitConverter.ToUInt32(nextBytes.Skip(20).Take(4).ToArray());
+
                         if (sig == UAsset.ACE7_MAGIC)
                         {
                             // Decrypt file in-situ
@@ -503,15 +509,32 @@ namespace UAssetGUI
                         }
                         else if (sig != UAsset.UASSET_MAGIC)
                         {
+                            // check if accidentally opened .uexp
+                            if (Path.GetExtension(filePath) == ".uexp")
+                            {
+                                MessageBox.Show("Failed to open this file! This is a .uexp file, which cannot be read directly. Please open the respective .uasset file instead.", "Uh oh!");
+                            }
                             // check if Zen asset for custom popup
                             // this definitely has potential for false positives, but it will still filter out basically any other file type, if it mattered that much i'd just actually parse the thing
-                            if ((sig == 0 || sig == 1) && nextFourBytes > 40 && nextFourBytes < 1e9)
+                            else if (Path.GetExtension(filePath) == ".uasset" && (sig == 0 || sig == 1) && nextFourBytes > 40 && nextFourBytes < 1e9) // IsUnversioned reasonable, HeaderSize reasonable
                             {
-                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! Zen Loader assets cannot currently be loaded directly into UAssetGUI. You can try extracting traditional cooked assets from IOStore container files by using ZenTools by Archengius, or otherwise try software like FModel or umodel to view the asset.\n\nWould you like to open the GitHub page for ZenTools?", "Uh oh!", MessageBoxButtons.YesNo);
+                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE5 Zen Loader assets cannot currently be loaded directly into UAssetGUI. You could try to extract traditional cooked assets from IOStore container files by using something like ZenTools by Archengius, or otherwise try software like FModel to read the asset.\n\nWould you like to open the GitHub page for ZenTools?", "Uh oh!", MessageBoxButtons.YesNo);
                                 switch (messageBoxRes)
                                 {
                                     case DialogResult.Yes:
                                         UAGUtils.OpenURL("https://github.com/Archengius/ZenTools");
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            else if (Path.GetExtension(filePath) == ".uasset" && nextFourBytes == 0 && ue4CookedHeaderSize > 40 && ue4CookedHeaderSize < 1e9) // zero FName, CookedHeaderSize reasonable
+                            {
+                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE4 Zen Loader assets cannot currently be loaded directly into UAssetGUI. You could try to extract traditional cooked assets from IOStore container files by using something like ZenTools-UE4, originally by Archengius and developed by Ryn/WistfulHopes, or otherwise try software like FModel to read the asset.\n\nWould you like to open the GitHub page for ZenTools-UE4?", "Uh oh!", MessageBoxButtons.YesNo);
+                                switch (messageBoxRes)
+                                {
+                                    case DialogResult.Yes:
+                                        UAGUtils.OpenURL("https://github.com/WistfulHopes/ZenTools-UE4");
                                         break;
                                     default:
                                         break;

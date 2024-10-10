@@ -12,6 +12,22 @@ UAssetGUI is a tool designed for low-level examination and modification of Unrea
 ## Installation
 You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository](https://github.com/atenfyr/UAssetGUI/releases).
 
+## Command line arguments
+You can run the program with command line arguments to export to and import from JSON, without opening the GUI.
+
+### Export to JSON
+```
+UAssetGUI tojson <source> <destination> <engine version> [mappings name]
+```
+Example: `UAssetGUI tojson A.umap B.json 514 Outriders`
+
+### Import from JSON
+```
+UAssetGUI fromjson <source> <destination> [mappings name]
+```
+
+Example: `UAssetGUI fromjson B.json A.umap Outriders`
+
 ## Compilation
 If you'd like to compile UAssetGUI for yourself, read on:
 

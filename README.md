@@ -19,7 +19,8 @@ You can run the program with command line arguments to export to and import from
 ```
 UAssetGUI tojson <source> <destination> <engine version> [mappings name]
 ```
-Example: `UAssetGUI tojson A.umap B.json 514 Outriders`
+Example: `UAssetGUI tojson A.uasset B.json VER_UE4_25`
+
 
 ### Import from JSON
 ```

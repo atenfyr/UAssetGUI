@@ -39,6 +39,7 @@
             browser1.Name = "browser1";
             browser1.Size = new System.Drawing.Size(619, 408);
             browser1.TabIndex = 0;
+            browser1.Navigating += browser1_Navigating;
             // 
             // closeButton
             // 

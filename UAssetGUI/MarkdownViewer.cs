@@ -25,9 +25,11 @@ namespace UAssetGUI
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
 
-            string stylingHTML = "<!DOCTYPE html><html><head><style>html{font-family:Arial,Helvetica,sans-serif;background-color:" + ColorTranslator.ToHtml(this.BackColor) + ";color:" + ColorTranslator.ToHtml(this.ForeColor) + "}a{color:" + ColorTranslator.ToHtml(UAGPalette.LinkColor) + ";text-decoration:underline !important}</style></head>";
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            string stylingHTML = "<!DOCTYPE html><html><head><style>html{font-family:Arial,Helvetica,sans-serif;background-color:" + ColorTranslator.ToHtml(this.BackColor) + ";color:" + ColorTranslator.ToHtml(this.ForeColor) + "}a{color:" + ColorTranslator.ToHtml(UAGPalette.LinkColor) + "}</style></head>";
+            string finalHTML = stylingHTML + "<body>" + Markdown.ToHtml(MarkdownToDisplay, pipeline) + "</body></html>";
 
-            this.browser1.DocumentText = stylingHTML + "<body>" + Markdown.ToHtml(MarkdownToDisplay) + "</body></html>";
+            this.browser1.DocumentText = finalHTML;
 
             ForceResize();
         }
@@ -46,6 +48,18 @@ namespace UAssetGUI
         private void MarkdownViewer_Resize(object sender, EventArgs e)
         {
             ForceResize();
+        }
+
+        private void browser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        {
+            string scheme = e.Url?.Scheme;
+            if (scheme == "http" || scheme == "https")
+            {
+                e.Cancel = true;
+                UAGUtils.OpenURL(e.Url.ToString());
+            }
+            // otherwise, presumably "navigating" to raw HTML (scheme == "about")
+            // not really worried about implementing this in a more secure way
         }
     }
 }

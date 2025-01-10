@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace UAssetGUI
@@ -43,12 +40,62 @@ namespace UAssetGUI
 
         private void licenseButton_Click(object sender, EventArgs e)
         {
-            UAGUtils.OpenURL("https://github.com/" + Form1.GitHubRepo + "/blob/master/LICENSE");
+            UAGUtils.InvokeUI(() =>
+            {
+                string rawMarkdownText = string.Empty;
+                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UAssetGUI.LICENSE"))
+                {
+                    if (stream != null)
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            if (reader != null) rawMarkdownText = reader.ReadToEnd().Trim();
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(rawMarkdownText))
+                {
+                    UAGUtils.OpenURL("https://github.com/" + Form1.GitHubRepo + "/blob/master/LICENSE");
+                    return;
+                }
+
+                var formPopup = new MarkdownViewer();
+                formPopup.MarkdownToDisplay = "```\n" + rawMarkdownText + "\n```";
+                formPopup.Text = "License";
+                formPopup.StartPosition = FormStartPosition.CenterParent;
+                formPopup.ShowDialog(this);
+            });
         }
 
         private void noticeButton_Click(object sender, EventArgs e)
         {
-            UAGUtils.OpenURL("https://github.com/" + Form1.GitHubRepo + "/blob/master/NOTICE.md");
+            UAGUtils.InvokeUI(() =>
+            {
+                string rawMarkdownText = string.Empty;
+                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UAssetGUI.NOTICE.md"))
+                {
+                    if (stream != null)
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            if (reader != null) rawMarkdownText = reader.ReadToEnd().Trim();
+                        }
+                    }
+                }
+
+                if (string.IsNullOrEmpty(rawMarkdownText))
+                {
+                    UAGUtils.OpenURL("https://github.com/" + Form1.GitHubRepo + "/blob/master/NOTICE.md");
+                    return;
+                }
+
+                var formPopup = new MarkdownViewer();
+                formPopup.MarkdownToDisplay = rawMarkdownText;
+                formPopup.Text = "List of 3rd-party software";
+                formPopup.StartPosition = FormStartPosition.CenterParent;
+                formPopup.ShowDialog(this);
+            });
         }
     }
 }

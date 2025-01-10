@@ -56,6 +56,10 @@
     <Delete Files="$(ProjectDir)git_commit.txt" />
   </Target>
   <ItemGroup>
+    <None Remove="LICENSE" />
+    <None Remove="NOTICE.md" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="ColorfulTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -130,6 +134,8 @@
     <EmbeddedResource Include="git_commit.txt">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="LICENSE" />
+    <EmbeddedResource Include="NOTICE.md" />
     <Content Include="next_patch_notes.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +150,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FolderBrowserEx" Version="1.0.1" />
+    <PackageReference Include="Markdig" Version="0.40.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>

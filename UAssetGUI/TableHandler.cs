@@ -2135,7 +2135,7 @@ namespace UAssetGUI
                         if (asset.Exports.Count <= rowNum)
                         {
                             // If we add a new category, we'll make a new NormalExport (None-terminated UProperty list). If you want to make some other kind of export, you'll need to do it manually with UAssetAPI
-                            var newCat = new NormalExport(asset, new byte[4]);
+                            var newCat = new NormalExport(asset, Array.Empty<Byte>());
                             newCat.Data = new List<PropertyData>();
                             asset.Exports.Add(newCat);
                             isNewExport = true;

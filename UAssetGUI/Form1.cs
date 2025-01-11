@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.ExportTypes;
-using UAssetAPI.IO;
 using UAssetAPI.PropertyTypes.Objects;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
@@ -509,8 +508,13 @@ namespace UAssetGUI
                         }
                         else if (sig != UAsset.UASSET_MAGIC)
                         {
+                            // check if opened .usmap
+                            if (Path.GetExtension(filePath) == ".usmap")
+                            {
+                                ImportMappingsFromPathInteractive(filePath);
+                            }
                             // check if accidentally opened .uexp
-                            if (Path.GetExtension(filePath) == ".uexp")
+                            else if (Path.GetExtension(filePath) == ".uexp")
                             {
                                 MessageBox.Show("Failed to open this file! This is a .uexp file, which cannot be read directly. Please open the respective .uasset file instead.", "Uh oh!");
                             }
@@ -1536,7 +1540,7 @@ namespace UAssetGUI
             // update version information if we have it
             if (ParsingMappings != null)
             {
-                var detVer = UnrealPackage.GetEngineVersion(ParsingMappings.FileVersionUE4, ParsingMappings.FileVersionUE5, ParsingMappings.CustomVersionContainer);
+                var detVer = UAsset.GetEngineVersion(ParsingMappings.FileVersionUE4, ParsingMappings.FileVersionUE5, ParsingMappings.CustomVersionContainer);
                 if (detVer != EngineVersion.UNKNOWN)
                 {
                     SetParsingVersion(detVer);
@@ -1961,7 +1965,7 @@ namespace UAssetGUI
             });
         }
 
-        private int ExtractIOStore(string inPath, string outPath)
+        /*private int ExtractIOStore(string inPath, string outPath)
         {
             var test = new IOStoreContainer(inPath);
             test.BeginRead();
@@ -2005,7 +2009,7 @@ namespace UAssetGUI
             timer.Stop();
 
             MessageBox.Show("Extracted " + numExtracted + " files in " + timer.ElapsedMilliseconds + " ms.", this.Text);
-        }
+        }*/
 
         private string SelectMappings()
         {
@@ -2057,13 +2061,10 @@ namespace UAssetGUI
             });
         }
 
-        private void importMappingsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ImportMappingsFromPathInteractive(string importPath)
         {
             UAGUtils.InvokeUI(() =>
             {
-                string importPath = SelectMappings();
-                if (importPath == null) return;
-
                 string newFileName = Path.GetFileNameWithoutExtension(importPath);
 
                 // special case if just "Mappings.usmap"
@@ -2094,6 +2095,16 @@ namespace UAssetGUI
                 {
                     MessageBox.Show("Failed to import mappings!", "Uh oh!");
                 }
+            });
+        }
+
+        private void importMappingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UAGUtils.InvokeUI(() =>
+            {
+                string importPath = SelectMappings();
+                if (importPath == null) return;
+                ImportMappingsFromPathInteractive(importPath);
             });
         }
 

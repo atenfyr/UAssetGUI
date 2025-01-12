@@ -462,8 +462,13 @@ namespace UAssetGUI
             return res;
         }
 
-        public DateTime LastLoadTimestamp = DateTime.UtcNow;
         public void LoadFileAt(string filePath)
+        {
+            UAGUtils.InvokeUI(() => LoadFileAtInternal(filePath));
+        }
+
+        public DateTime LastLoadTimestamp = DateTime.UtcNow;
+        private void LoadFileAtInternal(string filePath)
         {
             dataGridView1.Visible = true;
             byteView1.Visible = false;
@@ -671,6 +676,12 @@ namespace UAssetGUI
             }
             catch (Exception ex)
             {
+                string formattedListOfFailedToAccessAssets = null;
+                if (tableEditor?.asset != null && tableEditor.asset.HasUnversionedProperties && (tableEditor.asset.OtherAssetsFailedToAccess?.Count ?? 0) > 0)
+                {
+                    formattedListOfFailedToAccessAssets = string.Join("\n", tableEditor.asset.OtherAssetsFailedToAccess);
+                }
+
                 //MessageBox.Show(ex.StackTrace);
                 currentSavingPath = "";
                 SetUnsavedChanges(false);
@@ -684,6 +695,7 @@ namespace UAssetGUI
                 dataGridView1.Columns.Clear();
                 dataGridView1.Rows.Clear();
                 UAGPalette.RefreshTheme(this);
+
                 switch (ex)
                 {
                     case IOException _:
@@ -699,13 +711,18 @@ namespace UAssetGUI
                         MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
                         break;
                 }
+
+                if (formattedListOfFailedToAccessAssets != null)
+                {
+                    MessageBox.Show("UAssetAPI attempted to access the following assets, but failed to do so. It's possible that this error could be resolved by giving it access to these assets. You can either include them in the same directory, or reconstruct the game's Content directory tree.\n\n" + formattedListOfFailedToAccessAssets, "Notice");
+                }
             }
             finally
             {
                 LastLoadTimestamp = DateTime.UtcNow;
                 UpdateRPC();
 
-                UAGUtils.InvokeUI(treeView1.Select);
+                treeView1.Select();
             }
         }
 

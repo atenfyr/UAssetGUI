@@ -948,8 +948,8 @@ namespace UAssetGUI
                 if (nameB == null || typeB == null) return null;
                 if (!(nameB is string) || !(typeB is string)) return null;
 
-                string name = (string)nameB;
-                string type = (string)typeB;
+                string name = ((string)nameB)?.Trim();
+                string type = ((string)typeB)?.Trim();
                 if (name.Equals(string.Empty) || type.Equals(string.Empty)) return null;
 
                 FName nameName = namesAreDummies ? FName.DefineDummy(asset, name) : FName.FromString(asset, name);

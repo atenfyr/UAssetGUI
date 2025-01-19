@@ -221,13 +221,20 @@ namespace UAssetGUI
 
                 string initialSelection = newSelection == null ? (allMappingsKeys.Contains(UAGConfig.Data.PreferredMappings) ? UAGConfig.Data.PreferredMappings : allMappingsKeys[0]) : newSelection;
 
+                bool success = false;
                 for (int i = 0; i < allMappingsKeys.Count; i++)
                 {
                     if (allMappingsKeys[i] == initialSelection)
                     {
                         comboSpecifyMappings.SelectedIndex = i;
+                        success = true;
                         break;
                     }
+                }
+
+                if (!success)
+                {
+                    comboSpecifyMappings.SelectedIndex = 0;
                 }
 
                 UpdateComboSpecifyMappings(alsoCheckVersion);

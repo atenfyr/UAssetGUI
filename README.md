@@ -37,14 +37,16 @@ Example 2: `UAssetGUI fromjson B.json A.umap Outriders`
 
 ### Open a specific file in the GUI
 ```
-UAssetGUI <file name> [engine version] [mappings name]
+UAssetGUI [file name] [engine version] [mappings name]
 ```
 
-Example 1: `UAssetGUI test.uasset`
+Example 1: `UAssetGUI` (to simply open the GUI without opening a file)
 
-Example 2: `UAssetGUI test.uasset VER_UE4_23`
+Example 2: `UAssetGUI test.uasset`
 
-Example 3: `UAssetGUI test.uasset VER_UE5_1 Engine`
+Example 3: `UAssetGUI test.uasset 23`
+
+Example 4: `UAssetGUI test.uasset VER_UE5_4 Bellwright`
 
 ## Compilation
 If you'd like to compile UAssetGUI for yourself, read on:

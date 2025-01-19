@@ -926,6 +926,12 @@ namespace UAssetGUI
                             Clipboard.SetText(string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData);
                             return;
                         }
+                        else if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                        {
+                            string parsedData = BitConverter.ToString(((StructExport)pointerNode.Pointer).ScriptBytecodeRaw)?.Replace("-", " ");
+                            Clipboard.SetText(string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData);
+                            return;
+                        }
                         else if (pointerNode.Pointer is StructPropertyData copyingDat1)
                         {
                             if (treeView1.Focused) objectToCopy = copyingDat1;
@@ -1054,6 +1060,24 @@ namespace UAssetGUI
                             }
                             return;
                         }
+                        else if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                        {
+                            try
+                            {
+                                ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw = Clipboard.GetText() == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(Clipboard.GetText());
+                            }
+                            catch (Exception)
+                            {
+                                // the thing we're trying to paste probably isn't a byte array
+                            }
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
                         else if (pointerNode.Pointer is StructPropertyData copyingDat1 && deserializedClipboard != null)
                         {
                             if (rowIndex < 0) return;
@@ -1163,6 +1187,12 @@ namespace UAssetGUI
                             {
                                 ((NormalExport)pointerNode.Pointer).Extras = new byte[0];
                             }
+
+                            return;
+                        }
+                        else if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                        {
+                            ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw = new byte[0];
 
                             return;
                         }
@@ -1728,10 +1758,14 @@ namespace UAssetGUI
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode && (pointerNode.Type == PointingTreeNodeType.ByteArray || pointerNode.Type == PointingTreeNodeType.KismetByteArray))
                     {
                         byte[] rawData = File.ReadAllBytes(openFileDialog.FileName);
-                        if (pointerNode.Pointer is NormalExport usCategory)
+                        if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                        {
+                            ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw = rawData;
+                        }
+                        else if (pointerNode.Pointer is NormalExport usCategory)
                         {
                             usCategory.Extras = rawData;
                         }
@@ -1761,10 +1795,14 @@ namespace UAssetGUI
                 DialogResult res = dialog.ShowDialog();
                 if (res == DialogResult.OK)
                 {
-                    if (treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                    if (treeView1.SelectedNode is PointingTreeNode pointerNode && (pointerNode.Type == PointingTreeNodeType.ByteArray || pointerNode.Type == PointingTreeNodeType.KismetByteArray))
                     {
                         byte[] rawData = new byte[0];
-                        if (pointerNode.Pointer is NormalExport usCategory)
+                        if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                        {
+                            rawData = ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw;
+                        }
+                        else if (pointerNode.Pointer is NormalExport usCategory)
                         {
                             rawData = usCategory.Extras;
                         }
@@ -1790,9 +1828,13 @@ namespace UAssetGUI
 
             if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
             {
-                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && treeView1.SelectedNode is PointingTreeNode pointerNode && pointerNode.Type == PointingTreeNodeType.ByteArray)
+                if (int.TryParse(replacementPrompt.OutputText, out int numBytes) && treeView1.SelectedNode is PointingTreeNode pointerNode && (pointerNode.Type == PointingTreeNodeType.ByteArray || pointerNode.Type == PointingTreeNodeType.KismetByteArray))
                 {
-                    if (pointerNode.Pointer is NormalExport usCategory)
+                    if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                    {
+                        ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw = new byte[numBytes];
+                    }
+                    else if (pointerNode.Pointer is NormalExport usCategory)
                     {
                         usCategory.Extras = new byte[numBytes];
                     }

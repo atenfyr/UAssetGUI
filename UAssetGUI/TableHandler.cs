@@ -56,7 +56,8 @@ namespace UAssetGUI
         ByteArray,
         Dummy,
         UserDefinedStructData,
-        Kismet
+        Kismet,
+        KismetByteArray
     }
 
     public class PointingTreeNode : TreeNode
@@ -283,7 +284,7 @@ namespace UAssetGUI
                                 categoryNode.Nodes.Add(parentNode2);
                                 if (structUs.ScriptBytecode == null)
                                 {
-                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs.ScriptBytecodeRaw, PointingTreeNodeType.Normal, i);
+                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs, PointingTreeNodeType.KismetByteArray, i);
                                     bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
@@ -1420,12 +1421,23 @@ namespace UAssetGUI
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
-                        if (pointerNode.Type == PointingTreeNodeType.ByteArray)
+                        if (pointerNode.Type == PointingTreeNodeType.ByteArray || pointerNode.Type == PointingTreeNodeType.KismetByteArray)
                         {
                             Control currentlyFocusedControl = origForm.ActiveControl;
                             dataGridView1.Visible = false;
                             byteView1.SetBytes(new byte[] { });
-                            byteView1.SetBytes(pointerNode.Pointer is RawExport ? ((RawExport)pointerNode.Pointer).Data : ((NormalExport)pointerNode.Pointer).Extras);
+                            if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
+                            {
+                                byteView1.SetBytes(((StructExport)pointerNode.Pointer).ScriptBytecodeRaw);
+                            }
+                            else if (pointerNode.Pointer is RawExport)
+                            {
+                                byteView1.SetBytes(((RawExport)pointerNode.Pointer).Data);
+                            }
+                            else if (pointerNode.Pointer is NormalExport)
+                            {
+                                byteView1.SetBytes(((NormalExport)pointerNode.Pointer).Extras);
+                            }
                             byteView1.Visible = true;
                             origForm.importBinaryData.Visible = true;
                             origForm.exportBinaryData.Visible = true;

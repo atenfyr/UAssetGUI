@@ -2069,14 +2069,25 @@ namespace UAssetGUI
 
                 if (inPath == null) return;
 
+                bool success = true;
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
-                var thing = new SaveGame(inPath);
-                thing.PatchUsmap(patchPath);
-                timer.Stop();
-                UpdateMappings();
-
-                MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
+                try
+                {
+                    var thing = new SaveGame(inPath);
+                    thing.PatchUsmap(patchPath);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Failed to patch mappings! " + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                    success = false;
+                }
+                finally
+                {
+                    timer.Stop();
+                    UpdateMappings();
+                    if (success) MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
+                }
             });
         }
 

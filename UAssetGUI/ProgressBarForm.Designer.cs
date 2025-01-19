@@ -60,7 +60,7 @@
             // 
             label1.Location = new System.Drawing.Point(16, 79);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(71, 30);
+            label1.Size = new System.Drawing.Size(95, 30);
             label1.TabIndex = 16;
             label1.Text = "label1";
             label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

@@ -529,11 +529,11 @@ namespace UAssetGUI
             if (e.Node is PointingFileTreeNode ptn) InitializeChildren(ptn);
         }
 
-        private void ExtractVisit(DirectoryTreeItem processingNode, ProgressBarForm progressBarForm)
+        private void ExtractVisit(DirectoryTreeItem processingNode, ProgressBarForm progressBarForm, FileStream stream2 = null, PakReader reader2 = null)
         {
             if (processingNode.IsFile)
             {
-                UAGConfig.ExtractFile(processingNode);
+                UAGConfig.ExtractFile(processingNode, stream2, reader2);
                 extractAllBackgroundWorker.ReportProgress(0); // the percentage we pass in is unused
                 return;
             }
@@ -541,7 +541,7 @@ namespace UAssetGUI
             foreach (var entry in processingNode.Children)
             {
                 if (extractAllBackgroundWorker.CancellationPending) break;
-                ExtractVisit(entry.Value, progressBarForm);
+                ExtractVisit(entry.Value, progressBarForm, stream2, reader2);
             }
         }
 
@@ -574,10 +574,15 @@ namespace UAssetGUI
         private void extractAllBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null) throw new InvalidOperationException("No container loaded");
-            foreach (var entry in loadedTree.RootNodes)
+
+            using (FileStream stream = new FileStream(this.CurrentContainerPath, FileMode.Open))
             {
-                if (extractAllBackgroundWorker.CancellationPending) break;
-                ExtractVisit(entry.Value, progressBarForm);
+                var reader = new PakBuilder().Reader(stream);
+                foreach (var entry in loadedTree.RootNodes)
+                {
+                    if (extractAllBackgroundWorker.CancellationPending) break;
+                    ExtractVisit(entry.Value, progressBarForm, stream, reader);
+                }
             }
 
             if (extractAllBackgroundWorker.CancellationPending)
@@ -786,9 +791,9 @@ namespace UAssetGUI
         public DirectoryTreeItem Parent;
         public IDictionary<string, DirectoryTreeItem> Children;
 
-        public string SaveFileToTemp()
+        public string SaveFileToTemp(string outputPathDirectory = null, FileStream stream2 = null, PakReader reader2 = null)
         {
-            string outputPathDirectory = Path.Combine(Path.GetTempPath(), "UAG_read_only", Path.GetFileNameWithoutExtension(ParentForm.CurrentContainerPath));
+            outputPathDirectory = outputPathDirectory ?? Path.Combine(Path.GetTempPath(), "UAG_read_only", Path.GetFileNameWithoutExtension(ParentForm.CurrentContainerPath));
             
             string outputPath1 = Path.Combine(outputPathDirectory, FullPath.Replace('/', Path.DirectorySeparatorChar));
             string outputPath2 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".uexp").Replace('/', Path.DirectorySeparatorChar));
@@ -803,11 +808,35 @@ namespace UAssetGUI
                 return outputPath1;
             }
 
-            using (FileStream stream = new FileStream(ParentForm.CurrentContainerPath, FileMode.Open))
+            if (reader2 == null || stream2 == null)
             {
-                var reader = new PakBuilder().Reader(stream);
+                using (FileStream stream = new FileStream(ParentForm.CurrentContainerPath, FileMode.Open))
+                {
+                    var reader = new PakBuilder().Reader(stream);
 
-                byte[] res = reader.Get(stream, FullPath.Substring(Prefix?.Length ?? 0));
+                    byte[] res = reader.Get(stream, FullPath.Substring(Prefix?.Length ?? 0));
+                    if (res != null)
+                    {
+                        if (File.Exists(outputPath1)) { try { File.Delete(outputPath1); } catch { } }
+                        File.WriteAllBytes(outputPath1, res);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+
+                    res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
+                    if (File.Exists(outputPath2)) { try { File.Delete(outputPath2); } catch { } }
+                    if (res != null) File.WriteAllBytes(outputPath2, res);
+
+                    res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
+                    if (File.Exists(outputPath3)) { try { File.Delete(outputPath3); } catch { } }
+                    if (res != null) File.WriteAllBytes(outputPath3, res);
+                }
+            }
+            else
+            {
+                byte[] res = reader2.Get(stream2, FullPath.Substring(Prefix?.Length ?? 0));
                 if (res != null)
                 {
                     File.WriteAllBytes(outputPath1, res);
@@ -817,11 +846,12 @@ namespace UAssetGUI
                     return null;
                 }
 
-                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
+                res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
                 if (res != null) File.WriteAllBytes(outputPath2, res);
-                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
+                res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
                 if (res != null) File.WriteAllBytes(outputPath2, res);
             }
+
 
             return outputPath1;
         }

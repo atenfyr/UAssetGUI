@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using UAssetAPI;
 using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
@@ -127,30 +128,18 @@ namespace UAssetGUI
             try { File.Delete(Path.ChangeExtension(outputPath, ".ubulk")); } catch { }
         }
 
-        public static string ExtractFile(DirectoryTreeItem item)
+        public static string ExtractFile(DirectoryTreeItem item, FileStream stream2 = null, PakReader reader2 = null)
         {
             var finalPath = Path.Combine(ExtractedFolder, item.FullPath.Replace('/', Path.DirectorySeparatorChar));
 
             // recursive if we were given a directory
             if (!item.IsFile)
             {
-                foreach (var child in item.Children) ExtractFile(child.Value);
+                foreach (var child in item.Children) ExtractFile(child.Value, stream2, reader2);
                 return finalPath;
             }
 
-            string outputPath = item.SaveFileToTemp();
-            try { Directory.CreateDirectory(Path.GetDirectoryName(finalPath)); } catch { return null; } // fail silently if cant make the directory we need
-
-            try { Directory.Delete(finalPath, true); } catch { } // if we turn a directory into a file, try and get rid of the directory
-
-            File.Copy(outputPath, finalPath, true);
-            try { File.Copy(Path.ChangeExtension(outputPath, ".uexp"), Path.ChangeExtension(finalPath, ".uexp"), true); } catch { }
-            try { File.Copy(Path.ChangeExtension(outputPath, ".ubulk"), Path.ChangeExtension(finalPath, ".ubulk"), true); } catch { }
-            try { File.Delete(outputPath); } catch { }
-            try { File.Delete(Path.ChangeExtension(outputPath, ".uexp")); } catch { }
-            try { File.Delete(Path.ChangeExtension(outputPath, ".ubulk")); } catch { }
-
-            return finalPath;
+            return item.SaveFileToTemp(ExtractedFolder, stream2, reader2);
         }
 
         public static bool TryGetMappings(string name, out Usmap mappings)

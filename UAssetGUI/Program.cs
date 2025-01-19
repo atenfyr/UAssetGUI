@@ -33,7 +33,7 @@ namespace UAssetGUI
                 switch (args[1].ToLowerInvariant())
                 {
                     // tojson <source> <destination> <engine version> [mappings name]
-                    // UAssetGUI tojson A.umap B.json 514 Outriders
+                    // UAssetGUI tojson A.umap B.json 23 Outriders
                     case "tojson":
                         UAGConfig.LoadMappings();
 
@@ -41,10 +41,8 @@ namespace UAssetGUI
                         if (args.Length >= 6) UAGConfig.TryGetMappings(args[5], out selectedMappings);
 
                         EngineVersion selectedVer = EngineVersion.UNKNOWN;
-                        if (!Enum.TryParse(args[4], out selectedVer))
-                        {
-                            if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
-                        }
+                        if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
+                        else Enum.TryParse(args[4], out selectedVer);
 
                         string jsonSerializedAsset = new UAsset(args[2], selectedVer, selectedMappings).SerializeJson(Newtonsoft.Json.Formatting.Indented);
                         File.WriteAllText(args[3], jsonSerializedAsset);

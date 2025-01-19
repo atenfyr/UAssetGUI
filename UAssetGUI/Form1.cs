@@ -387,10 +387,17 @@ namespace UAssetGUI
             if (args.Length > 1)
             {
                 EngineVersion selectedVer = EngineVersion.UNKNOWN;
-                if (args.Length > 2 && !Enum.TryParse(args[2], out selectedVer))
+
+                if (args.Length > 2)
                 {
-                    if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = (EngineVersion)selectedVerRaw;
+                    if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
+                    else Enum.TryParse(args[2], out selectedVer);
                 }
+                if (args.Length > 3)
+                {
+                    UpdateMappings(args[3]);
+                }
+
                 if (selectedVer > EngineVersion.UNKNOWN) SetParsingVersion(selectedVer);
                 LoadFileAt(args[1]);
             }

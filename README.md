@@ -13,21 +13,34 @@ UAssetGUI is a tool designed for low-level examination and modification of Unrea
 You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository](https://github.com/atenfyr/UAssetGUI/releases).
 
 ## Command line arguments
-You can run the program with command line arguments to export to and import from JSON, without opening the GUI.
+You can run the program with command line arguments to perform various tasks, such as exporting and importing from UAssetAPI JSON without opening the GUI.
+
+In the following cases, the engine version can either be specified as an EngineVersion enum entry (e.g. `VER_UE4_23` to refer to 4.23, `VER_UE5_0` to refer to 5.0, etc.) or as an integer (e.g. `23` to refer to 4.23, `29` to refer to 5.0, etc.). Specifying a set of mappings is optional, but if specified, must be the name of a file within the Mappings config directory (with no extension).
 
 ### Export to JSON
 ```
 UAssetGUI tojson <source> <destination> <engine version> [mappings name]
 ```
-Example: `UAssetGUI tojson A.uasset B.json VER_UE4_25`
 
+Example 1: `UAssetGUI tojson A.uasset B.json VER_UE5_1`
+Example 2: `UAssetGUI tojson A.uasset B.json 27 Astro`
 
 ### Import from JSON
 ```
 UAssetGUI fromjson <source> <destination> [mappings name]
 ```
 
-Example: `UAssetGUI fromjson B.json A.umap Outriders`
+Example 1: `UAssetGUI fromjson B.json A.umap`
+Example 2: `UAssetGUI fromjson B.json A.umap Outriders`
+
+### Open a specific file in the GUI
+```
+UAssetGUI <file name> [engine version] [mappings name]
+```
+
+Example 1: `UAssetGUI test.uasset`
+Example 2: `UAssetGUI test.uasset VER_UE4_23`
+Example 3: `UAssetGUI test.uasset VER_UE5_1 Engine`
 
 ## Compilation
 If you'd like to compile UAssetGUI for yourself, read on:

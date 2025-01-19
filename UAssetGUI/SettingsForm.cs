@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
+using UAssetAPI;
 
 namespace UAssetGUI
 {
@@ -16,6 +18,21 @@ namespace UAssetGUI
         private void SettingsForm_Load(object sender, EventArgs e)
         {
             if (this.Owner is Form1) BaseForm = (Form1)this.Owner;
+
+            customSerializationFlagsBox.BeginUpdate();
+            customSerializationFlagsBox.Items.Clear();
+            List<CustomSerializationFlags> allFlags = Enum.GetValues(typeof(CustomSerializationFlags)).Cast<CustomSerializationFlags>().ToList();
+            int entryIdx = 0;
+            for (int i = 0; i < allFlags.Count; i++)
+            {
+                CustomSerializationFlags option = allFlags[i];
+                if (option == 0) continue;
+
+                customSerializationFlagsBox.Items.Add(option.ToString());
+                customSerializationFlagsBox.SetItemChecked(entryIdx++, (UAGConfig.Data.CustomSerializationFlags & (int)option) > 0);
+            }
+            customSerializationFlagsBox.EndUpdate();
+
             themeComboBox.DataSource = Enum.GetValues(typeof(UAGTheme));
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
             valuesOnScroll.Checked = UAGConfig.Data.ChangeValuesOnScroll;
@@ -155,6 +172,32 @@ namespace UAssetGUI
                     BaseForm.tableEditor.Save(true);
                 }
             });
+        }
+
+        private void customSerializationFlagsBox_Click(object sender, EventArgs e)
+        {
+            // idea from https://stackoverflow.com/a/334672
+            for (int i = 0; i < customSerializationFlagsBox.Items.Count; i++)
+            {
+                if (customSerializationFlagsBox.GetItemRectangle(i).Contains(customSerializationFlagsBox.PointToClient(MousePosition)))
+                {
+                    customSerializationFlagsBox.SetItemChecked(i, !customSerializationFlagsBox.GetItemChecked(i));
+                }
+            }
+
+            // update config
+            CustomSerializationFlags res = 0;
+            for (int i = 0; i < customSerializationFlagsBox.Items.Count; i++)
+            {
+                string item = customSerializationFlagsBox.Items[i] as string;
+                if (item == null) continue;
+                if (customSerializationFlagsBox.GetItemChecked(i))
+                {
+                    res |= Enum.Parse<CustomSerializationFlags>(item);
+                }
+            }
+
+            UAGConfig.Data.CustomSerializationFlags = (int)res;
         }
     }
 }

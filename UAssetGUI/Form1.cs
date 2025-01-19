@@ -575,6 +575,7 @@ namespace UAssetGUI
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
                         targetAsset.Mappings = ParsingMappings;
+                        targetAsset.CustomSerializationFlags = (CustomSerializationFlags)UAGConfig.Data.CustomSerializationFlags;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
 
                         var strmRaw = targetAsset.PathToStream(filePath);

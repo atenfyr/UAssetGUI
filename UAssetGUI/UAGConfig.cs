@@ -26,6 +26,7 @@ namespace UAssetGUI
         public bool EnablePrettyBytecode;
         public int StartupWidth;
         public int StartupHeight;
+        public int CustomSerializationFlags;
 
         public UAGConfigData()
         {
@@ -44,6 +45,7 @@ namespace UAssetGUI
             EnablePrettyBytecode = true;
             StartupWidth = 1000;
             StartupHeight = 700;
+            CustomSerializationFlags = 0;
         }
     }
 

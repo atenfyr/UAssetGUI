@@ -76,119 +76,127 @@ namespace UAssetGUI
 
             UAGUtils.InitializeInvoke(this);
 
-            UAGConfig.Load();
-
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-
-            string gitVersionGUI = string.Empty;
-            using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
+            try
             {
-                if (stream != null)
+                UAGConfig.Load();
+
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+                string gitVersionGUI = string.Empty;
+                using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
                 {
-                    using (StreamReader reader = new StreamReader(stream))
+                    if (stream != null)
                     {
-                        if (reader != null) gitVersionGUI = reader.ReadToEnd().Trim();
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            if (reader != null) gitVersionGUI = reader.ReadToEnd().Trim();
+                        }
                     }
                 }
-            }
 
-            if (!gitVersionGUI.All("0123456789abcdef".Contains)) gitVersionGUI = string.Empty;
+                if (!gitVersionGUI.All("0123456789abcdef".Contains)) gitVersionGUI = string.Empty;
 
-            string gitVersionAPI = string.Empty;
-            using (Stream stream = typeof(PropertyData).Assembly.GetManifestResourceStream("UAssetAPI.git_commit.txt"))
-            {
-                if (stream != null)
+                string gitVersionAPI = string.Empty;
+                using (Stream stream = typeof(PropertyData).Assembly.GetManifestResourceStream("UAssetAPI.git_commit.txt"))
                 {
-                    using (StreamReader reader = new StreamReader(stream))
+                    if (stream != null)
                     {
-                        if (reader != null) gitVersionAPI = reader.ReadToEnd().Trim();
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            if (reader != null) gitVersionAPI = reader.ReadToEnd().Trim();
+                        }
                     }
                 }
-            }
 
-            if (!gitVersionAPI.All("0123456789abcdef".Contains)) gitVersionAPI = string.Empty;
+                if (!gitVersionAPI.All("0123456789abcdef".Contains)) gitVersionAPI = string.Empty;
 
-            if (!string.IsNullOrEmpty(gitVersionGUI))
-            {
-                UAGUtils._displayVersion += " (" + gitVersionGUI;
-                if (!string.IsNullOrEmpty(gitVersionAPI))
+                if (!string.IsNullOrEmpty(gitVersionGUI))
                 {
-                    UAGUtils._displayVersion += " - " + gitVersionAPI;
+                    UAGUtils._displayVersion += " (" + gitVersionGUI;
+                    if (!string.IsNullOrEmpty(gitVersionAPI))
+                    {
+                        UAGUtils._displayVersion += " - " + gitVersionAPI;
+                    }
+                    UAGUtils._displayVersion += ")";
                 }
-                UAGUtils._displayVersion += ")";
-            }
 
-            this.Text = DisplayVersion;
-            this.AllowDrop = true;
-            dataGridView1.Visible = true;
+                this.Text = DisplayVersion;
+                this.AllowDrop = true;
+                dataGridView1.Visible = true;
 
-            // Extra data viewer
-            byteView1 = new ByteViewer
-            {
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-                AutoSize = true,
-                Visible = false
-            };
-            splitContainer1.Panel2.Controls.Add(byteView1);
-
-            jsonView = new TextBox
-            {
-                Dock = DockStyle.Fill,
-                Visible = false,
-                AutoSize = true,
-                Multiline = true,
-                ReadOnly = true,
-                MaxLength = int.MaxValue,
-                ScrollBars = ScrollBars.Both,
-            };
-            splitContainer1.Panel2.Controls.Add(jsonView);
-
-            jsonView.TextChanged += (object sender, EventArgs e) => { if (tableEditor == null) return; tableEditor.dirtySinceLastLoad = true; SetUnsavedChanges(true); };
-
-            importBinaryData.Visible = false;
-            exportBinaryData.Visible = false;
-            setBinaryData.Visible = false;
-
-            // Enable double buffering to look nicer
-            if (!SystemInformation.TerminalServerSession)
-            {
-                Type ourGridType = dataGridView1.GetType();
-                PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
-                pi.SetValue(dataGridView1, true, null);
-            }
-
-            // Auto resizing
-            SizeChanged += frm_sizeChanged;
-            FormClosing += frm_closing;
-
-            // position of ByteViewer buttons depends on splitter location so resize if splitter moves
-            splitContainer1.SplitterMoved += (sender, e) => { ForceResize(); };
-
-            // Drag-and-drop support
-            DragEnter += new DragEventHandler(frm_DragEnter);
-            DragDrop += new DragEventHandler(frm_DragDrop);
-
-            dataGridView1.MouseWheel += dataGridView1_MouseWheel;
-            //dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
-
-            menuStrip1.Renderer = new UAGMenuStripRenderer();
-            foreach (ToolStripMenuItem entry in menuStrip1.Items)
-            {
-                entry.DropDownOpened += (sender, args) =>
+                // Extra data viewer
+                byteView1 = new ByteViewer
                 {
-                    isDropDownOpened[entry] = true;
+                    Dock = DockStyle.Fill,
+                    AutoScroll = true,
+                    AutoSize = true,
+                    Visible = false
                 };
-                entry.DropDownClosed += (sender, args) =>
+                splitContainer1.Panel2.Controls.Add(byteView1);
+
+                jsonView = new TextBox
                 {
-                    isDropDownOpened[entry] = false;
+                    Dock = DockStyle.Fill,
+                    Visible = false,
+                    AutoSize = true,
+                    Multiline = true,
+                    ReadOnly = true,
+                    MaxLength = int.MaxValue,
+                    ScrollBars = ScrollBars.Both,
                 };
+                splitContainer1.Panel2.Controls.Add(jsonView);
+
+                jsonView.TextChanged += (object sender, EventArgs e) => { if (tableEditor == null) return; tableEditor.dirtySinceLastLoad = true; SetUnsavedChanges(true); };
+
+                importBinaryData.Visible = false;
+                exportBinaryData.Visible = false;
+                setBinaryData.Visible = false;
+
+                // Enable double buffering to look nicer
+                if (!SystemInformation.TerminalServerSession)
+                {
+                    Type ourGridType = dataGridView1.GetType();
+                    PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+                    pi.SetValue(dataGridView1, true, null);
+                }
+
+                // Auto resizing
+                SizeChanged += frm_sizeChanged;
+                FormClosing += frm_closing;
+
+                // position of ByteViewer buttons depends on splitter location so resize if splitter moves
+                splitContainer1.SplitterMoved += (sender, e) => { ForceResize(); };
+
+                // Drag-and-drop support
+                DragEnter += new DragEventHandler(frm_DragEnter);
+                DragDrop += new DragEventHandler(frm_DragDrop);
+
+                dataGridView1.MouseWheel += dataGridView1_MouseWheel;
+                //dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
+
+                menuStrip1.Renderer = new UAGMenuStripRenderer();
+                foreach (ToolStripMenuItem entry in menuStrip1.Items)
+                {
+                    entry.DropDownOpened += (sender, args) =>
+                    {
+                        isDropDownOpened[entry] = true;
+                    };
+                    entry.DropDownClosed += (sender, args) =>
+                    {
+                        isDropDownOpened[entry] = false;
+                    };
+                }
+
+                ac7decrypt = new AC7Decrypt();
+
+                UpdateRPC();
             }
-
-            ac7decrypt = new AC7Decrypt();
-
-            UpdateRPC();
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occured while initializing!\n" + ex.GetType() + ": " + ex.Message + "\n\nUAssetGUI will now close.", "UAssetGUI");
+                Environment.Exit(1); // kill the process
+            }
         }
 
         private static Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();

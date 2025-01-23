@@ -167,6 +167,7 @@ namespace UAssetGUI
 
                 // position of ByteViewer buttons depends on splitter location so resize if splitter moves
                 splitContainer1.SplitterMoved += (sender, e) => { ForceResize(); };
+                splitContainer1.SplitterDistance = UAGPalette.InitialSplitterDistance;
 
                 // Drag-and-drop support
                 DragEnter += new DragEventHandler(frm_DragEnter);

@@ -63,10 +63,21 @@ namespace UAssetGUI
             });
         }
 
+        /// <summary>
+        /// null = check based on favorite thing, false = force no comic sans, true = force yes comic sans
+        /// </summary>
+        public static bool? IsComicSansOverride = null;
+        public static bool IsComicSans()
+        {
+            if (IsComicSansOverride != null) return (bool)IsComicSansOverride;
+            return UAGConfig.Data.FavoriteThing.ToLowerInvariant().Trim().StartsWith("comic sans");
+        }
+
 
         private static Dictionary<Control, Font> oldFontSettings = null;
-        private static void RefreshAllButtonsInControl(this Control ctrl)
+        private static void RefreshAllButtonsInControl(this Control ctrl, out bool needRefreshForComicSans)
         {
+            needRefreshForComicSans = false;
             foreach (Control ctrl2 in ctrl.Controls)
             {
                 if (ctrl2 is Button butto)
@@ -89,19 +100,25 @@ namespace UAssetGUI
                     gp.ForeColor = UAGPalette.ForeColor;
                 }
 
-                if (UAGConfig.Data.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
+                if (IsComicSans())
                 {
+                    needRefreshForComicSans = true;
                     if (oldFontSettings == null) oldFontSettings = new Dictionary<Control, Font>();
                     if (ctrl2.Font.FontFamily.Name != "Comic Sans MS") oldFontSettings[ctrl2] = ctrl2.Font;
                     ctrl2.Font = new Font("Comic Sans MS", ctrl2.Font.Size, ctrl2.Font.Style);
                 }
                 else if (oldFontSettings != null)
                 {
-                    if (oldFontSettings.ContainsKey(ctrl2) && oldFontSettings[ctrl2] != null) ctrl2.Font = oldFontSettings[ctrl2];
+                    if (oldFontSettings.ContainsKey(ctrl2) && oldFontSettings[ctrl2] != null)
+                    {
+                        ctrl2.Font = oldFontSettings[ctrl2];
+                        needRefreshForComicSans = true;
+                    }
                     oldFontSettings[ctrl2] = null;
                 }
 
-                RefreshAllButtonsInControl(ctrl2);
+                RefreshAllButtonsInControl(ctrl2, out bool needRefreshForComicSansInner);
+                if (needRefreshForComicSansInner) needRefreshForComicSans = true;
             }
         }
 
@@ -157,6 +174,7 @@ namespace UAssetGUI
             }
         }
 
+        public static readonly int InitialSplitterDistance = 408;
         private static void RefreshThemeInternal(Form frm)
         {
             switch (CurrentTheme)
@@ -183,6 +201,8 @@ namespace UAssetGUI
                     break;
             }
 
+            frm.RefreshAllButtonsInControl(out bool needRefreshForComicSans);
+
             frm.Icon = Properties.Resources.icon;
             frm.BackColor = UAGPalette.BackColor;
             frm.ForeColor = UAGPalette.ForeColor;
@@ -201,6 +221,12 @@ namespace UAssetGUI
 
                 AdjustDGV(frm1.dataGridView1);
 
+                // reset splitter if comic sans
+                if (needRefreshForComicSans)
+                {
+                    frm1.splitContainer1.SplitterDistance = InitialSplitterDistance;
+                }
+
                 /*if (frm1.tableEditor != null)
                 {
                     frm1.tableEditor.Save(true);
@@ -216,7 +242,17 @@ namespace UAssetGUI
             {
                 AdjustDGV(frm2.mstoDataGridView);
             }
-            frm.RefreshAllButtonsInControl();
+
+            // fix some strange formatting issues with the comic sans easter egg
+            // could just always execute this, but just in case this has other undesired effects, only execute it when needed
+            // (not actually that big a deal if the comic sans easter egg breaks something, but a big deal if we break something else just to fix the easter egg...)
+            if (frm is SettingsForm frm4 && needRefreshForComicSans)
+            {
+                frm4.numericUpDown1.Location = new Point(frm4.favoriteThingBox.Location.X, frm4.label3.Location.Y);
+                frm4.numericUpDown1.Size = frm4.favoriteThingBox.Size;
+                frm4.customSerializationFlagsBox.Location = new Point(frm4.favoriteThingBox.Location.X, frm4.label4.Location.Y);
+                frm4.customSerializationFlagsBox.Size = frm4.favoriteThingBox.Size;
+            }
         }
     }
 }

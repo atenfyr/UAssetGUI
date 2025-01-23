@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using UAssetAPI;
@@ -11,6 +13,7 @@ namespace UAssetGUI
         public SettingsForm()
         {
             InitializeComponent();
+            numericUpDown1.MouseWheel += NumericUpDown1_MouseWheel;
         }
 
         private Form1 BaseForm;
@@ -137,7 +140,9 @@ namespace UAssetGUI
         private void favoriteThingBox_TextChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.FavoriteThing = favoriteThingBox.Text;
-            if (UAGConfig.Data.FavoriteThing.ToLowerInvariant().StartsWith("comic sans"))
+            string favoriteThingLowered = UAGConfig.Data.FavoriteThing.ToLowerInvariant().Trim();
+
+            if (UAGPalette.IsComicSans())
             {
                 isCurrentlyComicSans = true;
                 UAGPalette.RefreshTheme(BaseForm);
@@ -148,6 +153,19 @@ namespace UAssetGUI
                 isCurrentlyComicSans = false;
                 UAGPalette.RefreshTheme(BaseForm);
                 UAGPalette.RefreshTheme(this);
+            }
+
+            if (favoriteThingLowered == "atenfyr" || favoriteThingLowered == "adolescent")
+            {
+                // need MemoryStream to remain open until we're done using the image
+                // no need to dispose MemoryStream so let's just let GC handle it once image stops being used
+                var strm = new MemoryStream(Properties.Resources.dancing_cat); 
+                this.pictureBox1.Image = Image.FromStream(strm);
+                this.pictureBox1.Visible = true;
+            }
+            else
+            {
+                this.pictureBox1.Visible = false;
             }
         }
 
@@ -176,6 +194,8 @@ namespace UAssetGUI
 
         private void customSerializationFlagsBox_Click(object sender, EventArgs e)
         {
+            // this logic is here to prevent default list box selection logic
+
             // idea from https://stackoverflow.com/a/334672
             for (int i = 0; i < customSerializationFlagsBox.Items.Count; i++)
             {
@@ -198,6 +218,21 @@ namespace UAssetGUI
             }
 
             UAGConfig.Data.CustomSerializationFlags = (int)res;
+        }
+
+        private void NumericUpDown1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            // override default scroll logic to prevent weird +3 problem
+            if (e.Delta == 0) return;
+            ((HandledMouseEventArgs)e).Handled = true;
+
+            UAGUtils.InvokeUI(() =>
+            {
+                decimal newValue = numericUpDown1.Value + (e.Delta > 0 ? 1 : -1);
+                if (newValue < numericUpDown1.Minimum) newValue = numericUpDown1.Minimum;
+                if (newValue > numericUpDown1.Maximum) newValue = numericUpDown1.Maximum;
+                numericUpDown1.Value = newValue;
+            });
         }
     }
 }

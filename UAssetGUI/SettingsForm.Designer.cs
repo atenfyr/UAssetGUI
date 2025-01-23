@@ -47,7 +47,9 @@
             enablePrettyBytecode = new System.Windows.Forms.CheckBox();
             label4 = new System.Windows.Forms.Label();
             customSerializationFlagsBox = new System.Windows.Forms.CheckedListBox();
+            pictureBox1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // infoLabel
@@ -81,7 +83,7 @@
             // 
             label1.AutoSize = true;
             label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label1.Location = new System.Drawing.Point(65, 72);
+            label1.Location = new System.Drawing.Point(72, 72);
             label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(53, 16);
@@ -92,7 +94,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label2.Location = new System.Drawing.Point(15, 102);
+            label2.Location = new System.Drawing.Point(22, 102);
             label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(96, 16);
@@ -118,7 +120,7 @@
             // 
             themeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             themeComboBox.FormattingEnabled = true;
-            themeComboBox.Location = new System.Drawing.Point(135, 70);
+            themeComboBox.Location = new System.Drawing.Point(142, 70);
             themeComboBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             themeComboBox.Name = "themeComboBox";
             themeComboBox.Size = new System.Drawing.Size(252, 23);
@@ -127,7 +129,7 @@
             // 
             // favoriteThingBox
             // 
-            favoriteThingBox.Location = new System.Drawing.Point(135, 100);
+            favoriteThingBox.Location = new System.Drawing.Point(142, 100);
             favoriteThingBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             favoriteThingBox.Name = "favoriteThingBox";
             favoriteThingBox.Size = new System.Drawing.Size(252, 23);
@@ -148,7 +150,7 @@
             // 
             // numericUpDown1
             // 
-            numericUpDown1.Location = new System.Drawing.Point(135, 130);
+            numericUpDown1.Location = new System.Drawing.Point(142, 130);
             numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             numericUpDown1.Name = "numericUpDown1";
             numericUpDown1.Size = new System.Drawing.Size(252, 23);
@@ -159,7 +161,7 @@
             // 
             label3.AutoSize = true;
             label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label3.Location = new System.Drawing.Point(75, 130);
+            label3.Location = new System.Drawing.Point(82, 130);
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(45, 16);
@@ -254,7 +256,7 @@
             // 
             label4.AutoSize = true;
             label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label4.Location = new System.Drawing.Point(75, 161);
+            label4.Location = new System.Drawing.Point(82, 161);
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(44, 16);
@@ -265,7 +267,7 @@
             // 
             customSerializationFlagsBox.CheckOnClick = true;
             customSerializationFlagsBox.FormattingEnabled = true;
-            customSerializationFlagsBox.Location = new System.Drawing.Point(135, 161);
+            customSerializationFlagsBox.Location = new System.Drawing.Point(142, 161);
             customSerializationFlagsBox.Name = "customSerializationFlagsBox";
             customSerializationFlagsBox.ScrollAlwaysVisible = true;
             customSerializationFlagsBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
@@ -273,11 +275,22 @@
             customSerializationFlagsBox.TabIndex = 22;
             customSerializationFlagsBox.Click += customSerializationFlagsBox_Click;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Location = new System.Drawing.Point(6, 10);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new System.Drawing.Size(61, 78);
+            pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            pictureBox1.TabIndex = 23;
+            pictureBox1.TabStop = false;
+            pictureBox1.Visible = false;
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(421, 351);
+            Controls.Add(pictureBox1);
             Controls.Add(customSerializationFlagsBox);
             Controls.Add(label4);
             Controls.Add(enablePrettyBytecode);
@@ -304,6 +317,7 @@
             FormClosing += SettingsForm_FormClosing;
             Load += SettingsForm_Load;
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -316,10 +330,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button aboutButton;
         private System.Windows.Forms.ComboBox themeComboBox;
-        private System.Windows.Forms.TextBox favoriteThingBox;
         private System.Windows.Forms.CheckBox valuesOnScroll;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox enableDiscordRpc;
         private System.Windows.Forms.CheckBox enableDynamicTree;
         private System.Windows.Forms.CheckBox doubleClickToEdit;
@@ -327,7 +338,11 @@
         private System.Windows.Forms.CheckBox restoreSize;
         private System.Windows.Forms.CheckBox enableUpdateNotice;
         private System.Windows.Forms.CheckBox enablePrettyBytecode;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.CheckedListBox customSerializationFlagsBox;
+        internal System.Windows.Forms.NumericUpDown numericUpDown1;
+        internal System.Windows.Forms.Label label3;
+        internal System.Windows.Forms.TextBox favoriteThingBox;
+        internal System.Windows.Forms.CheckedListBox customSerializationFlagsBox;
+        internal System.Windows.Forms.Label label4;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }

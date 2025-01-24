@@ -196,7 +196,18 @@ namespace UAssetGUI
         {
             // this logic is here to prevent default list box selection logic
 
-            // idea from https://stackoverflow.com/a/334672
+            // The following block of code is modified and adapted from source code on StackOverflow created and licensed by user Hath, copyright 2008: https://stackoverflow.com/a/334672
+            // The original code is adapted for usage in this software under the terms of the CC BY-SA 2.5 license: https://creativecommons.org/licenses/by-sa/2.5/
+            /*
+                UNLESS OTHERWISE AGREED TO BY THE PARTIES IN WRITING, LICENSOR OFFERS THE
+                WORK AS-IS AND MAKES NO REPRESENTATIONS OR WARRANTIES OF ANY KIND
+                CONCERNING THE MATERIALS, EXPRESS, IMPLIED, STATUTORY OR OTHERWISE,
+                INCLUDING, WITHOUT LIMITATION, WARRANTIES OF TITLE, MERCHANTIBILITY, FITNESS
+                FOR A PARTICULAR PURPOSE, NONINFRINGEMENT, OR THE ABSENCE OF LATENT
+                OR OTHER DEFECTS, ACCURACY, OR THE PRESENCE OF ABSENCE OF ERRORS, WHETHER OR
+                NOT DISCOVERABLE. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF IMPLIED
+                WARRANTIES, SO SUCH EXCLUSION MAY NOT APPLY TO YOU.
+            */
             for (int i = 0; i < customSerializationFlagsBox.Items.Count; i++)
             {
                 if (customSerializationFlagsBox.GetItemRectangle(i).Contains(customSerializationFlagsBox.PointToClient(MousePosition)))

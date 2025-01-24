@@ -102,9 +102,12 @@ namespace UAssetGUI
 
                 if (IsComicSans())
                 {
-                    needRefreshForComicSans = true;
                     if (oldFontSettings == null) oldFontSettings = new Dictionary<Control, Font>();
-                    if (ctrl2.Font.FontFamily.Name != "Comic Sans MS") oldFontSettings[ctrl2] = ctrl2.Font;
+                    if (ctrl2.Font.FontFamily.Name != "Comic Sans MS")
+                    {
+                        oldFontSettings[ctrl2] = ctrl2.Font;
+                        needRefreshForComicSans = true;
+                    }
                     ctrl2.Font = new Font("Comic Sans MS", ctrl2.Font.Size, ctrl2.Font.Style);
                 }
                 else if (oldFontSettings != null)

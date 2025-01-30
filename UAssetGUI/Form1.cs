@@ -1359,6 +1359,9 @@ namespace UAssetGUI
                     case "Name Map":
                         tableEditor.mode = TableHandlerMode.NameMap;
                         break;
+                    case "Soft Object Paths":
+                        tableEditor.mode = TableHandlerMode.SoftObjectPathList;
+                        break;
                     case "Import Data":
                         tableEditor.mode = TableHandlerMode.Imports;
                         break;

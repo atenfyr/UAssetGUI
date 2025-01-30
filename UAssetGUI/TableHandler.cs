@@ -22,6 +22,7 @@ namespace UAssetGUI
         None = -1,
         GeneralInformation,
         NameMap,
+        SoftObjectPathList,
         Imports,
         ExportInformation,
         SoftPackageReferences,
@@ -213,6 +214,7 @@ namespace UAssetGUI
             treeView1.Nodes.Clear();
             treeView1.BackColor = UAGPalette.BackColor;
             treeView1.Nodes.Add(new PointingTreeNode("General Information", null));
+            if (asset.SoftObjectPathList != null && (asset.SoftObjectPathList.Count > 0 || !asset.IsFilterEditorOnly)) treeView1.Nodes.Add(new PointingTreeNode("Soft Object Paths", null));
             treeView1.Nodes.Add(new PointingTreeNode("Name Map", null));
             treeView1.Nodes.Add(new PointingTreeNode("Import Data", null));
             treeView1.Nodes.Add(new PointingTreeNode("Export Information", null));
@@ -1265,6 +1267,18 @@ namespace UAssetGUI
                     }
                     //((Form1)dataGridView1.Parent).CurrentDataGridViewStrip = ((Form1)dataGridView1.Parent).nameMapContext;
                     break;
+                case TableHandlerMode.SoftObjectPathList:
+                    AddColumns(new string[] { "PackageName", "AssetName", "SubPathString", "" });
+
+                    for (int num = 0; num < asset.SoftObjectPathList.Count; num++)
+                    {
+                        string a = asset.SoftObjectPathList[num].AssetPath.PackageName == null ? FString.NullCase : asset.SoftObjectPathList[num].AssetPath.PackageName.ToString();
+                        string b = asset.SoftObjectPathList[num].AssetPath.AssetName == null ? FString.NullCase : asset.SoftObjectPathList[num].AssetPath.AssetName.ToString();
+                        string c = asset.SoftObjectPathList[num].SubPathString == null ? FString.NullCase : asset.SoftObjectPathList[num].SubPathString.ToString();
+                        dataGridView1.Rows.Add(a, b, c);
+                        dataGridView1.Rows[num].HeaderCell.Value = Convert.ToString(num);
+                    }
+                    break;
                 case TableHandlerMode.Imports:
                     AddColumns(new string[] { "ClassPackage", "ClassName", "OuterIndex", "ObjectName", "bImportOptional", "" });
 
@@ -2064,6 +2078,27 @@ namespace UAssetGUI
                             finalStr.IsCasePreserving = isCasePreserving;
                             asset.AddNameReference(finalStr, true);
                         }
+                    }
+                    break;
+                case TableHandlerMode.SoftObjectPathList:
+                    if (asset.SoftObjectPathList == null) asset.SoftObjectPathList = new List<FSoftObjectPath>();
+
+                    asset.SoftObjectPathList.Clear();
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        string a = row.Cells[0].Value as string;
+                        string b = row.Cells[1].Value as string;
+                        string c = row.Cells[2].Value as string;
+
+                        if (a == FString.NullCase) a = null;
+                        if (b == FString.NullCase) b = null;
+                        if (c == FString.NullCase) c = null;
+
+                        // if all empty, then remove (invalid, probably just the last row)
+                        if (a == null && b == null && c == null) continue;
+
+                        FSoftObjectPath nuevo = new FSoftObjectPath(FName.FromString(asset, a), FName.FromString(asset, b), FString.FromString(c));
+                        asset.SoftObjectPathList.Add(nuevo);
                     }
                     break;
                 case TableHandlerMode.Imports:

@@ -646,7 +646,11 @@ namespace UAssetGUI
                 if (jsonTracingPath != null && (failedToMaintainBinaryEquality || failedCategoryCount > 0))
                 {
                     // if ser-hex-viewer available (https://github.com/trumank/ser-hex), run that
-                    Process.Start(new ProcessStartInfo("ser-hex-viewer", "\"" + jsonTracingPath + "\"") { UseShellExecute = false });
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo("ser-hex-viewer", "\"" + jsonTracingPath + "\"") { UseShellExecute = false });
+                    }
+                    catch { }
                 }
 #endif
 

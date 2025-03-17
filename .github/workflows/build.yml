@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
     
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true

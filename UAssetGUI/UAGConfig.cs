@@ -8,7 +8,7 @@ using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
 {
-    public class UAGConfigData
+    public struct UAGConfigData
     {
         public string PreferredVersion;
         public string PreferredMappings;

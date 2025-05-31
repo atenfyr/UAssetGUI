@@ -76,128 +76,131 @@ namespace UAssetGUI
 
             UAGUtils.InitializeInvoke(this);
 
-            try
+            UAGUtils.InvokeUI(() =>
             {
-                UAGConfig.Load();
-
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-
-                string gitVersionGUI = string.Empty;
-                using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
+                try
                 {
-                    if (stream != null)
+                    UAGConfig.Load();
+
+                    Assembly assembly = Assembly.GetExecutingAssembly();
+                    UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+
+                    string gitVersionGUI = string.Empty;
+                    using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
                     {
-                        using (StreamReader reader = new StreamReader(stream))
+                        if (stream != null)
                         {
-                            if (reader != null) gitVersionGUI = reader.ReadToEnd().Trim();
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                if (reader != null) gitVersionGUI = reader.ReadToEnd().Trim();
+                            }
                         }
                     }
-                }
 
-                if (!gitVersionGUI.All("0123456789abcdef".Contains)) gitVersionGUI = string.Empty;
+                    if (!gitVersionGUI.All("0123456789abcdef".Contains)) gitVersionGUI = string.Empty;
 
-                string gitVersionAPI = string.Empty;
-                using (Stream stream = typeof(PropertyData).Assembly.GetManifestResourceStream("UAssetAPI.git_commit.txt"))
-                {
-                    if (stream != null)
+                    string gitVersionAPI = string.Empty;
+                    using (Stream stream = typeof(PropertyData).Assembly.GetManifestResourceStream("UAssetAPI.git_commit.txt"))
                     {
-                        using (StreamReader reader = new StreamReader(stream))
+                        if (stream != null)
                         {
-                            if (reader != null) gitVersionAPI = reader.ReadToEnd().Trim();
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                if (reader != null) gitVersionAPI = reader.ReadToEnd().Trim();
+                            }
                         }
                     }
-                }
 
-                if (!gitVersionAPI.All("0123456789abcdef".Contains)) gitVersionAPI = string.Empty;
+                    if (!gitVersionAPI.All("0123456789abcdef".Contains)) gitVersionAPI = string.Empty;
 
-                if (!string.IsNullOrEmpty(gitVersionGUI))
-                {
-                    UAGUtils._displayVersion += " (" + gitVersionGUI;
-                    if (!string.IsNullOrEmpty(gitVersionAPI))
+                    if (!string.IsNullOrEmpty(gitVersionGUI))
                     {
-                        UAGUtils._displayVersion += " - " + gitVersionAPI;
+                        UAGUtils._displayVersion += " (" + gitVersionGUI;
+                        if (!string.IsNullOrEmpty(gitVersionAPI))
+                        {
+                            UAGUtils._displayVersion += " - " + gitVersionAPI;
+                        }
+                        UAGUtils._displayVersion += ")";
                     }
-                    UAGUtils._displayVersion += ")";
-                }
 
-                this.Text = DisplayVersion;
-                this.AllowDrop = true;
-                dataGridView1.Visible = true;
+                    this.Text = DisplayVersion;
+                    this.AllowDrop = true;
+                    dataGridView1.Visible = true;
 
-                // Extra data viewer
-                byteView1 = new ByteViewer
-                {
-                    Dock = DockStyle.Fill,
-                    AutoScroll = true,
-                    AutoSize = true,
-                    Visible = false
-                };
-                splitContainer1.Panel2.Controls.Add(byteView1);
-
-                jsonView = new TextBox
-                {
-                    Dock = DockStyle.Fill,
-                    Visible = false,
-                    AutoSize = true,
-                    Multiline = true,
-                    ReadOnly = true,
-                    MaxLength = int.MaxValue,
-                    ScrollBars = ScrollBars.Both,
-                };
-                splitContainer1.Panel2.Controls.Add(jsonView);
-
-                jsonView.TextChanged += (object sender, EventArgs e) => { if (tableEditor == null) return; tableEditor.dirtySinceLastLoad = true; SetUnsavedChanges(true); };
-
-                importBinaryData.Visible = false;
-                exportBinaryData.Visible = false;
-                setBinaryData.Visible = false;
-
-                // Enable double buffering to look nicer
-                if (!SystemInformation.TerminalServerSession)
-                {
-                    Type ourGridType = dataGridView1.GetType();
-                    PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
-                    pi.SetValue(dataGridView1, true, null);
-                }
-
-                // Auto resizing
-                SizeChanged += frm_sizeChanged;
-                FormClosing += frm_closing;
-
-                // position of ByteViewer buttons depends on splitter location so resize if splitter moves
-                splitContainer1.SplitterMoved += (sender, e) => { ForceResize(); };
-                splitContainer1.SplitterDistance = UAGPalette.InitialSplitterDistance;
-
-                // Drag-and-drop support
-                DragEnter += new DragEventHandler(frm_DragEnter);
-                DragDrop += new DragEventHandler(frm_DragDrop);
-
-                dataGridView1.MouseWheel += dataGridView1_MouseWheel;
-                //dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
-
-                menuStrip1.Renderer = new UAGMenuStripRenderer();
-                foreach (ToolStripMenuItem entry in menuStrip1.Items)
-                {
-                    entry.DropDownOpened += (sender, args) =>
+                    // Extra data viewer
+                    byteView1 = new ByteViewer
                     {
-                        isDropDownOpened[entry] = true;
+                        Dock = DockStyle.Fill,
+                        AutoScroll = true,
+                        AutoSize = true,
+                        Visible = false
                     };
-                    entry.DropDownClosed += (sender, args) =>
+                    splitContainer1.Panel2.Controls.Add(byteView1);
+
+                    jsonView = new TextBox
                     {
-                        isDropDownOpened[entry] = false;
+                        Dock = DockStyle.Fill,
+                        Visible = false,
+                        AutoSize = true,
+                        Multiline = true,
+                        ReadOnly = true,
+                        MaxLength = int.MaxValue,
+                        ScrollBars = ScrollBars.Both,
                     };
+                    splitContainer1.Panel2.Controls.Add(jsonView);
+
+                    jsonView.TextChanged += (object sender, EventArgs e) => { if (tableEditor == null) return; tableEditor.dirtySinceLastLoad = true; SetUnsavedChanges(true); };
+
+                    importBinaryData.Visible = false;
+                    exportBinaryData.Visible = false;
+                    setBinaryData.Visible = false;
+
+                    // Enable double buffering to look nicer
+                    if (!SystemInformation.TerminalServerSession)
+                    {
+                        Type ourGridType = dataGridView1.GetType();
+                        PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+                        pi.SetValue(dataGridView1, true, null);
+                    }
+
+                    // Auto resizing
+                    SizeChanged += frm_sizeChanged;
+                    FormClosing += frm_closing;
+
+                    // position of ByteViewer buttons depends on splitter location so resize if splitter moves
+                    splitContainer1.SplitterMoved += (sender, e) => { ForceResize(); };
+                    splitContainer1.SplitterDistance = UAGPalette.InitialSplitterDistance;
+
+                    // Drag-and-drop support
+                    DragEnter += new DragEventHandler(frm_DragEnter);
+                    DragDrop += new DragEventHandler(frm_DragDrop);
+
+                    dataGridView1.MouseWheel += dataGridView1_MouseWheel;
+                    //dataGridView1.EditMode = UAGConfig.Data.DoubleClickToEdit ? DataGridViewEditMode.EditProgrammatically : DataGridViewEditMode.EditOnEnter;
+
+                    menuStrip1.Renderer = new UAGMenuStripRenderer();
+                    foreach (ToolStripMenuItem entry in menuStrip1.Items)
+                    {
+                        entry.DropDownOpened += (sender, args) =>
+                        {
+                            isDropDownOpened[entry] = true;
+                        };
+                        entry.DropDownClosed += (sender, args) =>
+                        {
+                            isDropDownOpened[entry] = false;
+                        };
+                    }
+
+                    ac7decrypt = new AC7Decrypt();
+
+                    UpdateRPC();
                 }
-
-                ac7decrypt = new AC7Decrypt();
-
-                UpdateRPC();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error occured while initializing!\n" + ex.GetType() + ": " + ex.Message + "\n\nUAssetGUI will now close.", "UAssetGUI");
-                Environment.Exit(1); // kill the process
-            }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occured while initializing!\n" + ex.GetType() + ": " + ex.Message + "\n\nUAssetGUI will now close.", "UAssetGUI");
+                    Environment.Exit(1); // kill the process
+                }
+            });
         }
 
         private static Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();
@@ -334,89 +337,92 @@ namespace UAssetGUI
         private Version latestOnlineVersion = null;
         private void Form1_Load(object sender, EventArgs e)
         {
-            // sync size from config
-            if (UAGConfig.Data.RestoreSize)
+            UAGUtils.InvokeUI(() =>
             {
-                this.Size = new Size(UAGConfig.Data.StartupWidth, UAGConfig.Data.StartupHeight);
-            }
-
-            UAGPalette.InitializeTheme();
-            UAGPalette.RefreshTheme(this);
-
-            // load mappings and update combo box
-            UpdateMappings(null, false);
-
-            // update version combo box
-            string initialSelection = versionOptionsKeys[0];
-            try
-            {
-                initialSelection = UAGConfig.Data.PreferredVersion;
-            }
-            catch
-            {
-                initialSelection = versionOptionsKeys[0];
-            }
-
-            comboSpecifyVersion.Items.AddRange(versionOptionsKeys);
-            comboSpecifyVersion.SelectedIndex = 0;
-
-            for (int i = 0; i < versionOptionsKeys.Length; i++)
-            {
-                if (versionOptionsKeys[i] == initialSelection)
+                // sync size from config
+                if (UAGConfig.Data.RestoreSize)
                 {
-                    comboSpecifyVersion.SelectedIndex = i;
-                    break;
+                    this.Size = new Size(UAGConfig.Data.StartupWidth, UAGConfig.Data.StartupHeight);
                 }
-            }
 
-            UpdateComboSpecifyVersion();
+                UAGPalette.InitializeTheme();
+                UAGPalette.RefreshTheme(this);
 
-            // set text for copy/paste/delete
-            this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
-            this.pasteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.V);
-            this.deleteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Delete);
+                // load mappings and update combo box
+                UpdateMappings(null, false);
 
-            // Fetch the latest version from github
-            Task.Run(() =>
-            {
-                latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
-            }).ContinueWith(res =>
-            {
-                if (UAGConfig.Data.EnableUpdateNotice && latestOnlineVersion != null && latestOnlineVersion.IsUAGVersionLower())
+                // update version combo box
+                string initialSelection = versionOptionsKeys[0];
+                try
                 {
-                    DialogResult updateBoxRes = MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!\nWould you like to open the webpage in your browser?", "Notice", MessageBoxButtons.YesNo);
-                    switch (updateBoxRes)
+                    initialSelection = UAGConfig.Data.PreferredVersion;
+                }
+                catch
+                {
+                    initialSelection = versionOptionsKeys[0];
+                }
+
+                comboSpecifyVersion.Items.AddRange(versionOptionsKeys);
+                comboSpecifyVersion.SelectedIndex = 0;
+
+                for (int i = 0; i < versionOptionsKeys.Length; i++)
+                {
+                    if (versionOptionsKeys[i] == initialSelection)
                     {
-                        case DialogResult.Yes:
-                            UAGUtils.OpenURL("https://github.com/" + GitHubRepo + "/releases/latest");
-                            break;
-                        default:
-                            break;
+                        comboSpecifyVersion.SelectedIndex = i;
+                        break;
                     }
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
 
-            UpdateVersionFromMappings();
+                UpdateComboSpecifyVersion();
 
-            // Command line parameter support
-            string[] args = Environment.GetCommandLineArgs();
-            if (args.Length > 1)
-            {
-                EngineVersion selectedVer = EngineVersion.UNKNOWN;
+                // set text for copy/paste/delete
+                this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
+                this.pasteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.V);
+                this.deleteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Delete);
 
-                if (args.Length > 2)
+                // Fetch the latest version from github
+                Task.Run(() =>
                 {
-                    if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
-                    else Enum.TryParse(args[2], out selectedVer);
-                }
-                if (args.Length > 3)
+                    latestOnlineVersion = GitHubAPI.GetLatestVersionFromGitHub(GitHubRepo);
+                }).ContinueWith(res =>
                 {
-                    UpdateMappings(args[3]);
-                }
+                    if (UAGConfig.Data.EnableUpdateNotice && latestOnlineVersion != null && latestOnlineVersion.IsUAGVersionLower())
+                    {
+                        DialogResult updateBoxRes = MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!\nWould you like to open the webpage in your browser?", "Notice", MessageBoxButtons.YesNo);
+                        switch (updateBoxRes)
+                        {
+                            case DialogResult.Yes:
+                                UAGUtils.OpenURL("https://github.com/" + GitHubRepo + "/releases/latest");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
 
-                if (selectedVer > EngineVersion.UNKNOWN) SetParsingVersion(selectedVer);
-                LoadFileAt(args[1]);
-            }
+                UpdateVersionFromMappings();
+
+                // Command line parameter support
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length > 1)
+                {
+                    EngineVersion selectedVer = EngineVersion.UNKNOWN;
+
+                    if (args.Length > 2)
+                    {
+                        if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
+                        else Enum.TryParse(args[2], out selectedVer);
+                    }
+                    if (args.Length > 3)
+                    {
+                        UpdateMappings(args[3]);
+                    }
+
+                    if (selectedVer > EngineVersion.UNKNOWN) SetParsingVersion(selectedVer);
+                    LoadFileAt(args[1]);
+                }
+            });
         }
 
         private ISet<string> unknownTypes = new HashSet<string>();

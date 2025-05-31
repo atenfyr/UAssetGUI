@@ -929,10 +929,8 @@ namespace UAssetGUI
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        private string CopyIndividual(int rowIndex)
         {
-            if (tableEditor == null) return;
-            int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
             object objectToCopy = null;
 
             switch (tableEditor.mode)
@@ -943,14 +941,12 @@ namespace UAssetGUI
                         if (pointerNode.Type == PointingTreeNodeType.ByteArray)
                         {
                             string parsedData = BitConverter.ToString(pointerNode.Pointer is RawExport ? ((RawExport)pointerNode.Pointer).Data : ((NormalExport)pointerNode.Pointer).Extras)?.Replace("-", " ");
-                            Clipboard.SetText(string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData);
-                            return;
+                            return string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData;
                         }
                         else if (pointerNode.Type == PointingTreeNodeType.KismetByteArray)
                         {
                             string parsedData = BitConverter.ToString(((StructExport)pointerNode.Pointer).ScriptBytecodeRaw)?.Replace("-", " ");
-                            Clipboard.SetText(string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData);
-                            return;
+                            return string.IsNullOrWhiteSpace(parsedData) ? "zero" : parsedData;
                         }
                         else if (pointerNode.Pointer is StructPropertyData copyingDat1)
                         {
@@ -995,8 +991,7 @@ namespace UAssetGUI
 
             if (objectToCopy != null)
             {
-                Clipboard.SetText(tableEditor.asset.SerializeJsonObject(objectToCopy, Newtonsoft.Json.Formatting.None));
-                return;
+                return tableEditor.asset.SerializeJsonObject(objectToCopy, Newtonsoft.Json.Formatting.None);
             }
 
             // fallback to copying raw row data
@@ -1008,9 +1003,32 @@ namespace UAssetGUI
                 {
                     newClipboardText[i] = currentRow.Cells[i].Value?.ToString() ?? string.Empty;
                 }
-                Clipboard.SetText(JsonConvert.SerializeObject(newClipboardText, Formatting.None));
-                return;
+                return JsonConvert.SerializeObject(newClipboardText, Formatting.None);
             }
+
+            return null;
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tableEditor == null) return;
+
+            string fullData = null;
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                Dictionary<int, string> dataByRowIndex = new Dictionary<int, string>();
+                foreach (DataGridViewRow row in dataGridView1.SelectedRows)
+                {
+                    dataByRowIndex[row.Index] = CopyIndividual(row.Index).Replace("\r", "").Replace("\n", "");
+                }
+                fullData = string.Join('\n', dataByRowIndex.OrderBy(entry => entry.Key).Select(entry => entry.Value)); // sort values by key ascending
+            }
+            else
+            {
+                fullData = CopyIndividual(-1);
+            }
+
+            if (fullData != null) Clipboard.SetText(fullData);
         }
 
         private TreeNode SearchForTreeNode(TreeView node, int expNum)
@@ -1035,15 +1053,12 @@ namespace UAssetGUI
             return null;
         }
 
-        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void PasteIndividual(int rowIndex, string dat)
         {
-            if (tableEditor == null) return;
-            int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
-
             PropertyData deserializedClipboard = null;
             try
             {
-                deserializedClipboard = tableEditor.asset.DeserializeJsonObject<PropertyData>(Clipboard.GetText());
+                deserializedClipboard = tableEditor.asset.DeserializeJsonObject<PropertyData>(dat);
             }
             catch (Exception)
             {
@@ -1061,11 +1076,11 @@ namespace UAssetGUI
                             {
                                 if (pointerNode.Pointer is RawExport)
                                 {
-                                    ((RawExport)pointerNode.Pointer).Data = Clipboard.GetText() == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(Clipboard.GetText());
+                                    ((RawExport)pointerNode.Pointer).Data = dat == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(dat);
                                 }
                                 else if (pointerNode.Pointer is NormalExport)
                                 {
-                                    ((NormalExport)pointerNode.Pointer).Extras = Clipboard.GetText() == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(Clipboard.GetText());
+                                    ((NormalExport)pointerNode.Pointer).Extras = dat== "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(dat);
                                 }
                             }
                             catch (Exception)
@@ -1084,7 +1099,7 @@ namespace UAssetGUI
                         {
                             try
                             {
-                                ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw = Clipboard.GetText() == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(Clipboard.GetText());
+                                ((StructExport)pointerNode.Pointer).ScriptBytecodeRaw = dat == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(dat);
                             }
                             catch (Exception)
                             {
@@ -1142,7 +1157,7 @@ namespace UAssetGUI
                             Export deserExport = null;
                             try
                             {
-                                deserExport = tableEditor.asset.DeserializeJsonObject<Export>(Clipboard.GetText());
+                                deserExport = tableEditor.asset.DeserializeJsonObject<Export>(dat);
                             }
                             catch (Exception)
                             {
@@ -1175,7 +1190,7 @@ namespace UAssetGUI
             {
                 try
                 {
-                    string[] rawData = JsonConvert.DeserializeObject<string[]>(Clipboard.GetText());
+                    string[] rawData = JsonConvert.DeserializeObject<string[]>(dat);
                     dataGridView1.Rows.Insert(rowIndex, rawData);
                     SetUnsavedChanges(true);
                     return;
@@ -1184,6 +1199,19 @@ namespace UAssetGUI
                 {
                     // the thing we're trying to paste probably isn't a string array
                 }
+            }
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tableEditor == null) return;
+            int rowIndex = dataGridView1.SelectedCells.Count > 0 ? dataGridView1.SelectedCells[0].RowIndex : -1;
+
+            string[] allDats = Clipboard.GetText().Split('\n');
+            foreach (string dat in allDats)
+            {
+                PasteIndividual(rowIndex, dat);
+                rowIndex += 1; // paste after new row
             }
         }
 

@@ -9,8 +9,8 @@
     <AssemblyTitle>UAssetGUI</AssemblyTitle>
     <Product>UAssetGUI</Product>
     <Copyright>Copyright © Atenfyr 2024</Copyright>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <Configurations>Debug;Release;DebugVerbose;DebugTracing</Configurations>
     <UseWindowsForms>true</UseWindowsForms>
@@ -44,7 +44,7 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
   </PropertyGroup>
   <Target Name="BeforeBuildMigrated" BeforeTargets="PreBuildEvent">
     <Exec ContinueOnError="true" ConsoleToMsBuild="true" Command="git rev-parse --short HEAD">

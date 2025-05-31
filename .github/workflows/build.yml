@@ -65,7 +65,7 @@ jobs:
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4.6.1
       with:
-          name: UAssetGUI-${{ steps.get_version.outputs.version }}-${{ steps.vars.outputs.sha_short }}
+          name: v${{ steps.get_version.outputs.version }}-experimental-${{ steps.vars.outputs.sha_short }}
           path: ./build/*.exe
 
     - name: Make Experimental Pre-Release
@@ -73,5 +73,5 @@ jobs:
       with:
         prerelease: true
         tag_name: experimental-latest
-        name: UAssetGUI-${{ steps.get_version.outputs.version }}-${{ steps.vars.outputs.sha_short }}
+        name: v${{ steps.get_version.outputs.version }}-experimental-${{ steps.vars.outputs.sha_short }}
         files: ./build/*.exe

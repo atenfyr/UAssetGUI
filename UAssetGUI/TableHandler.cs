@@ -2052,6 +2052,7 @@ namespace UAssetGUI
                                 if (uint.TryParse(propertyValue, out uint newPackageSource)) asset.PackageSource = newPackageSource;
                                 break;
                             case "FolderName":
+                            case "PackageName":
                                 asset.FolderName = FString.FromString(propertyValue, Encoding.UTF8.GetByteCount(propertyValue) == propertyValue.Length ? Encoding.ASCII : Encoding.Unicode);
                                 break;
                         }

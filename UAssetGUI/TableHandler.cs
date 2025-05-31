@@ -930,8 +930,9 @@ namespace UAssetGUI
         /// <param name="original">The original PropertyData instance that this row was intended to represent. Used to clone values not represented in the display.</param>
         /// <param name="namesAreDummies">Whether or not the Name column is not serialized to disk (so shouldn't be appended to the name map).</param>
         /// <param name="useUnversionedProperties">Whether or not unversioned properties are being used. If true, namesAreDummies is overriden to be true.</param>
+        /// <param name="expectedContext">Expected PropertySerializationContext, otherwise Normal.</param>
         /// <returns>The interpreted PropertyData instance.</returns>
-        private PropertyData RowToPD(int rowNum, PropertyData original, bool namesAreDummies = false, bool useUnversionedProperties = false)
+        private PropertyData RowToPD(int rowNum, PropertyData original, bool namesAreDummies = false, bool useUnversionedProperties = false, PropertySerializationContext expectedContext = PropertySerializationContext.Normal)
         {
             if (useUnversionedProperties) namesAreDummies = true;
 
@@ -1089,6 +1090,14 @@ namespace UAssetGUI
                             if (transformB != null) existingStrings[4] = Convert.ToString(transformB);
 
                             newThing.FromString(existingStrings, asset);
+
+                            // override for enums if needed to ensure Value is not dummy
+                            if (namesAreDummies && newThing is EnumPropertyData newThingEnum && expectedContext != PropertySerializationContext.Normal)
+                            {
+                                // convert Value from dummy to non-dummy
+                                newThingEnum.Value = FName.FromString(asset, newThingEnum.Value.ToString());
+                            }
+
                             finalProp = newThing;
                             break;
                     }
@@ -2763,7 +2772,7 @@ namespace UAssetGUI
                             List<PropertyData> origArr = usArr.Value.ToList();
                             for (int i = 0; i < dataGridView1.Rows.Count; i++)
                             {
-                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), !(origArr.ElementAtOrDefault(i) is StructPropertyData), asset.HasUnversionedProperties);
+                                PropertyData val = RowToPD(i, origArr.ElementAtOrDefault(i), !(origArr.ElementAtOrDefault(i) is StructPropertyData), asset.HasUnversionedProperties, PropertySerializationContext.Array);
                                 if (val == null)
                                 {
                                     dirtySinceLastLoad = true;
@@ -2804,8 +2813,8 @@ namespace UAssetGUI
                                 }
                             }
 
-                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key, true, asset.HasUnversionedProperties);
-                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value, true, asset.HasUnversionedProperties);
+                            PropertyData desiredKey = RowToPD(0, usDictEntry.Entry.Key, true, asset.HasUnversionedProperties, PropertySerializationContext.Map);
+                            PropertyData desiredValue = RowToPD(1, usDictEntry.Entry.Value, true, asset.HasUnversionedProperties, PropertySerializationContext.Map);
 
                             if (currentEntry >= 0)
                             {

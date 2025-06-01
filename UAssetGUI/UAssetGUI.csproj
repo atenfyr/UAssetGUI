@@ -12,7 +12,7 @@
     <AssemblyVersion>1.0.4.0</AssemblyVersion>
     <FileVersion>1.0.4.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <Configurations>Debug;Release;DebugVerbose;DebugTracing</Configurations>
+    <Configurations>Debug;Release;DebugVerbose;DebugTracing;ReleaseX</Configurations>
     <UseWindowsForms>true</UseWindowsForms>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Platforms>AnyCPU;x86</Platforms>
@@ -38,7 +38,13 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>embedded</DebugType>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseX|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseX|x86'">
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <PropertyGroup>

@@ -85,6 +85,13 @@ namespace UAssetGUI
                     Assembly assembly = Assembly.GetExecutingAssembly();
                     UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
+                    // version suffix based on nature of the build
+#if RELEASEX
+                    UAGUtils._displayVersion += "x";
+#elif DEBUG
+                    UAGUtils._displayVersion += "d";
+#endif
+
                     string gitVersionGUI = string.Empty;
                     using (Stream stream = assembly.GetManifestResourceStream("UAssetGUI.git_commit.txt"))
                     {

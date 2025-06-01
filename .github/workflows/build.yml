@@ -45,10 +45,10 @@ jobs:
       run: nuget restore UAssetGUI.sln
 
     - name: Build All
-      run: msbuild UAssetGUI.sln /p:Configuration=Release
+      run: msbuild UAssetGUI.sln /p:Configuration=ReleaseX
 
     - name: Build Publish Binary
-      run: dotnet publish --sc false -c Release -r win-x64 -p:PublishSingleFile=true -o ./build ./UAssetGUI/UAssetGUI.csproj
+      run: dotnet publish --sc false -c ReleaseX -r win-x64 -p:PublishSingleFile=true -o ./build ./UAssetGUI/UAssetGUI.csproj
 
     - name: Get Short SHA
       id: vars

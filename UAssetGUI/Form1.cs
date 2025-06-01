@@ -88,7 +88,7 @@ namespace UAssetGUI
                     // version suffix based on nature of the build
 #if RELEASEX
                     UAGUtils._displayVersion += "x";
-#elif DEBUG
+#elif DEBUG || DEBUGVERBOSE || DEBUGTRACING
                     UAGUtils._displayVersion += "d";
 #endif
 

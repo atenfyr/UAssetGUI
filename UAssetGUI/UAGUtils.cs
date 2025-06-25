@@ -186,8 +186,9 @@ namespace UAssetGUI
             internalForm = control;
         }
 
-        public static void InvokeUI(Action act)
+        public static bool InvokeUI(Action act)
         {
+            if (internalForm == null) return false;
             if (internalForm.InvokeRequired)
             {
                 internalForm.Invoke(act);
@@ -196,6 +197,7 @@ namespace UAssetGUI
             {
                 act();
             }
+            return true;
         }
     }
 }

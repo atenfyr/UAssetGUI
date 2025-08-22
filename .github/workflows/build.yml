@@ -20,12 +20,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
     - name: .NET Setup
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
@@ -33,10 +33,10 @@ jobs:
       run: git submodule update --init --recursive
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v2
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
+      uses: NuGet/setup-nuget@v2
 
     - name: Navigate to workspace
       run: cd $GITHUB_WORKSPACE
@@ -63,7 +63,7 @@ jobs:
         show_log_message: true
 
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4.6.1
+      uses: actions/upload-artifact@v4
       with:
           name: v${{ steps.get_version.outputs.version }}-experimental-${{ steps.vars.outputs.sha_short }}
           path: ./build/*.exe
@@ -75,3 +75,4 @@ jobs:
         tag_name: experimental-latest
         name: v${{ steps.get_version.outputs.version }}-experimental-${{ steps.vars.outputs.sha_short }}
         files: ./build/*.exe
+

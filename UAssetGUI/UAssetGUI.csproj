@@ -150,16 +150,16 @@
     <ProjectReference Include="..\UAssetAPI\UAssetAPI\UAssetAPI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="5.7.0">
+    <PackageReference Include="Costura.Fody" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
-    <PackageReference Include="Fody" Version="6.5.5">
+    <PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
+    <PackageReference Include="Fody" Version="6.9.3">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FolderBrowserEx" Version="1.0.1" />
-    <PackageReference Include="Markdig" Version="0.40.0" />
+    <PackageReference Include="Markdig" Version="0.41.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+    <PackageReference Include="System.Resources.Extensions" Version="9.0.8" />
   </ItemGroup>
 </Project>

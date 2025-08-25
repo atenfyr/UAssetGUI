@@ -1,0 +1,87 @@
+name: CI .deb
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - ".github/**"
+      - ".gitignore"
+      - "*.md"
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore packages
+      run: dotnet restore UAssetGUI.sln
+
+    - name: Build Linux x64 Binary
+      run: |
+        dotnet publish ./UAssetGUI/UAssetGUI.csproj \
+          -c ReleaseX \
+          -r linux-x64 \
+          --self-contained true \
+          -p:PublishSingleFile=true \
+          -p:IncludeAllContentForSelfExtract=true \
+          -p:PublishTrimmed=false \
+          -o ./build/linux-x64
+
+    - name: Prepare .deb package
+      run: |
+        mkdir -p uassetgui/DEBIAN
+        mkdir -p uassetgui/usr/local/bin
+        cp build/linux-x64/UAssetGUI uassetgui/usr/local/bin/uassetgui
+
+        echo "Package: uassetgui
+        Version: 1.0
+        Section: utils
+        Priority: optional
+        Architecture: amd64
+        Maintainer: Your Name <you@example.com>
+        Description: UAssetGUI Linux version
+         A tool for UE asset GUI operations." > uassetgui/DEBIAN/control
+
+    - name: Build .deb package
+      run: dpkg-deb --build uassetgui uassetgui.deb
+
+    - name: Get Short SHA
+      id: vars
+      shell: bash
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Get Project Version
+      uses: bbonkr/get-version-action@v1
+      id: get_version
+      with:
+        project: './UAssetGUI/UAssetGUI.csproj'
+        show_log_message: true
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: v${{ steps.get_version.outputs.version }}-experimental-${{ steps.vars.outputs.sha_short }}-linux
+          path: ./uassetgui.deb
+
+    - name: Make Experimental Pre-Release
+      uses: softprops/action-gh-release@v2
+      with:
+        prerelease: true
+        tag_name: experimental-latest
+        name: v${{ steps.get_version.outputs.version }}-experimental-${{ steps.vars.outputs.sha_short }}-linux
+        files: ./uassetgui.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

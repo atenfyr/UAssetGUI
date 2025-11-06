@@ -42,11 +42,12 @@ namespace UAssetGUI
             progressBar1 = new System.Windows.Forms.ProgressBar();
             buttonReplace = new System.Windows.Forms.Button();
             textBoxReplace = new System.Windows.Forms.TextBox();
-            checkBoxReplace = new System.Windows.Forms.CheckBox();
             label2 = new System.Windows.Forms.Label();
             buttonReplaceAll = new System.Windows.Forms.Button();
             comboBoxReplace = new System.Windows.Forms.ComboBox();
             labelStatus = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
             searchDirectionGroupBox.SuspendLayout();
             optionsGroupBox.SuspendLayout();
             SuspendLayout();
@@ -57,7 +58,7 @@ namespace UAssetGUI
             closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            closeButton.Location = new System.Drawing.Point(354, 75);
+            closeButton.Location = new System.Drawing.Point(354, 188);
             closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             closeButton.Name = "closeButton";
             closeButton.Size = new System.Drawing.Size(88, 30);
@@ -78,7 +79,7 @@ namespace UAssetGUI
             // 
             // searchForBox
             // 
-            searchForBox.Location = new System.Drawing.Point(90, 18);
+            searchForBox.Location = new System.Drawing.Point(91, 18);
             searchForBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             searchForBox.Name = "searchForBox";
             searchForBox.Size = new System.Drawing.Size(258, 23);
@@ -103,7 +104,7 @@ namespace UAssetGUI
             // 
             searchDirectionGroupBox.Controls.Add(searchDirBackwardButton);
             searchDirectionGroupBox.Controls.Add(searchDirForwardButton);
-            searchDirectionGroupBox.Location = new System.Drawing.Point(211, 76);
+            searchDirectionGroupBox.Location = new System.Drawing.Point(211, 146);
             searchDirectionGroupBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             searchDirectionGroupBox.Name = "searchDirectionGroupBox";
             searchDirectionGroupBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -140,7 +141,7 @@ namespace UAssetGUI
             // 
             optionsGroupBox.Controls.Add(useRegexCheckBox);
             optionsGroupBox.Controls.Add(caseSensitiveCheckBox);
-            optionsGroupBox.Location = new System.Drawing.Point(12, 76);
+            optionsGroupBox.Location = new System.Drawing.Point(12, 146);
             optionsGroupBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             optionsGroupBox.Name = "optionsGroupBox";
             optionsGroupBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -173,17 +174,19 @@ namespace UAssetGUI
             // 
             // progressBar1
             // 
-            progressBar1.Location = new System.Drawing.Point(344, 124);
+            progressBar1.Location = new System.Drawing.Point(354, 162);
             progressBar1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new System.Drawing.Size(98, 27);
+            progressBar1.Size = new System.Drawing.Size(88, 20);
             progressBar1.TabIndex = 13;
             // 
             // buttonReplace
             // 
-            buttonReplace.Location = new System.Drawing.Point(263, 46);
+            buttonReplace.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            buttonReplace.Location = new System.Drawing.Point(354, 51);
+            buttonReplace.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             buttonReplace.Name = "buttonReplace";
-            buttonReplace.Size = new System.Drawing.Size(75, 23);
+            buttonReplace.Size = new System.Drawing.Size(88, 30);
             buttonReplace.TabIndex = 14;
             buttonReplace.Text = "Replace";
             buttonReplace.UseVisualStyleBackColor = true;
@@ -191,26 +194,16 @@ namespace UAssetGUI
             // 
             // textBoxReplace
             // 
-            textBoxReplace.Location = new System.Drawing.Point(157, 47);
+            textBoxReplace.Location = new System.Drawing.Point(91, 55);
             textBoxReplace.Name = "textBoxReplace";
-            textBoxReplace.Size = new System.Drawing.Size(100, 23);
+            textBoxReplace.Size = new System.Drawing.Size(257, 23);
             textBoxReplace.TabIndex = 15;
             textBoxReplace.TextChanged += textBoxReplace_TextChanged;
-            // 
-            // checkBoxReplace
-            // 
-            checkBoxReplace.AutoSize = true;
-            checkBoxReplace.Location = new System.Drawing.Point(66, 49);
-            checkBoxReplace.Name = "checkBoxReplace";
-            checkBoxReplace.Size = new System.Drawing.Size(67, 19);
-            checkBoxReplace.TabIndex = 16;
-            checkBoxReplace.Text = "Relative";
-            checkBoxReplace.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(12, 51);
+            label2.Location = new System.Drawing.Point(19, 58);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(48, 15);
             label2.TabIndex = 17;
@@ -218,9 +211,11 @@ namespace UAssetGUI
             // 
             // buttonReplaceAll
             // 
-            buttonReplaceAll.Location = new System.Drawing.Point(344, 46);
+            buttonReplaceAll.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            buttonReplaceAll.Location = new System.Drawing.Point(354, 87);
+            buttonReplaceAll.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             buttonReplaceAll.Name = "buttonReplaceAll";
-            buttonReplaceAll.Size = new System.Drawing.Size(98, 23);
+            buttonReplaceAll.Size = new System.Drawing.Size(88, 30);
             buttonReplaceAll.TabIndex = 18;
             buttonReplaceAll.Text = "Replace All";
             buttonReplaceAll.UseVisualStyleBackColor = true;
@@ -230,32 +225,52 @@ namespace UAssetGUI
             // 
             comboBoxReplace.FormattingEnabled = true;
             comboBoxReplace.Items.AddRange(new object[] { "absolute", "relative", "percent" });
-            comboBoxReplace.Location = new System.Drawing.Point(66, 46);
+            comboBoxReplace.Location = new System.Drawing.Point(91, 91);
             comboBoxReplace.Name = "comboBoxReplace";
-            comboBoxReplace.Size = new System.Drawing.Size(85, 23);
+            comboBoxReplace.Size = new System.Drawing.Size(257, 23);
             comboBoxReplace.TabIndex = 19;
+            comboBoxReplace.SelectedIndexChanged += comboBoxReplace_SelectedIndexChanged;
             // 
             // labelStatus
             // 
             labelStatus.AutoSize = true;
             labelStatus.ForeColor = System.Drawing.Color.Crimson;
-            labelStatus.Location = new System.Drawing.Point(12, 154);
+            labelStatus.Location = new System.Drawing.Point(91, 224);
             labelStatus.Name = "labelStatus";
-            labelStatus.Size = new System.Drawing.Size(39, 15);
+            labelStatus.Size = new System.Drawing.Size(0, 15);
             labelStatus.TabIndex = 20;
-            labelStatus.Text = "Status";
+            labelStatus.Click += labelStatus_Click;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(19, 94);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(49, 15);
+            label3.TabIndex = 21;
+            label3.Text = "Method";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(19, 224);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(39, 15);
+            label4.TabIndex = 22;
+            label4.Text = "Status";
             // 
             // FindForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(446, 172);
+            ClientSize = new System.Drawing.Size(446, 248);
+            Controls.Add(label4);
+            Controls.Add(label3);
             Controls.Add(labelStatus);
             Controls.Add(comboBoxReplace);
             Controls.Add(searchDirectionGroupBox);
             Controls.Add(buttonReplaceAll);
             Controls.Add(label2);
-            Controls.Add(checkBoxReplace);
             Controls.Add(textBoxReplace);
             Controls.Add(buttonReplace);
             Controls.Add(progressBar1);
@@ -293,10 +308,11 @@ namespace UAssetGUI
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button buttonReplace;
         private System.Windows.Forms.TextBox textBoxReplace;
-        private System.Windows.Forms.CheckBox checkBoxReplace;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button buttonReplaceAll;
         private System.Windows.Forms.ComboBox comboBoxReplace;
         private System.Windows.Forms.Label labelStatus;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
     }
 }

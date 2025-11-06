@@ -225,7 +225,7 @@ namespace UAssetGUI
                 labelStatus.Text = "Cell is null.";
                 return;
             }
-            
+
             string input = storedValue;
             string input2 = textBoxReplace.Text;
             if (String.IsNullOrEmpty(input2))
@@ -254,7 +254,7 @@ namespace UAssetGUI
                         {
                             number -= bbase * Math.Abs(number2);
                         }
-                        else if(number2 > 0)
+                        else if (number2 > 0)
                         {
                             number += bbase * Math.Abs(number2);
                         }
@@ -268,7 +268,7 @@ namespace UAssetGUI
                         labelStatus.Text = "Selected method is not implemented.";
                         return;
                     }
-                    
+
                 }
                 else
                 {
@@ -277,8 +277,8 @@ namespace UAssetGUI
                 }
 
 
-                    // Zurück in String konvertieren
-                    string result = number.ToString();
+                // Zurück in String konvertieren
+                string result = number.ToString();
 
                 BaseForm.dataGridView1.SelectedRows[0].Cells[3].Value = result;
                 //Console.WriteLine("Ergebnis: " + result);
@@ -302,7 +302,7 @@ namespace UAssetGUI
         private void buttonReplaceAll_Click(object sender, EventArgs e)
         {
             BlockingSearch();
-            while (BaseForm.dataGridView1.SelectedRows.Count>0)
+            while (BaseForm.dataGridView1.SelectedRows.Count > 0)
             {
                 buttonReplace_Click(null, null);
                 BlockingSearch();

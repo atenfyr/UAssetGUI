@@ -254,9 +254,13 @@ namespace UAssetGUI
                         {
                             number -= bbase * Math.Abs(number2);
                         }
-                        else
+                        else if(number2 > 0)
                         {
                             number += bbase * Math.Abs(number2);
+                        }
+                        else
+                        {
+                            number = 0;
                         }
                     }
                     else

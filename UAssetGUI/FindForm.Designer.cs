@@ -53,11 +53,11 @@ namespace UAssetGUI
             // 
             // closeButton
             // 
-            closeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            closeButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            closeButton.Location = new System.Drawing.Point(354, 81);
+            closeButton.Location = new System.Drawing.Point(354, 75);
             closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             closeButton.Name = "closeButton";
             closeButton.Size = new System.Drawing.Size(88, 30);
@@ -86,11 +86,11 @@ namespace UAssetGUI
             // 
             // nextButton
             // 
-            nextButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            nextButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             nextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             nextButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             nextButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            nextButton.Location = new System.Drawing.Point(354, 7);
+            nextButton.Location = new System.Drawing.Point(354, 14);
             nextButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             nextButton.Name = "nextButton";
             nextButton.Size = new System.Drawing.Size(88, 30);
@@ -103,7 +103,7 @@ namespace UAssetGUI
             // 
             searchDirectionGroupBox.Controls.Add(searchDirBackwardButton);
             searchDirectionGroupBox.Controls.Add(searchDirForwardButton);
-            searchDirectionGroupBox.Location = new System.Drawing.Point(211, 81);
+            searchDirectionGroupBox.Location = new System.Drawing.Point(211, 76);
             searchDirectionGroupBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             searchDirectionGroupBox.Name = "searchDirectionGroupBox";
             searchDirectionGroupBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -173,7 +173,7 @@ namespace UAssetGUI
             // 
             // progressBar1
             // 
-            progressBar1.Location = new System.Drawing.Point(344, 129);
+            progressBar1.Location = new System.Drawing.Point(344, 124);
             progressBar1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new System.Drawing.Size(98, 27);
@@ -238,6 +238,7 @@ namespace UAssetGUI
             // labelStatus
             // 
             labelStatus.AutoSize = true;
+            labelStatus.ForeColor = System.Drawing.Color.Crimson;
             labelStatus.Location = new System.Drawing.Point(12, 154);
             labelStatus.Name = "labelStatus";
             labelStatus.Size = new System.Drawing.Size(39, 15);
@@ -248,9 +249,10 @@ namespace UAssetGUI
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(446, 214);
+            ClientSize = new System.Drawing.Size(446, 172);
             Controls.Add(labelStatus);
             Controls.Add(comboBoxReplace);
+            Controls.Add(searchDirectionGroupBox);
             Controls.Add(buttonReplaceAll);
             Controls.Add(label2);
             Controls.Add(checkBoxReplace);
@@ -258,7 +260,6 @@ namespace UAssetGUI
             Controls.Add(buttonReplace);
             Controls.Add(progressBar1);
             Controls.Add(optionsGroupBox);
-            Controls.Add(searchDirectionGroupBox);
             Controls.Add(nextButton);
             Controls.Add(searchForBox);
             Controls.Add(label1);

@@ -1103,8 +1103,8 @@ namespace UAssetGUI
                     }
                 }
 
-                string ArrayIndex = row.Cells[row.Cells.Count - 4].Value.ToString();
-                string isZero = row.Cells[row.Cells.Count - 2].Value.ToString();
+                string ArrayIndex = row.Cells[row.Cells.Count - 4]?.Value?.ToString() ?? "0";
+                string isZero = row.Cells[row.Cells.Count - 2]?.Value?.ToString() ?? "false";
 
                 int.TryParse(ArrayIndex, out finalProp.ArrayIndex);
                 finalProp.IsZero = (isZero.ToLowerInvariant() == "true" || isZero == "1");

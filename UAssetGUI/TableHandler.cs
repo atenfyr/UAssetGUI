@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -746,6 +746,24 @@ namespace UAssetGUI
                                 row.Cells[++columnIndexer].Value = string.Empty;
                                 row.Cells[++columnIndexer].Value = intPointData.Value[0];
                                 row.Cells[++columnIndexer].Value = intPointData.Value[1];
+                                break;
+                            case "IntVector2":
+                                var intVector2Data = (IntVector2PropertyData)thisPD;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = intVector2Data.Value.X;
+                                row.Cells[columnIndexer].ToolTipText = "X";
+                                row.Cells[++columnIndexer].Value = intVector2Data.Value.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                break;
+                            case "IntVector":
+                                var intVectorData = (IntVectorPropertyData)thisPD;
+                                row.Cells[++columnIndexer].Value = string.Empty;
+                                row.Cells[++columnIndexer].Value = intVectorData.Value.X;
+                                row.Cells[columnIndexer].ToolTipText = "X";
+                                row.Cells[++columnIndexer].Value = intVectorData.Value.Y;
+                                row.Cells[columnIndexer].ToolTipText = "Y";
+                                row.Cells[++columnIndexer].Value = intVectorData.Value.Z;
+                                row.Cells[columnIndexer].ToolTipText = "Z";
                                 break;
                             case "FloatRange":
                                 var floatRangeData = (FloatRangePropertyData)thisPD;

@@ -1,4 +1,4 @@
-﻿using DiscordRPC;
+using DiscordRPC;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -299,6 +299,7 @@ namespace UAssetGUI
             "5.4",
             "5.5",
             "5.6",
+            "5.7",
         };
 
         private EngineVersion[] versionOptionsValues = new EngineVersion[]
@@ -340,6 +341,7 @@ namespace UAssetGUI
             EngineVersion.VER_UE5_4,
             EngineVersion.VER_UE5_5,
             EngineVersion.VER_UE5_6,
+            EngineVersion.VER_UE5_7,
         };
 
         public static readonly string GitHubRepo = "atenfyr/UAssetGUI";

@@ -1091,7 +1091,7 @@ namespace UAssetGUI
                                 }
                                 else if (pointerNode.Pointer is NormalExport)
                                 {
-                                    ((NormalExport)pointerNode.Pointer).Extras = dat== "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(dat);
+                                    ((NormalExport)pointerNode.Pointer).Extras = dat == "zero" ? new byte[0] : UAPUtils.ConvertHexStringToByteArray(dat);
                                 }
                             }
                             catch (Exception)
@@ -2318,6 +2318,22 @@ namespace UAssetGUI
                         fcForm.RefreshTreeView(fcForm.saveTreeView);
                         fcForm.Activate();
                     }
+                }
+            }
+        }
+
+        private bool hasActivatedBefore = false;
+        private void Form1_Activated(object sender, EventArgs e)
+        {
+            // if first time the form is ever activated, check if FileContainerForm is open, if so then activate that
+            if (hasActivatedBefore) return;
+            hasActivatedBefore = true;
+            foreach (var form in Application.OpenForms)
+            {
+                if (form is FileContainerForm fcForm)
+                {
+                    fcForm.Activate();
+                    break;
                 }
             }
         }

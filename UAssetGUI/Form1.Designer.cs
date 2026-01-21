@@ -456,6 +456,7 @@ namespace UAssetGUI
             Name = "Form1";
             Padding = new Padding(6);
             Text = "UAssetGUI";
+            Activated += Form1_Activated;
             Load += Form1_Load;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

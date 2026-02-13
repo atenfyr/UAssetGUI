@@ -893,7 +893,7 @@ namespace UAssetGUI
                                 break;
                             case "StrProperty":
                                 var strPropData = (StrPropertyData)thisPD;
-                                row.Cells[++columnIndexer].Value = (strPropData.Value?.Encoding ?? Encoding.ASCII).HeaderName;
+                                row.Cells[++columnIndexer].Value = (strPropData.Value?.Encoding ?? Encoding.UTF8).HeaderName;
                                 row.Cells[++columnIndexer].Value = strPropData.Value?.Value == null ? FString.NullCase : Convert.ToString(strPropData.Value.Value);
                                 break;
                             case "SoftObjectPath":
@@ -1804,9 +1804,9 @@ namespace UAssetGUI
                                             DataGridViewRow row = new DataGridViewRow();
                                             row.CreateCells(dataGridView1);
                                             row.Cells[0].Value = key.FEncode();
-                                            row.Cells[1].Value = key?.Encoding?.HeaderName ?? Encoding.ASCII.HeaderName;
+                                            row.Cells[1].Value = key?.Encoding?.HeaderName ?? Encoding.UTF8.HeaderName;
                                             row.Cells[2].Value = value.FEncode();
-                                            row.Cells[3].Value = value?.Encoding?.HeaderName ?? Encoding.ASCII.HeaderName;
+                                            row.Cells[3].Value = value?.Encoding?.HeaderName ?? Encoding.UTF8.HeaderName;
                                             row.HeaderCell.Value = Convert.ToString(i);
                                             rows.Add(row);
                                         }
@@ -2081,7 +2081,7 @@ namespace UAssetGUI
                                 break;
                             case "FolderName":
                             case "PackageName":
-                                asset.FolderName = FString.FromString(propertyValue, Encoding.UTF8.GetByteCount(propertyValue) == propertyValue.Length ? Encoding.ASCII : Encoding.Unicode);
+                                asset.FolderName = FString.FromString(propertyValue, Encoding.UTF8.GetByteCount(propertyValue) == propertyValue.Length ? Encoding.UTF8 : Encoding.Unicode);
                                 break;
                         }
 
@@ -2112,7 +2112,7 @@ namespace UAssetGUI
                         if (string.IsNullOrWhiteSpace(encoding)) encoding = "ascii";
                         if (!string.IsNullOrWhiteSpace(ourValue))
                         {
-                            var finalStr = FString.FromString(ourValue, encoding.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.ASCII);
+                            var finalStr = FString.FromString(ourValue, encoding.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.UTF8);
                             finalStr.IsCasePreserving = isCasePreserving;
                             asset.AddNameReference(finalStr, true);
                         }

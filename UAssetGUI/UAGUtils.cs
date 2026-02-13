@@ -162,7 +162,7 @@ namespace UAssetGUI
         public static FString FDecode(this string val, string encodingHeaderName)
         {
             if (val == FString.NullCase) return null;
-            return FString.FromString(val.Replace("\\n", "\n").Replace("\\r", "\r"), encodingHeaderName.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.ASCII);
+            return FString.FromString(val.Replace("\\n", "\n").Replace("\\r", "\r"), encodingHeaderName.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.UTF8);
         }
 
         public static void OpenURL(string url)

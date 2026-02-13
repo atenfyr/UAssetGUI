@@ -1513,9 +1513,9 @@ namespace UAssetGUI
                 {
                     selectedCell.Value = (rawValLower == "true" ? false : true).ToString();
                 }
-                else if (rawValLower == Encoding.ASCII.HeaderName || rawValLower == Encoding.Unicode.HeaderName)
+                else if (rawValLower == Encoding.UTF8.HeaderName || rawValLower == Encoding.Unicode.HeaderName || rawValLower == Encoding.ASCII.HeaderName)
                 {
-                    selectedCell.Value = rawValLower == Encoding.ASCII.HeaderName ? Encoding.Unicode.HeaderName : Encoding.ASCII.HeaderName;
+                    selectedCell.Value = (rawValLower == Encoding.ASCII.HeaderName || rawValLower == Encoding.UTF8.HeaderName) ? Encoding.Unicode.HeaderName : Encoding.UTF8.HeaderName;
                 }
                 else
                 {

@@ -838,20 +838,31 @@ namespace UAssetGUI
                     isLooping = false;
                     try
                     {
-                        bool saveBak = File.Exists(path);
-
-                        tableEditor.asset.Write(path);
-                        SetUnsavedChanges(false);
-                        tableEditor.Load();
-
                         try
                         {
-                            if (UAGConfig.Data.EnableBakJson && saveBak) File.WriteAllText(path + ".bak.json", tableEditor.asset.SerializeJson(Newtonsoft.Json.Formatting.None));
+                            if (UAGConfig.Data.EnableBakJson && File.Exists(path))
+                            {
+                                var targetAsset = new UAsset(ParsingVersion);
+                                targetAsset.FilePath = tableEditor.asset.FilePath;
+                                targetAsset.Mappings = tableEditor.asset.Mappings;
+                                targetAsset.CustomSerializationFlags = tableEditor.asset.CustomSerializationFlags;
+                                if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
+
+                                var strmRaw = targetAsset.PathToStream(targetAsset.FilePath);
+                                targetAsset.Read(new AssetBinaryReader(strmRaw, targetAsset));
+
+                                File.WriteAllText(path + ".bak.json", targetAsset.SerializeJson(Newtonsoft.Json.Formatting.Indented));
+                            }
                         }
                         catch (Exception ex)
                         {
                             MessageBox.Show("Failed to save JSON backup! " + ex.Message, "Uh oh!");
                         }
+
+                        tableEditor.asset.Write(path);
+                        SetUnsavedChanges(false);
+                        tableEditor.Load();
+
                         return true;
                     }
                     catch (NameMapOutOfRangeException ex)

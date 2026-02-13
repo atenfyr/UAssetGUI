@@ -64,6 +64,7 @@ namespace UAssetGUI
                         if (jsonDeserializedAsset != null)
                         {
                             jsonDeserializedAsset.Mappings = selectedMappings;
+                            jsonDeserializedAsset.FilePath = args[2];
                             jsonDeserializedAsset.Write(args[3]);
                         }
                         return;

@@ -532,6 +532,7 @@ namespace UAssetGUI
                             targetAsset = UAsset.DeserializeJson(sr);
                         }
                         targetAsset.Mappings = ParsingMappings;
+                        targetAsset.FilePath = filePath;
                         desiredSetUnsavedChanges = true;
                         break;
                     case ".pak":
@@ -657,7 +658,7 @@ namespace UAssetGUI
                     }
                 }
 
-                bool failedToMaintainBinaryEquality = !string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.VerifyBinaryEquality();
+                bool failedToMaintainBinaryEquality = !string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.FilePath.EndsWith(".json") && !tableEditor.asset.VerifyBinaryEquality();
 
 #if DEBUGTRACING
                 if (jsonTracingPath != null && (failedToMaintainBinaryEquality || failedCategoryCount > 0))

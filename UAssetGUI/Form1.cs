@@ -838,9 +838,20 @@ namespace UAssetGUI
                     isLooping = false;
                     try
                     {
+                        bool saveBak = File.Exists(path);
+
                         tableEditor.asset.Write(path);
                         SetUnsavedChanges(false);
                         tableEditor.Load();
+
+                        try
+                        {
+                            if (UAGConfig.Data.EnableBakJson && saveBak) File.WriteAllText(path + ".bak.json", tableEditor.asset.SerializeJson(Newtonsoft.Json.Formatting.None));
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Failed to save JSON backup! " + ex.Message, "Uh oh!");
+                        }
                         return true;
                     }
                     catch (NameMapOutOfRangeException ex)

@@ -48,6 +48,7 @@ namespace UAssetGUI
             enablePrettyBytecode.Checked = UAGConfig.Data.EnablePrettyBytecode;
             restoreSize.Checked = UAGConfig.Data.RestoreSize;
             enableUpdateNotice.Checked = UAGConfig.Data.EnableUpdateNotice;
+            enableBakJson.Checked = UAGConfig.Data.EnableBakJson;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -123,6 +124,11 @@ namespace UAssetGUI
             UAGConfig.Data.EnablePrettyBytecode = enablePrettyBytecode.Checked;
         }
 
+        private void enableBakJson_CheckedChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.EnableBakJson = enableBakJson.Checked;
+        }
+
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.EnableDiscordRPC = enableDiscordRpc.Checked;
@@ -159,7 +165,7 @@ namespace UAssetGUI
             {
                 // need MemoryStream to remain open until we're done using the image
                 // no need to dispose MemoryStream so let's just let GC handle it once image stops being used
-                var strm = new MemoryStream(Properties.Resources.dancing_cat); 
+                var strm = new MemoryStream(Properties.Resources.dancing_cat);
                 this.pictureBox1.Image = Image.FromStream(strm);
                 this.pictureBox1.Visible = true;
             }

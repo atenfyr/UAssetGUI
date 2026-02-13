@@ -27,6 +27,7 @@ namespace UAssetGUI
         public int StartupWidth;
         public int StartupHeight;
         public int CustomSerializationFlags;
+        public bool EnableBakJson;
 
         public UAGConfigData()
         {
@@ -46,6 +47,7 @@ namespace UAssetGUI
             StartupWidth = 1000;
             StartupHeight = 700;
             CustomSerializationFlags = 0;
+            EnableBakJson = false;
         }
     }
 

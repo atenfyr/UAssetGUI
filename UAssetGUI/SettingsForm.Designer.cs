@@ -48,6 +48,7 @@
             label4 = new System.Windows.Forms.Label();
             customSerializationFlagsBox = new System.Windows.Forms.CheckedListBox();
             pictureBox1 = new System.Windows.Forms.PictureBox();
+            enableBakJson = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -70,7 +71,7 @@
             closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            closeButton.Location = new System.Drawing.Point(319, 313);
+            closeButton.Location = new System.Drawing.Point(319, 357);
             closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             closeButton.Name = "closeButton";
             closeButton.Size = new System.Drawing.Size(88, 30);
@@ -87,7 +88,7 @@
             label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(53, 16);
-            label1.TabIndex = 5;
+            label1.TabIndex = 15;
             label1.Text = "Theme:";
             // 
             // label2
@@ -98,7 +99,7 @@
             label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(96, 16);
-            label2.TabIndex = 6;
+            label2.TabIndex = 16;
             label2.Text = "Favorite Thing:";
             // 
             // aboutButton
@@ -107,7 +108,7 @@
             aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            aboutButton.Location = new System.Drawing.Point(14, 313);
+            aboutButton.Location = new System.Drawing.Point(14, 357);
             aboutButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             aboutButton.Name = "aboutButton";
             aboutButton.Size = new System.Drawing.Size(88, 30);
@@ -124,7 +125,7 @@
             themeComboBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             themeComboBox.Name = "themeComboBox";
             themeComboBox.Size = new System.Drawing.Size(252, 23);
-            themeComboBox.TabIndex = 8;
+            themeComboBox.TabIndex = 2;
             themeComboBox.SelectedIndexChanged += themeComboBox_SelectedIndexChanged;
             // 
             // favoriteThingBox
@@ -133,7 +134,7 @@
             favoriteThingBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             favoriteThingBox.Name = "favoriteThingBox";
             favoriteThingBox.Size = new System.Drawing.Size(252, 23);
-            favoriteThingBox.TabIndex = 9;
+            favoriteThingBox.TabIndex = 3;
             favoriteThingBox.TextChanged += favoriteThingBox_TextChanged;
             // 
             // valuesOnScroll
@@ -143,7 +144,7 @@
             valuesOnScroll.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             valuesOnScroll.Name = "valuesOnScroll";
             valuesOnScroll.Size = new System.Drawing.Size(151, 19);
-            valuesOnScroll.TabIndex = 10;
+            valuesOnScroll.TabIndex = 7;
             valuesOnScroll.Text = "Change values on scroll";
             valuesOnScroll.UseVisualStyleBackColor = true;
             valuesOnScroll.CheckedChanged += valuesOnScroll_CheckedChanged;
@@ -154,7 +155,7 @@
             numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             numericUpDown1.Name = "numericUpDown1";
             numericUpDown1.Size = new System.Drawing.Size(252, 23);
-            numericUpDown1.TabIndex = 11;
+            numericUpDown1.TabIndex = 4;
             numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
             // 
             // label3
@@ -165,7 +166,7 @@
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(45, 16);
-            label3.TabIndex = 12;
+            label3.TabIndex = 17;
             label3.Text = "Zoom:";
             // 
             // enableDiscordRpc
@@ -175,7 +176,7 @@
             enableDiscordRpc.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableDiscordRpc.Name = "enableDiscordRpc";
             enableDiscordRpc.Size = new System.Drawing.Size(129, 19);
-            enableDiscordRpc.TabIndex = 13;
+            enableDiscordRpc.TabIndex = 6;
             enableDiscordRpc.Text = "Enable Discord RPC";
             enableDiscordRpc.UseVisualStyleBackColor = true;
             enableDiscordRpc.CheckedChanged += enableDiscordRpc_CheckedChanged;
@@ -187,7 +188,7 @@
             enableDynamicTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableDynamicTree.Name = "enableDynamicTree";
             enableDynamicTree.Size = new System.Drawing.Size(133, 19);
-            enableDynamicTree.TabIndex = 14;
+            enableDynamicTree.TabIndex = 10;
             enableDynamicTree.Text = "Enable dynamic tree";
             enableDynamicTree.UseVisualStyleBackColor = true;
             enableDynamicTree.CheckedChanged += enableDynamicTree_CheckedChanged;
@@ -199,7 +200,7 @@
             doubleClickToEdit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             doubleClickToEdit.Name = "doubleClickToEdit";
             doubleClickToEdit.Size = new System.Drawing.Size(128, 19);
-            doubleClickToEdit.TabIndex = 15;
+            doubleClickToEdit.TabIndex = 8;
             doubleClickToEdit.Text = "Double click to edit";
             doubleClickToEdit.UseVisualStyleBackColor = true;
             doubleClickToEdit.CheckedChanged += doubleClickToEdit_CheckedChanged;
@@ -207,12 +208,12 @@
             // enableBak
             // 
             enableBak.AutoSize = true;
-            enableBak.Location = new System.Drawing.Point(215, 225);
+            enableBak.Location = new System.Drawing.Point(215, 278);
             enableBak.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableBak.Name = "enableBak";
-            enableBak.Size = new System.Drawing.Size(110, 19);
-            enableBak.TabIndex = 16;
-            enableBak.Text = "Enable .bak files";
+            enableBak.Size = new System.Drawing.Size(157, 19);
+            enableBak.TabIndex = 13;
+            enableBak.Text = "Enable .bak files (.uasset)";
             enableBak.UseVisualStyleBackColor = true;
             enableBak.CheckedChanged += enableBak_CheckedChanged;
             // 
@@ -223,7 +224,7 @@
             restoreSize.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             restoreSize.Name = "restoreSize";
             restoreSize.Size = new System.Drawing.Size(156, 19);
-            restoreSize.TabIndex = 17;
+            restoreSize.TabIndex = 11;
             restoreSize.Text = "Restore GUI size on open";
             restoreSize.UseVisualStyleBackColor = true;
             restoreSize.CheckedChanged += restoreSize_CheckedChanged;
@@ -235,7 +236,7 @@
             enableUpdateNotice.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableUpdateNotice.Name = "enableUpdateNotice";
             enableUpdateNotice.Size = new System.Drawing.Size(137, 19);
-            enableUpdateNotice.TabIndex = 18;
+            enableUpdateNotice.TabIndex = 12;
             enableUpdateNotice.Text = "Enable update notice";
             enableUpdateNotice.UseVisualStyleBackColor = true;
             enableUpdateNotice.CheckedChanged += enableUpdateNotice_CheckedChanged;
@@ -243,11 +244,11 @@
             // enablePrettyBytecode
             // 
             enablePrettyBytecode.AutoSize = true;
-            enablePrettyBytecode.Location = new System.Drawing.Point(215, 276);
+            enablePrettyBytecode.Location = new System.Drawing.Point(215, 225);
             enablePrettyBytecode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enablePrettyBytecode.Name = "enablePrettyBytecode";
             enablePrettyBytecode.Size = new System.Drawing.Size(147, 19);
-            enablePrettyBytecode.TabIndex = 19;
+            enablePrettyBytecode.TabIndex = 9;
             enablePrettyBytecode.Text = "Enable pretty bytecode";
             enablePrettyBytecode.UseVisualStyleBackColor = true;
             enablePrettyBytecode.CheckedChanged += enablePrettyBytecode_CheckedChanged;
@@ -260,7 +261,7 @@
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(44, 16);
-            label4.TabIndex = 21;
+            label4.TabIndex = 18;
             label4.Text = "Flags:";
             // 
             // customSerializationFlagsBox
@@ -272,7 +273,7 @@
             customSerializationFlagsBox.ScrollAlwaysVisible = true;
             customSerializationFlagsBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
             customSerializationFlagsBox.Size = new System.Drawing.Size(252, 22);
-            customSerializationFlagsBox.TabIndex = 22;
+            customSerializationFlagsBox.TabIndex = 5;
             customSerializationFlagsBox.Click += customSerializationFlagsBox_Click;
             // 
             // pictureBox1
@@ -285,11 +286,24 @@
             pictureBox1.TabStop = false;
             pictureBox1.Visible = false;
             // 
+            // enableBakJson
+            // 
+            enableBakJson.AutoSize = true;
+            enableBakJson.Location = new System.Drawing.Point(29, 305);
+            enableBakJson.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            enableBakJson.Name = "enableBakJson";
+            enableBakJson.Size = new System.Drawing.Size(146, 19);
+            enableBakJson.TabIndex = 14;
+            enableBakJson.Text = "Enable .bak files (.json)";
+            enableBakJson.UseVisualStyleBackColor = true;
+            enableBakJson.CheckedChanged += enableBakJson_CheckedChanged;
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(421, 351);
+            ClientSize = new System.Drawing.Size(421, 395);
+            Controls.Add(enableBakJson);
             Controls.Add(pictureBox1);
             Controls.Add(customSerializationFlagsBox);
             Controls.Add(label4);
@@ -344,5 +358,6 @@
         internal System.Windows.Forms.CheckedListBox customSerializationFlagsBox;
         internal System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.CheckBox enableBakJson;
     }
 }

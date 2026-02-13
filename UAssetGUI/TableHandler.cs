@@ -1402,10 +1402,10 @@ namespace UAssetGUI
                         {
                             dataGridView1.Rows.Add(new object[] { "Position", asset.WorldTileInfo.Position[0], asset.WorldTileInfo.Position[1], asset.WorldTileInfo.Position[2] });
                             dataGridView1.Rows.Add(new object[] { "AbsolutePosition", asset.WorldTileInfo.AbsolutePosition[0], asset.WorldTileInfo.AbsolutePosition[1], asset.WorldTileInfo.AbsolutePosition[2] });
-                            dataGridView1.Rows.Add(new object[] { "Bounds", asset.WorldTileInfo.Bounds.ToString() });
+                            dataGridView1.Rows.Add(new object[] { "Bounds", asset.WorldTileInfo.Bounds?.ToString() ?? FString.NullCase });
                             dataGridView1.Rows.Add(new object[] { "Layer", "" });
                             dataGridView1.Rows.Add(new object[] { "bHideInTileView", asset.WorldTileInfo.bHideInTileView });
-                            dataGridView1.Rows.Add(new object[] { "ParentTilePackageName", asset.WorldTileInfo.ParentTilePackageName.Value });
+                            dataGridView1.Rows.Add(new object[] { "ParentTilePackageName", asset.WorldTileInfo.ParentTilePackageName?.ToString() ?? FString.NullCase });
                             dataGridView1.Rows.Add(new object[] { "LODList", "" });
                             dataGridView1.Rows.Add(new object[] { "ZOrder", asset.WorldTileInfo.ZOrder });
                         }
@@ -1413,7 +1413,7 @@ namespace UAssetGUI
                         {
                             dataGridView1.Rows.Add(new object[] { "Name", fWTL.Name });
                             dataGridView1.Rows.Add(new object[] { "Reserved0", fWTL.Reserved0 });
-                            dataGridView1.Rows.Add(new object[] { "Reserved1", fWTL.Reserved1.ToString() });
+                            dataGridView1.Rows.Add(new object[] { "Reserved1", fWTL.Reserved1?.ToString() ?? FString.NullCase });
                             dataGridView1.Rows.Add(new object[] { "StreamingDistance", fWTL.StreamingDistance });
                             dataGridView1.Rows.Add(new object[] { "DistanceStreamingEnabled", fWTL.DistanceStreamingEnabled });
                         }

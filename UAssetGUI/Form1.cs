@@ -2451,7 +2451,7 @@ namespace UAssetGUI
                 }
 
                 // add imports
-                string[] imports = ["System", "System.Windows.Forms", "UAssetAPI", "UAssetAPI.ExportTypes", "UAssetAPI.PropertyTypes.Objects", "UAssetAPI.PropertyTypes.Structs", "UAssetAPI.UnrealTypes", "UAssetAPI.FieldTypes", "UAssetAPI.Unversioned", "UAssetAPI.JSON", "UAssetAPI.Kismet", "UAssetAPI.CustomVersions", "UAssetGUI"];
+                string[] imports = ["System", "System.Collections.Generic", "System.Linq", "System.Windows.Forms", "UAssetAPI", "UAssetAPI.ExportTypes", "UAssetAPI.PropertyTypes.Objects", "UAssetAPI.PropertyTypes.Structs", "UAssetAPI.UnrealTypes", "UAssetAPI.FieldTypes", "UAssetAPI.Unversioned", "UAssetAPI.JSON", "UAssetAPI.Kismet", "UAssetAPI.CustomVersions", "UAssetGUI"];
                 StringBuilder finalScriptText = new StringBuilder();
                 foreach (string newImport in imports)
                 {

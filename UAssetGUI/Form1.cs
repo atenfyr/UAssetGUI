@@ -637,8 +637,9 @@ namespace UAssetGUI
                                 if (targetAsset.OtherAssetsFailedToAccess == null || targetAsset.OtherAssetsFailedToAccess.Count == 0) break;
                                 foreach (FName otherAsset in targetAsset.OtherAssetsFailedToAccess)
                                 {
+                                    if (otherAsset == null) continue;
                                     DirectoryTreeItem targetItem = parentContainerForm.GetFromPackageName(parentContainerForm.loadTreeView, otherAsset.ToString());
-                                    targetItem.SaveFileToTemp(parentContainerForm.InteropType);
+                                    targetItem?.SaveFileToTemp(parentContainerForm.InteropType);
                                 }
                             }
 

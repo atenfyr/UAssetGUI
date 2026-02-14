@@ -18,6 +18,25 @@ namespace UAssetGUI
         [DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
+        internal static string ExtractCompressedResource(string resourceName, string outPath)
+        {
+            using (var stream = typeof(Program).Assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream == null) return null;
+
+                using (FileStream newFileStream = File.Open(outPath, FileMode.Create, FileAccess.Write))
+                {
+                    using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
+                    {
+                        gzipStream.CopyTo(newFileStream);
+                    }
+                }
+
+                return outPath;
+            }
+            return null;
+        }
+
         private static List<Type> strongRefs = new List<Type>();
         static Program()
         {
@@ -26,29 +45,13 @@ namespace UAssetGUI
                 // extract .dll.gz resources and load them on demand
                 AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
                 {
-                    using (var stream = typeof(Program).Assembly.GetManifestResourceStream($"UAssetGUI." + assemblyName.Name + ".dll.gz"))
-                    {
-                        // if not found, default behavior
-                        if (stream == null) return null;
+                    string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
+                    Directory.CreateDirectory(UAGConfig.ConfigFolder);
+                    Directory.CreateDirectory(libsPath);
 
-                        string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
-                        Directory.CreateDirectory(UAGConfig.ConfigFolder);
-                        Directory.CreateDirectory(libsPath);
-
-                        string outPath = Path.Combine(libsPath, assemblyName.Name + ".dll");
-                        using (FileStream newFileStream = File.Open(outPath, FileMode.Create, FileAccess.Write))
-                        {
-                            using (var gzipStream = new GZipStream(stream, CompressionMode.Decompress))
-                            {
-                                gzipStream.CopyTo(newFileStream);
-                            }
-                        }
-
-                        return Assembly.LoadFrom(outPath);
-                    }
-
-                    // if not found, default behavior
-                    return null;
+                    string outPath = ExtractCompressedResource("UAssetGUI." + assemblyName.Name + ".dll.gz", Path.Combine(libsPath, assemblyName.Name + ".dll"));
+                    if (outPath == null) return null; // if not found, default behavior
+                    return Assembly.LoadFrom(outPath);
                 };
 
                 strongRefs.Add(typeof(System.Collections.Immutable.ImmutableArray));
@@ -57,7 +60,6 @@ namespace UAssetGUI
             catch (Exception ex)
             {
                 Clipboard.SetText(ex.ToString());
-                Environment.Exit(1);
             }
         }
 
@@ -129,7 +131,6 @@ namespace UAssetGUI
             catch (Exception ex)
             {
                 Clipboard.SetText(ex.ToString());
-                Environment.Exit(1);
             }
         }
     }

@@ -133,6 +133,7 @@ namespace UAssetGUI
         public TreeView treeView1;
         public DataGridView dataGridView1;
         public TextBox jsonView;
+        public FileContainerForm ParentContainer;
 
         public bool readyToSave = true;
         public bool dirtySinceLastLoad = false; 

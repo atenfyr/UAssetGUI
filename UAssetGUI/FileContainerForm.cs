@@ -1,20 +1,82 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
+    public enum InteropType
+    {
+        Pak,
+        Retoc
+    }
+
+    public enum RetocEngineVersion
+    {
+        UE4_25 = EngineVersion.VER_UE4_25,
+        UE4_26 = EngineVersion.VER_UE4_26,
+        UE4_27 = EngineVersion.VER_UE4_27,
+        UE5_0 = EngineVersion.VER_UE5_0,
+        UE5_1 = EngineVersion.VER_UE5_1,
+        UE5_2 = EngineVersion.VER_UE5_2,
+        UE5_3 = EngineVersion.VER_UE5_3,
+        UE5_4 = EngineVersion.VER_UE5_4,
+        UE5_5 = EngineVersion.VER_UE5_5,
+        UE5_6 = EngineVersion.VER_UE5_6,
+        UE5_7 = EngineVersion.VER_UE5_7,
+    }
+
+    public struct RetocManifest
+    {
+        [JsonProperty("oplog")]
+        public RetocOpLog OpLog;
+    }
+
+    public struct RetocOpLog
+    {
+        [JsonProperty("entries")]
+        public List<RetocOp> Entries;
+    }
+
+    public struct RetocOp
+    {
+        [JsonProperty("packagestoreentry")]
+        public RetocPackageStoreEntry PackageStoreEntry;
+        [JsonProperty("packagedata")]
+        public List<RetocChunkData> PackageData;
+        [JsonProperty("bulkdata")]
+        public List<RetocChunkData> BulkData;
+    }
+
+    public struct RetocPackageStoreEntry
+    {
+        [JsonProperty("packagename")]
+        public string PackageName;
+    }
+
+    public struct RetocChunkData
+    {
+        [JsonProperty("id")]
+        public string ID;
+        [JsonProperty("filename")]
+        public string FileName;
+    }
+
     public partial class FileContainerForm : Form
     {
         public IDictionary<TreeView, DirectoryTree> DirectoryTreeMap = new Dictionary<TreeView, DirectoryTree>();
         public string CurrentContainerPath;
         public PakVersion Version = PakVersion.V4;
+        public InteropType InteropType = InteropType.Pak;
         public string MountPoint = "../../../";
+        public bool RetocAvailable = false;
 
         public FileContainerForm()
         {
@@ -54,6 +116,8 @@ namespace UAssetGUI
                     isDropDownOpened[entry] = false;
                 };
             }
+
+            RetocAvailable = SendCommandToRetoc("--version", out string outputText, out _) && outputText.Contains("retoc_cli");
 
             LoadContainer(CurrentContainerPath);
             RefreshTreeView(saveTreeView);
@@ -137,6 +201,13 @@ namespace UAssetGUI
             return null;
         }
 
+        public DirectoryTreeItem GetFromPackageName(TreeView treeView, string packageName)
+        {
+            DirectoryTree tree = DirectoryTreeMap[treeView];
+            if (tree?.PackagePathToNode == null || !tree.PackagePathToNode.ContainsKey(packageName)) return null;
+            return tree.PackagePathToNode[packageName];
+        }
+
         public void RefreshTreeView(TreeView treeView)
         {
             // get existing expanded nodes
@@ -181,6 +252,7 @@ namespace UAssetGUI
             CurrentContainerPath = null;
             DirectoryTreeMap[loadTreeView] = null;
             Version = PakVersion.V4;
+            InteropType = InteropType.Pak;
             MountPoint = "../../../";
 
             RefreshTreeView(loadTreeView);
@@ -188,12 +260,13 @@ namespace UAssetGUI
             SelectedTreeView = saveTreeView;
         }
 
-        public void LoadContainer(string path)
+        public void LoadContainerPak(string path)
         {
             if (path == null) return;
             try
             {
                 CurrentContainerPath = path;
+                InteropType = InteropType.Pak;
 
                 string[] allFiles = Array.Empty<string>();
                 using (FileStream stream = new FileStream(CurrentContainerPath, FileMode.Open))
@@ -226,9 +299,81 @@ namespace UAssetGUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to open file! " + ex.Message, "Uh oh!");
+                UAGUtils.InvokeUI(() => { MessageBox.Show("Failed to open file! " + ex.Message, "Uh oh!"); });
 
                 UnloadContainer();
+            }
+        }
+
+        public void LoadContainerUtoc(string path)
+        {
+            if (path == null) return;
+            if (!RetocAvailable) return;
+            try
+            {
+                CurrentContainerPath = path;
+                InteropType = InteropType.Retoc;
+                Version = PakVersion.V11;
+                MountPoint = "../../../"; // retoc always uses this mount point
+                string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
+
+                // extract file manifest
+                string expectedManifestPath = Path.Combine(libsPath, "pakstore.json");
+                try { File.Delete(expectedManifestPath); } catch { }
+                bool extractedManifest = SendCommandToRetoc($"manifest \"{Path.GetDirectoryName(path)}\"", out _, out _);
+                RetocManifest manifestData = JsonConvert.DeserializeObject<RetocManifest>(File.ReadAllText(expectedManifestPath));
+
+                if (manifestData.OpLog.Entries == null) throw new InvalidOperationException("Failed to extract manifest");
+
+                // process manifest
+                List<string> allFilesList = new List<string>();
+                foreach (RetocOp op in manifestData.OpLog.Entries)
+                {
+                    if (op.PackageData == null) continue;
+                    foreach (RetocChunkData chunk in op.PackageData)
+                    {
+                        if (!string.IsNullOrEmpty(chunk.FileName))
+                        {
+                            // we expect the filename to always start with MountPoint, but we check anyways
+                            allFilesList.Add(chunk.FileName.StartsWith(MountPoint) ? chunk.FileName.Substring(MountPoint.Length) : chunk.FileName);
+                        }
+                    }
+                }
+
+                string[] allFiles = allFilesList.ToArray();
+                DirectoryTreeMap[loadTreeView] = new DirectoryTree(this, allFiles, null, string.Empty);
+                RefreshTreeView(loadTreeView);
+
+                this.Text = BaseForm.DisplayVersion + " - " + CurrentContainerPath;
+                SelectedTreeView = loadTreeView;
+            }
+            catch (Exception ex)
+            {
+                UAGUtils.InvokeUI(() => { MessageBox.Show("Failed to open file! " + ex.Message, "Uh oh!"); });
+
+                UnloadContainer();
+            }
+        }
+
+        public void LoadContainer(string path)
+        {
+            if (path == null) return;
+
+            string ext = Path.GetExtension(path);
+            switch(ext)
+            {
+                case ".pak":
+                    LoadContainerPak(path);
+                    break;
+                case ".utoc":
+                    LoadContainerUtoc(path);
+                    break;
+                case ".ucas":
+                    LoadContainerUtoc(Path.ChangeExtension(path, ".utoc"));
+                    break;
+                default:
+                    UAGUtils.InvokeUI(() => { MessageBox.Show($"Unknown file extension {ext}", "Uh oh!"); });
+                    break;
             }
         }
 
@@ -238,19 +383,71 @@ namespace UAssetGUI
             string[] stagingFiles = UAGConfig.GetStagingFiles(this.CurrentContainerPath, out string[] fixedPathsOnDisk);
             if (stagingFiles == null || fixedPathsOnDisk == null || stagingFiles.Length != fixedPathsOnDisk.Length) return false;
 
-            using (FileStream stream = new FileStream(path, FileMode.Create))
+            switch (Path.GetExtension(path))
             {
-                var pakWriter = new PakBuilder().Writer(stream, Version, MountPoint);
-                for (int i = 0; i < stagingFiles.Length; i++)
-                {
-                    string ext = Path.GetExtension(fixedPathsOnDisk[i]);
-                    if (ext == ".bak") continue;
-                    pakWriter.WriteFile(stagingFiles[i], File.ReadAllBytes(fixedPathsOnDisk[i]));
-                }
-                pakWriter.WriteIndex();
+                case ".pak":
+                    using (FileStream stream = new FileStream(path, FileMode.Create))
+                    {
+                        var pakWriter = new PakBuilder().Writer(stream, Version, MountPoint);
+                        for (int i = 0; i < stagingFiles.Length; i++)
+                        {
+                            string ext = Path.GetExtension(fixedPathsOnDisk[i]);
+                            if (ext == ".bak" || fixedPathsOnDisk[i].EndsWith(".bak.json")) continue;
+                            pakWriter.WriteFile(stagingFiles[i], File.ReadAllBytes(fixedPathsOnDisk[i]));
+                        }
+                        pakWriter.WriteIndex();
+                    }
+                    break;
+                case ".utoc":
+                    string engVer = ((RetocEngineVersion)BaseForm.ParsingVersion).ToString();
+                    FileContainerForm.SendCommandToRetoc($"to-zen --version {engVer} \"{UAGConfig.GetStagingDirectory(path)}\" \"{path}\"", out _, out _);
+                    break;
             }
 
             return true;
+        }
+
+        public static bool SendCommandToRetoc(string args, out string outputText, out string errorText, bool displayConsole = false)
+        {
+            outputText = null;
+            errorText = null;
+
+            string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
+            string retocPath = Path.Combine(libsPath, "retoc.exe");
+            Directory.CreateDirectory(UAGConfig.ConfigFolder);
+            Directory.CreateDirectory(libsPath);
+
+            if (!HasAlreadyExtractedRetoc) ExtractRetoc();
+
+            Process process = new Process();
+            process.StartInfo.FileName = retocPath;
+            process.StartInfo.Arguments = args;
+            process.StartInfo.WorkingDirectory = libsPath;
+            process.StartInfo.UseShellExecute = displayConsole ? true : false;
+            process.StartInfo.RedirectStandardOutput = displayConsole ? false : true;
+            process.StartInfo.RedirectStandardError = displayConsole ? false : true;
+            process.StartInfo.CreateNoWindow = displayConsole ? false : true;
+
+            process.Start();
+
+            if (process.StartInfo.RedirectStandardOutput) outputText = process.StandardOutput.ReadToEnd().TrimEnd();
+            if (process.StartInfo.RedirectStandardError) errorText = process.StandardError.ReadToEnd().TrimEnd();
+            process.WaitForExit();
+            int errorCode = process.ExitCode;
+            process.Close();
+
+            return errorCode == 0;
+        }
+
+        private static bool HasAlreadyExtractedRetoc = false;
+        public static string ExtractRetoc()
+        {
+            HasAlreadyExtractedRetoc = true;
+            string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
+            Directory.CreateDirectory(UAGConfig.ConfigFolder);
+            Directory.CreateDirectory(libsPath);
+
+            return Program.ExtractCompressedResource($"UAssetGUI.retoc.exe.gz", Path.Combine(libsPath, "retoc.exe"));
         }
 
         public void ForceResize()
@@ -432,7 +629,7 @@ namespace UAssetGUI
         {
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog())
             {
-                openFileDialog.Filter = ".pak Container Files (*.pak)|*.pak|All files (*.*)|*.*";
+                openFileDialog.Filter = "Unreal Engine Container Files (*.pak, *.utoc)|*.pak;*.utoc|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 
@@ -447,7 +644,7 @@ namespace UAssetGUI
         {
             using (System.Windows.Forms.SaveFileDialog dialog = new System.Windows.Forms.SaveFileDialog())
             {
-                dialog.Filter = ".pak Container Files (*.pak)|*.pak|All files (*.*)|*.*";
+                dialog.Filter = ".pak Container Files (*.pak)|*.pak|.utoc Container Files (*.utoc)|*.utoc|All files (*.*)|*.*";
                 dialog.FilterIndex = 1;
                 dialog.RestoreDirectory = true;
 
@@ -533,7 +730,7 @@ namespace UAssetGUI
         {
             if (processingNode.IsFile)
             {
-                UAGConfig.ExtractFile(processingNode, stream2, reader2);
+                UAGConfig.ExtractFile(processingNode, this.InteropType, stream2, reader2);
                 extractAllBackgroundWorker.ReportProgress(0); // the percentage we pass in is unused
                 return;
             }
@@ -554,43 +751,66 @@ namespace UAssetGUI
                 return;
             }
 
-            if (extractAllBackgroundWorker.IsBusy) return;
-
-            int numFiles = loadedTree.GetNumFiles();
-
-            UAGUtils.InvokeUI(() =>
+            switch(InteropType)
             {
-                progressBarForm = new ProgressBarForm();
-                progressBarForm.Value = 0;
-                progressBarForm.Maximum = numFiles;
-                progressBarForm.Text = this.Text;
-                progressBarForm.BaseForm = this;
-                progressBarForm.Show(this);
-            });
+                case InteropType.Pak:
+                    if (extractAllBackgroundWorker.IsBusy) return;
 
-            extractAllBackgroundWorker.RunWorkerAsync();
+                    int numFiles = loadedTree.GetNumFiles();
+
+                    UAGUtils.InvokeUI(() =>
+                    {
+                        progressBarForm = new ProgressBarForm();
+                        progressBarForm.Value = 0;
+                        progressBarForm.Maximum = numFiles;
+                        progressBarForm.Text = this.Text;
+                        progressBarForm.BaseForm = this;
+                        progressBarForm.Show(this);
+                    });
+
+                    extractAllBackgroundWorker.RunWorkerAsync();
+                    break;
+                case InteropType.Retoc:
+                    if (extractAllBackgroundWorker.IsBusy) return;
+                    extractAllBackgroundWorker.RunWorkerAsync();
+                    break;
+                default:
+                    MessageBox.Show($"This operation is not supported for the current interop type ({InteropType.ToString()}).", "Notice");
+                    break;
+            }
         }
 
         private void extractAllBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null) throw new InvalidOperationException("No container loaded");
+            Directory.CreateDirectory(UAGConfig.ExtractedFolder);
 
-            using (FileStream stream = new FileStream(this.CurrentContainerPath, FileMode.Open))
+            switch (InteropType)
             {
-                var reader = new PakBuilder().Reader(stream);
-                foreach (var entry in loadedTree.RootNodes)
-                {
-                    if (extractAllBackgroundWorker.CancellationPending) break;
-                    ExtractVisit(entry.Value, progressBarForm, stream, reader);
-                }
-            }
+                case InteropType.Pak:
+                    if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null) throw new InvalidOperationException("No container loaded");
 
-            if (extractAllBackgroundWorker.CancellationPending)
-            {
-                e.Cancel = true;
-                return;
+                    using (FileStream stream = new FileStream(this.CurrentContainerPath, FileMode.Open))
+                    {
+                        var reader = new PakBuilder().Reader(stream);
+                        foreach (var entry in loadedTree.RootNodes)
+                        {
+                            if (extractAllBackgroundWorker.CancellationPending) break;
+                            ExtractVisit(entry.Value, progressBarForm, stream, reader);
+                        }
+                    }
+
+                    if (extractAllBackgroundWorker.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    UAGUtils.OpenDirectory(UAGConfig.ExtractedFolder);
+                    break;
+                case InteropType.Retoc:
+                    FileContainerForm.SendCommandToRetoc($"to-legacy \"{Path.GetDirectoryName(CurrentContainerPath)}\" \"{UAGConfig.ExtractedFolder}\"", out _, out _, true);
+                    UAGUtils.OpenDirectory(UAGConfig.ExtractedFolder);
+                    break;
             }
-            UAGUtils.OpenDirectory(UAGConfig.ExtractedFolder);
         }
 
         private void extractAllBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -612,9 +832,9 @@ namespace UAssetGUI
                 }
                 else
                 {
-                    MessageBox.Show("Extracted " + progressBarForm.Value + " files successfully.", "Notice");
+                    MessageBox.Show(progressBarForm == null ? "Operation completed." : ("Extracted " + progressBarForm.Value + " files successfully."), "Notice");
                 }
-                progressBarForm.Close();
+                progressBarForm?.Close();
             });
         }
     }
@@ -644,7 +864,7 @@ namespace UAssetGUI
                 tsmItem = new ToolStripMenuItem("Extract");
                 tsmItem.Click += (sender, args) =>
                 {
-                    string outPath = UAGConfig.ExtractFile(Pointer);
+                    string outPath = UAGConfig.ExtractFile(Pointer, item.ParentForm.InteropType);
                     if (outPath == null) return;
                     if ((Path.GetExtension(outPath)?.Length ?? 0) > 0) outPath = Path.GetDirectoryName(outPath);
                     UAGUtils.OpenDirectory(outPath);
@@ -671,16 +891,19 @@ namespace UAssetGUI
     {
         public FileContainerForm ParentForm;
         public IDictionary<string, DirectoryTreeItem> RootNodes;
+        public IDictionary<string, DirectoryTreeItem> PackagePathToNode;
 
         public DirectoryTree(FileContainerForm parentForm)
         {
             RootNodes = new Dictionary<string, DirectoryTreeItem>();
+            PackagePathToNode = new Dictionary<string, DirectoryTreeItem>();
             ParentForm = parentForm;
         }
 
         public DirectoryTree(FileContainerForm parentForm, string[] paths, string[] fixedAssetsOnDisk = null, string prefix = null)
         {
             RootNodes = new Dictionary<string, DirectoryTreeItem>();
+            PackagePathToNode = new Dictionary<string, DirectoryTreeItem>();
             ParentForm = parentForm;
             if (fixedAssetsOnDisk != null && fixedAssetsOnDisk.Length == paths.Length)
             {
@@ -728,6 +951,8 @@ namespace UAssetGUI
             return currentItem;
         }
 
+        private static readonly Regex ProjectWithContentPrefixRegex = new Regex(@"^\/?[^\s\/]+\/Content", RegexOptions.Compiled);
+
         public DirectoryTreeItem CreateNode(string path, string fixedAssetOnDisk = null, string prefix = null)
         {
             string[] pathComponents = path.Split('/');
@@ -760,7 +985,7 @@ namespace UAssetGUI
             for (int i = 1; i < pathComponents.Length; i++)
             {
                 string ext = Path.GetExtension(pathComponents[i]);
-                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk" || ext == ".bak")) return null;
+                if (ext.Length > 1 && (ext == ".uexp" || ext == ".ubulk" || ext == ".bak" || pathComponents[i].EndsWith(".bak.json"))) return null;
 
                 if (!currentItem.Children.ContainsKey(pathComponents[i]))
                 {
@@ -775,6 +1000,13 @@ namespace UAssetGUI
                     currentItem.FixedPathOnDisk = startingFixedAssetOnDisk;
                 }
             }
+
+            // todo, this algorithm needs to be fixed for plugins
+            // Engine/Plugins/Animation/ControlRig/Content/Controls/ControlRigGizmoMaterial.uasset => /ControlRig/Controls/ControlRigGizmoMaterial
+            string packageName = Path.ChangeExtension(currentItem.FullPath, null).Replace('\\', '/').Replace(Path.DirectorySeparatorChar, '/').Replace("Engine/Content/", "Engine/");
+            packageName = ProjectWithContentPrefixRegex.Replace(packageName, "/Game", 1);
+            if (!packageName.StartsWith('/')) packageName = '/' + packageName;
+            PackagePathToNode[packageName] = currentItem;
 
             return currentItem;
         }
@@ -791,7 +1023,7 @@ namespace UAssetGUI
         public DirectoryTreeItem Parent;
         public IDictionary<string, DirectoryTreeItem> Children;
 
-        public string SaveFileToTemp(string outputPathDirectory = null, FileStream stream2 = null, PakReader reader2 = null)
+        public string SaveFileToTemp(InteropType interopType, string outputPathDirectory = null, FileStream stream2 = null, PakReader reader2 = null)
         {
             outputPathDirectory = outputPathDirectory ?? Path.Combine(Path.GetTempPath(), "UAG_read_only", Path.GetFileNameWithoutExtension(ParentForm.CurrentContainerPath));
             
@@ -808,57 +1040,75 @@ namespace UAssetGUI
                 return outputPath1;
             }
 
-            if (reader2 == null || stream2 == null)
+            switch(interopType)
             {
-                using (FileStream stream = new FileStream(ParentForm.CurrentContainerPath, FileMode.Open))
-                {
-                    var reader = new PakBuilder().Reader(stream);
-
-                    byte[] res = reader.Get(stream, FullPath.Substring(Prefix?.Length ?? 0));
-                    if (res != null)
+                case InteropType.Pak:
                     {
-                        if (File.Exists(outputPath1)) { try { File.Delete(outputPath1); } catch { } }
-                        File.WriteAllBytes(outputPath1, res);
+                        if (reader2 == null || stream2 == null)
+                        {
+                            using (FileStream stream = new FileStream(ParentForm.CurrentContainerPath, FileMode.Open))
+                            {
+                                var reader = new PakBuilder().Reader(stream);
+
+                                byte[] res = reader.Get(stream, FullPath.Substring(Prefix?.Length ?? 0));
+                                if (res != null)
+                                {
+                                    if (File.Exists(outputPath1)) { try { File.Delete(outputPath1); } catch { } }
+                                    File.WriteAllBytes(outputPath1, res);
+                                }
+                                else
+                                {
+                                    return null;
+                                }
+
+                                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
+                                if (File.Exists(outputPath2)) { try { File.Delete(outputPath2); } catch { } }
+                                if (res != null) File.WriteAllBytes(outputPath2, res);
+
+                                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
+                                if (File.Exists(outputPath3)) { try { File.Delete(outputPath3); } catch { } }
+                                if (res != null) File.WriteAllBytes(outputPath3, res);
+                            }
+                        }
+                        else
+                        {
+                            byte[] res = reader2.Get(stream2, FullPath.Substring(Prefix?.Length ?? 0));
+                            if (res != null)
+                            {
+                                File.WriteAllBytes(outputPath1, res);
+                            }
+                            else
+                            {
+                                return null;
+                            }
+
+                            res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
+                            if (res != null) File.WriteAllBytes(outputPath2, res);
+                            res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
+                            if (res != null) File.WriteAllBytes(outputPath3, res);
+                        }
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    break;
+                case InteropType.Retoc:
+                    string targetPath = FullPath.Substring(Prefix?.Length ?? 0);
+                    string origPathPrefix = Path.Combine(Path.GetTempPath(), "UAG_retoc", "RetocFiles");
+                    bool retocSuccess = FileContainerForm.SendCommandToRetoc($"to-legacy --filter \"{targetPath}\" \"{Path.GetDirectoryName(ParentForm.CurrentContainerPath)}\" \"{origPathPrefix}\"", out _, out _);
+                    if (!retocSuccess) return null;
 
-                    res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
-                    if (File.Exists(outputPath2)) { try { File.Delete(outputPath2); } catch { } }
-                    if (res != null) File.WriteAllBytes(outputPath2, res);
-
-                    res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
-                    if (File.Exists(outputPath3)) { try { File.Delete(outputPath3); } catch { } }
-                    if (res != null) File.WriteAllBytes(outputPath3, res);
-                }
+                    string origPath1 = Path.Combine(origPathPrefix, targetPath);
+                    try { File.Move(Path.ChangeExtension(origPath1, "uasset"), outputPath1, true); } catch { }
+                    try { File.Move(Path.ChangeExtension(origPath1, "umap"), outputPath1, true); } catch { }
+                    try { File.Move(Path.ChangeExtension(origPath1, "uexp"), outputPath2, true); } catch { }
+                    try { File.Move(Path.ChangeExtension(origPath1, "ubulk"), outputPath3, true); } catch { }
+                    break;
             }
-            else
-            {
-                byte[] res = reader2.Get(stream2, FullPath.Substring(Prefix?.Length ?? 0));
-                if (res != null)
-                {
-                    File.WriteAllBytes(outputPath1, res);
-                }
-                else
-                {
-                    return null;
-                }
-
-                res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
-                if (res != null) File.WriteAllBytes(outputPath2, res);
-                res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
-                if (res != null) File.WriteAllBytes(outputPath2, res);
-            }
-
 
             return outputPath1;
         }
 
         public void OpenFile()
         {
-            string outputPath = FixedPathOnDisk != null ? FixedPathOnDisk : this.SaveFileToTemp();
+            string outputPath = FixedPathOnDisk != null ? FixedPathOnDisk : this.SaveFileToTemp(this.ParentForm.InteropType);
             if (outputPath == null)
             {
                 MessageBox.Show("Unable to open file!", "Uh oh!");
@@ -868,7 +1118,7 @@ namespace UAssetGUI
             string ext = Path.GetExtension(outputPath);
             if (ext == ".uasset" || ext == ".umap")
             {
-                this.ParentForm.BaseForm.LoadFileAt(outputPath);
+                this.ParentForm.BaseForm.LoadFileAt(outputPath, this.ParentForm);
                 this.ParentForm.BaseForm.Focus();
             }
             else
@@ -884,7 +1134,7 @@ namespace UAssetGUI
         {
             if (newPath == null) newPath = this.FullPath;
 
-            UAGConfig.StageFile(this, newPath);
+            UAGConfig.StageFile(this, this.ParentForm.InteropType, newPath);
             this.ParentForm.RefreshTreeView(this.ParentForm.saveTreeView);
 
             var generatedNode = this.ParentForm.GetSpecificNode(this.ParentForm.saveTreeView, newPath);

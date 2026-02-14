@@ -81,10 +81,16 @@ namespace UAssetGUI
             }
         }
 
-        public static string[] GetStagingFiles(string pakPath, out string[] fixedPathsOnDisk)
+        public static string GetStagingDirectory(string pakPath)
         {
             string rootDir = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(pakPath)) : StagingFolder;
             Directory.CreateDirectory(rootDir);
+            return rootDir;
+        }
+
+        public static string[] GetStagingFiles(string pakPath, out string[] fixedPathsOnDisk)
+        {
+            string rootDir = GetStagingDirectory(pakPath);
 
             fixedPathsOnDisk = Directory.GetFiles(rootDir, "*.*", SearchOption.AllDirectories);
             string[] res = new string[fixedPathsOnDisk.Length]; Array.Copy(fixedPathsOnDisk, res, fixedPathsOnDisk.Length);
@@ -111,19 +117,19 @@ namespace UAssetGUI
             try { File.Copy(Path.ChangeExtension(rawPathOnDisk, ".ubulk"), Path.ChangeExtension(finalPath, ".ubulk"), true); } catch { }
         }
 
-        public static void StageFile(DirectoryTreeItem item, string newPath = null)
+        public static void StageFile(DirectoryTreeItem item, InteropType interopType, string newPath = null)
         {
             // recursive if we were given a directory
             if (!item.IsFile)
             {
-                foreach (var child in item.Children) StageFile(child.Value, newPath == null ? null : Path.Combine(newPath, child.Value.Name));
+                foreach (var child in item.Children) StageFile(child.Value, interopType, newPath == null ? null : Path.Combine(newPath, child.Value.Name));
                 return;
             }
 
             if (newPath == null) newPath = item.FullPath;
             newPath = newPath.Replace('/', Path.DirectorySeparatorChar);
 
-            string outputPath = item.SaveFileToTemp();
+            string outputPath = item.SaveFileToTemp(interopType);
             var finalPath = DifferentStagingPerPak ? Path.Combine(StagingFolder, Path.GetFileNameWithoutExtension(item.ParentForm.CurrentContainerPath), newPath) : Path.Combine(StagingFolder, newPath);
             if (outputPath == null || finalPath == null) return;
             try { Directory.CreateDirectory(Path.GetDirectoryName(finalPath)); } catch { return; } // fail silently if cant make the directory we need
@@ -138,18 +144,18 @@ namespace UAssetGUI
             try { File.Delete(Path.ChangeExtension(outputPath, ".ubulk")); } catch { }
         }
 
-        public static string ExtractFile(DirectoryTreeItem item, FileStream stream2 = null, PakReader reader2 = null)
+        public static string ExtractFile(DirectoryTreeItem item, InteropType interopType, FileStream stream2 = null, PakReader reader2 = null)
         {
             var finalPath = Path.Combine(ExtractedFolder, item.FullPath.Replace('/', Path.DirectorySeparatorChar));
 
             // recursive if we were given a directory
             if (!item.IsFile)
             {
-                foreach (var child in item.Children) ExtractFile(child.Value, stream2, reader2);
+                foreach (var child in item.Children) ExtractFile(child.Value, interopType, stream2, reader2);
                 return finalPath;
             }
 
-            return item.SaveFileToTemp(ExtractedFolder, stream2, reader2);
+            return item.SaveFileToTemp(interopType, ExtractedFolder, stream2, reader2);
         }
 
         public static bool TryGetMappings(string name, out Usmap mappings)

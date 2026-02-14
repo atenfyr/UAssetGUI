@@ -29,8 +29,8 @@ namespace UAssetGUI
 {
     public partial class Form1 : Form
     {
-        internal EngineVersion ParsingVersion = EngineVersion.UNKNOWN;
-        internal Usmap ParsingMappings = null;
+        public EngineVersion ParsingVersion = EngineVersion.UNKNOWN;
+        public Usmap ParsingMappings = null;
         internal DataGridView dataGridView1;
         internal ColorfulTreeView treeView1;
         internal SplitContainer splitContainer1;
@@ -517,13 +517,13 @@ namespace UAssetGUI
             return res;
         }
 
-        public void LoadFileAt(string filePath)
+        public void LoadFileAt(string filePath, FileContainerForm parentContainerForm = null)
         {
-            UAGUtils.InvokeUI(() => LoadFileAtInternal(filePath));
+            UAGUtils.InvokeUI(() => LoadFileAtInternal(filePath, parentContainerForm));
         }
 
         public DateTime LastLoadTimestamp = DateTime.UtcNow;
-        private void LoadFileAtInternal(string filePath)
+        private void LoadFileAtInternal(string filePath, FileContainerForm parentContainerForm = null)
         {
             dataGridView1.Visible = true;
             byteView1.Visible = false;
@@ -551,6 +551,8 @@ namespace UAssetGUI
                         desiredSetUnsavedChanges = true;
                         break;
                     case ".pak":
+                    case ".utoc":
+                    case ".ucas":
                         OpenFileContainerForm(filePath);
                         return;
                     default:
@@ -585,11 +587,11 @@ namespace UAssetGUI
                             // this definitely has potential for false positives, but it will still filter out basically any other file type, if it mattered that much i'd just actually parse the thing
                             else if (Path.GetExtension(filePath) == ".uasset" && (sig == 0 || sig == 1) && nextFourBytes > 40 && nextFourBytes < 1e9) // IsUnversioned reasonable, HeaderSize reasonable
                             {
-                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE5 Zen Loader assets cannot currently be loaded directly into UAssetGUI. You could try to extract traditional cooked assets from IOStore container files by using something like ZenTools by Archengius, or otherwise try software like FModel to read the asset.\n\nWould you like to open the GitHub page for ZenTools?", "Uh oh!", MessageBoxButtons.YesNo);
+                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE5 Zen Loader assets cannot be loaded directly into UAssetGUI. You could try to instead open the corresponding .utoc container file in UAssetGUI. You could also execute retoc directly from the command line.\n\nWould you like to open the GitHub page for retoc?", "Uh oh!", MessageBoxButtons.YesNo);
                                 switch (messageBoxRes)
                                 {
                                     case DialogResult.Yes:
-                                        UAGUtils.OpenURL("https://github.com/Archengius/ZenTools");
+                                        UAGUtils.OpenURL("https://github.com/trumank/retoc");
                                         break;
                                     default:
                                         break;
@@ -597,11 +599,11 @@ namespace UAssetGUI
                             }
                             else if (Path.GetExtension(filePath) == ".uasset" && nextFourBytes == 0 && ue4CookedHeaderSize > 40 && ue4CookedHeaderSize < 1e9) // zero FName, CookedHeaderSize reasonable
                             {
-                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE4 Zen Loader assets cannot currently be loaded directly into UAssetGUI. You could try to extract traditional cooked assets from IOStore container files by using something like ZenTools-UE4, originally by Archengius and developed by Ryn/WistfulHopes, or otherwise try software like FModel to read the asset.\n\nWould you like to open the GitHub page for ZenTools-UE4?", "Uh oh!", MessageBoxButtons.YesNo);
+                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE4 Zen Loader assets cannot be loaded directly into UAssetGUI. You could try to instead open the corresponding .utoc container file in UAssetGUI. You could also execute retoc directly from the command line.\n\nWould you like to open the GitHub page for retoc?", "Uh oh!", MessageBoxButtons.YesNo);
                                 switch (messageBoxRes)
                                 {
                                     case DialogResult.Yes:
-                                        UAGUtils.OpenURL("https://github.com/WistfulHopes/ZenTools-UE4");
+                                        UAGUtils.OpenURL("https://github.com/trumank/retoc");
                                         break;
                                     default:
                                         break;
@@ -621,6 +623,35 @@ namespace UAssetGUI
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
 
                         var strmRaw = targetAsset.PathToStream(filePath);
+
+                        // check: are we being loaded from a container? if so, pre-load the asset to grab any dependencies before loading properly
+                        if (parentContainerForm != null && targetAsset != null)
+                        {
+                            // repeat pre-load up to 3 times, or until no more assets are failed to access
+                            for (int preloadIter = 0; preloadIter < 3; preloadIter++)
+                            {
+                                if (targetAsset.OtherAssetsFailedToAccess != null) targetAsset.OtherAssetsFailedToAccess.Clear();
+                                targetAsset.CustomSerializationFlags |= CustomSerializationFlags.SkipLoadingExports; // skip loading exports for pre-load (significant speed-up)
+                                targetAsset.Read(new AssetBinaryReader(strmRaw, targetAsset));
+
+                                if (targetAsset.OtherAssetsFailedToAccess == null || targetAsset.OtherAssetsFailedToAccess.Count == 0) break;
+                                foreach (FName otherAsset in targetAsset.OtherAssetsFailedToAccess)
+                                {
+                                    DirectoryTreeItem targetItem = parentContainerForm.GetFromPackageName(parentContainerForm.loadTreeView, otherAsset.ToString());
+                                    targetItem.SaveFileToTemp(parentContainerForm.InteropType);
+                                }
+                            }
+
+                            // reset everything for the real load
+                            targetAsset = new UAsset(ParsingVersion);
+                            targetAsset.FilePath = filePath;
+                            targetAsset.Mappings = ParsingMappings;
+                            targetAsset.CustomSerializationFlags = (CustomSerializationFlags)UAGConfig.Data.CustomSerializationFlags;
+                            if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
+
+                            strmRaw = targetAsset.PathToStream(filePath);
+                        }
+
 #if DEBUGTRACING
                         var strm = new UAssetAPI.Trace.TraceStream(strmRaw, filePath);
                         UAssetAPI.Trace.LoggingAspect.Start(strm);
@@ -636,6 +667,7 @@ namespace UAssetGUI
                 SetUnsavedChanges(false);
 
                 tableEditor = new TableHandler(dataGridView1, targetAsset, treeView1, jsonView);
+                tableEditor.ParentContainer = parentContainerForm;
 
                 saveToolStripMenuItem.Enabled = !IsReadOnly();
                 saveAsToolStripMenuItem.Enabled = true;
@@ -1599,10 +1631,15 @@ namespace UAssetGUI
 
             if (!e.Cancel) DisposeDiscordRpc();
 
-            // delete temp folder
+            // delete temp folders
             try
             {
                 Directory.Delete(Path.Combine(Path.GetTempPath(), "UAG_read_only"), true);
+            }
+            catch { }
+            try
+            {
+                Directory.Delete(Path.Combine(Path.GetTempPath(), "UAG_retoc"), true);
             }
             catch { }
         }

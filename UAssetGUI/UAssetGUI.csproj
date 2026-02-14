@@ -74,6 +74,7 @@
     <None Remove="Microsoft.CodeAnalysis.CSharp.dll.gz" />
     <None Remove="Microsoft.CodeAnalysis.dll.gz" />
     <None Remove="NOTICE.md" />
+    <None Remove="retoc.exe.gz" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="ColorfulTreeView.cs">
@@ -160,6 +161,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="NOTICE.md" />
+    <EmbeddedResource Include="retoc.exe.gz" />
     <Content Include="next_patch_notes.txt" />
   </ItemGroup>
   <ItemGroup>

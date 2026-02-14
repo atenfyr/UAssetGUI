@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.Unversioned;
@@ -28,6 +29,7 @@ namespace UAssetGUI
         public int StartupHeight;
         public int CustomSerializationFlags;
         public bool EnableBakJson;
+        public bool AllowUntrustedScripts;
 
         public UAGConfigData()
         {
@@ -48,6 +50,7 @@ namespace UAssetGUI
             StartupHeight = 700;
             CustomSerializationFlags = 0;
             EnableBakJson = false;
+            AllowUntrustedScripts = false;
         }
     }
 
@@ -55,10 +58,13 @@ namespace UAssetGUI
     {
         public static UAGConfigData Data;
         public static Dictionary<string, string> AllMappings = new Dictionary<string, string>();
+        public static List<string> AllScriptIDs = new List<string>();
+
         public readonly static string ConfigFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
         public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
         public readonly static string StagingFolder = Path.Combine(ConfigFolder, "Staging");
         public readonly static string ExtractedFolder = Path.Combine(ConfigFolder, "Extracted");
+        public readonly static string ScriptsFolder = Path.Combine(ConfigFolder, "Scripts");
 
         internal static bool DifferentStagingPerPak = false;
 
@@ -175,6 +181,128 @@ namespace UAssetGUI
 
             mappings = null;
             return false;
+        }
+        
+        public static void RefreshAllScriptIDs()
+        {
+            Directory.CreateDirectory(ScriptsFolder);
+            AllScriptIDs = Directory.GetFiles(ScriptsFolder, "*.cs", SearchOption.TopDirectoryOnly).Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
+            if (AllScriptIDs.Count == 0)
+            {
+                InstallBuiltInScripts();
+            }
+
+            UAGUtils.InvokeUI(() =>
+            {
+                foreach (var form in Application.OpenForms)
+                {
+                    if (form is Form1 form1)
+                    {
+                        {
+                            List<ToolStripItem> subScriptItems = new List<ToolStripItem>();
+                            foreach (string scriptID in AllScriptIDs)
+                            {
+                                ToolStripMenuItem newItem = new ToolStripMenuItem()
+                                {
+                                    Name = "executeScriptToolStripMenuItemSubScriptItem_" + scriptID,
+                                    Size = form1.executeScriptToolStripMenuItem.Size,
+                                    Text = scriptID.Replace('_', ' '),
+                                    Tag = scriptID
+                                };
+                                newItem.Click += form1.executeScriptSubItem_Click;
+                                subScriptItems.Add(newItem);
+                            }
+                            ToolStripMenuItem newItem2 = new ToolStripMenuItem()
+                            {
+                                Name = "executeScriptToolStripMenuItemSubScriptItem_New",
+                                Size = form1.executeScriptToolStripMenuItem.Size,
+                                Text = "Add new script...",
+                            };
+                            newItem2.Click += form1.executeScriptNewItem_Click;
+                            subScriptItems.Add(newItem2);
+
+                            form1.executeScriptToolStripMenuItem.DropDownItems.Clear();
+                            form1.executeScriptToolStripMenuItem.DropDownItems.AddRange(subScriptItems.ToArray());
+                        }
+                        {
+                            List<ToolStripItem> subScriptItems = new List<ToolStripItem>();
+                            foreach (string scriptID in AllScriptIDs)
+                            {
+                                ToolStripMenuItem newItem = new ToolStripMenuItem()
+                                {
+                                    Name = "editScriptToolStripMenuItemSubScriptItem_" + scriptID,
+                                    Size = form1.editScriptToolStripMenuItem.Size,
+                                    Text = scriptID.Replace('_', ' '),
+                                    Tag = scriptID
+                                };
+                                newItem.Click += form1.editScriptSubItem_Click;
+                                subScriptItems.Add(newItem);
+                            }
+                            ToolStripMenuItem newItem2 = new ToolStripMenuItem()
+                            {
+                                Name = "editScriptToolStripMenuItemSubScriptItem_New",
+                                Size = form1.editScriptToolStripMenuItem.Size,
+                                Text = "Add new script...",
+                            };
+                            newItem2.Click += form1.executeScriptNewItem_Click;
+                            subScriptItems.Add(newItem2);
+
+                            form1.editScriptToolStripMenuItem.DropDownItems.Clear();
+                            form1.editScriptToolStripMenuItem.DropDownItems.AddRange(subScriptItems.ToArray());
+                        }
+
+                        form1.executeScriptToolStripMenuItem.Enabled = UAGConfig.Data.AllowUntrustedScripts;
+                        form1.editScriptToolStripMenuItem.Enabled = UAGConfig.Data.AllowUntrustedScripts;
+
+                        UAGPalette.RefreshTheme(form1);
+                    }
+                }
+            });
+        }
+
+        public static string GetScriptTextByID(string id)
+        {
+            Directory.CreateDirectory(ScriptsFolder);
+            try
+            {
+                return File.ReadAllText(Path.ChangeExtension(Path.Combine(ScriptsFolder, id), "cs"));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static string CreateAndReturnPathToScript(string id)
+        {
+            string newScriptPath = Path.ChangeExtension(Path.Combine(ScriptsFolder, id), "cs");
+            if (File.Exists(newScriptPath)) return newScriptPath;
+            try
+            {
+                File.WriteAllText(newScriptPath, Properties.Resources.Hello_world);
+                RefreshAllScriptIDs();
+                return newScriptPath;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static bool InstallBuiltInScripts()
+        {
+            try
+            {
+                File.WriteAllText(Path.ChangeExtension(Path.Combine(ScriptsFolder, "Hello_world"), "cs"), Properties.Resources.Hello_world);
+                File.WriteAllText(Path.ChangeExtension(Path.Combine(ScriptsFolder, "Set_all_visible_floats_to_100"), "cs"), Properties.Resources.Set_all_visible_floats_to_100);
+
+                RefreshAllScriptIDs();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static void Save()

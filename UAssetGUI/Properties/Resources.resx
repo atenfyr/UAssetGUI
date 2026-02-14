@@ -121,7 +121,13 @@
   <data name="dancing_cat" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dancing_cat.gif;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Hello_world" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ExampleScripts\Hello_world.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Set_all_visible_floats_to_100" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ExampleScripts\Set_all_visible_floats_to_100.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

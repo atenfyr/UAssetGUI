@@ -1,4 +1,7 @@
 using DiscordRPC;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,7 +11,11 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UAssetAPI;
@@ -219,7 +226,7 @@ namespace UAssetGUI
 
         private List<string> allMappingsKeys = new List<string>();
 
-        private void OpenFileContainerForm(string path = null)
+        public void OpenFileContainerForm(string path = null)
         {
             var test = new FileContainerForm();
             test.CurrentContainerPath = path;
@@ -362,6 +369,9 @@ namespace UAssetGUI
                 // load mappings and update combo box
                 UpdateMappings(null, false);
 
+                // load scripts
+                UAGConfig.RefreshAllScriptIDs();
+
                 // update version combo box
                 string initialSelection = versionOptionsKeys[0];
                 try
@@ -391,6 +401,11 @@ namespace UAssetGUI
                 this.copyToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.C);
                 this.pasteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Control | Keys.V);
                 this.deleteToolStripMenuItem.ShortcutKeyDisplayString = UAGUtils.ShortcutToText(Keys.Delete);
+
+                this.menuStrip1.Items.OfType<ToolStripMenuItem>().ToList().ForEach(tsmi =>
+                {
+                    tsmi.MouseHover += (sender, arg) => ((ToolStripDropDownItem)sender).ShowDropDown();
+                });
 
                 // Fetch the latest version from github
                 Task.Run(() =>
@@ -1968,7 +1983,7 @@ namespace UAssetGUI
         private readonly HashSet<string> invalidExtraFolders = new HashSet<string>() { "AkAudio", "ClothingSystemRuntime", "SQEXSEAD" };
         private readonly string PROJECT_NAME_PREFIX = "/Script/";
         private readonly string CONTENT_NAME_PREFIX = "/Game/";
-        private string GetProjectName()
+        public string GetProjectName()
         {
             if (tableEditor?.asset == null) return null;
             if (UAGConfig.Data.PreferredMappings != "No mappings" && UAGConfig.Data.PreferredMappings != "Mappings") return UAGConfig.Data.PreferredMappings;
@@ -2343,6 +2358,232 @@ namespace UAssetGUI
                     }
                 }
             }
+        }
+
+        // the following three methods were developed using the following example code as reference: https://github.com/andersstorhaug/SingleFileScripting/tree/main
+        // that example was prepared by andersstorhaug, with portions of code derived from Roslyn (see NOTICE.md)
+
+        internal static MetadataReference GetReference(Type type)
+        {
+            return GetReference(type.Assembly);
+        }
+
+        internal static MetadataReference GetReference(Assembly asm)
+        {
+            unsafe
+            {
+                return asm.TryGetRawMetadata(out var blob, out var length)
+                    ? AssemblyMetadata.Create(ModuleMetadata.CreateFromMetadata((IntPtr)blob, length)).GetReference()
+                    : throw new InvalidOperationException($"Could not get raw metadata for assembly {asm.ToString()}");
+            }
+        }
+
+        private volatile int customAsmId = 0;
+        internal Dictionary<string, string> lastCompiledScriptText = new Dictionary<string, string>(); // ID vs text when last compiled
+        internal Dictionary<string, ScriptAssemblyLoadContext> compiledScriptsAsms = new Dictionary<string, ScriptAssemblyLoadContext>(); // ID vs asm
+        internal Dictionary<string, Func<object[], Task>> compiledScripts = new Dictionary<string, Func<object[], Task>>(); // ID vs entryPointDelegate
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal Task ExecuteScript(string scriptText, string scriptID)
+        {
+            if (scriptText == null) throw new ArgumentException("scriptText is null");
+            if (scriptID == null) throw new ArgumentException("scriptID is null");
+            if (!UAGConfig.Data.AllowUntrustedScripts) throw new ArgumentException("AllowUntrustedScripts is not enabled");
+
+            Func<object[], Task> entryPointDelegate = null;
+            if (!compiledScripts.TryGetValue(scriptID, out entryPointDelegate) || entryPointDelegate == null || !lastCompiledScriptText.ContainsKey(scriptID) || lastCompiledScriptText[scriptID] != scriptText)
+            {
+                if (compiledScriptsAsms.ContainsKey(scriptID)) compiledScriptsAsms[scriptID]?.Unload();
+                compiledScriptsAsms[scriptID] = null;
+                lastCompiledScriptText[scriptID] = null;
+                compiledScripts[scriptID] = null;
+
+                ScriptAssemblyLoadContext assemblyLoadContext = new ScriptAssemblyLoadContext();
+
+                List<MetadataReference> references = [
+                    GetReference(typeof(object)),
+                    GetReference(typeof(System.Windows.Forms.Form)),
+                    GetReference(typeof(UAssetAPI.UAsset)),
+                    GetReference(typeof(UAssetGUI.Form1))
+                ];
+
+                foreach (AssemblyName asmName in typeof(UAssetGUI.Form1).Assembly.GetReferencedAssemblies())
+                {
+                    references.Add(GetReference(Assembly.Load(asmName)));
+                }
+
+                // add imports
+                string[] imports = ["System", "System.Windows.Forms", "UAssetAPI", "UAssetAPI.ExportTypes", "UAssetAPI.PropertyTypes.Objects", "UAssetAPI.PropertyTypes.Structs", "UAssetAPI.UnrealTypes", "UAssetAPI.FieldTypes", "UAssetAPI.Unversioned", "UAssetAPI.JSON", "UAssetAPI.Kismet", "UAssetAPI.CustomVersions", "UAssetGUI"];
+                StringBuilder finalScriptText = new StringBuilder();
+                foreach (string newImport in imports)
+                {
+                    finalScriptText.AppendLine($"using {newImport};");
+                }
+                finalScriptText.Append(scriptText);
+
+                // parse syntax
+                SyntaxTree syntaxTree = SyntaxFactory.ParseSyntaxTree(finalScriptText.ToString(), new CSharpParseOptions(kind: SourceCodeKind.Script, languageVersion: LanguageVersion.Latest));
+
+                // compile
+                var compilation = CSharpCompilation.CreateScriptCompilation(
+                    assemblyName: "Script" + customAsmId + "_" + scriptID,
+                    syntaxTree,
+                    references,
+                    returnType: null,
+                    globalsType: typeof(RoslynGlobals));
+                customAsmId++;
+
+                var peStream = new MemoryStream(); // don't need to dispose
+                var pdbStream = new MemoryStream(); // don't need to dispose
+                var result = compilation.Emit(peStream, pdbStream, xmlDocumentationStream: null, win32Resources: null, manifestResources: null,
+                    new EmitOptions(
+                        debugInformationFormat: DebugInformationFormat.PortablePdb,
+                        pdbChecksumAlgorithm: default(HashAlgorithmName)));
+
+                if (!result.Success)
+                {
+                    string errorText = "Errors occurred during compilation\n\n";
+                    foreach (var exception in result.Diagnostics)
+                    {
+                        errorText += exception.ToString() + "\n";
+                    }
+                    throw new ArgumentException(errorText);
+                }
+
+                // load asm
+                peStream.Seek(0, SeekOrigin.Begin);
+                pdbStream.Seek(0, SeekOrigin.Begin);
+                var scriptAssembly = assemblyLoadContext.LoadFromStream(peStream, pdbStream);
+
+                // get entry point
+                var entryPoint = compilation.GetEntryPoint(CancellationToken.None) ?? throw new InvalidOperationException("Entry point could not be determined");
+                var entryPointType = scriptAssembly.GetType($"{entryPoint.ContainingNamespace.MetadataName}.{entryPoint.ContainingType.MetadataName}", throwOnError: true, ignoreCase: false);
+                var entryPointMethod = entryPointType?.GetTypeInfo().GetDeclaredMethod(entryPoint.MetadataName) ?? throw new InvalidOperationException("Entry point method could not be determined");
+                entryPointDelegate = entryPointMethod.CreateDelegate<Func<object[], Task>>();
+
+                compiledScriptsAsms[scriptID] = assemblyLoadContext;
+                lastCompiledScriptText[scriptID] = scriptText;
+                compiledScripts[scriptID] = entryPointDelegate;
+            }
+
+            return entryPointDelegate.Invoke([new RoslynGlobals() { Interface = new ScriptInterfaceWrapper(this) }, null]);
+        }
+
+        public class RoslynGlobals
+        {
+            public IScriptInterface Interface;
+        }
+
+        internal void executeScriptSubItem_Click(object sender, EventArgs e)
+        {
+            string scriptID = ((ToolStripMenuItem)sender).Tag as string;
+            string scriptText = scriptID == null ? null : UAGConfig.GetScriptTextByID(scriptID);
+            if (scriptText == null)
+            {
+                UAGUtils.InvokeUI(() =>
+                {
+                    MessageBox.Show("Failed to read script", "Uh oh!");
+                    UAGConfig.RefreshAllScriptIDs();
+                });
+                return;
+            }
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    ExecuteScript(scriptText, scriptID).Wait();
+                }
+                catch (AggregateException ae)
+                {
+                    string errText = "";
+                    foreach (var ex in ae.InnerExceptions)
+                    {
+                        errText += "\n\n" + ex.GetType().ToString() + ": " + ex.Message + "\n" + ex.StackTrace;
+                    }
+
+                    UAGUtils.InvokeUI(() =>
+                    {
+                        MessageBox.Show("Script threw an exception" + errText, "Uh oh!");
+                        UAGConfig.RefreshAllScriptIDs();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    string errText = "\n\n" + ex.GetType().ToString() + ": " + ex.Message + "\n" + ex.StackTrace;
+
+                    UAGUtils.InvokeUI(() =>
+                    {
+                        MessageBox.Show("Failed to execute script" + errText, "Uh oh!");
+                        UAGConfig.RefreshAllScriptIDs();
+                    });
+                }
+            });
+        }
+
+        internal void editScriptSubItem_Click(object sender, EventArgs e)
+        {
+            string scriptId = ((ToolStripMenuItem)sender).Tag as string;
+            if (scriptId == null)
+            {
+                UAGUtils.InvokeUI(() =>
+                {
+                    MessageBox.Show("Failed to get script ID", "Uh oh!");
+                    UAGConfig.RefreshAllScriptIDs();
+                });
+                return;
+            }
+
+            string newScriptPath = UAGConfig.CreateAndReturnPathToScript(scriptId);
+            if (newScriptPath == null)
+            {
+                MessageBox.Show("Failed to find script on disk", "Uh oh!");
+                UAGConfig.RefreshAllScriptIDs();
+            }
+            else
+            {
+                new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        UseShellExecute = true,
+                        FileName = newScriptPath
+                    }
+                }.Start();
+            }
+        }
+
+        internal void executeScriptNewItem_Click(object sender, EventArgs e)
+        {
+            TextPrompt replacementPrompt = new TextPrompt()
+            {
+                DisplayText = "What would you like to name your new script?"
+            };
+
+            replacementPrompt.StartPosition = FormStartPosition.CenterParent;
+
+            if (replacementPrompt.ShowDialog(this) == DialogResult.OK)
+            {
+                string newScriptName = string.Join("_", replacementPrompt.OutputText.Replace(' ', '_').Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+                string newScriptPath = UAGConfig.CreateAndReturnPathToScript(newScriptName);
+                if (newScriptPath == null)
+                {
+                    MessageBox.Show("Failed to create new script", "Uh oh!");
+                }
+                else
+                {
+                    new Process()
+                    {
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            UseShellExecute = true,
+                            FileName = newScriptPath
+                        }
+                    }.Start();
+                }
+            }
+
+            replacementPrompt.Dispose();
         }
 
         private bool hasActivatedBefore = false;

@@ -14,6 +14,8 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <Configurations>Debug;Release;DebugVerbose;DebugTracing;ReleaseX</Configurations>
     <UseWindowsForms>true</UseWindowsForms>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
@@ -64,7 +66,13 @@
     <Delete Files="$(ProjectDir)git_commit.txt" />
   </Target>
   <ItemGroup>
+    <Compile Remove="Resources\ExampleScripts\Hello_world.cs" />
+    <Compile Remove="Resources\ExampleScripts\Set_all_visible_floats_to_100.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="LICENSE" />
+    <None Remove="Microsoft.CodeAnalysis.CSharp.dll.gz" />
+    <None Remove="Microsoft.CodeAnalysis.dll.gz" />
     <None Remove="NOTICE.md" />
   </ItemGroup>
   <ItemGroup>
@@ -138,11 +146,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\ExampleScripts\Hello_world.cs" />
     <None Include="Resources\icon.ico" />
+    <None Include="Resources\ExampleScripts\Set_all_visible_floats_to_100.cs" />
     <EmbeddedResource Include="git_commit.txt">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="LICENSE" />
+    <EmbeddedResource Include="Microsoft.CodeAnalysis.CSharp.dll.gz">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Microsoft.CodeAnalysis.dll.gz">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="NOTICE.md" />
     <Content Include="next_patch_notes.txt" />
   </ItemGroup>
@@ -153,7 +169,12 @@
     <PackageReference Include="DiscordRichPresence" Version="1.1.1.14" />
     <PackageReference Include="FolderBrowserEx" Version="1.0.1" />
     <PackageReference Include="Markdig" Version="0.40.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Collections.Immutable" Version="10.0.3" />
+    <PackageReference Include="System.Reflection.Metadata" Version="10.0.3" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>
 </Project>

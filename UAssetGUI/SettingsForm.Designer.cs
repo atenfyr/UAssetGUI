@@ -49,6 +49,7 @@
             customSerializationFlagsBox = new System.Windows.Forms.CheckedListBox();
             pictureBox1 = new System.Windows.Forms.PictureBox();
             enableBakJson = new System.Windows.Forms.CheckBox();
+            allowUntrustedScriptsBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -298,11 +299,24 @@
             enableBakJson.UseVisualStyleBackColor = true;
             enableBakJson.CheckedChanged += enableBakJson_CheckedChanged;
             // 
+            // allowUntrustedScriptsBox
+            // 
+            allowUntrustedScriptsBox.AutoSize = true;
+            allowUntrustedScriptsBox.Location = new System.Drawing.Point(215, 305);
+            allowUntrustedScriptsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            allowUntrustedScriptsBox.Name = "allowUntrustedScriptsBox";
+            allowUntrustedScriptsBox.Size = new System.Drawing.Size(147, 19);
+            allowUntrustedScriptsBox.TabIndex = 24;
+            allowUntrustedScriptsBox.Text = "Allow untrusted scripts";
+            allowUntrustedScriptsBox.UseVisualStyleBackColor = true;
+            allowUntrustedScriptsBox.CheckedChanged += allowUntrustedScriptsBox_CheckedChanged;
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(421, 395);
+            Controls.Add(allowUntrustedScriptsBox);
             Controls.Add(enableBakJson);
             Controls.Add(pictureBox1);
             Controls.Add(customSerializationFlagsBox);
@@ -359,5 +373,6 @@
         internal System.Windows.Forms.Label label4;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.CheckBox enableBakJson;
+        private System.Windows.Forms.CheckBox allowUntrustedScriptsBox;
     }
 }

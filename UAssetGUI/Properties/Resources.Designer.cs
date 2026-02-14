@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UAssetGUI.Properties
-{
-
-
+namespace UAssetGUI.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -71,12 +71,44 @@ namespace UAssetGUI.Properties
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to // this example script displays a simple message to the user
+        ///UAGUtils.InvokeUI(() =&gt;
+        ///{
+        ///    MessageBox.Show(&quot;Welcome to scripting with C# in UAssetGUI!\n\n&quot; + Interface.GetBaseForm().GetProjectName() + &quot;\n&quot; + Interface.GetDisplayVersion(), &quot;Hello, world!&quot;);
+        ///});
+        ///.
+        /// </summary>
+        internal static string Hello_world {
+            get {
+                return ResourceManager.GetString("Hello_world", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon icon {
             get {
                 object obj = ResourceManager.GetObject("icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to // this example script changes the value of all float entries in the currently selected node to 100
+        ///UAGUtils.InvokeUI(() =&gt;
+        ///{
+        ///    // get currently selected node
+        ///    int numChanged = 0;
+        ///    var pointingTreeNode = Interface.GetTreeView().SelectedNode as PointingTreeNode;
+        ///    if (pointingTreeNode.Type == PointingTreeNodeType.Normal &amp;&amp; pointingTreeNode.Pointer is NormalExport normalExport)
+        ///    {
+        ///        // update all FloatProperty and DoubleProperty entries in normalExport
+        ///        foreach (PropertyData [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Set_all_visible_floats_to_100 {
+            get {
+                return ResourceManager.GetString("Set_all_visible_floats_to_100", resourceCulture);
             }
         }
     }

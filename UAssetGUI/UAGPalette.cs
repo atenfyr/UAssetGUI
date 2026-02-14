@@ -172,6 +172,14 @@ namespace UAssetGUI
                     {
                         childItem.BackColor = UAGPalette.BackColor;
                         childItem.ForeColor = UAGPalette.ForeColor;
+                        if (childItem is ToolStripMenuItem childItem_tsmi && childItem_tsmi.DropDownItems != null)
+                        {
+                            foreach (ToolStripItem childItem2 in childItem_tsmi.DropDownItems)
+                            {
+                                childItem2.BackColor = UAGPalette.BackColor;
+                                childItem2.ForeColor = UAGPalette.ForeColor;
+                            }
+                        }
                     }
                 }
             }

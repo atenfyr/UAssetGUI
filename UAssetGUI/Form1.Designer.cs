@@ -51,6 +51,8 @@ namespace UAssetGUI
             refreshToolStripMenuItem = new ToolStripMenuItem();
             recalculateNodesToolStripMenuItem = new ToolStripMenuItem();
             utilsToolStripMenuItem = new ToolStripMenuItem();
+            executeScriptToolStripMenuItem = new ToolStripMenuItem();
+            editScriptToolStripMenuItem = new ToolStripMenuItem();
             importMappingsToolStripMenuItem = new ToolStripMenuItem();
             patchusmapWithsavVersionInfoToolStripMenuItem = new ToolStripMenuItem();
             listValidPropertiesToolStripMenuItem = new ToolStripMenuItem();
@@ -222,10 +224,22 @@ namespace UAssetGUI
             // 
             // utilsToolStripMenuItem
             // 
-            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { importMappingsToolStripMenuItem, patchusmapWithsavVersionInfoToolStripMenuItem, listValidPropertiesToolStripMenuItem });
+            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { executeScriptToolStripMenuItem, editScriptToolStripMenuItem, importMappingsToolStripMenuItem, patchusmapWithsavVersionInfoToolStripMenuItem, listValidPropertiesToolStripMenuItem });
             utilsToolStripMenuItem.Name = "utilsToolStripMenuItem";
             utilsToolStripMenuItem.Size = new System.Drawing.Size(42, 20);
             utilsToolStripMenuItem.Text = "Utils";
+            // 
+            // executeScriptToolStripMenuItem
+            // 
+            executeScriptToolStripMenuItem.Name = "executeScriptToolStripMenuItem";
+            executeScriptToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
+            executeScriptToolStripMenuItem.Text = "Execute script...";
+            // 
+            // executeScriptToolStripMenuItem
+            // 
+            editScriptToolStripMenuItem.Name = "editScriptToolStripMenuItem";
+            editScriptToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
+            editScriptToolStripMenuItem.Text = "Edit script...";
             // 
             // importMappingsToolStripMenuItem
             // 
@@ -505,6 +519,8 @@ namespace UAssetGUI
         private ToolStripMenuItem utilsToolStripMenuItem;
         private ToolStripMenuItem patchusmapWithsavVersionInfoToolStripMenuItem;
         private ToolStripMenuItem importMappingsToolStripMenuItem;
+        public ToolStripMenuItem executeScriptToolStripMenuItem;
+        public ToolStripMenuItem editScriptToolStripMenuItem;
         private ToolStripMenuItem openContainersToolStripMenuItem;
     }
 }

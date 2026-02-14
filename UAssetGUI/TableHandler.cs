@@ -1208,7 +1208,7 @@ namespace UAssetGUI
             dataGridView1.BackgroundColor = UAGPalette.InactiveColor;
         }
 
-        private Form1 GetParentForm()
+        public Form1 GetParentForm()
         {
             return (Form1) dataGridView1.Parent.Parent.Parent;
         }

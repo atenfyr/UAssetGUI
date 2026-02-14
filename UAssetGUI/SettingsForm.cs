@@ -49,6 +49,7 @@ namespace UAssetGUI
             restoreSize.Checked = UAGConfig.Data.RestoreSize;
             enableUpdateNotice.Checked = UAGConfig.Data.EnableUpdateNotice;
             enableBakJson.Checked = UAGConfig.Data.EnableBakJson;
+            allowUntrustedScriptsBox.Checked = UAGConfig.Data.AllowUntrustedScripts;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -127,6 +128,29 @@ namespace UAssetGUI
         private void enableBakJson_CheckedChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.EnableBakJson = enableBakJson.Checked;
+        }
+
+        private void allowUntrustedScriptsBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (allowUntrustedScriptsBox.Checked && !UAGConfig.Data.AllowUntrustedScripts)
+            {
+                DialogResult result = MessageBox.Show("Scripts in UAssetGUI can potentially execute malicious code and cause damage to your computer. Never execute any scripts that you do not fully trust.\n\nWould you like to continue?", BaseForm.DisplayVersion, MessageBoxButtons.OKCancel);
+                if (result == DialogResult.OK)
+                {
+                    UAGConfig.Data.AllowUntrustedScripts = allowUntrustedScriptsBox.Checked;
+                    UAGConfig.RefreshAllScriptIDs();
+                }
+                else
+                {
+                    UAGConfig.Data.AllowUntrustedScripts = false;
+                    allowUntrustedScriptsBox.Checked = false;
+                }
+
+                return;
+            }
+
+            UAGConfig.Data.AllowUntrustedScripts = allowUntrustedScriptsBox.Checked;
+            UAGConfig.RefreshAllScriptIDs();
         }
 
         private void enableDiscordRpc_CheckedChanged(object sender, EventArgs e)

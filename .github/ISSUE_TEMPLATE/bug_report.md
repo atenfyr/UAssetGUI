@@ -16,6 +16,7 @@ Steps to reproduce the behavior:
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
+
 Please provide a copy of an asset that can be used to reproduce the issue if needed, along with the game's Unreal Engine version. If the asset uses unversioned properties, you should also provide a set of mappings. YOUR ISSUE WILL NOT BE REVIEWED IF YOUR ISSUE CANNOT BE REPLICATED BECAUSE NO TEST ASSET IS PROVIDED.
 
 **Expected behavior**

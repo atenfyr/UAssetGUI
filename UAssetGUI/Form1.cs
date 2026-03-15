@@ -2327,7 +2327,7 @@ namespace UAssetGUI
 
                 try
                 {
-                    File.Copy(importPath, Path.ChangeExtension(Path.Combine(UAGConfig.MappingsFolder, newFileName), ".usmap"), true);
+                    File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + ".usmap"), true);
                     if (UAGConfig.AllMappings.ContainsKey(newFileName)) UAGConfig.AllMappings.Remove(newFileName);
                     UpdateMappings(newFileName);
                 }

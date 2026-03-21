@@ -69,13 +69,7 @@ namespace UAssetGUI
             }
         }
 
-        public string DisplayVersion
-        {
-            get
-            {
-                return "UAssetGUI v" + UAGUtils._displayVersion;
-            }
-        }
+        public string DisplayVersion => UAGUtils.DisplayVersion;
 
         public Form1()
         {
@@ -433,23 +427,22 @@ namespace UAssetGUI
                 UpdateVersionFromMappings();
 
                 // Command line parameter support
-                string[] args = Environment.GetCommandLineArgs();
-                if (args.Length > 1)
+                if (Program.args.Count > 1)
                 {
                     EngineVersion selectedVer = EngineVersion.UNKNOWN;
 
-                    if (args.Length > 2)
+                    if (Program.args.Count > 2)
                     {
-                        if (int.TryParse(args[2], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
-                        else Enum.TryParse(args[2], out selectedVer);
+                        if (int.TryParse(Program.args[2], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
+                        else Enum.TryParse(Program.args[2], out selectedVer);
                     }
-                    if (args.Length > 3)
+                    if (Program.args.Count > 3)
                     {
-                        UpdateMappings(args[3]);
+                        UpdateMappings(Program.args[3]);
                     }
 
                     if (selectedVer > EngineVersion.UNKNOWN) SetParsingVersion(selectedVer);
-                    LoadFileAt(args[1]);
+                    LoadFileAt(Program.args[1]);
                 }
             });
         }

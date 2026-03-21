@@ -48,6 +48,14 @@ Example 3: `UAssetGUI test.uasset 23`
 
 Example 4: `UAssetGUI test.uasset VER_UE5_4 Bellwright`
 
+### Portable mode
+
+If desired, you may wish to use UAssetGUI in portable mode. In portable mode, all configuration files, saved mappings, etc. are stored in a "Data" folder adjacent to the executable file, allowing UAssetGUI to be used on a USB drive or other portable media. This feature is only available in v1.0.4 or higher.
+
+To set up portable mode, execute UAssetGUI with the following command line parameter. Once UAssetGUI has been launched in portable mode at least once, UAssetGUI can be executed normally (with no parameters) and it will remain in portable mode. To disable portable mode and return to normal operation, simply delete the "Data" folder adjacent to the UAssetGUI executable file.
+
+Usage: `UAssetGUI portable`
+
 ## Linux Setup
 If you would like to set up UAssetGUI for Linux (through Wine), perform the following steps:
 

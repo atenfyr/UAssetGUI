@@ -11,6 +11,7 @@ namespace UAssetGUI
 {
     public struct UAGConfigData
     {
+        public string Agent;
         public string PreferredVersion;
         public string PreferredMappings;
         public string Theme;
@@ -34,6 +35,7 @@ namespace UAssetGUI
 
         public UAGConfigData()
         {
+            Agent = "UAssetGUI";
             PreferredVersion = string.Empty;
             Theme = string.Empty;
             MapStructTypeOverride = string.Empty;
@@ -62,12 +64,21 @@ namespace UAssetGUI
         public static Dictionary<string, string> AllMappings = new Dictionary<string, string>();
         public static List<string> AllScriptIDs = new List<string>();
 
-        public readonly static string ConfigFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
-        public readonly static string MappingsFolder = Path.Combine(ConfigFolder, "Mappings");
-        public readonly static string StagingFolder = Path.Combine(ConfigFolder, "Staging");
-        public readonly static string ExtractedFolder = Path.Combine(ConfigFolder, "Extracted");
-        public readonly static string ScriptsFolder = Path.Combine(ConfigFolder, "Scripts");
-        public readonly static string TempFolder = Path.Combine(Path.GetTempPath(), "UAssetGUI");
+        public static bool SafeToAccessConfigFolder = false;
+        public static bool IsPortable = false;
+        public static string ConfigFolder
+        {
+            get
+            {
+                if (!SafeToAccessConfigFolder) throw new InvalidOperationException("Attempt to access UAGConfig.ConfigFolder before it is ready");
+                return IsPortable ? Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Data") : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UAssetGUI");
+            }
+        }
+        public static string MappingsFolder => Path.Combine(ConfigFolder, "Mappings");
+        public static string StagingFolder => Path.Combine(ConfigFolder, "Staging");
+        public static string ExtractedFolder => Path.Combine(ConfigFolder, "Extracted");
+        public static string ScriptsFolder => Path.Combine(ConfigFolder, "Scripts");
+        public static string TempFolder => Path.Combine(Path.GetTempPath(), "UAssetGUI");
 
         internal static bool DifferentStagingPerPak = false;
 
@@ -316,6 +327,7 @@ namespace UAssetGUI
 
         public static void Save()
         {
+            Data.Agent = UAGUtils.DisplayVersion;
             SaveCustomFile("config.json", JsonConvert.SerializeObject(Data, Formatting.Indented));
         }
 

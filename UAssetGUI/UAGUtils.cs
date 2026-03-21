@@ -15,6 +15,13 @@ namespace UAssetGUI
     public static class UAGUtils
     {
         internal static string _displayVersion = string.Empty;
+        public static string DisplayVersion
+        {
+            get
+            {
+                return "UAssetGUI v" + UAGUtils._displayVersion;
+            }
+        }
 
         public static T TryGetElement<T>(this T[] array, int index)
         {

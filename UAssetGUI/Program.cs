@@ -76,30 +76,7 @@ namespace UAssetGUI
         }
 
         private static List<Type> strongRefs = new List<Type>();
-        static Program()
-        {
-            try
-            {
-                // extract .dll.gz resources and load them on demand
-                AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
-                {
-                    string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
-                    Directory.CreateDirectory(UAGConfig.ConfigFolder);
-                    Directory.CreateDirectory(libsPath);
-
-                    string outPath = ExtractCompressedResource("UAssetGUI." + assemblyName.Name + ".dll.gz", Path.Combine(libsPath, assemblyName.Name + ".dll"));
-                    if (outPath == null) return null; // if not found, fall back to default behavior
-                    return Assembly.LoadFrom(outPath);
-                };
-
-                strongRefs.Add(typeof(System.Collections.Immutable.ImmutableArray));
-                strongRefs.Add(typeof(System.Reflection.Metadata.MetadataReader));
-            }
-            catch (Exception ex)
-            {
-                Clipboard.SetText(ex.ToString());
-            }
-        }
+        public static List<string> args;
 
         /// <summary>
         /// The main entry point for the application.
@@ -114,8 +91,41 @@ namespace UAssetGUI
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.SetDefaultFont(new Font(new FontFamily("Microsoft Sans Serif"), 8.25f)); // default font changed in .NET Core 3.0
 
-                string[] args = Environment.GetCommandLineArgs();
-                if (args.Length >= 2)
+                args = Environment.GetCommandLineArgs().ToList();
+
+                UAGConfig.IsPortable = false;
+
+                for (int i = 0; i < args.Count; i++)
+                {
+                    switch (args[i])
+                    {
+                        case "portable":
+                        case "--portable":
+                            UAGConfig.IsPortable = true;
+                            args.RemoveAt(i);
+                            i--;
+                            break;
+                    }
+                }
+
+                // if a file at Data\config.json exists and has the word "UAssetGUI" in it, start up in portable mode
+                try
+                {
+                    string desiredConfigFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Data", "config.json");
+                    if (File.Exists(desiredConfigFile) && File.ReadAllText(desiredConfigFile).Contains("UAssetGUI"))
+                    {
+                        UAGConfig.IsPortable = true;
+                    }
+                }
+                catch
+                {
+
+                }
+
+                // only from here is it safe to reference ConfigFolder
+                UAGConfig.SafeToAccessConfigFolder = true;
+
+                if (args.Count >= 2)
                 {
                     Usmap selectedMappings = null;
 
@@ -126,8 +136,8 @@ namespace UAssetGUI
                         case "tojson":
                             UAGConfig.LoadMappings();
 
-                            if (args.Length < 5) break;
-                            if (args.Length >= 6) UAGConfig.TryGetMappings(args[5], out selectedMappings);
+                            if (args.Count < 5) break;
+                            if (args.Count >= 6) UAGConfig.TryGetMappings(args[5], out selectedMappings);
 
                             EngineVersion selectedVer = EngineVersion.UNKNOWN;
                             if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
@@ -141,8 +151,8 @@ namespace UAssetGUI
                         case "fromjson":
                             UAGConfig.LoadMappings();
 
-                            if (args.Length < 4) break;
-                            if (args.Length >= 5) UAGConfig.TryGetMappings(args[4], out selectedMappings);
+                            if (args.Count < 4) break;
+                            if (args.Count >= 5) UAGConfig.TryGetMappings(args[4], out selectedMappings);
 
                             UAsset jsonDeserializedAsset = null;
                             using (var sr = new FileStream(args[2], FileMode.Open))
@@ -158,6 +168,29 @@ namespace UAssetGUI
                             }
                             return;
                     }
+                }
+
+                // set up assembly extracting (needs config folder to be set up)
+                try
+                {
+                    // extract .dll.gz resources and load them on demand
+                    AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
+                    {
+                        string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
+                        Directory.CreateDirectory(UAGConfig.ConfigFolder);
+                        Directory.CreateDirectory(libsPath);
+
+                        string outPath = ExtractCompressedResource("UAssetGUI." + assemblyName.Name + ".dll.gz", Path.Combine(libsPath, assemblyName.Name + ".dll"));
+                        if (outPath == null) return null; // if not found, fall back to default behavior
+                        return Assembly.LoadFrom(outPath);
+                    };
+
+                    strongRefs.Add(typeof(System.Collections.Immutable.ImmutableArray));
+                    strongRefs.Add(typeof(System.Reflection.Metadata.MetadataReader));
+                }
+                catch (Exception ex)
+                {
+                    Clipboard.SetText(ex.ToString());
                 }
 
                 Form1 f1 = new Form1

@@ -410,7 +410,7 @@ namespace UAssetGUI
             comboSpecifyMappings.Location = new System.Drawing.Point(728, 3);
             comboSpecifyMappings.Margin = new Padding(4, 3, 4, 3);
             comboSpecifyMappings.Name = "comboSpecifyMappings";
-            comboSpecifyMappings.Size = new System.Drawing.Size(300, 24);
+            comboSpecifyMappings.Size = new System.Drawing.Size(108, 24);
             comboSpecifyMappings.TabIndex = 3;
             comboSpecifyMappings.DrawItem += comboSpecifyVersion_DrawItem;
             comboSpecifyMappings.SelectedIndexChanged += comboSpecifyMappings_SelectedIndexChanged;

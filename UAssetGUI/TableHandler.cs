@@ -1214,6 +1214,21 @@ namespace UAssetGUI
             return (Form1) dataGridView1.Parent.Parent.Parent;
         }
 
+        private void SetHexButtonsVisible(bool newValue)
+        {
+            var origForm = GetParentForm();
+            if (origForm == null) return;
+
+            bool willResize = false;
+            if (origForm.importBinaryData.Visible != newValue) willResize = true;
+
+            origForm.importBinaryData.Visible = newValue;
+            origForm.exportBinaryData.Visible = newValue;
+            origForm.setBinaryData.Visible = newValue;
+
+            if (willResize) origForm.ForceResize();
+        }
+
         public void Load() // Updates the table with selected asset data
         {
             if (mode == TableHandlerMode.None)
@@ -1225,9 +1240,7 @@ namespace UAssetGUI
             var origForm = GetParentForm();
             var byteView1 = origForm.byteView1;
             byteView1.Visible = false;
-            origForm.importBinaryData.Visible = false;
-            origForm.exportBinaryData.Visible = false;
-            origForm.setBinaryData.Visible = false;
+            SetHexButtonsVisible(false);
             var jsonView = origForm.jsonView;
             jsonView.Visible = false;
             dataGridView1.Visible = true;
@@ -1481,9 +1494,7 @@ namespace UAssetGUI
                                 byteView1.SetBytes(((NormalExport)pointerNode.Pointer).Extras);
                             }
                             byteView1.Visible = true;
-                            origForm.importBinaryData.Visible = true;
-                            origForm.exportBinaryData.Visible = true;
-                            origForm.setBinaryData.Visible = true;
+                            SetHexButtonsVisible(true);
                             currentlyFocusedControl.Focus();
                             origForm.ForceResize();
                             standardRendering = false;

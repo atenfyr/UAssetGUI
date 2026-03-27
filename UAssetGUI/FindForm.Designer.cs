@@ -29,158 +29,267 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
-            this.closeButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.searchForBox = new System.Windows.Forms.TextBox();
-            this.nextButton = new System.Windows.Forms.Button();
-            this.searchDirectionGroupBox = new System.Windows.Forms.GroupBox();
-            this.searchDirBackwardButton = new System.Windows.Forms.RadioButton();
-            this.searchDirForwardButton = new System.Windows.Forms.RadioButton();
-            this.optionsGroupBox = new System.Windows.Forms.GroupBox();
-            this.useRegexCheckBox = new System.Windows.Forms.CheckBox();
-            this.caseSensitiveCheckBox = new System.Windows.Forms.CheckBox();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.searchDirectionGroupBox.SuspendLayout();
-            this.optionsGroupBox.SuspendLayout();
-            this.SuspendLayout();
+            closeButton = new System.Windows.Forms.Button();
+            label1 = new System.Windows.Forms.Label();
+            searchForBox = new System.Windows.Forms.TextBox();
+            nextButton = new System.Windows.Forms.Button();
+            searchDirectionGroupBox = new System.Windows.Forms.GroupBox();
+            searchDirBackwardButton = new System.Windows.Forms.RadioButton();
+            searchDirForwardButton = new System.Windows.Forms.RadioButton();
+            optionsGroupBox = new System.Windows.Forms.GroupBox();
+            useRegexCheckBox = new System.Windows.Forms.CheckBox();
+            caseSensitiveCheckBox = new System.Windows.Forms.CheckBox();
+            progressBar1 = new System.Windows.Forms.ProgressBar();
+            buttonReplace = new System.Windows.Forms.Button();
+            textBoxReplace = new System.Windows.Forms.TextBox();
+            label2 = new System.Windows.Forms.Label();
+            buttonReplaceAll = new System.Windows.Forms.Button();
+            comboBoxReplace = new System.Windows.Forms.ComboBox();
+            labelStatus = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            label4 = new System.Windows.Forms.Label();
+            searchDirectionGroupBox.SuspendLayout();
+            optionsGroupBox.SuspendLayout();
+            SuspendLayout();
             // 
             // closeButton
             // 
-            this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
-            this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(224, 124);
-            this.closeButton.Name = "closeButton";
-            this.closeButton.Size = new System.Drawing.Size(75, 26);
-            this.closeButton.TabIndex = 6;
-            this.closeButton.Text = "Close";
-            this.closeButton.UseVisualStyleBackColor = true;
-            this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
+            closeButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            closeButton.Location = new System.Drawing.Point(354, 188);
+            closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            closeButton.Name = "closeButton";
+            closeButton.Size = new System.Drawing.Size(88, 30);
+            closeButton.TabIndex = 6;
+            closeButton.Text = "Close";
+            closeButton.UseVisualStyleBackColor = true;
+            closeButton.Click += closeButton_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Search for:";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(14, 22);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(63, 15);
+            label1.TabIndex = 6;
+            label1.Text = "Search for:";
             // 
             // searchForBox
             // 
-            this.searchForBox.Location = new System.Drawing.Point(77, 16);
-            this.searchForBox.Name = "searchForBox";
-            this.searchForBox.Size = new System.Drawing.Size(222, 20);
-            this.searchForBox.TabIndex = 0;
+            searchForBox.Location = new System.Drawing.Point(91, 18);
+            searchForBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            searchForBox.Name = "searchForBox";
+            searchForBox.Size = new System.Drawing.Size(258, 23);
+            searchForBox.TabIndex = 0;
             // 
             // nextButton
             // 
-            this.nextButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.nextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.nextButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
-            this.nextButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.nextButton.Location = new System.Drawing.Point(143, 124);
-            this.nextButton.Name = "nextButton";
-            this.nextButton.Size = new System.Drawing.Size(75, 26);
-            this.nextButton.TabIndex = 5;
-            this.nextButton.Text = "Next";
-            this.nextButton.UseVisualStyleBackColor = true;
-            this.nextButton.Click += new System.EventHandler(this.nextButton_Click);
+            nextButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            nextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            nextButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            nextButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            nextButton.Location = new System.Drawing.Point(354, 14);
+            nextButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            nextButton.Name = "nextButton";
+            nextButton.Size = new System.Drawing.Size(88, 30);
+            nextButton.TabIndex = 5;
+            nextButton.Text = "Next";
+            nextButton.UseVisualStyleBackColor = true;
+            nextButton.Click += nextButton_Click;
             // 
             // searchDirectionGroupBox
             // 
-            this.searchDirectionGroupBox.Controls.Add(this.searchDirBackwardButton);
-            this.searchDirectionGroupBox.Controls.Add(this.searchDirForwardButton);
-            this.searchDirectionGroupBox.Location = new System.Drawing.Point(200, 42);
-            this.searchDirectionGroupBox.Name = "searchDirectionGroupBox";
-            this.searchDirectionGroupBox.Size = new System.Drawing.Size(99, 65);
-            this.searchDirectionGroupBox.TabIndex = 11;
-            this.searchDirectionGroupBox.TabStop = false;
-            this.searchDirectionGroupBox.Text = "Search direction";
+            searchDirectionGroupBox.Controls.Add(searchDirBackwardButton);
+            searchDirectionGroupBox.Controls.Add(searchDirForwardButton);
+            searchDirectionGroupBox.Location = new System.Drawing.Point(211, 146);
+            searchDirectionGroupBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            searchDirectionGroupBox.Name = "searchDirectionGroupBox";
+            searchDirectionGroupBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            searchDirectionGroupBox.Size = new System.Drawing.Size(115, 75);
+            searchDirectionGroupBox.TabIndex = 11;
+            searchDirectionGroupBox.TabStop = false;
+            searchDirectionGroupBox.Text = "Search direction";
             // 
             // searchDirBackwardButton
             // 
-            this.searchDirBackwardButton.AutoSize = true;
-            this.searchDirBackwardButton.Location = new System.Drawing.Point(6, 42);
-            this.searchDirBackwardButton.Name = "searchDirBackwardButton";
-            this.searchDirBackwardButton.Size = new System.Drawing.Size(73, 17);
-            this.searchDirBackwardButton.TabIndex = 4;
-            this.searchDirBackwardButton.TabStop = true;
-            this.searchDirBackwardButton.Text = "Backward";
-            this.searchDirBackwardButton.UseVisualStyleBackColor = true;
+            searchDirBackwardButton.AutoSize = true;
+            searchDirBackwardButton.Location = new System.Drawing.Point(7, 48);
+            searchDirBackwardButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            searchDirBackwardButton.Name = "searchDirBackwardButton";
+            searchDirBackwardButton.Size = new System.Drawing.Size(76, 19);
+            searchDirBackwardButton.TabIndex = 4;
+            searchDirBackwardButton.TabStop = true;
+            searchDirBackwardButton.Text = "Backward";
+            searchDirBackwardButton.UseVisualStyleBackColor = true;
             // 
             // searchDirForwardButton
             // 
-            this.searchDirForwardButton.AutoSize = true;
-            this.searchDirForwardButton.Location = new System.Drawing.Point(6, 19);
-            this.searchDirForwardButton.Name = "searchDirForwardButton";
-            this.searchDirForwardButton.Size = new System.Drawing.Size(63, 17);
-            this.searchDirForwardButton.TabIndex = 3;
-            this.searchDirForwardButton.TabStop = true;
-            this.searchDirForwardButton.Text = "Forward";
-            this.searchDirForwardButton.UseVisualStyleBackColor = true;
+            searchDirForwardButton.AutoSize = true;
+            searchDirForwardButton.Location = new System.Drawing.Point(8, 23);
+            searchDirForwardButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            searchDirForwardButton.Name = "searchDirForwardButton";
+            searchDirForwardButton.Size = new System.Drawing.Size(68, 19);
+            searchDirForwardButton.TabIndex = 3;
+            searchDirForwardButton.TabStop = true;
+            searchDirForwardButton.Text = "Forward";
+            searchDirForwardButton.UseVisualStyleBackColor = true;
             // 
             // optionsGroupBox
             // 
-            this.optionsGroupBox.Controls.Add(this.useRegexCheckBox);
-            this.optionsGroupBox.Controls.Add(this.caseSensitiveCheckBox);
-            this.optionsGroupBox.Location = new System.Drawing.Point(15, 42);
-            this.optionsGroupBox.Name = "optionsGroupBox";
-            this.optionsGroupBox.Size = new System.Drawing.Size(164, 65);
-            this.optionsGroupBox.TabIndex = 12;
-            this.optionsGroupBox.TabStop = false;
-            this.optionsGroupBox.Text = "Options";
+            optionsGroupBox.Controls.Add(useRegexCheckBox);
+            optionsGroupBox.Controls.Add(caseSensitiveCheckBox);
+            optionsGroupBox.Location = new System.Drawing.Point(12, 146);
+            optionsGroupBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            optionsGroupBox.Name = "optionsGroupBox";
+            optionsGroupBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            optionsGroupBox.Size = new System.Drawing.Size(191, 75);
+            optionsGroupBox.TabIndex = 12;
+            optionsGroupBox.TabStop = false;
+            optionsGroupBox.Text = "Options";
             // 
             // useRegexCheckBox
             // 
-            this.useRegexCheckBox.AutoSize = true;
-            this.useRegexCheckBox.Location = new System.Drawing.Point(6, 42);
-            this.useRegexCheckBox.Name = "useRegexCheckBox";
-            this.useRegexCheckBox.Size = new System.Drawing.Size(74, 17);
-            this.useRegexCheckBox.TabIndex = 2;
-            this.useRegexCheckBox.Text = "Use regex";
-            this.useRegexCheckBox.UseVisualStyleBackColor = true;
+            useRegexCheckBox.AutoSize = true;
+            useRegexCheckBox.Location = new System.Drawing.Point(7, 48);
+            useRegexCheckBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            useRegexCheckBox.Name = "useRegexCheckBox";
+            useRegexCheckBox.Size = new System.Drawing.Size(76, 19);
+            useRegexCheckBox.TabIndex = 2;
+            useRegexCheckBox.Text = "Use regex";
+            useRegexCheckBox.UseVisualStyleBackColor = true;
             // 
             // caseSensitiveCheckBox
             // 
-            this.caseSensitiveCheckBox.AutoSize = true;
-            this.caseSensitiveCheckBox.Location = new System.Drawing.Point(6, 19);
-            this.caseSensitiveCheckBox.Name = "caseSensitiveCheckBox";
-            this.caseSensitiveCheckBox.Size = new System.Drawing.Size(94, 17);
-            this.caseSensitiveCheckBox.TabIndex = 1;
-            this.caseSensitiveCheckBox.Text = "Case sensitive";
-            this.caseSensitiveCheckBox.UseVisualStyleBackColor = true;
+            caseSensitiveCheckBox.AutoSize = true;
+            caseSensitiveCheckBox.Location = new System.Drawing.Point(7, 22);
+            caseSensitiveCheckBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            caseSensitiveCheckBox.Name = "caseSensitiveCheckBox";
+            caseSensitiveCheckBox.Size = new System.Drawing.Size(99, 19);
+            caseSensitiveCheckBox.TabIndex = 1;
+            caseSensitiveCheckBox.Text = "Case sensitive";
+            caseSensitiveCheckBox.UseVisualStyleBackColor = true;
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(15, 126);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(114, 23);
-            this.progressBar1.TabIndex = 13;
+            progressBar1.Location = new System.Drawing.Point(354, 162);
+            progressBar1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            progressBar1.Name = "progressBar1";
+            progressBar1.Size = new System.Drawing.Size(88, 20);
+            progressBar1.TabIndex = 13;
+            // 
+            // buttonReplace
+            // 
+            buttonReplace.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            buttonReplace.Location = new System.Drawing.Point(354, 51);
+            buttonReplace.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            buttonReplace.Name = "buttonReplace";
+            buttonReplace.Size = new System.Drawing.Size(88, 30);
+            buttonReplace.TabIndex = 14;
+            buttonReplace.Text = "Replace";
+            buttonReplace.UseVisualStyleBackColor = true;
+            buttonReplace.Click += buttonReplace_Click;
+            // 
+            // textBoxReplace
+            // 
+            textBoxReplace.Location = new System.Drawing.Point(91, 55);
+            textBoxReplace.Name = "textBoxReplace";
+            textBoxReplace.Size = new System.Drawing.Size(257, 23);
+            textBoxReplace.TabIndex = 15;
+            textBoxReplace.TextChanged += textBoxReplace_TextChanged;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(19, 58);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(48, 15);
+            label2.TabIndex = 17;
+            label2.Text = "Replace";
+            // 
+            // buttonReplaceAll
+            // 
+            buttonReplaceAll.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            buttonReplaceAll.Location = new System.Drawing.Point(354, 87);
+            buttonReplaceAll.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            buttonReplaceAll.Name = "buttonReplaceAll";
+            buttonReplaceAll.Size = new System.Drawing.Size(88, 30);
+            buttonReplaceAll.TabIndex = 18;
+            buttonReplaceAll.Text = "Replace All";
+            buttonReplaceAll.UseVisualStyleBackColor = true;
+            buttonReplaceAll.Click += buttonReplaceAll_Click;
+            // 
+            // comboBoxReplace
+            // 
+            comboBoxReplace.FormattingEnabled = true;
+            comboBoxReplace.Items.AddRange(new object[] { "absolute", "relative", "percent" });
+            comboBoxReplace.Location = new System.Drawing.Point(91, 91);
+            comboBoxReplace.Name = "comboBoxReplace";
+            comboBoxReplace.Size = new System.Drawing.Size(257, 23);
+            comboBoxReplace.TabIndex = 19;
+            comboBoxReplace.SelectedIndexChanged += comboBoxReplace_SelectedIndexChanged;
+            // 
+            // labelStatus
+            // 
+            labelStatus.AutoSize = true;
+            labelStatus.ForeColor = System.Drawing.Color.Crimson;
+            labelStatus.Location = new System.Drawing.Point(91, 224);
+            labelStatus.Name = "labelStatus";
+            labelStatus.Size = new System.Drawing.Size(0, 15);
+            labelStatus.TabIndex = 20;
+            labelStatus.Click += labelStatus_Click;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(19, 94);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(49, 15);
+            label3.TabIndex = 21;
+            label3.Text = "Method";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(19, 224);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(39, 15);
+            label4.TabIndex = 22;
+            label4.Text = "Status";
             // 
             // FindForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(311, 162);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.optionsGroupBox);
-            this.Controls.Add(this.searchDirectionGroupBox);
-            this.Controls.Add(this.nextButton);
-            this.Controls.Add(this.searchForBox);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.closeButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "FindForm";
-            this.Text = "Find";
-            this.Load += new System.EventHandler(this.FindForm_Load);
-            this.searchDirectionGroupBox.ResumeLayout(false);
-            this.searchDirectionGroupBox.PerformLayout();
-            this.optionsGroupBox.ResumeLayout(false);
-            this.optionsGroupBox.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(446, 248);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(labelStatus);
+            Controls.Add(comboBoxReplace);
+            Controls.Add(searchDirectionGroupBox);
+            Controls.Add(buttonReplaceAll);
+            Controls.Add(label2);
+            Controls.Add(textBoxReplace);
+            Controls.Add(buttonReplace);
+            Controls.Add(progressBar1);
+            Controls.Add(optionsGroupBox);
+            Controls.Add(nextButton);
+            Controls.Add(searchForBox);
+            Controls.Add(label1);
+            Controls.Add(closeButton);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "FindForm";
+            Text = "Find";
+            Load += FindForm_Load;
+            searchDirectionGroupBox.ResumeLayout(false);
+            searchDirectionGroupBox.PerformLayout();
+            optionsGroupBox.ResumeLayout(false);
+            optionsGroupBox.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -197,5 +306,13 @@ namespace UAssetGUI
         private System.Windows.Forms.CheckBox useRegexCheckBox;
         private System.Windows.Forms.CheckBox caseSensitiveCheckBox;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Button buttonReplace;
+        private System.Windows.Forms.TextBox textBoxReplace;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button buttonReplaceAll;
+        private System.Windows.Forms.ComboBox comboBoxReplace;
+        private System.Windows.Forms.Label labelStatus;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
     }
 }

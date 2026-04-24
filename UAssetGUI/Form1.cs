@@ -569,7 +569,17 @@ namespace UAssetGUI
                     default:
                         MapStructTypeOverrideForm.LoadFromConfig();
 
-                        uint sig = GetFileSignature(filePath, out byte[] nextBytes);
+                        uint sig = 0;
+                        byte[] nextBytes = Array.Empty<byte>();
+                        try
+                        {
+                            sig = GetFileSignature(filePath, out nextBytes);
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            MessageBox.Show("Failed to open this file! " + ex.Message, "Uh oh!");
+                            return;
+                        }
 
                         uint nextFourBytes = uint.MaxValue;
                         uint ue4CookedHeaderSize = uint.MaxValue;

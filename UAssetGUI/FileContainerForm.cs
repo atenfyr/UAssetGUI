@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,6 +33,7 @@ namespace UAssetGUI
         UE5_5 = EngineVersion.VER_UE5_5,
         UE5_6 = EngineVersion.VER_UE5_6,
         UE5_7 = EngineVersion.VER_UE5_7,
+        UE5_8 = EngineVersion.VER_UE5_8,
     }
 
     public struct RetocManifest

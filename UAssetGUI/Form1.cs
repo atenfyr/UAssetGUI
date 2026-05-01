@@ -1631,7 +1631,7 @@ namespace UAssetGUI
                         }
                     }
                 }
-                preferredWidth += SystemInformation.VerticalScrollBarWidth;
+                preferredWidth += (int)(SystemInformation.VerticalScrollBarWidth * 1.2f);
             }
 
             // enforce minimum width
@@ -2370,6 +2370,8 @@ namespace UAssetGUI
                     File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + ".usmap"), true);
                     if (UAGConfig.AllMappings.ContainsKey(newFileName)) UAGConfig.AllMappings.Remove(newFileName);
                     UpdateMappings(newFileName);
+
+                    UAGUtils.InvokeUI(ForceResize);
                 }
                 catch
                 {

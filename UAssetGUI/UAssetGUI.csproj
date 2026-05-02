@@ -9,9 +9,9 @@
     <AssemblyTitle>UAssetGUI</AssemblyTitle>
     <Product>UAssetGUI</Product>
     <Copyright>Copyright (c) 2020 - 2026 atenfyr</Copyright>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
-    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.0</FileVersion>
+    <Version>1.1.1</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <Configurations>Debug;Release;DebugVerbose;DebugTracing;ReleaseX</Configurations>
     <UseWindowsForms>true</UseWindowsForms>

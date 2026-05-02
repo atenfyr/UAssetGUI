@@ -12,6 +12,8 @@ UAssetGUI is a tool designed for low-level examination and modification of Unrea
 ## Installation
 You can find pre-built binaries of UAssetGUI in the [Releases tab of this repository](https://github.com/atenfyr/UAssetGUI/releases).
 
+An experimental release of UAssetGUI is published with every new commit. If you have issues with the stable release of UAssetGUI, you may wish to try to use the experimental release. You can download the experimental release here: https://github.com/atenfyr/UAssetGUI/releases/tag/experimental-latest.
+
 ## Command line arguments
 You can run the program with command line arguments to perform various tasks, such as exporting and importing from UAssetAPI JSON without opening the GUI.
 

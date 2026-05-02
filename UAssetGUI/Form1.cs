@@ -199,6 +199,18 @@ namespace UAssetGUI
                         };
                     }
 
+                    // if debug, add "Add breakpoint..." under utils
+#if DEBUG || DEBUGVERBOSE || DEBUGTRACING
+                    ToolStripMenuItem addBreakpointItem = new ToolStripMenuItem()
+                    {
+                        Name = "addBreakpointToolStripMenuItem",
+                        Size = this.utilsToolStripMenuItem.Size,
+                        Text = "Add breakpoint..."
+                    };
+                    addBreakpointItem.Click += this.addBreakpoint_Click;
+                    utilsToolStripMenuItem.DropDownItems.Add(addBreakpointItem);
+#endif
+
                     ac7decrypt = new AC7Decrypt();
 
                     UpdateRPC();
@@ -645,7 +657,14 @@ namespace UAssetGUI
                         targetAsset.CustomSerializationFlags = (CustomSerializationFlags)UAGConfig.Data.CustomSerializationFlags;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
 
-                        var strmRaw = targetAsset.PathToStream(filePath);
+                        Stream strmRaw = targetAsset.PathToStream(filePath);
+
+#if DEBUG || DEBUGVERBOSE || DEBUGTRACING
+                        if (MonitoringStream.Enabled)
+                        {
+                            strmRaw = new MonitoringStream(strmRaw, targetAsset);
+                        }
+#endif
 
                         // check: are we being loaded from a container? if so, pre-load the asset to grab any dependencies before loading properly
                         if (parentContainerForm != null && targetAsset != null)
@@ -2671,6 +2690,46 @@ namespace UAssetGUI
 
             replacementPrompt.Dispose();
         }
+
+#if DEBUG || DEBUGVERBOSE || DEBUGTRACING
+        internal void addBreakpoint_Click(object sender, EventArgs e)
+        {
+            TextPrompt offsetPrompt = new TextPrompt()
+            {
+                DisplayText = "Enter breakpoint offset relative to uexp start (or -1)"
+            };
+
+            offsetPrompt.StartPosition = FormStartPosition.CenterParent;
+
+            if (offsetPrompt.ShowDialog(this) == DialogResult.OK)
+            {
+                if (long.TryParse(offsetPrompt.OutputText, out long newOffset))
+                {
+                    if (newOffset < 0)
+                    {
+                        MonitoringStream.Enabled = false;
+                        MonitoringStream.StopOffset = -1;
+                        MonitoringStream.IsUexpOffset = false;
+                    }
+                    else
+                    {
+                        MonitoringStream.Enabled = true;
+                        MonitoringStream.StopOffset = newOffset;
+                        MonitoringStream.IsUexpOffset = true;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Failed to parse the input as an integer.\nInterpreting this as a request to remove breakpoint.", "Uh oh!");
+                    MonitoringStream.Enabled = false;
+                    MonitoringStream.StopOffset = -1;
+                    MonitoringStream.IsUexpOffset = false;
+                }
+            }
+
+            offsetPrompt.Dispose();
+        }
+#endif
 
         private bool hasActivatedBefore = false;
         private void Form1_Activated(object sender, EventArgs e)

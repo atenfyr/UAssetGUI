@@ -5,11 +5,13 @@ using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -36,6 +38,9 @@ namespace UAssetGUI
         internal SplitContainer splitContainer1;
         internal MenuStrip menuStrip1;
         internal AC7Decrypt ac7decrypt;
+#if DEBUGTRACING
+        public bool TracingEnabled = false;
+#endif
 
         public TableHandler tableEditor;
         public ByteViewer byteView1;
@@ -209,6 +214,16 @@ namespace UAssetGUI
                     };
                     addBreakpointItem.Click += this.addBreakpoint_Click;
                     utilsToolStripMenuItem.DropDownItems.Add(addBreakpointItem);
+#endif
+#if DEBUGTRACING
+                    ToolStripMenuItem toggleTracingItem = new ToolStripMenuItem()
+                    {
+                        Name = "toggleTracingToolStripMenuItem",
+                        Size = this.utilsToolStripMenuItem.Size,
+                        Text = "Toggle tracing"
+                    };
+                    toggleTracingItem.Click += this.toggleTracing_Click;
+                    utilsToolStripMenuItem.DropDownItems.Add(toggleTracingItem);
 #endif
 
                     ac7decrypt = new AC7Decrypt();
@@ -696,10 +711,18 @@ namespace UAssetGUI
                         }
 
 #if DEBUGTRACING
-                        var strm = new UAssetAPI.Trace.TraceStream(strmRaw, filePath);
-                        UAssetAPI.Trace.LoggingAspect.Start(strm);
-                        targetAsset.Read(new AssetBinaryReader(strm, targetAsset));
-                        jsonTracingPath = UAssetAPI.Trace.LoggingAspect.Stop();
+                        if (TracingEnabled)
+                        {
+                            var strm = new UAssetAPI.Trace.TraceStream(strmRaw, filePath);
+                            UAssetAPI.Trace.LoggingAspect.Start(strm);
+                            targetAsset.Read(new AssetBinaryReader(strm, targetAsset));
+                            jsonTracingPath = UAssetAPI.Trace.LoggingAspect.Stop();
+                        }
+                        else
+                        {
+                            jsonTracingPath = null;
+                            targetAsset.Read(new AssetBinaryReader(strmRaw, targetAsset));
+                        }
 #else
                         targetAsset.Read(new AssetBinaryReader(strmRaw, targetAsset));
 #endif
@@ -751,14 +774,41 @@ namespace UAssetGUI
                 bool failedToMaintainBinaryEquality = !string.IsNullOrEmpty(tableEditor.asset.FilePath) && !tableEditor.asset.FilePath.EndsWith(".json") && !tableEditor.asset.VerifyBinaryEquality();
 
 #if DEBUGTRACING
-                if (jsonTracingPath != null && (failedToMaintainBinaryEquality || failedCategoryCount > 0))
+                if (TracingEnabled && jsonTracingPath != null)
                 {
                     // if ser-hex-viewer available (https://github.com/trumank/ser-hex), run that
                     try
                     {
                         Process.Start(new ProcessStartInfo("ser-hex-viewer", "\"" + jsonTracingPath + "\"") { UseShellExecute = false });
                     }
-                    catch { }
+                    catch (Win32Exception)
+                    {
+                        DialogResult res = MessageBox.Show("Failed to launch ser-hex-viewer.\nWould you like to download a copy from atenfyr.com and try again?\n\n(ser-hex by trumank under MIT license. See Settings -> About -> View 3rd-party software...)", DisplayVersion, MessageBoxButtons.YesNo);
+                        switch (res)
+                        {
+                            case DialogResult.Yes:
+                                Task.Run(() =>
+                                {
+                                    using (HttpClient client = new HttpClient())
+                                    {
+                                        client.DefaultRequestHeaders.Add("User-Agent", "UAssetGUI/" + UAGUtils._displayVersion);
+                                        HttpResponseMessage response = client.Send(new HttpRequestMessage(HttpMethod.Get, "https://atenfyr.com/misc/ser-hex-viewer.exe"));
+                                        response.EnsureSuccessStatusCode();
+
+                                        Stream contentStream = response.Content.ReadAsStream();
+                                        FileStream fileStream = new FileStream("ser-hex-viewer.exe", FileMode.Create, FileAccess.Write);
+                                        contentStream.CopyTo(fileStream);
+                                        fileStream.Close();
+                                    }
+
+                                    Process.Start(new ProcessStartInfo("ser-hex-viewer", "\"" + jsonTracingPath + "\"") { UseShellExecute = false });
+                                });
+                                break;
+                            case DialogResult.No:
+                            case DialogResult.Cancel:
+                                break;
+                        }
+                    }
                 }
 #endif
 
@@ -2728,6 +2778,14 @@ namespace UAssetGUI
             }
 
             offsetPrompt.Dispose();
+        }
+#endif
+
+#if DEBUGTRACING
+        internal void toggleTracing_Click(object sender, EventArgs e)
+        {
+            TracingEnabled = !TracingEnabled;
+            MessageBox.Show(TracingEnabled ? "Tracing is now enabled." : "Tracing is now disabled.", "Notice");
         }
 #endif
 

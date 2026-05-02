@@ -315,6 +315,7 @@ namespace UAssetGUI
             {
                 File.WriteAllText(Path.ChangeExtension(Path.Combine(ScriptsFolder, "Hello_world"), "cs"), Properties.Resources.Hello_world);
                 File.WriteAllText(Path.ChangeExtension(Path.Combine(ScriptsFolder, "Set_all_visible_floats_to_100"), "cs"), Properties.Resources.Set_all_visible_floats_to_100);
+                File.WriteAllText(Path.ChangeExtension(Path.Combine(ScriptsFolder, "Print_visible_nodes"), "cs"), Properties.Resources.Print_visible_nodes);
 
                 RefreshAllScriptIDs();
                 return true;

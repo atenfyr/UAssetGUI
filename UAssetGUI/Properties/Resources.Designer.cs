@@ -111,5 +111,13 @@ namespace UAssetGUI.Properties {
                 return ResourceManager.GetString("Set_all_visible_floats_to_100", resourceCulture);
             }
         }
+
+        internal static string Print_visible_nodes
+        {
+            get
+            {
+                return ResourceManager.GetString("Print_visible_nodes", resourceCulture);
+            }
+        }
     }
 }

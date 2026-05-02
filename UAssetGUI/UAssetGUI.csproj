@@ -67,6 +67,7 @@
   </Target>
   <ItemGroup>
     <Compile Remove="Resources\ExampleScripts\Hello_world.cs" />
+    <Compile Remove="Resources\ExampleScripts\Print_visible_nodes.cs" />
     <Compile Remove="Resources\ExampleScripts\Set_all_visible_floats_to_100.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ExampleScripts\Hello_world.cs" />
+    <None Include="Resources\ExampleScripts\Print_visible_nodes.cs" />
     <None Include="Resources\icon.ico" />
     <None Include="Resources\ExampleScripts\Set_all_visible_floats_to_100.cs" />
     <EmbeddedResource Include="git_commit.txt">

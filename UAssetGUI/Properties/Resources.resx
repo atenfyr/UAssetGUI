@@ -130,4 +130,7 @@
   <data name="Set_all_visible_floats_to_100" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ExampleScripts\Set_all_visible_floats_to_100.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="Print_visible_nodes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ExampleScripts\Print_visible_nodes.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

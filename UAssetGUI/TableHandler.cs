@@ -106,11 +106,6 @@ namespace UAssetGUI
             : base("Export " + (exportNum + 1) + " (" + objectName + ")", pointer, type, exportNum, willCopyWholeExport)
         {
             ObjectName = objectName;
-
-            ToolStripMenuItem tsmItem = new ToolStripMenuItem("Copy object name");
-            tsmItem.Click += (sender, args) => Clipboard.SetText(ObjectName);
-            this.ContextMenuStrip = new ContextMenuStrip();
-            this.ContextMenuStrip.Items.Add(tsmItem);
         }
     }
 
@@ -238,11 +233,12 @@ namespace UAssetGUI
             treeView1.Nodes.Add(new PointingTreeNode("Export Data", null));
 
             PointingTreeNode superTopNode = (PointingTreeNode)treeView1.Nodes[treeView1.Nodes.Count - 1];
+            PointingTreeNode[] plannedCollection = new PointingTreeNode[asset.Exports.Count];
             for (int i = 0; i < asset.Exports.Count; i++)
             {
                 Export baseUs = asset.Exports[i];
                 var categoryNode = new ExportPointingTreeNode(baseUs.ObjectName.Value.Value, null, 0, i, true);
-                superTopNode.Nodes.Add(categoryNode);
+                plannedCollection[i] = categoryNode;
                 switch (baseUs)
                 {
                     case RawExport us3:
@@ -360,6 +356,8 @@ namespace UAssetGUI
                         }
                 }
             }
+
+            superTopNode.Nodes.AddRange(plannedCollection);
 
             treeView1.SelectedNode = treeView1.Nodes[0];
             treeView1.EndUpdate();

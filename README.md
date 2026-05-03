@@ -14,6 +14,15 @@ You can find pre-built binaries of UAssetGUI in the [Releases tab of this reposi
 
 An experimental release of UAssetGUI is published with every new commit. If you have issues with the stable release of UAssetGUI, you may wish to try to use the experimental release. You can download the experimental release here: https://github.com/atenfyr/UAssetGUI/releases/tag/experimental-latest.
 
+### Linux Setup
+If you would like to set up UAssetGUI for Linux (through Wine), perform the following steps:
+
+1. If needed, download the latest UAssetGUI.exe binary through the Releases page of this repository.
+2. If needed, install the latest version of Wine. See this guide: https://gitlab.winehq.org/wine/wine/-/wikis/Download. These instructions were tested using Wine 11.0.
+3. Install the latest version of winetricks. See this guide: https://github.com/Winetricks/winetricks?tab=readme-ov-file#installing. If you are on Debian/Ubuntu, you should perform the steps under "Manual Install" on the winetricks GitHub page to make sure that winetricks is up-to-date.
+4. To install necessary pre-requisites, execute `winetricks dotnetdesktop8 micross` on the command line and go through all prompts that appear.
+5. Open UAssetGUI through Wine: `wine UAssetGUI.exe`
+
 ## Command line arguments
 You can run the program with command line arguments to perform various tasks, such as exporting and importing from UAssetAPI JSON without opening the GUI.
 
@@ -58,15 +67,6 @@ To set up portable mode, execute UAssetGUI with the following command line param
 
 Usage: `UAssetGUI portable`
 
-## Linux Setup
-If you would like to set up UAssetGUI for Linux (through Wine), perform the following steps:
-
-1. If needed, download the latest UAssetGUI.exe binary through the Releases page of this repository.
-2. If needed, install the latest version of Wine. See this guide: https://gitlab.winehq.org/wine/wine/-/wikis/Download. These instructions were tested using Wine 11.0.
-3. Install the latest version of winetricks. See this guide: https://github.com/Winetricks/winetricks?tab=readme-ov-file#installing. If you are on Debian/Ubuntu, you should perform the steps under "Manual Install" on the winetricks GitHub page to make sure that winetricks is up-to-date.
-4. To install necessary pre-requisites, execute `winetricks dotnetdesktop8 micross` on the command line and go through all prompts that appear.
-5. Open UAssetGUI through Wine: `wine UAssetGUI.exe`
-
 ## Compilation
 If you'd like to compile UAssetGUI for yourself, read on:
 
@@ -100,11 +100,16 @@ git submodule update --init
 6. Press the "Start" button or press F5 to compile and open UAssetGUI.
 
 ## Contributing
-Any contributions, whether through pull requests or issues, that you make are greatly appreciated.
+Any contributions, whether through pull requests or issues, that you may make are greatly appreciated.
 
-If you have an Unreal Engine .uasset file that displays "failed to maintain binary equality," feel free to submit an issue on [the UAssetAPI issues page](https://github.com/atenfyr/UAssetAPI/issues) with a copy of the asset in question along with the name of the game, the Unreal version that it was cooked with, and a mappings file for the game, if needed.
+If you have an Unreal Engine .uasset file that displays "failed to maintain binary equality," feel free to submit an issue on [the UAssetAPI issues page](https://github.com/atenfyr/UAssetAPI/issues) with a copy of the asset in question along with the name of the game, the Unreal Engine version that it was cooked with, and a mappings file for the game, if needed.
 
 Please note: Your issue will NOT be reviewed if your issue cannot be replicated due to no test asset being provided.
+
+We currently do not accept AI-generated code on the UAssetAPI or UAssetGUI repositories. UAssetGUI is mature, stable software, so all changes must be thoroughly tested and reviewed by a human. Pull requests containing AI-generated code, text, documentation, or other AI-generated assets will not be reviewed.
+
+## Source
+Source code for UAssetGUI is available on GitHub: https://github.com/atenfyr/UAssetGUI
 
 ## License
 UAssetAPI and UAssetGUI are distributed under the MIT license, which you can view in detail in the [LICENSE file](LICENSE).

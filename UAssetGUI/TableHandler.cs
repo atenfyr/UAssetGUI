@@ -210,8 +210,8 @@ namespace UAssetGUI
             treeView1.Nodes.Clear();
             treeView1.BackColor = UAGPalette.BackColor;
             treeView1.Nodes.Add(new PointingTreeNode("General Information", null));
-            if (asset.SoftObjectPathList != null && (asset.SoftObjectPathList.Count > 0 || !asset.IsFilterEditorOnly)) treeView1.Nodes.Add(new PointingTreeNode("Soft Object Paths", null));
             treeView1.Nodes.Add(new PointingTreeNode("Name Map", null));
+            if (asset.SoftObjectPathList != null && (asset.SoftObjectPathList.Count > 0 || !asset.IsFilterEditorOnly)) treeView1.Nodes.Add(new PointingTreeNode("Soft Object Paths", null));
             treeView1.Nodes.Add(new PointingTreeNode("Import Data", null));
             treeView1.Nodes.Add(new PointingTreeNode("Export Information", null));
             if (numDependsInts != 0) treeView1.Nodes.Add(new PointingTreeNode("Depends Map", null));

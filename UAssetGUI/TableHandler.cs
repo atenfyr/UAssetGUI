@@ -1109,7 +1109,7 @@ namespace UAssetGUI
                             newThing.FromString(existingStrings, asset);
 
                             // override for enums if needed to ensure Value is not dummy
-                            if (namesAreDummies && newThing is EnumPropertyData newThingEnum && expectedContext != PropertySerializationContext.Normal)
+                            if (namesAreDummies && newThing is EnumPropertyData newThingEnum && !expectedContext.IsNormal())
                             {
                                 // convert Value from dummy to non-dummy
                                 newThingEnum.Value = FName.FromString(asset, newThingEnum.Value.ToString());

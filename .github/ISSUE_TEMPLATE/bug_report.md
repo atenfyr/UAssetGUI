@@ -17,7 +17,7 @@ Steps to reproduce the behavior:
 3. Scroll down to '....'
 4. See error
 
-Please provide a copy of an asset that can be used to reproduce the issue if needed, along with the game's Unreal Engine version. If the asset uses unversioned properties, you should also provide a set of mappings. YOUR ISSUE WILL NOT BE REVIEWED IF YOUR ISSUE CANNOT BE REPLICATED BECAUSE NO TEST ASSET IS PROVIDED.
+Please provide a copy of one or more test assets that can be used to reproduce the issue if needed, along with the game's Unreal Engine version. If the asset uses unversioned properties, you should also provide a set of mappings, along with copies of any other assets that may be needed to fully parse the test asset(s). YOUR ISSUE WILL NOT BE REVIEWED IF NO TEST ASSET(S) ARE PROVIDED (unless the issue is completely unrelated to asset parsing).
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

@@ -104,7 +104,7 @@ Any contributions, whether through pull requests or issues, that you may make ar
 
 If you have an Unreal Engine .uasset file that displays "failed to maintain binary equality," feel free to submit an issue on [the UAssetAPI issues page](https://github.com/atenfyr/UAssetAPI/issues) with a copy of the asset in question along with the name of the game, the Unreal Engine version that it was cooked with, and a mappings file for the game, if needed.
 
-Please note: Your issue will NOT be reviewed if your issue cannot be replicated due to no test asset being provided.
+Please note: Your issue will NOT be reviewed if no test asset(s) are provided (unless the issue is completely unrelated to asset parsing).
 
 We currently do not accept AI-generated code on the UAssetAPI or UAssetGUI repositories. UAssetGUI is mature, stable software, so all changes must be thoroughly tested and reviewed by a human. Pull requests containing AI-generated code, text, documentation, or other AI-generated assets will not be reviewed.
 

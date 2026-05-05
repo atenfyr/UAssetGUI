@@ -54,7 +54,7 @@ namespace UAssetGUI
             executeScriptToolStripMenuItem = new ToolStripMenuItem();
             editScriptToolStripMenuItem = new ToolStripMenuItem();
             importMappingsToolStripMenuItem = new ToolStripMenuItem();
-            patchusmapWithsavVersionInfoToolStripMenuItem = new ToolStripMenuItem();
+            patchusmapWithVersionInfoToolStripMenuItem = new ToolStripMenuItem();
             listValidPropertiesToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             configDirToolStripMenuItem = new ToolStripMenuItem();
@@ -224,7 +224,7 @@ namespace UAssetGUI
             // 
             // utilsToolStripMenuItem
             // 
-            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { executeScriptToolStripMenuItem, editScriptToolStripMenuItem, importMappingsToolStripMenuItem, patchusmapWithsavVersionInfoToolStripMenuItem, listValidPropertiesToolStripMenuItem });
+            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { executeScriptToolStripMenuItem, editScriptToolStripMenuItem, importMappingsToolStripMenuItem, patchusmapWithVersionInfoToolStripMenuItem, listValidPropertiesToolStripMenuItem });
             utilsToolStripMenuItem.Name = "utilsToolStripMenuItem";
             utilsToolStripMenuItem.Size = new System.Drawing.Size(42, 20);
             utilsToolStripMenuItem.Text = "Utils";
@@ -248,12 +248,12 @@ namespace UAssetGUI
             importMappingsToolStripMenuItem.Text = "Import mappings...";
             importMappingsToolStripMenuItem.Click += importMappingsToolStripMenuItem_Click;
             // 
-            // patchusmapWithsavVersionInfoToolStripMenuItem
+            // patchusmapWithVersionInfoToolStripMenuItem
             // 
-            patchusmapWithsavVersionInfoToolStripMenuItem.Name = "patchusmapWithsavVersionInfoToolStripMenuItem";
-            patchusmapWithsavVersionInfoToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
-            patchusmapWithsavVersionInfoToolStripMenuItem.Text = "Patch .usmap with .sav version info...";
-            patchusmapWithsavVersionInfoToolStripMenuItem.Click += patchusmapWithsavVersionInfoToolStripMenuItem_Click;
+            patchusmapWithVersionInfoToolStripMenuItem.Name = "patchusmapWithVersionInfoToolStripMenuItem";
+            patchusmapWithVersionInfoToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
+            patchusmapWithVersionInfoToolStripMenuItem.Text = "Patch .usmap with current version info...";
+            patchusmapWithVersionInfoToolStripMenuItem.Click += patchusmapWithVersionInfoToolStripMenuItem_Click;
             // 
             // listValidPropertiesToolStripMenuItem
             // 
@@ -517,7 +517,7 @@ namespace UAssetGUI
         public ComboBox comboSpecifyMappings;
         private ToolStripMenuItem listValidPropertiesToolStripMenuItem;
         private ToolStripMenuItem utilsToolStripMenuItem;
-        private ToolStripMenuItem patchusmapWithsavVersionInfoToolStripMenuItem;
+        private ToolStripMenuItem patchusmapWithVersionInfoToolStripMenuItem;
         private ToolStripMenuItem importMappingsToolStripMenuItem;
         public ToolStripMenuItem executeScriptToolStripMenuItem;
         public ToolStripMenuItem editScriptToolStripMenuItem;

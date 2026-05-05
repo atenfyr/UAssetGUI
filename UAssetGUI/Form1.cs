@@ -2366,35 +2366,31 @@ namespace UAssetGUI
             return null;
         }
 
-        private void patchusmapWithsavVersionInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        private void patchusmapWithVersionInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             UAGUtils.InvokeUI(() =>
             {
                 string patchPath = SelectMappings();
-                if (patchPath == null) return;
+                if (patchPath == null) return; // no mappings selected, end method
 
-                string inPath = null;
-                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                DialogResult res = MessageBox.Show($"Are you sure you would like to continue?\nThis operation will permanently modify the selected .usmap file and cannot be undone.\n{Path.GetFileName(patchPath)} will be set to version {ParsingVersion.ToString()}.", DisplayVersion, MessageBoxButtons.YesNo);
+                switch (res)
                 {
-                    openFileDialog.Filter = "Unreal save game (*.sav, *.savegame)|*.sav;*.savegame|All files (*.*)|*.*";
-                    openFileDialog.FilterIndex = 1;
-                    openFileDialog.RestoreDirectory = true;
-
-                    if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        inPath = openFileDialog.FileName;
-                    }
+                    case DialogResult.Yes:
+                        // continue
+                        break;
+                    case DialogResult.No:
+                    case DialogResult.Cancel:
+                        // end method
+                        return;
                 }
-
-                if (inPath == null) return;
 
                 bool success = true;
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
                 try
                 {
-                    var thing = new SaveGame(inPath);
-                    thing.PatchUsmap(patchPath);
+                    Usmap.PatchUsmapWithVersion(patchPath, ParsingVersion);
                 }
                 catch (Exception ex)
                 {

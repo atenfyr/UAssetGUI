@@ -574,6 +574,7 @@ namespace UAssetGUI
                                 targetAsset = UAsset.DeserializeJson(sr);
                             }
                             targetAsset.Mappings = ParsingMappings;
+                            targetAsset.GameSpecificOverride = UAGConfig.GetOverride();
                             targetAsset.FilePath = filePath;
                             desiredSetUnsavedChanges = true;
                         }
@@ -669,6 +670,7 @@ namespace UAssetGUI
                         targetAsset = new UAsset(ParsingVersion);
                         targetAsset.FilePath = filePath;
                         targetAsset.Mappings = ParsingMappings;
+                        targetAsset.GameSpecificOverride = UAGConfig.GetOverride();
                         targetAsset.CustomSerializationFlags = (CustomSerializationFlags)UAGConfig.Data.CustomSerializationFlags;
                         if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
 
@@ -688,6 +690,7 @@ namespace UAssetGUI
                             for (int preloadIter = 0; preloadIter < 3; preloadIter++)
                             {
                                 if (targetAsset.OtherAssetsFailedToAccess != null) targetAsset.OtherAssetsFailedToAccess.Clear();
+                                targetAsset.GameSpecificOverride = UAGConfig.GetOverride();
                                 targetAsset.CustomSerializationFlags |= CustomSerializationFlags.SkipLoadingExports; // skip loading exports for pre-load (significant speed-up)
                                 targetAsset.Read(new AssetBinaryReader(strmRaw, targetAsset));
 
@@ -704,6 +707,7 @@ namespace UAssetGUI
                             targetAsset = new UAsset(ParsingVersion);
                             targetAsset.FilePath = filePath;
                             targetAsset.Mappings = ParsingMappings;
+                            targetAsset.GameSpecificOverride = UAGConfig.GetOverride();
                             targetAsset.CustomSerializationFlags = (CustomSerializationFlags)UAGConfig.Data.CustomSerializationFlags;
                             if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
 
@@ -986,6 +990,7 @@ namespace UAssetGUI
                                 var targetAsset = new UAsset(ParsingVersion);
                                 targetAsset.FilePath = tableEditor.asset.FilePath;
                                 targetAsset.Mappings = tableEditor.asset.Mappings;
+                                targetAsset.GameSpecificOverride = UAGConfig.GetOverride();
                                 targetAsset.CustomSerializationFlags = tableEditor.asset.CustomSerializationFlags;
                                 if (MapStructTypeOverrideForm.MapStructTypeOverride != null) targetAsset.MapStructTypeOverride = MapStructTypeOverrideForm.MapStructTypeOverride;
 

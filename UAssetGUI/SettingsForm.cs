@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
@@ -50,6 +51,12 @@ namespace UAssetGUI
             enableUpdateNotice.Checked = UAGConfig.Data.EnableUpdateNotice;
             enableBakJson.Checked = UAGConfig.Data.EnableBakJson;
             allowUntrustedScriptsBox.Checked = UAGConfig.Data.AllowUntrustedScripts;
+
+            if (string.IsNullOrEmpty(UAGConfig.Data.GameSpecificOverride)) UAGConfig.Data.GameSpecificOverride = GameSpecificOverride.None.ToString();
+            Enum.TryParse(UAGConfig.Data.GameSpecificOverride.ToString(), out GameSpecificOverride currentOverride);
+
+            gameOverrideBox.DataSource = Enum.GetValues(typeof(GameSpecificOverride));
+            gameOverrideBox.SelectedIndex = (int)currentOverride;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
@@ -274,6 +281,11 @@ namespace UAssetGUI
                 if (newValue > numericUpDown1.Maximum) newValue = numericUpDown1.Maximum;
                 numericUpDown1.Value = newValue;
             });
+        }
+
+        private void gameOverrideBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UAGConfig.Data.GameSpecificOverride = gameOverrideBox.SelectedValue.ToString();
         }
     }
 }

@@ -50,6 +50,8 @@
             pictureBox1 = new System.Windows.Forms.PictureBox();
             enableBakJson = new System.Windows.Forms.CheckBox();
             allowUntrustedScriptsBox = new System.Windows.Forms.CheckBox();
+            gameOverrideBox = new System.Windows.Forms.ComboBox();
+            label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -72,7 +74,7 @@
             closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            closeButton.Location = new System.Drawing.Point(319, 357);
+            closeButton.Location = new System.Drawing.Point(319, 383);
             closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             closeButton.Name = "closeButton";
             closeButton.Size = new System.Drawing.Size(88, 30);
@@ -109,7 +111,7 @@
             aboutButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             aboutButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             aboutButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            aboutButton.Location = new System.Drawing.Point(14, 357);
+            aboutButton.Location = new System.Drawing.Point(14, 383);
             aboutButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             aboutButton.Name = "aboutButton";
             aboutButton.Size = new System.Drawing.Size(88, 30);
@@ -141,11 +143,11 @@
             // valuesOnScroll
             // 
             valuesOnScroll.AutoSize = true;
-            valuesOnScroll.Location = new System.Drawing.Point(215, 198);
+            valuesOnScroll.Location = new System.Drawing.Point(215, 232);
             valuesOnScroll.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             valuesOnScroll.Name = "valuesOnScroll";
             valuesOnScroll.Size = new System.Drawing.Size(151, 19);
-            valuesOnScroll.TabIndex = 7;
+            valuesOnScroll.TabIndex = 8;
             valuesOnScroll.Text = "Change values on scroll";
             valuesOnScroll.UseVisualStyleBackColor = true;
             valuesOnScroll.CheckedChanged += valuesOnScroll_CheckedChanged;
@@ -173,11 +175,11 @@
             // enableDiscordRpc
             // 
             enableDiscordRpc.AutoSize = true;
-            enableDiscordRpc.Location = new System.Drawing.Point(29, 198);
+            enableDiscordRpc.Location = new System.Drawing.Point(29, 232);
             enableDiscordRpc.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableDiscordRpc.Name = "enableDiscordRpc";
             enableDiscordRpc.Size = new System.Drawing.Size(129, 19);
-            enableDiscordRpc.TabIndex = 6;
+            enableDiscordRpc.TabIndex = 7;
             enableDiscordRpc.Text = "Enable Discord RPC";
             enableDiscordRpc.UseVisualStyleBackColor = true;
             enableDiscordRpc.CheckedChanged += enableDiscordRpc_CheckedChanged;
@@ -185,11 +187,11 @@
             // enableDynamicTree
             // 
             enableDynamicTree.AutoSize = true;
-            enableDynamicTree.Location = new System.Drawing.Point(29, 251);
+            enableDynamicTree.Location = new System.Drawing.Point(29, 285);
             enableDynamicTree.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableDynamicTree.Name = "enableDynamicTree";
             enableDynamicTree.Size = new System.Drawing.Size(133, 19);
-            enableDynamicTree.TabIndex = 10;
+            enableDynamicTree.TabIndex = 11;
             enableDynamicTree.Text = "Enable dynamic tree";
             enableDynamicTree.UseVisualStyleBackColor = true;
             enableDynamicTree.CheckedChanged += enableDynamicTree_CheckedChanged;
@@ -197,11 +199,11 @@
             // doubleClickToEdit
             // 
             doubleClickToEdit.AutoSize = true;
-            doubleClickToEdit.Location = new System.Drawing.Point(29, 225);
+            doubleClickToEdit.Location = new System.Drawing.Point(29, 259);
             doubleClickToEdit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             doubleClickToEdit.Name = "doubleClickToEdit";
             doubleClickToEdit.Size = new System.Drawing.Size(128, 19);
-            doubleClickToEdit.TabIndex = 8;
+            doubleClickToEdit.TabIndex = 9;
             doubleClickToEdit.Text = "Double click to edit";
             doubleClickToEdit.UseVisualStyleBackColor = true;
             doubleClickToEdit.CheckedChanged += doubleClickToEdit_CheckedChanged;
@@ -209,11 +211,11 @@
             // enableBak
             // 
             enableBak.AutoSize = true;
-            enableBak.Location = new System.Drawing.Point(215, 278);
+            enableBak.Location = new System.Drawing.Point(215, 312);
             enableBak.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableBak.Name = "enableBak";
             enableBak.Size = new System.Drawing.Size(157, 19);
-            enableBak.TabIndex = 13;
+            enableBak.TabIndex = 14;
             enableBak.Text = "Enable .bak files (.uasset)";
             enableBak.UseVisualStyleBackColor = true;
             enableBak.CheckedChanged += enableBak_CheckedChanged;
@@ -221,11 +223,11 @@
             // restoreSize
             // 
             restoreSize.AutoSize = true;
-            restoreSize.Location = new System.Drawing.Point(215, 251);
+            restoreSize.Location = new System.Drawing.Point(215, 285);
             restoreSize.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             restoreSize.Name = "restoreSize";
             restoreSize.Size = new System.Drawing.Size(156, 19);
-            restoreSize.TabIndex = 11;
+            restoreSize.TabIndex = 12;
             restoreSize.Text = "Restore GUI size on open";
             restoreSize.UseVisualStyleBackColor = true;
             restoreSize.CheckedChanged += restoreSize_CheckedChanged;
@@ -233,11 +235,11 @@
             // enableUpdateNotice
             // 
             enableUpdateNotice.AutoSize = true;
-            enableUpdateNotice.Location = new System.Drawing.Point(29, 278);
+            enableUpdateNotice.Location = new System.Drawing.Point(29, 312);
             enableUpdateNotice.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableUpdateNotice.Name = "enableUpdateNotice";
             enableUpdateNotice.Size = new System.Drawing.Size(137, 19);
-            enableUpdateNotice.TabIndex = 12;
+            enableUpdateNotice.TabIndex = 13;
             enableUpdateNotice.Text = "Enable update notice";
             enableUpdateNotice.UseVisualStyleBackColor = true;
             enableUpdateNotice.CheckedChanged += enableUpdateNotice_CheckedChanged;
@@ -245,11 +247,11 @@
             // enablePrettyBytecode
             // 
             enablePrettyBytecode.AutoSize = true;
-            enablePrettyBytecode.Location = new System.Drawing.Point(215, 225);
+            enablePrettyBytecode.Location = new System.Drawing.Point(215, 259);
             enablePrettyBytecode.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enablePrettyBytecode.Name = "enablePrettyBytecode";
             enablePrettyBytecode.Size = new System.Drawing.Size(147, 19);
-            enablePrettyBytecode.TabIndex = 9;
+            enablePrettyBytecode.TabIndex = 10;
             enablePrettyBytecode.Text = "Enable pretty bytecode";
             enablePrettyBytecode.UseVisualStyleBackColor = true;
             enablePrettyBytecode.CheckedChanged += enablePrettyBytecode_CheckedChanged;
@@ -290,11 +292,11 @@
             // enableBakJson
             // 
             enableBakJson.AutoSize = true;
-            enableBakJson.Location = new System.Drawing.Point(29, 305);
+            enableBakJson.Location = new System.Drawing.Point(29, 339);
             enableBakJson.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             enableBakJson.Name = "enableBakJson";
             enableBakJson.Size = new System.Drawing.Size(146, 19);
-            enableBakJson.TabIndex = 14;
+            enableBakJson.TabIndex = 15;
             enableBakJson.Text = "Enable .bak files (.json)";
             enableBakJson.UseVisualStyleBackColor = true;
             enableBakJson.CheckedChanged += enableBakJson_CheckedChanged;
@@ -302,20 +304,44 @@
             // allowUntrustedScriptsBox
             // 
             allowUntrustedScriptsBox.AutoSize = true;
-            allowUntrustedScriptsBox.Location = new System.Drawing.Point(215, 305);
+            allowUntrustedScriptsBox.Location = new System.Drawing.Point(215, 339);
             allowUntrustedScriptsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             allowUntrustedScriptsBox.Name = "allowUntrustedScriptsBox";
             allowUntrustedScriptsBox.Size = new System.Drawing.Size(147, 19);
-            allowUntrustedScriptsBox.TabIndex = 24;
+            allowUntrustedScriptsBox.TabIndex = 16;
             allowUntrustedScriptsBox.Text = "Allow untrusted scripts";
             allowUntrustedScriptsBox.UseVisualStyleBackColor = true;
             allowUntrustedScriptsBox.CheckedChanged += allowUntrustedScriptsBox_CheckedChanged;
+            // 
+            // gameOverrideBox
+            // 
+            gameOverrideBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            gameOverrideBox.FormattingEnabled = true;
+            gameOverrideBox.Location = new System.Drawing.Point(142, 189);
+            gameOverrideBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gameOverrideBox.Name = "gameOverrideBox";
+            gameOverrideBox.Size = new System.Drawing.Size(252, 23);
+            gameOverrideBox.TabIndex = 6;
+            gameOverrideBox.SelectedIndexChanged += gameOverrideBox_SelectedIndexChanged;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            label5.Location = new System.Drawing.Point(15, 191);
+            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(102, 16);
+            label5.TabIndex = 26;
+            label5.Text = "Game Override:";
             // 
             // SettingsForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(421, 395);
+            ClientSize = new System.Drawing.Size(421, 421);
+            Controls.Add(gameOverrideBox);
+            Controls.Add(label5);
             Controls.Add(allowUntrustedScriptsBox);
             Controls.Add(enableBakJson);
             Controls.Add(pictureBox1);
@@ -374,5 +400,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.CheckBox enableBakJson;
         private System.Windows.Forms.CheckBox allowUntrustedScriptsBox;
+        private System.Windows.Forms.ComboBox gameOverrideBox;
+        private System.Windows.Forms.Label label5;
     }
 }

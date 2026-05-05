@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using UAssetAPI;
+using UAssetAPI.UnrealTypes;
 using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
@@ -32,6 +33,7 @@ namespace UAssetGUI
         public bool EnableBakJson;
         public bool AllowUntrustedScripts;
         public string RetocExtraCommands;
+        public string GameSpecificOverride;
 
         public UAGConfigData()
         {
@@ -55,6 +57,7 @@ namespace UAssetGUI
             EnableBakJson = false;
             AllowUntrustedScripts = false;
             RetocExtraCommands = string.Empty;
+            GameSpecificOverride = string.Empty;
         }
     }
 
@@ -324,6 +327,12 @@ namespace UAssetGUI
             {
                 return false;
             }
+        }
+
+        public static GameSpecificOverride GetOverride()
+        {
+            if (string.IsNullOrEmpty(UAGConfig.Data.GameSpecificOverride)) return GameSpecificOverride.None;
+            return Enum.TryParse(UAGConfig.Data.GameSpecificOverride, out GameSpecificOverride overr) ? overr : GameSpecificOverride.None;
         }
 
         public static void Save()

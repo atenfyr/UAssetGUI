@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace UAssetGUI
             searchDirForwardButton.Tag = SearchDirection.Forward;
             searchDirBackwardButton.Tag = SearchDirection.Backward;
             searchDirForwardButton.Checked = true;
+            comboBoxReplace.SelectedIndex = 0;
         }
 
         private Form1 BaseForm;
@@ -201,6 +203,115 @@ namespace UAssetGUI
             {
                 PerformSearch(ts.Token);
             });
+        }
+
+        private void buttonReplace_Click(object sender, EventArgs e)
+        {
+            if (BaseForm.dataGridView1.SelectedRows.Count < 1)
+            {
+                labelStatus.Text = "No row selected please insert a name and click above the desired value.";
+                return;
+            }
+            if (BaseForm.dataGridView1.SelectedRows[0].Cells.Count < 4)
+            {
+                labelStatus.Text = "Not enough cells (cant edit on this position.)";
+                return;
+            }
+            string storedValue;
+            storedValue = (string)BaseForm.dataGridView1.SelectedRows[0].Cells[3].Value;
+
+            if (storedValue == null)
+            {
+                labelStatus.Text = "Cell is null.";
+                return;
+            }
+
+            string input = storedValue;
+            string input2 = textBoxReplace.Text;
+            if (String.IsNullOrEmpty(input2))
+            {
+                labelStatus.Text = "Replace field is empty.";
+                return;
+            }
+
+            // Konvertieren zu float
+            if (float.TryParse(input, out float number))
+            {
+                if (float.TryParse(input2.Replace(".", ","), out float number2))
+                {
+                    if ((string)comboBoxReplace.SelectedItem == "relative")
+                    {
+                        number += number2;
+                    }
+                    else if ((string)comboBoxReplace.SelectedItem == "absolute")
+                    {
+                        number = number2;
+                    }
+                    else if ((string)comboBoxReplace.SelectedItem == "percent")
+                    {
+                        float bbase = number / 100;
+                        if (number2 < 0)
+                        {
+                            number -= bbase * Math.Abs(number2);
+                        }
+                        else if (number2 > 0)
+                        {
+                            number += bbase * Math.Abs(number2);
+                        }
+                        else
+                        {
+                            number = 0;
+                        }
+                    }
+                    else
+                    {
+                        labelStatus.Text = "Selected method is not implemented.";
+                        return;
+                    }
+
+                }
+                else
+                {
+                    labelStatus.Text = "Replace field only accept numbers.";
+                    return;
+                }
+
+
+                // Zurück in String konvertieren
+                string result = number.ToString();
+
+                BaseForm.dataGridView1.SelectedRows[0].Cells[3].Value = result;
+                //Console.WriteLine("Ergebnis: " + result);
+            }
+            else
+            {
+                labelStatus.Text = "Cell content is not a number only number are allowed.";
+                return;
+            }
+        }
+        private void BlockingSearch()
+        {
+            SyncSettings();
+            if (
+            BaseForm.tableEditor == null || BaseForm.tableEditor.asset == null
+            ) return;
+
+            PerformSearch(ts.Token);
+        }
+
+        private void buttonReplaceAll_Click(object sender, EventArgs e)
+        {
+            BlockingSearch();
+            while (BaseForm.dataGridView1.SelectedRows.Count > 0)
+            {
+                buttonReplace_Click(null, null);
+                BlockingSearch();
+            }
+        }
+
+        private void textBoxReplace_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 

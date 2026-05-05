@@ -5,3 +5,5 @@ TestResults
 UAssetGUI/bin
 UAssetGUI/obj
 UAssetGUI/git_commit.txt
+UAssetGUI/Properties/Settings.settings
+UAssetGUI/Properties/Settings.Designer.cs

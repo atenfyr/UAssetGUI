@@ -48,7 +48,7 @@ namespace UAssetGUI
         public UAGConfigData()
         {
             Agent = "UAssetGUI";
-            Language = "en_US";
+            Language = string.Empty;
             PreferredVersion = string.Empty;
             Theme = string.Empty;
             MapStructTypeOverride = string.Empty;
@@ -250,7 +250,7 @@ namespace UAssetGUI
                             {
                                 Name = "executeScriptToolStripMenuItemSubScriptItem_New",
                                 Size = form1.executeScriptToolStripMenuItem.Size,
-                                Text = "Add new script...",
+                                Text = UAGConfig.GetString("Menu.Utils.EditScript.AddNewScript"),
                             };
                             newItem2.Click += form1.executeScriptNewItem_Click;
                             subScriptItems.Add(newItem2);
@@ -276,7 +276,7 @@ namespace UAssetGUI
                             {
                                 Name = "editScriptToolStripMenuItemSubScriptItem_New",
                                 Size = form1.editScriptToolStripMenuItem.Size,
-                                Text = "Add new script...",
+                                Text = UAGConfig.GetString("Menu.Utils.EditScript.AddNewScript"),
                             };
                             newItem2.Click += form1.executeScriptNewItem_Click;
                             subScriptItems.Add(newItem2);
@@ -398,10 +398,12 @@ namespace UAssetGUI
             }
         }
 
-        public static void SetLanguage(string code)
+        public static bool SetLanguage(string code)
         {
+            if (UAGConfig.Data.Language == code) return false;
             UAGConfig.Data.Language = code;
             _LocalizedStringsCache = null;
+            return true;
         }
 
         public static string GetString(string key)
@@ -455,7 +457,10 @@ namespace UAssetGUI
             }
             finally
             {
-                if (string.IsNullOrEmpty(UAGConfig.Data.Language)) UAGConfig.Data.Language = GetLanguageCodes()[0];
+                if (string.IsNullOrEmpty(UAGConfig.Data.Language) || !LanguageCodes.Contains(UAGConfig.Data.Language))
+                {
+                    UAGConfig.Data.Language = GetLanguageCodes()[0];
+                }
             }
         }
     }

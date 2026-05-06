@@ -10,7 +10,7 @@ using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
-    public partial class MapStructTypeOverrideForm : Form
+    public partial class MapStructTypeOverrideForm : Form, ILocalizable
     {
         public static Dictionary<string, Tuple<FString, FString>> MapStructTypeOverride = null;
 
@@ -18,7 +18,8 @@ namespace UAssetGUI
         {
             InitializeComponent();
 
-            infoLabel.Text = "This table maps MapProperty names to the type of the structs within them. You can use header dumps to determine these values if necessary.";
+            this.Text = UAGConfig.GetString("MSTO.WindowName");
+            infoLabel.Text = UAGConfig.GetString("MSTO.Header");
 
             if (!SystemInformation.TerminalServerSession)
             {
@@ -26,6 +27,15 @@ namespace UAssetGUI
                 PropertyInfo pi = ourGridType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
                 pi.SetValue(mstoDataGridView, true, null);
             }
+        }
+
+        public void Localize()
+        {
+            refreshButton.Text = UAGConfig.GetString("MSTO.Button.Refresh");
+            importButton.Text = UAGConfig.GetString("MSTO.Button.Import");
+            exportButton.Text = UAGConfig.GetString("MSTO.Button.Export");
+            resetButton.Text = UAGConfig.GetString("MSTO.Button.Reset");
+            closeButton.Text = UAGConfig.GetString("Generic.Button.Close");
         }
 
         private static void CheckIfMapStructTypeOverrideIsNull()
@@ -100,7 +110,7 @@ namespace UAssetGUI
             mstoDataGridView.AllowUserToAddRows = true;
             mstoDataGridView.ReadOnly = false;
             mstoDataGridView.BackgroundColor = UAGPalette.DataGridViewActiveColor;
-            AddColumns(new string[] { "Map Name", "Key Struct Type Name", "Value Struct Type Name" });
+            AddColumns(new string[] { UAGConfig.GetString("MSTO.Table.MapName"), UAGConfig.GetString("MSTO.Table.KeyStructTypeName"), UAGConfig.GetString("MSTO.Table.ValueStructTypeName") });
 
             foreach (KeyValuePair<string, Tuple<FString, FString>> entry in MapStructTypeOverride)
             {
@@ -215,7 +225,7 @@ namespace UAssetGUI
 
         private void resetButton_Click(object sender, EventArgs e)
         {
-            DialogResult res = MessageBox.Show("Are you sure you want to reset the table to its defaults?", this.Text, MessageBoxButtons.OKCancel);
+            DialogResult res = MessageBox.Show(UAGConfig.GetString("MSTO.Prompt.Reset"), this.Text, MessageBoxButtons.OKCancel);
             if (res != DialogResult.OK) return;
 
             MapStructTypeOverride = null;

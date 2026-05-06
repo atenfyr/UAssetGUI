@@ -209,16 +209,16 @@ namespace UAssetGUI
             treeView1.BeginUpdate();
             treeView1.Nodes.Clear();
             treeView1.BackColor = UAGPalette.BackColor;
-            treeView1.Nodes.Add(new PointingTreeNode("General Information", null));
-            treeView1.Nodes.Add(new PointingTreeNode("Name Map", null));
-            if (asset.SoftObjectPathList != null && (asset.SoftObjectPathList.Count > 0 || !asset.IsFilterEditorOnly)) treeView1.Nodes.Add(new PointingTreeNode("Soft Object Paths", null));
-            treeView1.Nodes.Add(new PointingTreeNode("Import Data", null));
-            treeView1.Nodes.Add(new PointingTreeNode("Export Information", null));
-            if (numDependsInts != 0) treeView1.Nodes.Add(new PointingTreeNode("Depends Map", null));
-            if (asset.SoftPackageReferenceList != null) treeView1.Nodes.Add(new PointingTreeNode("Soft Package References", null));
+            treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeGeneralInformation, null));
+            treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeNameMap, null));
+            if (asset.SoftObjectPathList != null && (asset.SoftObjectPathList.Count > 0 || !asset.IsFilterEditorOnly)) treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeSoftObjectPathList, null));
+            treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeImports, null));
+            treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeExportInformation, null));
+            if (numDependsInts != 0) treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeDependsMap, null));
+            if (asset.SoftPackageReferenceList != null) treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeSoftPackageReferences, null));
             if (asset.WorldTileInfo != null)
             {
-                treeView1.Nodes.Add(new PointingTreeNode("World Tile Info", null));
+                treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeWorldTileInfo, null));
                 PointingTreeNode worldInfoNode = (PointingTreeNode)treeView1.Nodes[treeView1.Nodes.Count - 1];
                 worldInfoNode.Nodes.Add(new PointingTreeNode("Layer (5)", asset.WorldTileInfo.Layer));
                 worldInfoNode.Nodes.Add(new PointingTreeNode("LODList (" + asset.WorldTileInfo.LODList.Length + ")", asset.WorldTileInfo.LODList));
@@ -228,9 +228,9 @@ namespace UAssetGUI
                     lodListNode.Nodes.Add(new PointingTreeNode("LOD entry #" + (i + 1), asset.WorldTileInfo.LODList[i]));
                 }
             }
-            if (asset.ObjectVersionUE5 >= ObjectVersionUE5.DATA_RESOURCES) treeView1.Nodes.Add(new PointingTreeNode("Data Resources", null));
-            treeView1.Nodes.Add(new PointingTreeNode("Custom Version Container", null));
-            treeView1.Nodes.Add(new PointingTreeNode("Export Data", null));
+            if (asset.ObjectVersionUE5 >= ObjectVersionUE5.DATA_RESOURCES) treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeDataResources, null));
+            treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeCustomVersionContainer, null));
+            treeView1.Nodes.Add(new PointingTreeNode(Form1.NodeExportData, null));
 
             PointingTreeNode superTopNode = (PointingTreeNode)treeView1.Nodes[treeView1.Nodes.Count - 1];
             PointingTreeNode[] plannedCollection = new PointingTreeNode[asset.Exports.Count];
@@ -243,7 +243,7 @@ namespace UAssetGUI
                 {
                     case RawExport us3:
                         {
-                            var parentNode = new PointingTreeNode("Raw Data (" + us3.Data.Length + " B)", us3, PointingTreeNodeType.ByteArray, i);
+                            var parentNode = new PointingTreeNode(string.Format(UAGConfig.GetString("Node.RawData"), us3.Data.Length), us3, PointingTreeNodeType.ByteArray, i);
                             parentNode.ChildrenInitialized = true;
                             categoryNode.Nodes.Add(parentNode);
                             break;
@@ -278,18 +278,18 @@ namespace UAssetGUI
 
                             if (us is StructExport structUs)
                             {
-                                var parentNode2 = new PointingTreeNode("UStruct Data", structUs, PointingTreeNodeType.StructData, i);
+                                var parentNode2 = new PointingTreeNode(UAGConfig.GetString("Node.UStruct"), structUs, PointingTreeNodeType.StructData, i);
                                 parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                                 if (structUs.ScriptBytecode == null)
                                 {
-                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecodeRaw.Length + " B)", structUs, PointingTreeNodeType.KismetByteArray, i);
+                                    var bytecodeNode = new PointingTreeNode(string.Format(UAGConfig.GetString("Node.ScriptBytecode1"), structUs.ScriptBytecodeRaw.Length), structUs, PointingTreeNodeType.KismetByteArray, i);
                                     bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
                                 else
                                 {
-                                    var bytecodeNode = new PointingTreeNode("ScriptBytecode (" + structUs.ScriptBytecode.Length + " instructions)", structUs, PointingTreeNodeType.Kismet, i);
+                                    var bytecodeNode = new PointingTreeNode(string.Format(UAGConfig.GetString("Node.ScriptBytecode2"), structUs.ScriptBytecode.Length), structUs, PointingTreeNodeType.Kismet, i);
                                     bytecodeNode.ChildrenInitialized = true;
                                     parentNode2.Nodes.Add(bytecodeNode);
                                 }
@@ -297,7 +297,7 @@ namespace UAssetGUI
 
                             if (us is UserDefinedStructExport us6)
                             {
-                                var parentNode2 = new PointingTreeNode("UserDefinedStruct Data (" + us6.StructData.Count + ")", us, PointingTreeNodeType.UserDefinedStructData, i);
+                                var parentNode2 = new PointingTreeNode(string.Format(UAGConfig.GetString("Node.UserDefinedStruct"), us6.StructData.Count), us, PointingTreeNodeType.UserDefinedStructData, i);
                                 parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
 
@@ -306,21 +306,21 @@ namespace UAssetGUI
 
                             if (us is ClassExport)
                             {
-                                var parentNode2 = new PointingTreeNode("UClass Data", (ClassExport)us, PointingTreeNodeType.ClassData, i);
+                                var parentNode2 = new PointingTreeNode(UAGConfig.GetString("Node.UClass"), (ClassExport)us, PointingTreeNodeType.ClassData, i);
                                 parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             if (us is PropertyExport)
                             {
-                                var parentNode2 = new PointingTreeNode("UProperty Data", (PropertyExport)us, PointingTreeNodeType.UPropertyData, i);
+                                var parentNode2 = new PointingTreeNode(UAGConfig.GetString("Node.UProperty"), (PropertyExport)us, PointingTreeNodeType.UPropertyData, i);
                                 parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             if (us is DataTableExport us4)
                             {
-                                var parentNode2 = new PointingTreeNode("Table Info (" + us4.Table.Data.Count + ")", us4.Table, 0, i);
+                                var parentNode2 = new PointingTreeNode(string.Format(UAGConfig.GetString("Node.TableInfo"), us4.Table.Data.Count), us4.Table, 0, i);
                                 parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                                 foreach (StructPropertyData entry in us4.Table.Data)
@@ -341,13 +341,13 @@ namespace UAssetGUI
 
                             if (us is EnumExport us5)
                             {
-                                var parentNode2 = new PointingTreeNode("Enum Data", us5, PointingTreeNodeType.EnumData, i);
+                                var parentNode2 = new PointingTreeNode(UAGConfig.GetString("Node.EnumData"), us5, PointingTreeNodeType.EnumData, i);
                                 parentNode2.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode2);
                             }
 
                             {
-                                var parentNode3 = new PointingTreeNode("Extra Data (" + us.Extras.Length + " B)", us, PointingTreeNodeType.ByteArray, i);
+                                var parentNode3 = new PointingTreeNode(string.Format(UAGConfig.GetString("Node.ExtraData"), us.Extras.Length), us, PointingTreeNodeType.ByteArray, i);
                                 parentNode3.ChildrenInitialized = true;
                                 categoryNode.Nodes.Add(parentNode3);
                             }

@@ -73,6 +73,16 @@ namespace UAssetGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] empty {
+            get {
+                object obj = ResourceManager.GetObject("empty", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] en_US {
             get {
                 object obj = ResourceManager.GetObject("en_US", resourceCulture);

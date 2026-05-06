@@ -513,6 +513,9 @@ namespace UAssetGUI
             importBinaryData.Text = UAGConfig.GetString("Generic.Button.Import");
             exportBinaryData.Text = UAGConfig.GetString("Generic.Button.Export");
             setBinaryData.Text = UAGConfig.GetString("Generic.Button.SetToNull");
+
+            if (allMappingsKeys != null && allMappingsKeys.Count >= 1) allMappingsKeys[0] = UAGConfig.GetString("Generic.NoMappings");
+            if (comboSpecifyMappings != null && comboSpecifyMappings.Items != null && comboSpecifyMappings.Items.Count >= 1) comboSpecifyMappings.Items[0] = UAGConfig.GetString("Generic.NoMappings");
         }
 
         private ISet<string> unknownTypes = new HashSet<string>();
@@ -1594,6 +1597,18 @@ namespace UAssetGUI
             }
         }
 
+        internal static string NodeGeneralInformation => UAGConfig.GetString("Node.GeneralInformation");
+        internal static string NodeNameMap => UAGConfig.GetString("Node.NameMap");
+        internal static string NodeSoftObjectPathList => UAGConfig.GetString("Node.SoftObjectPathList");
+        internal static string NodeImports => UAGConfig.GetString("Node.Imports");
+        internal static string NodeExportInformation => UAGConfig.GetString("Node.ExportInformation");
+        internal static string NodeDependsMap => UAGConfig.GetString("Node.DependsMap");
+        internal static string NodeSoftPackageReferences => UAGConfig.GetString("Node.SoftPackageReferences");
+        internal static string NodeWorldTileInfo => UAGConfig.GetString("Node.WorldTileInfo");
+        internal static string NodeDataResources => UAGConfig.GetString("Node.DataResources");
+        internal static string NodeCustomVersionContainer => UAGConfig.GetString("Node.CustomVersionContainer");
+        internal static string NodeExportData => UAGConfig.GetString("Node.ExportData");
+
         public void UpdateModeFromSelectedNode(TreeNode e)
         {
             if (e == null) return;
@@ -1603,41 +1618,48 @@ namespace UAssetGUI
             if (tableEditor != null)
             {
                 tableEditor.mode = TableHandlerMode.ExportData;
-                switch (selectedNodeText)
+                if (selectedNodeText == NodeGeneralInformation)
                 {
-                    case "General Information":
-                        tableEditor.mode = TableHandlerMode.GeneralInformation;
-                        break;
-                    case "Name Map":
-                        tableEditor.mode = TableHandlerMode.NameMap;
-                        break;
-                    case "Soft Object Paths":
-                        tableEditor.mode = TableHandlerMode.SoftObjectPathList;
-                        break;
-                    case "Import Data":
-                        tableEditor.mode = TableHandlerMode.Imports;
-                        break;
-                    case "Export Information":
-                        tableEditor.mode = TableHandlerMode.ExportInformation;
-                        break;
-                    case "Depends Map":
-                        tableEditor.mode = TableHandlerMode.DependsMap;
-                        break;
-                    case "Soft Package References":
-                        tableEditor.mode = TableHandlerMode.SoftPackageReferences;
-                        break;
-                    case "World Tile Info":
-                        tableEditor.mode = TableHandlerMode.WorldTileInfo;
-                        break;
-                    case "Data Resources":
-                        tableEditor.mode = TableHandlerMode.DataResources;
-                        break;
-                    case "Custom Version Container":
-                        tableEditor.mode = TableHandlerMode.CustomVersionContainer;
-                        break;
+                    tableEditor.mode = TableHandlerMode.GeneralInformation;
+                }
+                else if (selectedNodeText == NodeNameMap)
+                {
+                    tableEditor.mode = TableHandlerMode.NameMap;
+                }
+                else if (selectedNodeText == NodeSoftObjectPathList)
+                {
+                    tableEditor.mode = TableHandlerMode.SoftObjectPathList;
+                }
+                else if (selectedNodeText == NodeImports)
+                {
+                    tableEditor.mode = TableHandlerMode.Imports;
+                }
+                else if (selectedNodeText == NodeExportInformation)
+                {
+                    tableEditor.mode = TableHandlerMode.ExportInformation;
+                }
+                else if (selectedNodeText == NodeDependsMap)
+                {
+                    tableEditor.mode = TableHandlerMode.DependsMap;
+                }
+                else if (selectedNodeText == NodeSoftPackageReferences)
+                {
+                    tableEditor.mode = TableHandlerMode.SoftPackageReferences;
+                }
+                else if (selectedNodeText == NodeWorldTileInfo)
+                {
+                    tableEditor.mode = TableHandlerMode.WorldTileInfo;
+                }
+                else if (selectedNodeText == NodeDataResources)
+                {
+                    tableEditor.mode = TableHandlerMode.DataResources;
+                }
+                else if (selectedNodeText == NodeCustomVersionContainer)
+                {
+                    tableEditor.mode = TableHandlerMode.CustomVersionContainer;
                 }
 
-                if (parentSelectedNodeText == "World Tile Info") tableEditor.mode = TableHandlerMode.WorldTileInfo;
+                if (parentSelectedNodeText == NodeWorldTileInfo) tableEditor.mode = TableHandlerMode.WorldTileInfo;
 
                 tableEditor.Load();
             }

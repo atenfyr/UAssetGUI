@@ -55,12 +55,12 @@ namespace UAssetGUI
             UAGConfig.Save();
         }
 
-        public static void RefreshTheme(Form frm)
+        public static void RefreshTheme(Form frm, bool alsoLocalize = true)
         {
             UAGUtils.InvokeUI(() =>
             {
-                RefreshThemeInternal(frm);
-                if (frm is ILocalizable localizable) localizable.Localize();
+                RefreshThemeInternal(frm, alsoLocalize);
+                if (alsoLocalize && frm is ILocalizable localizable) localizable.Localize();
             });
         }
 
@@ -187,7 +187,7 @@ namespace UAssetGUI
         }
 
         public static readonly int InitialSplitterDistance = 408;
-        private static void RefreshThemeInternal(Form frm)
+        private static void RefreshThemeInternal(Form frm, bool alsoLocalize = true)
         {
             switch (CurrentTheme)
             {

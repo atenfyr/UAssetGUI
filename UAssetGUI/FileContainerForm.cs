@@ -859,7 +859,7 @@ namespace UAssetGUI
                 {
                     TextPrompt replacementPrompt = new TextPrompt()
                     {
-                        DisplayText = "What path should this object be staged to?",
+                        DisplayText = UAGConfig.GetString("FileContainerForm.Prompt.StageToPath"),
                         Text = this.Text
                     };
 
@@ -919,7 +919,7 @@ namespace UAssetGUI
         {
             if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null)
             {
-                MessageBox.Show("Please load a container first to extract it.", BaseForm.DisplayVersion);
+                MessageBox.Show(UAGConfig.GetString("FileContainerForm.Prompt.ExtractNoContainer"), BaseForm.DisplayVersion);
                 return;
             }
 
@@ -996,15 +996,15 @@ namespace UAssetGUI
             {
                 if (e.Cancelled)
                 {
-                    MessageBox.Show("Operation canceled.", BaseForm.DisplayVersion);
+                    MessageBox.Show(UAGConfig.GetString("FileContainerForm.Prompt.ExtractCancel"), BaseForm.DisplayVersion);
                 }
                 else if (e.Error != null)
                 {
-                    MessageBox.Show("An error occured during extraction! " + e.Error.Message, BaseForm.DisplayVersion);
+                    MessageBox.Show(string.Format(UAGConfig.GetString("FileContainerForm.Prompt.ExtractError"), e.Error.Message), BaseForm.DisplayVersion);
                 }
                 else
                 {
-                    MessageBox.Show(progressBarForm == null ? "Operation completed." : ("Extracted " + progressBarForm.Value + " files successfully."), BaseForm.DisplayVersion);
+                    MessageBox.Show(progressBarForm == null ? UAGConfig.GetString("FileContainerForm.Prompt.ExtractDoneGeneric") : string.Format(UAGConfig.GetString("FileContainerForm.Prompt.ExtractDoneCount"), progressBarForm.Value), BaseForm.DisplayVersion);
                 }
                 progressBarForm?.Close();
             });
@@ -1023,7 +1023,7 @@ namespace UAssetGUI
             {
                 TextPrompt replacementPrompt = new TextPrompt()
                 {
-                    DisplayText = "Enter a string to search for (or empty to remove):",
+                    DisplayText = UAGConfig.GetString("FileContainerForm.Prompt.ApplyFilter"),
                     Text = this.Text,
                     AllowEmptyText = true
                 };
@@ -1053,7 +1053,7 @@ namespace UAssetGUI
             {
                 TextPrompt replacementPrompt = new TextPrompt()
                 {
-                    DisplayText = "Extra retoc command line parameters:",
+                    DisplayText = UAGConfig.GetString("FileContainerForm.Prompt.SetExtraRetocParameters"),
                     Text = this.Text,
                     AllowEmptyText = true
                 };
@@ -1086,14 +1086,14 @@ namespace UAssetGUI
 
             if (Pointer.IsFile)
             {
-                tsmItem = new ToolStripMenuItem("Open");
+                tsmItem = new ToolStripMenuItem(UAGConfig.GetString("FileContainerForm.ContextMenu.Open"));
                 tsmItem.Click += (sender, args) => Pointer.OpenFile();
                 this.ContextMenuStrip.Items.Add(tsmItem);
             }
 
             if (Pointer.FixedPathOnDisk == null)
             {
-                tsmItem = new ToolStripMenuItem("Extract");
+                tsmItem = new ToolStripMenuItem(UAGConfig.GetString("FileContainerForm.ContextMenu.Extract"));
                 tsmItem.Click += (sender, args) =>
                 {
                     string outPath = UAGConfig.ExtractFile(Pointer, item.ParentForm.InteropType);
@@ -1102,17 +1102,17 @@ namespace UAssetGUI
                     UAGUtils.OpenDirectory(outPath);
                 };
                 this.ContextMenuStrip.Items.Add(tsmItem);
-                tsmItem = new ToolStripMenuItem("Stage");
+                tsmItem = new ToolStripMenuItem(UAGConfig.GetString("FileContainerForm.ContextMenu.Stage"));
                 tsmItem.Click += (sender, args) => Pointer.StageFile();
                 this.ContextMenuStrip.Items.Add(tsmItem);
-                tsmItem = new ToolStripMenuItem("Stage to path...");
+                tsmItem = new ToolStripMenuItem(UAGConfig.GetString("FileContainerForm.ContextMenu.StageToPath"));
                 tsmItem.Click += (sender, args) => Pointer.StageFileToPath();
                 this.ContextMenuStrip.Items.Add(tsmItem);
             }
 
             if (Pointer.FixedPathOnDisk != null)
             {
-                tsmItem = new ToolStripMenuItem("Delete");
+                tsmItem = new ToolStripMenuItem(UAGConfig.GetString("FileContainerForm.ContextMenu.Delete"));
                 tsmItem.Click += (sender, args) => Pointer.DeleteFile();
                 this.ContextMenuStrip.Items.Add(tsmItem);
             }

@@ -23,6 +23,8 @@ namespace UAssetGUI
         {
             if (this.Owner is Form1) BaseForm = (Form1)this.Owner;
 
+            _readyToUpdateTheme = false;
+
             customSerializationFlagsBox.BeginUpdate();
             customSerializationFlagsBox.Items.Clear();
             List<CustomSerializationFlags> allFlags = Enum.GetValues(typeof(CustomSerializationFlags)).Cast<CustomSerializationFlags>().ToList();
@@ -39,6 +41,7 @@ namespace UAssetGUI
 
             themeComboBox.DataSource = new string[2] { UAGConfig.GetString("Settings.Theme.Light"), UAGConfig.GetString("Settings.Theme.Dark") };
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
+
             valuesOnScroll.Checked = UAGConfig.Data.ChangeValuesOnScroll;
             doubleClickToEdit.Checked = UAGConfig.Data.DoubleClickToEdit;
             enableDiscordRpc.Checked = UAGConfig.Data.EnableDiscordRPC;
@@ -55,17 +58,24 @@ namespace UAssetGUI
             if (string.IsNullOrEmpty(UAGConfig.Data.GameSpecificOverride)) UAGConfig.Data.GameSpecificOverride = GameSpecificOverride.None.ToString();
             Enum.TryParse(UAGConfig.Data.GameSpecificOverride.ToString(), out GameSpecificOverride currentOverride);
 
+            string lang = UAGConfig.Data.Language;
+            languageComboBox.DataSource = UAGConfig.GetLanguageNames();
+            languageComboBox.SelectedIndex = UAGConfig.GetLanguageCodes().ToList().IndexOf(lang);
+
             gameOverrideBox.DataSource = Enum.GetValues(typeof(GameSpecificOverride));
             gameOverrideBox.SelectedIndex = (int)currentOverride;
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
+
             _readyToUpdateTheme = true;
         }
 
         public void Localize()
         {
+            infoLabel.Text = UAGConfig.GetString("Settings.Header");
             themeLabel.Text = UAGConfig.GetString("Settings.Theme");
+            languageLabel.Text = UAGConfig.GetString("Settings.Language");
             favoriteThingLabel.Text = UAGConfig.GetString("Settings.FavoriteThing");
             zoomLabel.Text = UAGConfig.GetString("Settings.Zoom");
             flagsLabel.Text = UAGConfig.GetString("Settings.Flags");
@@ -82,7 +92,33 @@ namespace UAssetGUI
             allowUntrustedScriptsBox.Text = UAGConfig.GetString("Settings.AllowUntrustedScripts");
             aboutButton.Text = UAGConfig.GetString("Settings.Button.About");
             closeButton.Text = UAGConfig.GetString("Generic.Button.Close");
-            // TODO move labels as needed for text length!
+
+            MoveLabels();
+
+            // update theme names
+            _readyToUpdateTheme = false;
+            themeComboBox.DataSource = new string[2] { UAGConfig.GetString("Settings.Theme.Light"), UAGConfig.GetString("Settings.Theme.Dark") };
+            themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
+            _readyToUpdateTheme = true;
+        }
+
+        private void MoveLabel(Label lbl, Control controlToRight, Graphics g)
+        {
+            int textWidth = (int)g.MeasureString(lbl.Text, lbl.Font).Width;
+            lbl.Location = new Point(controlToRight.Location.X - textWidth - 10, lbl.Location.Y);
+        }
+
+        private void MoveLabels()
+        {
+            using (Graphics g = themeLabel.CreateGraphics())
+            {
+                MoveLabel(themeLabel, themeComboBox, g);
+                MoveLabel(languageLabel, languageComboBox, g);
+                MoveLabel(favoriteThingLabel, favoriteThingBox, g);
+                MoveLabel(zoomLabel, numericUpDown1, g);
+                MoveLabel(flagsLabel, customSerializationFlagsBox, g);
+                MoveLabel(gameOverrideLabel, gameOverrideBox, g);
+            }
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -109,8 +145,8 @@ namespace UAssetGUI
             if (!_readyToUpdateTheme) return;
             UAGTheme nextTheme = (UAGTheme)themeComboBox.SelectedIndex;
             UAGPalette.SetCurrentTheme(nextTheme);
-            UAGPalette.RefreshTheme(BaseForm);
-            UAGPalette.RefreshTheme(this);
+            UAGPalette.RefreshTheme(BaseForm, false);
+            UAGPalette.RefreshTheme(this, false);
         }
 
         private void valuesOnScroll_CheckedChanged(object sender, EventArgs e)
@@ -303,6 +339,25 @@ namespace UAssetGUI
         private void gameOverrideBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             UAGConfig.Data.GameSpecificOverride = gameOverrideBox.SelectedValue.ToString();
+        }
+
+        private void languageComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_readyToUpdateTheme) return;
+
+            bool wasSuccessful = UAGConfig.SetLanguage(UAGConfig.GetLanguageCodes()[UAGConfig.GetLanguageNames().ToList().IndexOf(languageComboBox.SelectedValue.ToString())]);
+            if (!wasSuccessful) return;
+
+            UAGUtils.InvokeUI(() =>
+            {
+                foreach (var form in Application.OpenForms)
+                {
+                    if (form is ILocalizable localizable)
+                    {
+                        localizable.Localize();
+                    }
+                }
+            });
         }
     }
 }

@@ -289,6 +289,8 @@ namespace UAssetGUI
 
         private void RefreshTreeViewInner(TreeView treeView, bool flatView)
         {
+            if (treeView == null || !DirectoryTreeMap.ContainsKey(treeView)) return;
+
             treeView.SuspendLayout();
 
             // get existing expanded nodes

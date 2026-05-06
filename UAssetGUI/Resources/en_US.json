@@ -22,6 +22,7 @@
   "Node.TableInfo": "Table Info ({0})",
   "Node.EnumData": "Enum Data",
   "Node.ExtraData": "Extra Data ({0} B)",
+  "Node.ExportWithNumber": "Export {0} ({1})",
   "Generic.Button.Import": "Import",
   "Generic.Button.Export": "Export",
   "Generic.Button.SetToNull": "Set to null...",

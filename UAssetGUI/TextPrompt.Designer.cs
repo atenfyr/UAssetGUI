@@ -30,85 +30,85 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
-            this.mainLabel = new System.Windows.Forms.Label();
-            this.gamePathBox = new System.Windows.Forms.TextBox();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this.okButton = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            mainLabel = new Label();
+            gamePathBox = new TextBox();
+            cancelButton = new Button();
+            okButton = new Button();
+            SuspendLayout();
             // 
             // mainLabel
             // 
-            this.mainLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.mainLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.mainLabel.Location = new System.Drawing.Point(12, 13);
-            this.mainLabel.Name = "mainLabel";
-            this.mainLabel.Size = new System.Drawing.Size(361, 20);
-            this.mainLabel.TabIndex = 4;
-            this.mainLabel.Text = "Select your game installation directory:";
-            this.mainLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            mainLabel.Anchor = AnchorStyles.Top;
+            mainLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            mainLabel.Location = new System.Drawing.Point(12, 13);
+            mainLabel.Name = "mainLabel";
+            mainLabel.Size = new System.Drawing.Size(361, 44);
+            mainLabel.TabIndex = 4;
+            mainLabel.Text = "Select your game installation directory:";
+            mainLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // gamePathBox
             // 
-            this.gamePathBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.gamePathBox.Location = new System.Drawing.Point(12, 47);
-            this.gamePathBox.Name = "gamePathBox";
-            this.gamePathBox.Size = new System.Drawing.Size(361, 20);
-            this.gamePathBox.TabIndex = 0;
-            this.gamePathBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextPrompt_KeyDown);
+            gamePathBox.Anchor = AnchorStyles.Left;
+            gamePathBox.Location = new System.Drawing.Point(12, 66);
+            gamePathBox.Name = "gamePathBox";
+            gamePathBox.Size = new System.Drawing.Size(361, 23);
+            gamePathBox.TabIndex = 0;
+            gamePathBox.KeyDown += TextPrompt_KeyDown;
             // 
             // cancelButton
             // 
-            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.cancelButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.cancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cancelButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cancelButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.cancelButton.Location = new System.Drawing.Point(70, 79);
-            this.cancelButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(67, 26);
-            this.cancelButton.TabIndex = 3;
-            this.cancelButton.Text = "Cancel";
-            this.cancelButton.UseVisualStyleBackColor = false;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            cancelButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            cancelButton.BackColor = System.Drawing.Color.FromArgb(51, 51, 51);
+            cancelButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            cancelButton.FlatStyle = FlatStyle.Flat;
+            cancelButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            cancelButton.ForeColor = System.Drawing.Color.FromArgb(225, 225, 225);
+            cancelButton.Location = new System.Drawing.Point(70, 95);
+            cancelButton.MinimumSize = new System.Drawing.Size(0, 26);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new System.Drawing.Size(67, 26);
+            cancelButton.TabIndex = 3;
+            cancelButton.Text = "Cancel";
+            cancelButton.UseVisualStyleBackColor = false;
+            cancelButton.Click += cancelButton_Click;
             // 
             // okButton
             // 
-            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.okButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
-            this.okButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.okButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.okButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.okButton.Location = new System.Drawing.Point(15, 79);
-            this.okButton.MinimumSize = new System.Drawing.Size(0, 26);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(49, 26);
-            this.okButton.TabIndex = 2;
-            this.okButton.Text = "OK";
-            this.okButton.UseVisualStyleBackColor = false;
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            okButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            okButton.BackColor = System.Drawing.Color.FromArgb(51, 51, 51);
+            okButton.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            okButton.FlatStyle = FlatStyle.Flat;
+            okButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            okButton.ForeColor = System.Drawing.Color.FromArgb(225, 225, 225);
+            okButton.Location = new System.Drawing.Point(15, 95);
+            okButton.MinimumSize = new System.Drawing.Size(0, 26);
+            okButton.Name = "okButton";
+            okButton.Size = new System.Drawing.Size(49, 26);
+            okButton.TabIndex = 2;
+            okButton.Text = "OK";
+            okButton.UseVisualStyleBackColor = false;
+            okButton.Click += okButton_Click;
             // 
             // TextPrompt
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(42)))), ((int)(((byte)(45)))));
-            this.ClientSize = new System.Drawing.Size(385, 114);
-            this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.okButton);
-            this.Controls.Add(this.gamePathBox);
-            this.Controls.Add(this.mainLabel);
-            this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(225)))), ((int)(((byte)(225)))), ((int)(((byte)(225)))));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.Name = "TextPrompt";
-            this.Text = "InitialPathPrompt";
-            this.Load += new System.EventHandler(this.InitialPathPrompt_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextPrompt_KeyDown);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            BackColor = System.Drawing.Color.FromArgb(40, 42, 45);
+            ClientSize = new System.Drawing.Size(385, 130);
+            Controls.Add(cancelButton);
+            Controls.Add(okButton);
+            Controls.Add(gamePathBox);
+            Controls.Add(mainLabel);
+            ForeColor = System.Drawing.Color.FromArgb(225, 225, 225);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            Name = "TextPrompt";
+            Text = "InitialPathPrompt";
+            Load += InitialPathPrompt_Load;
+            KeyDown += TextPrompt_KeyDown;
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

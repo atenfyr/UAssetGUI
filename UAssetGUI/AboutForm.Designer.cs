@@ -29,79 +29,84 @@ namespace UAssetGUI
         /// </summary>
         private void InitializeComponent()
         {
-            this.closeButton = new System.Windows.Forms.Button();
-            this.licenseButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.noticeButton = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            closeButton = new System.Windows.Forms.Button();
+            licenseButton = new System.Windows.Forms.Button();
+            label1 = new System.Windows.Forms.Label();
+            noticeButton = new System.Windows.Forms.Button();
+            SuspendLayout();
             // 
             // closeButton
             // 
-            this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
-            this.closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.closeButton.Location = new System.Drawing.Point(320, 274);
-            this.closeButton.Name = "closeButton";
-            this.closeButton.Size = new System.Drawing.Size(75, 26);
-            this.closeButton.TabIndex = 4;
-            this.closeButton.Text = "Close";
-            this.closeButton.UseVisualStyleBackColor = true;
-            this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
+            closeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            closeButton.Location = new System.Drawing.Point(437, 316);
+            closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            closeButton.Name = "closeButton";
+            closeButton.Size = new System.Drawing.Size(88, 30);
+            closeButton.TabIndex = 4;
+            closeButton.Text = "Close";
+            closeButton.UseVisualStyleBackColor = true;
+            closeButton.Click += closeButton_Click;
             // 
             // licenseButton
             // 
-            this.licenseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.licenseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.licenseButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
-            this.licenseButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.licenseButton.Location = new System.Drawing.Point(12, 274);
-            this.licenseButton.Name = "licenseButton";
-            this.licenseButton.Size = new System.Drawing.Size(103, 26);
-            this.licenseButton.TabIndex = 2;
-            this.licenseButton.Text = "View license...";
-            this.licenseButton.UseVisualStyleBackColor = true;
-            this.licenseButton.Click += new System.EventHandler(this.licenseButton_Click);
+            licenseButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            licenseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            licenseButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            licenseButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            licenseButton.Location = new System.Drawing.Point(14, 316);
+            licenseButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            licenseButton.Name = "licenseButton";
+            licenseButton.Size = new System.Drawing.Size(120, 30);
+            licenseButton.TabIndex = 2;
+            licenseButton.Text = "View license...";
+            licenseButton.UseVisualStyleBackColor = true;
+            licenseButton.Click += licenseButton_Click;
             // 
             // label1
             // 
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(407, 271);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "AboutText should be overridden before displaying this form";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            label1.Dock = System.Windows.Forms.DockStyle.Top;
+            label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            label1.Location = new System.Drawing.Point(0, 0);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(539, 313);
+            label1.TabIndex = 1;
+            label1.Text = "AboutText should be overridden before displaying this form";
+            label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // noticeButton
             // 
-            this.noticeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.noticeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.noticeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
-            this.noticeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.noticeButton.Location = new System.Drawing.Point(121, 274);
-            this.noticeButton.Name = "noticeButton";
-            this.noticeButton.Size = new System.Drawing.Size(161, 26);
-            this.noticeButton.TabIndex = 3;
-            this.noticeButton.Text = "View 3rd-party software...";
-            this.noticeButton.UseVisualStyleBackColor = true;
-            this.noticeButton.Click += new System.EventHandler(this.noticeButton_Click);
+            noticeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            noticeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            noticeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            noticeButton.ForeColor = System.Drawing.SystemColors.ControlText;
+            noticeButton.Location = new System.Drawing.Point(141, 316);
+            noticeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            noticeButton.Name = "noticeButton";
+            noticeButton.Size = new System.Drawing.Size(217, 30);
+            noticeButton.TabIndex = 3;
+            noticeButton.Text = "View 3rd-party software...";
+            noticeButton.UseVisualStyleBackColor = true;
+            noticeButton.Click += noticeButton_Click;
             // 
             // AboutForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(407, 312);
-            this.Controls.Add(this.noticeButton);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.licenseButton);
-            this.Controls.Add(this.closeButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "AboutForm";
-            this.Text = "About";
-            this.Load += new System.EventHandler(this.AboutForm_Load);
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(539, 360);
+            Controls.Add(noticeButton);
+            Controls.Add(label1);
+            Controls.Add(licenseButton);
+            Controls.Add(closeButton);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "AboutForm";
+            Text = "About";
+            Load += AboutForm_Load;
+            ResumeLayout(false);
 
         }
 

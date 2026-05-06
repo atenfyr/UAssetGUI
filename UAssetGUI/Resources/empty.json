@@ -22,6 +22,7 @@
   "Node.TableInfo": "",
   "Node.EnumData": "",
   "Node.ExtraData": "",
+  "Node.ExportWithNumber": "",
   "Generic.Button.Import": "",
   "Generic.Button.Export": "",
   "Generic.Button.SetToNull": "",
@@ -164,5 +165,5 @@
   "About.Button.ThirdPartySoftware": "",
   "About.WindowName.License": "",
   "About.WindowName.ThirdPartySoftware": "",
-  "About.Text": "BLAH\n"
+  "About.Text": ""
 }

@@ -105,7 +105,7 @@ namespace UAssetGUI
         private void MoveLabel(Label lbl, Control controlToRight, Graphics g)
         {
             int textWidth = (int)g.MeasureString(lbl.Text, lbl.Font).Width;
-            lbl.Location = new Point(controlToRight.Location.X - textWidth - 10, lbl.Location.Y);
+            lbl.Location = new Point(controlToRight.Location.X - textWidth - 10, controlToRight.Location.Y + controlToRight.Height / 2 - lbl.Height / 2);
         }
 
         private void MoveLabels()

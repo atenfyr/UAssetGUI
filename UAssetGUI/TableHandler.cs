@@ -103,7 +103,7 @@ namespace UAssetGUI
         public string ObjectName;
 
         public ExportPointingTreeNode(string objectName, object pointer, PointingTreeNodeType type = 0, int exportNum = -1, bool willCopyWholeExport = false)
-            : base("Export " + (exportNum + 1) + " (" + objectName + ")", pointer, type, exportNum, willCopyWholeExport)
+            : base(string.Format(UAGConfig.GetString("Node.ExportWithNumber"), exportNum + 1, objectName), pointer, type, exportNum, willCopyWholeExport)
         {
             ObjectName = objectName;
         }

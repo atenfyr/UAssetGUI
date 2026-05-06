@@ -76,10 +76,10 @@
             closeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             closeButton.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             closeButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            closeButton.Location = new System.Drawing.Point(368, 409);
+            closeButton.Location = new System.Drawing.Point(347, 409);
             closeButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             closeButton.Name = "closeButton";
-            closeButton.Size = new System.Drawing.Size(88, 30);
+            closeButton.Size = new System.Drawing.Size(109, 30);
             closeButton.TabIndex = 4;
             closeButton.Text = "Close";
             closeButton.UseVisualStyleBackColor = true;
@@ -116,7 +116,7 @@
             aboutButton.Location = new System.Drawing.Point(14, 409);
             aboutButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             aboutButton.Name = "aboutButton";
-            aboutButton.Size = new System.Drawing.Size(88, 30);
+            aboutButton.Size = new System.Drawing.Size(110, 30);
             aboutButton.TabIndex = 7;
             aboutButton.Text = "About...";
             aboutButton.UseVisualStyleBackColor = true;

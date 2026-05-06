@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace UAssetGUI
 {
-    public partial class FindForm : Form
+    public partial class FindForm : Form, ILocalizable
     {
         public string SearchTerm = string.Empty;
         public bool UseRegex = false;
@@ -32,6 +32,20 @@ namespace UAssetGUI
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
+        }
+
+        public void Localize()
+        {
+            this.Text = UAGConfig.GetString("FindForm.WindowName");
+            this.searchForLabel.Text = UAGConfig.GetString("FindForm.SearchFor");
+            this.optionsGroupBox.Text = UAGConfig.GetString("FindForm.Options");
+            this.caseSensitiveCheckBox.Text = UAGConfig.GetString("FindForm.Options.CaseSensitive");
+            this.useRegexCheckBox.Text = UAGConfig.GetString("FindForm.Options.UseRegex");
+            this.searchDirectionGroupBox.Text = UAGConfig.GetString("FindForm.SearchDirection");
+            this.searchDirForwardButton.Text = UAGConfig.GetString("FindForm.SearchDirection.Forward");
+            this.searchDirBackwardButton.Text = UAGConfig.GetString("FindForm.SearchDirection.Backward");
+            this.nextButton.Text = UAGConfig.GetString("FindForm.Button.Next");
+            this.closeButton.Text = UAGConfig.GetString("Generic.Button.Close");
         }
 
         private void SyncSettings()
@@ -100,7 +114,7 @@ namespace UAssetGUI
                     if (cancelToken.IsCancellationRequested)
                     {
                         foundSomething = false; wasCanceled = true;
-                        MessageBox.Show("Operation canceled.");
+                        MessageBox.Show(UAGConfig.GetString("Generic.Prompt.OperationCanceled"));
                         break;
                     }
 
@@ -185,7 +199,7 @@ namespace UAssetGUI
                     {
                         BaseForm.treeView1.SelectedNode = originalNode;
                         BaseForm.UpdateModeFromSelectedNode(originalNode);
-                        if (!wasCanceled) MessageBox.Show("0 results found.");
+                        if (!wasCanceled) MessageBox.Show(string.Format(UAGConfig.GetString("Generic.Prompt.ResultsFound"), 0));
                     }
                 });
             }

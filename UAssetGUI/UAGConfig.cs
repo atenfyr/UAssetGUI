@@ -217,7 +217,7 @@ namespace UAssetGUI
             return false;
         }
         
-        public static void RefreshAllScriptIDs()
+        public static void RefreshAllScriptIDs(bool refreshTheme = true)
         {
             Directory.CreateDirectory(ScriptsFolder);
             AllScriptIDs = Directory.GetFiles(ScriptsFolder, "*.cs", SearchOption.TopDirectoryOnly).Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
@@ -288,7 +288,7 @@ namespace UAssetGUI
                         form1.executeScriptToolStripMenuItem.Enabled = UAGConfig.Data.AllowUntrustedScripts;
                         form1.editScriptToolStripMenuItem.Enabled = UAGConfig.Data.AllowUntrustedScripts;
 
-                        UAGPalette.RefreshTheme(form1);
+                        if (refreshTheme) UAGPalette.RefreshTheme(form1);
                     }
                 }
             });

@@ -479,8 +479,14 @@ namespace UAssetGUI
             });
         }
 
+        private string _lastCode = null;
         public void Localize()
         {
+            if (UAGConfig.Data.Language == _lastCode)
+            {
+                return;
+            }
+
             fileToolStripMenuItem.Text = UAGConfig.GetString("Menu.File");
             openToolStripMenuItem.Text = UAGConfig.GetString("Menu.File.Open");
             openContainersToolStripMenuItem.Text = UAGConfig.GetString("Menu.File.OpenContainers");
@@ -516,6 +522,11 @@ namespace UAssetGUI
 
             if (allMappingsKeys != null && allMappingsKeys.Count >= 1) allMappingsKeys[0] = UAGConfig.GetString("Generic.NoMappings");
             if (comboSpecifyMappings != null && comboSpecifyMappings.Items != null && comboSpecifyMappings.Items.Count >= 1) comboSpecifyMappings.Items[0] = UAGConfig.GetString("Generic.NoMappings");
+
+            RecalculateNodes();
+            UAGConfig.RefreshAllScriptIDs(false); // false to avoid infinite loop
+
+            _lastCode = UAGConfig.Data.Language;
         }
 
         private ISet<string> unknownTypes = new HashSet<string>();
@@ -1846,6 +1857,11 @@ namespace UAssetGUI
         }
 
         private void refreshFullToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RecalculateNodes();
+        }
+
+        private void RecalculateNodes()
         {
             if (tableEditor != null)
             {

@@ -83,7 +83,7 @@ namespace UAssetGUI
             }
             else
             {
-                row.Cells[column].Value = objData.IsExport() ? "Jump" : (objData.IsImport() ? objData.ToImport(asset)?.ObjectName?.ToString() : string.Empty);
+                row.Cells[column].Value = objData.IsExport() ? UAGConfig.GetString("Table.Generic.Jump") : (objData.IsImport() ? objData.ToImport(asset)?.ObjectName?.ToString() : string.Empty);
                 row.Cells[column].Tag = "CategoryJump";
                 if (objData.IsExport()) underlineStyle = true;
             }

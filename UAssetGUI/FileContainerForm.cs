@@ -996,7 +996,7 @@ namespace UAssetGUI
             {
                 if (e.Cancelled)
                 {
-                    MessageBox.Show(UAGConfig.GetString("FileContainerForm.Prompt.ExtractCancel"), BaseForm.DisplayVersion);
+                    MessageBox.Show(UAGConfig.GetString("Generic.Prompt.OperationCanceled"), BaseForm.DisplayVersion);
                 }
                 else if (e.Error != null)
                 {

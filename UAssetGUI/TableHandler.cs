@@ -179,8 +179,8 @@ namespace UAssetGUI
 
                         foreach (var entry in mapp.Value)
                         {
-                            entry.Key.Name = FName.DefineDummy(asset, "Key");
-                            entry.Value.Name = FName.DefineDummy(asset, "Value");
+                            entry.Key.Name = FName.DefineDummy(asset, UAGConfig.GetString("Table.Generic.Key"));
+                            entry.Value.Name = FName.DefineDummy(asset, UAGConfig.GetString("Table.Generic.Value"));
 
                             var softEntryNode = new PointingTreeNode(mapp.Name.Value.Value + " (2)", new PointingDictionaryEntry(entry, mapp), 0, topNode.ExportNum);
                             topNode.Nodes.Add(softEntryNode);
@@ -463,8 +463,8 @@ namespace UAssetGUI
 
                     foreach (var entry in mapp.Value)
                     {
-                        entry.Key.Name = FName.DefineDummy(asset, "Key");
-                        entry.Value.Name = FName.DefineDummy(asset, "Value");
+                        entry.Key.Name = FName.DefineDummy(asset, UAGConfig.GetString("Table.Generic.Key"));
+                        entry.Value.Name = FName.DefineDummy(asset, UAGConfig.GetString("Table.Generic.Value"));
 
                         var softEntryNode = new PointingTreeNode(mapp.Name.Value.Value + " (2)", new PointingDictionaryEntry(entry, mapp), 0, exportNum);
                         mapNode.Nodes.Add(softEntryNode);
@@ -529,7 +529,7 @@ namespace UAssetGUI
                     if (thisPD is UnknownPropertyData)
                     {
                         row.Cells[columnIndexer].Value = ((UnknownPropertyData)thisPD).SerializingPropertyType.ToString();
-                        row.Cells[++columnIndexer].Value = "Unknown ser.";
+                        row.Cells[++columnIndexer].Value = "Unknown ser."; // do not localize
                         row.Cells[++columnIndexer].Value = ((UnknownPropertyData)thisPD).Value.ConvertByteArrayToString();
                     }
                     else
@@ -1256,7 +1256,7 @@ namespace UAssetGUI
             switch (mode)
             {
                 case TableHandlerMode.GeneralInformation:
-                    AddColumns(new string[] { "Property Name", "Value", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Value"), "" });
 
                     dataGridView1.Rows.Add(new object[] { "LegacyFileVersion", asset.LegacyFileVersion.ToString() });
                     dataGridView1.Rows.Add(new object[] { "IsUnversioned", asset.IsUnversioned.ToString() });
@@ -1284,7 +1284,7 @@ namespace UAssetGUI
                 case TableHandlerMode.NameMap:
                     if (asset.GetCustomVersion<FReleaseObjectVersion>() < FReleaseObjectVersion.PropertiesSerializeRepCondition)
                     {
-                        AddColumns(new string[] { "Name", "Case Preserving?", "Encoding", "" });
+                        AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.NameMap.CasePreserving"), UAGConfig.GetString("Table.Generic.Encoding"), "" });
 
                         IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
                         for (int num = 0; num < headerIndexList.Count; num++)
@@ -1295,7 +1295,7 @@ namespace UAssetGUI
                     }
                     else
                     {
-                        AddColumns(new string[] { "Name", "Encoding", "" });
+                        AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Encoding"), "" });
 
                         IReadOnlyList<FString> headerIndexList = asset.GetNameMapIndexList();
                         for (int num = 0; num < headerIndexList.Count; num++)
@@ -1307,7 +1307,7 @@ namespace UAssetGUI
                     //((Form1)dataGridView1.Parent).CurrentDataGridViewStrip = ((Form1)dataGridView1.Parent).nameMapContext;
                     break;
                 case TableHandlerMode.SoftObjectPathList:
-                    AddColumns(new string[] { "PackageName", "AssetName", "SubPathString", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.SoftObjectPathList.PackageName"), UAGConfig.GetString("Table.SoftObjectPathList.AssetName"), UAGConfig.GetString("Table.SoftObjectPathList.SubPathString"), "" });
 
                     for (int num = 0; num < asset.SoftObjectPathList.Count; num++)
                     {
@@ -1319,7 +1319,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.Imports:
-                    AddColumns(new string[] { "ClassPackage", "ClassName", "OuterIndex", "ObjectName", "bImportOptional", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.Imports.ClassPackage"), UAGConfig.GetString("Table.Imports.ClassName"), UAGConfig.GetString("Table.Imports.OuterIndex"), UAGConfig.GetString("Table.Imports.ObjectName"), UAGConfig.GetString("Table.Imports.bImportOptional"), "" });
 
                     for (int num = 0; num < asset.Imports.Count; num++)
                     {
@@ -1385,7 +1385,7 @@ namespace UAssetGUI
 
                     break;
                 case TableHandlerMode.DependsMap:
-                    AddColumns(new string[] { "Export Index", "Value", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.DependsMap.ExportIndex"), UAGConfig.GetString("Table.Generic.Value"), "" });
 
                     if (asset.DependsMap == null) break;
                     for (int num = 0; num < asset.DependsMap.Count; num++)
@@ -1397,7 +1397,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.SoftPackageReferences:
-                    AddColumns(new string[] { "Value", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Value"), "" });
 
                     if (asset.SoftPackageReferenceList == null) break;
                     for (int num = 0; num < asset.SoftPackageReferenceList.Count; num++)
@@ -1406,7 +1406,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.WorldTileInfo:
-                    AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Value"), UAGConfig.GetString("Table.Generic.Value2"), UAGConfig.GetString("Table.Generic.Value3"), "" });
 
                     if (treeView1.SelectedNode is PointingTreeNode wtlPointerNode)
                     {
@@ -1449,7 +1449,7 @@ namespace UAssetGUI
                     dataGridView1.ReadOnly = true;
                     break;
                 case TableHandlerMode.DataResources:
-                    AddColumns(new string[] { "Index", "Flags", "SerialOffset", "DuplicateSerialOffset", "SerialSize", "RawSize", "OuterIndex", "LegacyBulkDataFlags", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.DataResources.Index"), UAGConfig.GetString("Table.Generic.Flags"), UAGConfig.GetString("Table.Generic.SerialOffset"), UAGConfig.GetString("Table.DataResources.DuplicateSerialOffset"), UAGConfig.GetString("Table.Generic.SerialSize"), UAGConfig.GetString("Table.DataResources.RawSize"), UAGConfig.GetString("Table.Imports.OuterIndex"), UAGConfig.GetString("Table.DataResources.LegacyBulkDataFlags"), "" });
 
                     if (asset.DataResources == null) break;
                     for (int num = 0; num < asset.DataResources.Count; num++)
@@ -1459,7 +1459,7 @@ namespace UAssetGUI
                     }
                     break;
                 case TableHandlerMode.CustomVersionContainer:
-                    AddColumns(new string[] { "Name", "Version", "" });
+                    AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Version"), "" });
 
                     if (asset.CustomVersionContainer == null) break;
                     for (int num = 0; num < asset.CustomVersionContainer.Count; num++)
@@ -1470,7 +1470,7 @@ namespace UAssetGUI
                 case TableHandlerMode.ExportData:
                     if (treeView1.SelectedNode is PointingTreeNode pointerNode)
                     {
-                        AddColumns(new string[] { "Name", "Type", "Variant", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "ArrayIndex", "Serial Offset", "Is Zero", "" });
+                        AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Type"), UAGConfig.GetString("Table.Generic.Variant"), UAGConfig.GetString("Table.Generic.Value"), UAGConfig.GetString("Table.Generic.Value2"), UAGConfig.GetString("Table.Generic.Value3"), UAGConfig.GetString("Table.Generic.Value4"), UAGConfig.GetString("Table.Generic.Value5"), UAGConfig.GetString("Table.Generic.ArrayIndex"), UAGConfig.GetString("Table.Generic.SerialOffset"), UAGConfig.GetString("Table.Generic.IsZero"), "" });
                         bool standardRendering = true;
                         PropertyData[] renderingArr = null;
 
@@ -1552,7 +1552,7 @@ namespace UAssetGUI
                                             break;
                                         case PointingTreeNodeType.StructData:
                                             dataGridView1.Columns.Clear();
-                                            AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
+                                            AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Value"), UAGConfig.GetString("Table.Generic.Value2"), UAGConfig.GetString("Table.Generic.Value3"), UAGConfig.GetString("Table.Generic.Value4"), UAGConfig.GetString("Table.Generic.Value5"), "" });
 
                                             StructExport strucCat = (StructExport)usCategory;
                                             List<DataGridViewRow> rows = new List<DataGridViewRow>();
@@ -1641,7 +1641,7 @@ namespace UAssetGUI
                                             break;
                                         case PointingTreeNodeType.ClassData:
                                             dataGridView1.Columns.Clear();
-                                            AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
+                                            AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Value"), UAGConfig.GetString("Table.Generic.Value2"), UAGConfig.GetString("Table.Generic.Value3"), UAGConfig.GetString("Table.Generic.Value4"), UAGConfig.GetString("Table.Generic.Value5"), "" });
 
                                             ClassExport bgcCat = (ClassExport)usCategory;
                                             List<DataGridViewRow> classRows = new List<DataGridViewRow>();
@@ -1686,7 +1686,7 @@ namespace UAssetGUI
                                                 row.CreateCells(dataGridView1);
                                                 row.Cells[0].Value = "ClassDefaultObject";
                                                 row.Cells[2].Value = bgcCat.ClassDefaultObject;
-                                                row.Cells[3].Value = "Jump";
+                                                row.Cells[3].Value = UAGConfig.GetString("Table.Generic.Jump");
                                                 row.Cells[3].Tag = "CategoryJump";
                                                 DataGridViewCellStyle sty = new DataGridViewCellStyle();
                                                 Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
@@ -1714,7 +1714,7 @@ namespace UAssetGUI
                                                 row.Cells[2].Value = bgcCat.FuncMap[i].Index;
                                                 if (bgcCat.FuncMap[i].Index != 0)
                                                 {
-                                                    row.Cells[3].Value = "Jump";
+                                                    row.Cells[3].Value = UAGConfig.GetString("Table.Generic.Jump");
                                                     row.Cells[3].Tag = "CategoryJump";
                                                     DataGridViewCellStyle sty = new DataGridViewCellStyle();
                                                     Font styFont = new Font(dataGridView1.Font.Name, UAGPalette.RecommendedFontSize, FontStyle.Underline);
@@ -1742,7 +1742,7 @@ namespace UAssetGUI
                                             break;
                                         case PointingTreeNodeType.EnumData:
                                             dataGridView1.Columns.Clear();
-                                            AddColumns(new string[] { "Name", "Value", "" });
+                                            AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Value"), "" });
 
                                             EnumExport enumCat = (EnumExport)usCategory;
                                             List<DataGridViewRow> enumRows = new List<DataGridViewRow>();
@@ -1770,7 +1770,7 @@ namespace UAssetGUI
                                             break;
                                         case PointingTreeNodeType.UPropertyData:
                                             dataGridView1.Columns.Clear();
-                                            AddColumns(new string[] { "Property Name", "Value", "Value 2", "Value 3", "Value 4", "Value 5", "" });
+                                            AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Name"), UAGConfig.GetString("Table.Generic.Value"), UAGConfig.GetString("Table.Generic.Value2"), UAGConfig.GetString("Table.Generic.Value3"), UAGConfig.GetString("Table.Generic.Value4"), UAGConfig.GetString("Table.Generic.Value5"), "" });
 
                                             PropertyExport uPropData = (PropertyExport)usCategory;
                                             List<DataGridViewRow> uPropRows = new List<DataGridViewRow>();
@@ -1804,7 +1804,7 @@ namespace UAssetGUI
                                 case FStringTable strUs:
                                     {
                                         dataGridView1.Columns.Clear();
-                                        AddColumns(new string[] { "Key", "Encoding", "Source String", "Encoding", "" });
+                                        AddColumns(new string[] { UAGConfig.GetString("Table.Generic.Key"), UAGConfig.GetString("Table.Generic.Encoding"), UAGConfig.GetString("Table.StringTable.SourceString"), UAGConfig.GetString("Table.Generic.Encoding"), "" });
                                         List<DataGridViewRow> rows = new List<DataGridViewRow>();
                                         for (int i = 0; i < strUs.Count; i++)
                                         {
@@ -1849,7 +1849,7 @@ namespace UAssetGUI
                                                 row.Cells[1].Value = "MapEntry";
                                                 row.Cells[2].Value = string.Empty;
 
-                                                row.Cells[3].Value = "Jump";
+                                                row.Cells[3].Value = UAGConfig.GetString("Table.Generic.Jump");
                                                 row.Cells[3].Tag = "ChildJump";
 
                                                 DataGridViewCellStyle sty = new DataGridViewCellStyle();
@@ -1879,7 +1879,7 @@ namespace UAssetGUI
                                     break;
                                 case GameplayTagContainerPropertyData usArr2:
                                     dataGridView1.Columns.Clear();
-                                    AddColumns(new string[] { "Tag Name", "" });
+                                    AddColumns(new string[] { UAGConfig.GetString("Table.GameplayTagContainer.TagName"), "" });
                                     usArr2.Value = usArr2.Value.StripNullsFromArray();
                                     for (int i = 0; i < usArr2.Value.Length; i++)
                                     {
@@ -1992,8 +1992,8 @@ namespace UAssetGUI
                                     dataGridView1.AllowUserToAddRows = false;
                                     var ourKey = usDictEntry.Entry.Key;
                                     var ourValue = usDictEntry.Entry.Value;
-                                    if (ourKey != null) ourKey.Name = FName.DefineDummy(asset, "Key");
-                                    if (ourValue != null) ourValue.Name = FName.DefineDummy(asset, "Value");
+                                    if (ourKey != null) ourKey.Name = FName.DefineDummy(asset, UAGConfig.GetString("Table.Generic.Key"));
+                                    if (ourValue != null) ourValue.Name = FName.DefineDummy(asset, UAGConfig.GetString("Table.Generic.Value"));
                                     renderingArr = [ourKey, ourValue];
                                     break;
                                 case FDelegate[] usRealMDArr:
@@ -2119,7 +2119,7 @@ namespace UAssetGUI
                         }
                         string encoding = (string)row.Cells[r++].Value;
 
-                        if (string.IsNullOrWhiteSpace(encoding)) encoding = "ascii";
+                        if (string.IsNullOrWhiteSpace(encoding)) encoding = Encoding.Unicode.HeaderName;
                         if (!string.IsNullOrWhiteSpace(ourValue))
                         {
                             var finalStr = FString.FromString(ourValue, encoding.Equals(Encoding.Unicode.HeaderName) ? Encoding.Unicode : Encoding.UTF8);
@@ -2801,7 +2801,7 @@ namespace UAssetGUI
                                 count++;
                             }
                             dtUs.Data = newData;
-                            pointerNode.Text = "Table Info (" + count + ")";
+                            pointerNode.Text = string.Format(UAGConfig.GetString("Node.TableInfo"), count);
                             break;
                         }
                         else if (pointerNode.Pointer is ArrayPropertyData usArr)

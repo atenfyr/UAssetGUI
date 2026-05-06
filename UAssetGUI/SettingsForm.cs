@@ -96,10 +96,11 @@ namespace UAssetGUI
             MoveLabels();
 
             // update theme names
-            _readyToUpdateTheme = false;
+            bool needToDisableThemeUpdate = _readyToUpdateTheme;
+            if (needToDisableThemeUpdate) _readyToUpdateTheme = false;
             themeComboBox.DataSource = new string[2] { UAGConfig.GetString("Settings.Theme.Light"), UAGConfig.GetString("Settings.Theme.Dark") };
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
-            _readyToUpdateTheme = true;
+            if (needToDisableThemeUpdate) _readyToUpdateTheme = true;
         }
 
         private void MoveLabel(Label lbl, Control controlToRight, Graphics g)

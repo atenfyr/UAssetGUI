@@ -2424,8 +2424,6 @@ namespace UAssetGUI
                 }
 
                 bool success = true;
-                Stopwatch timer = new Stopwatch();
-                timer.Start();
                 try
                 {
                     Usmap.PatchUsmapWithVersion(patchPath, ParsingVersion);
@@ -2437,9 +2435,8 @@ namespace UAssetGUI
                 }
                 finally
                 {
-                    timer.Stop();
                     UpdateMappings();
-                    if (success) MessageBox.Show("Operation completed in " + timer.ElapsedMilliseconds + " ms.", this.Text);
+                    if (success) MessageBox.Show(UAGConfig.GetString("Generic.Prompt.OperationCompleted"), this.Text);
                 }
             });
         }

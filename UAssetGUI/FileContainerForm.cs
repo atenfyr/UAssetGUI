@@ -1004,7 +1004,7 @@ namespace UAssetGUI
                 }
                 else
                 {
-                    MessageBox.Show(progressBarForm == null ? UAGConfig.GetString("FileContainerForm.Prompt.ExtractDoneGeneric") : string.Format(UAGConfig.GetString("FileContainerForm.Prompt.ExtractDoneCount"), progressBarForm.Value), BaseForm.DisplayVersion);
+                    MessageBox.Show(progressBarForm == null ? UAGConfig.GetString("Generic.Prompt.OperationCompleted") : string.Format(UAGConfig.GetString("FileContainerForm.Prompt.ExtractDoneCount"), progressBarForm.Value), BaseForm.DisplayVersion);
                 }
                 progressBarForm?.Close();
             });

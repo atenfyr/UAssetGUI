@@ -72,7 +72,7 @@ namespace UAssetGUI
         public string FileName;
     }
 
-    public partial class FileContainerForm : Form
+    public partial class FileContainerForm : Form, ILocalizable
     {
         public IDictionary<TreeView, DirectoryTree> DirectoryTreeMap = new Dictionary<TreeView, DirectoryTree>();
         public string CurrentContainerPath;
@@ -138,6 +138,32 @@ namespace UAssetGUI
 
             LoadContainer(CurrentContainerPath);
             RefreshTreeView(saveTreeView);
+        }
+
+        public void Localize()
+        {
+            fileToolStripMenuItem.Text = UAGConfig.GetString("Menu.File");
+            loadToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.File.Open");
+            saveToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.File.Save");
+            stageFromDiskToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.File.StageFromDisk");
+            stageFromDiskToPathToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.File.StageFromDiskToPath");
+            editToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit");
+            cutToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.Edit.Cut");
+            copyToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.Edit.Copy");
+            pasteToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.Edit.Paste");
+            deleteToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.Edit.Delete");
+            viewToolStripMenuItem.Text = UAGConfig.GetString("Menu.View");
+            expandAllToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.View.ExpandAll");
+            collapseAllToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.View.CollapseAll");
+            toggleFlatViewToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.View.ToggleFlatView");
+            applyFilterToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.View.ApplyFilter");
+            refreshToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.View.Refresh");
+            utilsToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils");
+            extractAllToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.Utils.ExtractAll");
+            setRetocCommandLineParametersToolStripMenuItem.Text = UAGConfig.GetString("FileContainerForm.Menu.Utils.SetExtraRetocParameters");
+
+            loadButton.Text = UAGConfig.GetString("FileContainerForm.Button.Load");
+            saveButton.Text = UAGConfig.GetString("FileContainerForm.Button.Save");
         }
 
         private static volatile Dictionary<ToolStripItem, bool> isDropDownOpened = new Dictionary<ToolStripItem, bool>();
@@ -409,7 +435,7 @@ namespace UAssetGUI
             }
             catch (Exception ex)
             {
-                UAGUtils.InvokeUI(() => { MessageBox.Show("Failed to open file! " + ex.Message, "Uh oh!"); });
+                MessageBox.Show(string.Format(UAGConfig.GetString("Error.Generic"), ex.Message), BaseForm.DisplayVersion);
 
                 UnloadContainer();
             }
@@ -432,7 +458,7 @@ namespace UAssetGUI
             {
                 UAGUtils.InvokeUI(() =>
                 {
-                    MessageBox.Show("Failed to launch retoc:\n\n" + ex.Message + "\n" + ex.StackTrace, "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("FileContainerForm.Error.LaunchRetoc"), ex.Message + "\n" + ex.StackTrace), BaseForm.DisplayVersion);
                 });
                 return;
             }
@@ -441,7 +467,7 @@ namespace UAssetGUI
             {
                 UAGUtils.InvokeUI(() =>
                 {
-                    MessageBox.Show("Failed to launch retoc:\n\n" + outputText + "\n" + errorText, "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("FileContainerForm.Error.LaunchRetoc"), outputText + "\n" + errorText), BaseForm.DisplayVersion);
                 });
                 return;
             }
@@ -489,7 +515,10 @@ namespace UAssetGUI
             }
             catch (Exception ex)
             {
-                UAGUtils.InvokeUI(() => { MessageBox.Show("Failed to open file! " + ex.Message, "Uh oh!"); });
+                UAGUtils.InvokeUI(() =>
+                {
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Error.Generic"), ex.Message), BaseForm.DisplayVersion);
+                });
 
                 UnloadContainer();
             }
@@ -512,7 +541,7 @@ namespace UAssetGUI
                     LoadContainerUtoc(Path.ChangeExtension(path, ".utoc"));
                     break;
                 default:
-                    UAGUtils.InvokeUI(() => { MessageBox.Show($"Unknown file extension {ext}", "Uh oh!"); });
+                    UAGUtils.InvokeUI(() => { MessageBox.Show(string.Format(UAGConfig.GetString("FileContainerForm.Error.UnknownExtension"), ext), BaseForm.DisplayVersion); });
                     break;
             }
         }
@@ -793,11 +822,11 @@ namespace UAssetGUI
                 if (res == DialogResult.OK)
                 {
                     bool success = SaveContainer(dialog.FileName);
-                    if (!success) MessageBox.Show("Failed to save!", "Uh oh!");
+                    if (!success) MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSave"), string.Empty), BaseForm.DisplayVersion);
                 }
                 else if (res != DialogResult.Cancel)
                 {
-                    MessageBox.Show("Failed to save!", "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSave"), string.Empty), BaseForm.DisplayVersion);
                 }
             }
         }
@@ -890,7 +919,7 @@ namespace UAssetGUI
         {
             if (!DirectoryTreeMap.TryGetValue(loadTreeView, out DirectoryTree loadedTree) || loadedTree == null)
             {
-                MessageBox.Show("Please load a container first to extract it.", "Notice");
+                MessageBox.Show("Please load a container first to extract it.", BaseForm.DisplayVersion);
                 return;
             }
 
@@ -918,7 +947,7 @@ namespace UAssetGUI
                     extractAllBackgroundWorker.RunWorkerAsync();
                     break;
                 default:
-                    MessageBox.Show($"This operation is not supported for the current interop type ({InteropType.ToString()}).", "Notice");
+                    MessageBox.Show($"This operation is not supported for the current interop type ({InteropType.ToString()}).", BaseForm.DisplayVersion);
                     break;
             }
         }
@@ -967,15 +996,15 @@ namespace UAssetGUI
             {
                 if (e.Cancelled)
                 {
-                    MessageBox.Show("Operation canceled.", "Notice");
+                    MessageBox.Show("Operation canceled.", BaseForm.DisplayVersion);
                 }
                 else if (e.Error != null)
                 {
-                    MessageBox.Show("An error occured during extraction! " + e.Error.Message, "Uh oh!");
+                    MessageBox.Show("An error occured during extraction! " + e.Error.Message, BaseForm.DisplayVersion);
                 }
                 else
                 {
-                    MessageBox.Show(progressBarForm == null ? "Operation completed." : ("Extracted " + progressBarForm.Value + " files successfully."), "Notice");
+                    MessageBox.Show(progressBarForm == null ? "Operation completed." : ("Extracted " + progressBarForm.Value + " files successfully."), BaseForm.DisplayVersion);
                 }
                 progressBarForm?.Close();
             });
@@ -1320,7 +1349,7 @@ namespace UAssetGUI
             string outputPath = FixedPathOnDisk != null ? FixedPathOnDisk : this.SaveFileToTemp(this.ParentForm.InteropType);
             if (outputPath == null)
             {
-                MessageBox.Show("Unable to open file!", "Uh oh!");
+                MessageBox.Show(string.Format(UAGConfig.GetString("Error.Generic"), string.Empty), this.ParentForm.BaseForm.DisplayVersion);
                 return;
             }
 

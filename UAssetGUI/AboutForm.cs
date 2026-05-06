@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace UAssetGUI
 {
-    public partial class AboutForm : Form
+    public partial class AboutForm : Form, ILocalizable
     {
         public string AboutText
         {
@@ -31,6 +31,13 @@ namespace UAssetGUI
 
             UAGPalette.RefreshTheme(this);
             this.AdjustFormPosition();
+        }
+
+        public void Localize()
+        {
+            licenseButton.Text = UAGConfig.GetString("About.Button.License");
+            noticeButton.Text = UAGConfig.GetString("About.Button.ThirdPartySoftware");
+            closeButton.Text = UAGConfig.GetString("Generic.Button.Close");
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -62,7 +69,7 @@ namespace UAssetGUI
 
                 var formPopup = new MarkdownViewer();
                 formPopup.MarkdownToDisplay = "```\n" + rawMarkdownText + "\n```";
-                formPopup.Text = "License";
+                formPopup.Text = UAGConfig.GetString("About.WindowName.License");
                 formPopup.StartPosition = FormStartPosition.CenterParent;
                 formPopup.ShowDialog(this);
             });
@@ -92,7 +99,7 @@ namespace UAssetGUI
 
                 var formPopup = new MarkdownViewer();
                 formPopup.MarkdownToDisplay = rawMarkdownText;
-                formPopup.Text = "List of 3rd-party software";
+                formPopup.Text = UAGConfig.GetString("About.WindowName.ThirdPartySoftware");
                 formPopup.StartPosition = FormStartPosition.CenterParent;
                 formPopup.ShowDialog(this);
             });

@@ -11,6 +11,14 @@ using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
 {
+    public interface ILocalizable
+    {
+        /// <summary>
+        /// Method called on initial form load or when language is changed.
+        /// </summary>
+        public void Localize();
+    }
+
     public struct UAGConfigData
     {
         public string Agent;
@@ -198,7 +206,7 @@ namespace UAssetGUI
                         {
                             if (form is Form1 form1)
                             {
-                                form1.UpdateMappings("No mappings", false);
+                                form1.UpdateMappings(UAGConfig.GetString("Generic.NoMappings"), false);
                             }
                         }
                     });
@@ -338,6 +346,19 @@ namespace UAssetGUI
             return Enum.TryParse(UAGConfig.Data.GameSpecificOverride, out GameSpecificOverride overr) ? overr : GameSpecificOverride.None;
         }
 
+        private static Dictionary<string, string> _LocalizedStringsFallbackCache;
+        private static Dictionary<string, string> LocalizedStringsFallback
+        {
+            get
+            {
+                if (_LocalizedStringsFallbackCache == null)
+                {
+                    _LocalizedStringsFallbackCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString(Properties.Resources.en_US));
+                }
+                return _LocalizedStringsFallbackCache;
+            }
+        }
+
         private static Dictionary<string, string> _LocalizedStringsCache;
         private static Dictionary<string, string> LocalizedStrings
         {
@@ -385,6 +406,11 @@ namespace UAssetGUI
 
         public static string GetString(string key)
         {
+            if (!LocalizedStrings.ContainsKey(key))
+            {
+                if (!LocalizedStringsFallback.ContainsKey(key)) throw new InvalidOperationException($"Attempt to load unknown localized string with key {key}");
+                return LocalizedStringsFallback[key];
+            }
             return LocalizedStrings[key];
         }
 

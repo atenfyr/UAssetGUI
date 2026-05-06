@@ -9,7 +9,7 @@ using UAssetAPI.UnrealTypes;
 
 namespace UAssetGUI
 {
-    public partial class SettingsForm : Form
+    public partial class SettingsForm : Form, ILocalizable
     {
         public SettingsForm()
         {
@@ -59,12 +59,11 @@ namespace UAssetGUI
             gameOverrideBox.SelectedIndex = (int)currentOverride;
 
             UAGPalette.RefreshTheme(this);
-            Localize();
             this.AdjustFormPosition();
             _readyToUpdateTheme = true;
         }
 
-        private void Localize()
+        public void Localize()
         {
             themeLabel.Text = UAGConfig.GetString("Settings.Theme");
             favoriteThingLabel.Text = UAGConfig.GetString("Settings.FavoriteThing");
@@ -99,12 +98,7 @@ namespace UAssetGUI
             {
                 var formPopup = new AboutForm();
 
-                formPopup.AboutText = (this.Owner as Form1).DisplayVersion + "\n" +
-                "By atenfyr\n" +
-                "\nThank you to trumank, LongerWarrior, Kaiheilos, and others for all your generous contributions to this software\n" +
-                "\nThank you to the love of my life for listening to me and supporting me despite not caring at all about any of this\n" +
-                "\nThank you for using this thing even after " + softwareAgeInYears + " years\n";
-
+                formPopup.AboutText = string.Format(UAGConfig.GetString("About.Text"), (this.Owner as Form1).DisplayVersion, softwareAgeInYears);
                 formPopup.StartPosition = FormStartPosition.CenterParent;
                 formPopup.ShowDialog(this);
             });

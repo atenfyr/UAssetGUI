@@ -5,13 +5,11 @@ using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -29,7 +27,7 @@ using UAssetAPI.Unversioned;
 
 namespace UAssetGUI
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, ILocalizable
     {
         public EngineVersion ParsingVersion = EngineVersion.UNKNOWN;
         public Usmap ParsingMappings = null;
@@ -47,8 +45,6 @@ namespace UAssetGUI
         public TextBox jsonView;
 
         private DiscordRpcClient _discordRpc = null;
-
-        public static readonly string UsmapInstructionsNotice = "If you have a .usmap file for this game, go to Utils --> Import Mappings... and select your .usmap file to import.";
 
         private void DisposeDiscordRpc()
         {
@@ -232,7 +228,14 @@ namespace UAssetGUI
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("An error occured while initializing!\n" + ex.GetType() + ": " + ex.Message + "\n\nUAssetGUI will now close.", "UAssetGUI");
+                    try
+                    {
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Error.WhileInitializing"), ex.GetType() + ": " + ex.Message), DisplayVersion);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("An error occured while initializing!\n" + ex.GetType() + ": " + ex.Message + "\n\nUAssetGUI will now close.", "UAssetGUI");
+                    }
                     Environment.Exit(1); // kill the process
                 }
             });
@@ -261,7 +264,7 @@ namespace UAssetGUI
             UAGUtils.InvokeUI(() =>
             {
                 allMappingsKeys.Clear();
-                allMappingsKeys.Add("No mappings");
+                allMappingsKeys.Add(UAGConfig.GetString("Generic.NoMappings"));
                 allMappingsKeys.AddRange(UAGConfig.AllMappings.Keys.OrderBy(s => s).ToArray());
                 comboSpecifyMappings.Items.Clear();
                 comboSpecifyMappings.Items.AddRange(allMappingsKeys.ToArray());
@@ -441,7 +444,7 @@ namespace UAssetGUI
                 {
                     if (UAGConfig.Data.EnableUpdateNotice && latestOnlineVersion != null && latestOnlineVersion.IsUAGVersionLower())
                     {
-                        DialogResult updateBoxRes = MessageBox.Show("A new version of UAssetGUI (v" + latestOnlineVersion + ") is available to download!\nWould you like to open the webpage in your browser?", "Notice", MessageBoxButtons.YesNo);
+                        DialogResult updateBoxRes = MessageBox.Show(string.Format(UAGConfig.GetString("Prompt.UpdateNotice"), "v" + latestOnlineVersion), DisplayVersion, MessageBoxButtons.YesNo);
                         switch (updateBoxRes)
                         {
                             case DialogResult.Yes:
@@ -474,6 +477,42 @@ namespace UAssetGUI
                     LoadFileAt(Program.args[1]);
                 }
             });
+        }
+
+        public void Localize()
+        {
+            fileToolStripMenuItem.Text = UAGConfig.GetString("Menu.File");
+            openToolStripMenuItem.Text = UAGConfig.GetString("Menu.File.Open");
+            openContainersToolStripMenuItem.Text = UAGConfig.GetString("Menu.File.OpenContainers");
+            saveToolStripMenuItem.Text = UAGConfig.GetString("Menu.File.Save");
+            saveAsToolStripMenuItem.Text = UAGConfig.GetString("Menu.File.SaveAs");
+            editToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit");
+            copyToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit.Copy");
+            pasteToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit.Paste");
+            deleteToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit.Delete");
+            findToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit.Find");
+            mapStructTypeOverridesToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit.EditMapStructTypeOverrides");
+            settingsToolStripMenuItem.Text = UAGConfig.GetString("Menu.Edit.Settings");
+            viewToolStripMenuItem.Text = UAGConfig.GetString("Menu.View");
+            expandAllToolStripMenuItem.Text = UAGConfig.GetString("Menu.View.ExpandAll");
+            collapseAllToolStripMenuItem.Text = UAGConfig.GetString("Menu.View.CollapseAll");
+            refreshToolStripMenuItem.Text = UAGConfig.GetString("Menu.View.Refresh");
+            recalculateNodesToolStripMenuItem.Text = UAGConfig.GetString("Menu.View.RecalculateNodes");
+            utilsToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils");
+            executeScriptToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.ExecuteScript");
+            editScriptToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.EditScript");
+            importMappingsToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.ImportMappings");
+            patchusmapWithVersionInfoToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.PatchUsmap");
+            listValidPropertiesToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.DumpSerializableProperties");
+            helpToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help");
+            configDirToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help.OpenConfigDirectory");
+            issuesToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help.GiveFeedback");
+            githubToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help.UAGLink");
+            apiLinkToolStripMenuItem1.Text = UAGConfig.GetString("Menu.Help.UAPLink");
+
+            importBinaryData.Text = UAGConfig.GetString("Generic.Button.Import");
+            exportBinaryData.Text = UAGConfig.GetString("Generic.Button.Export");
+            setBinaryData.Text = UAGConfig.GetString("Generic.Button.SetToNull");
         }
 
         private ISet<string> unknownTypes = new HashSet<string>();
@@ -582,7 +621,7 @@ namespace UAssetGUI
                         {
                             if (ex?.Message != null && ex.Message.Contains("Cannot deserialize the current JSON array")) // OK because Newtonsoft.Json does not translate exceptions
                             {
-                                UAGUtils.InvokeUI(() => { MessageBox.Show("Failed to open this file! This file is likely an FModel/CUE4Parse JSON file, which cannot be directly loaded into UAssetGUI.\n\nPlease export assets to JSON using UAssetGUI (File -> Save As), or look into other tools such as JsonAsAsset (https://github.com/JsonAsAsset/JsonAsAsset) for interpreting CUE4Parse JSON.", "Uh oh!"); });
+                                UAGUtils.InvokeUI(() => { MessageBox.Show(UAGConfig.GetString("Error.AttemptToOpenCUE4ParseJSON"), DisplayVersion); });
                                 return;
                             }
                             else
@@ -607,7 +646,7 @@ namespace UAssetGUI
                         }
                         catch (FileNotFoundException ex)
                         {
-                            MessageBox.Show("Failed to open this file! " + ex.Message, "Uh oh!");
+                            MessageBox.Show(string.Format(UAGConfig.GetString("Error.Generic"), ex.Message), DisplayVersion);
                             return;
                         }
 
@@ -632,13 +671,13 @@ namespace UAssetGUI
                             // check if accidentally opened .uexp
                             else if (Path.GetExtension(filePath) == ".uexp")
                             {
-                                MessageBox.Show("Failed to open this file! This is a .uexp file, which cannot be read directly. Please open the respective .uasset file instead.", "Uh oh!");
+                                MessageBox.Show(UAGConfig.GetString("Error.AttemptToOpenUEXP"), DisplayVersion);
                             }
                             // check if Zen asset for custom popup
                             // this definitely has potential for false positives, but it will still filter out basically any other file type, if it mattered that much i'd just actually parse the thing
                             else if (Path.GetExtension(filePath) == ".uasset" && (sig == 0 || sig == 1) && nextFourBytes > 40 && nextFourBytes < 1e9) // IsUnversioned reasonable, HeaderSize reasonable
                             {
-                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE5 Zen Loader assets cannot be loaded directly into UAssetGUI. You could try to instead open the corresponding .utoc container file in UAssetGUI. You could also execute retoc directly from the command line.\n\nWould you like to open the GitHub page for retoc?", "Uh oh!", MessageBoxButtons.YesNo);
+                                DialogResult messageBoxRes = MessageBox.Show(UAGConfig.GetString("Error.AttemptToOpenZenUE5"), DisplayVersion, MessageBoxButtons.YesNo);
                                 switch (messageBoxRes)
                                 {
                                     case DialogResult.Yes:
@@ -650,7 +689,7 @@ namespace UAssetGUI
                             }
                             else if (Path.GetExtension(filePath) == ".uasset" && nextFourBytes == 0 && ue4CookedHeaderSize > 40 && ue4CookedHeaderSize < 1e9) // zero FName, CookedHeaderSize reasonable
                             {
-                                DialogResult messageBoxRes = MessageBox.Show("Failed to open this file! UE4 Zen Loader assets cannot be loaded directly into UAssetGUI. You could try to instead open the corresponding .utoc container file in UAssetGUI. You could also execute retoc directly from the command line.\n\nWould you like to open the GitHub page for retoc?", "Uh oh!", MessageBoxButtons.YesNo);
+                                DialogResult messageBoxRes = MessageBox.Show(UAGConfig.GetString("Error.AttemptToOpenZenUE4"), DisplayVersion, MessageBoxButtons.YesNo);
                                 switch (messageBoxRes)
                                 {
                                     case DialogResult.Yes:
@@ -662,7 +701,7 @@ namespace UAssetGUI
                             }
                             else
                             {
-                                MessageBox.Show("Failed to open this file! File format not recognized", "Uh oh!");
+                                MessageBox.Show(UAGConfig.GetString("Error.AttemptToOpenUnknown"), DisplayVersion);
                             }
                             return;
                         }
@@ -818,43 +857,43 @@ namespace UAssetGUI
 
                 if (didACE7Decrypt)
                 {
-                    MessageBox.Show("This file uses Ace Combat 7 encryption and was decrypted in-situ.", "Notice");
+                    MessageBox.Show(UAGConfig.GetString("Notice.ACE7"), DisplayVersion);
                 }
 
                 if (failedCategoryCount > 0)
                 {
-                    MessageBox.Show("Failed to parse " + failedCategoryCount + " export" + (failedCategoryCount == 1 ? "" : "s") + "!", "Notice");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Notice.FailedExports"), failedCategoryCount), DisplayVersion);
                 }
 
                 if (hasDuplicates)
                 {
-                    MessageBox.Show("Encountered duplicate name map entries! Serialized FNames will coalesce to one of the entries in the map and binary equality may not be maintained.", "Notice");
+                    MessageBox.Show(UAGConfig.GetString("Notice.DuplicateNameMapEntries"), DisplayVersion);
                 }
 
                 if (unknownTypes.Count > 0)
                 {
-                    MessageBox.Show("Encountered " + unknownTypes.Count + " unknown property type" + (unknownTypes.Count == 1 ? "" : "s") + ":\n" + string.Join(", ", unknownTypes) + (failedToMaintainBinaryEquality ? "" : "\n\nThe asset will still parse normally."), "Notice");
+                    MessageBox.Show(failedToMaintainBinaryEquality ? string.Format(UAGConfig.GetString("Notice.UnknownTypesNotOK"), unknownTypes.Count, string.Join(", ", unknownTypes)) : string.Format(UAGConfig.GetString("Notice.UnknownTypesOK"), unknownTypes.Count, string.Join(", ", unknownTypes)), DisplayVersion);
                 }
 
                 if (rawStructTypes.Count > 0)
                 {
-                    MessageBox.Show("Encountered " + numRawStructs + " struct" + (numRawStructs == 1 ? "" : "s") + " that could not be parsed, and " + (numRawStructs == 1 ? "was" : "were") + " instead read as an array of bytes. " + (numRawStructs == 1 ? "It has the following type" : "They have the following types") + ":\n" + string.Join(", ", rawStructTypes) + (failedToMaintainBinaryEquality ? "" : "\n\nThe asset will still parse normally."), "Notice");
+                    MessageBox.Show(failedToMaintainBinaryEquality ? string.Format(UAGConfig.GetString("Notice.RawStructTypesNotOK"), numRawStructs, string.Join(", ", rawStructTypes)) : string.Format(UAGConfig.GetString("Notice.RawStructTypesOK"), numRawStructs, string.Join(", ", rawStructTypes)), DisplayVersion);
                 }
 
                 if (tableEditor.asset.HasUnversionedProperties && tableEditor.asset.Mappings == null)
                 {
-                    MessageBox.Show("Failed to parse unversioned properties! Exports cannot be parsed for this asset unless a valid set of mappings is provided. " + UsmapInstructionsNotice, "Notice");
+                    MessageBox.Show(UAGConfig.GetString("Notice.UnversionedButNoMappings"), DisplayVersion);
                 }
 
                 if (tableEditor.asset.HasUnversionedProperties && failedCategoryCount > 0 && (tableEditor.asset.OtherAssetsFailedToAccess?.Count ?? 0) > 0)
                 {
                     string formattedListOfFailedToAccessAssets = string.Join("\n", tableEditor.asset.OtherAssetsFailedToAccess);
-                    MessageBox.Show("UAssetAPI attempted to access the following assets, but failed to do so. Some errors may potentially be resolved by giving it access to these assets. You can either include them in the same directory, or reconstruct the game's Content directory tree.\n\n" + formattedListOfFailedToAccessAssets, "Notice");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Notice.FailedToAccessOtherAssets"), formattedListOfFailedToAccessAssets), DisplayVersion);
                 }
 
                 if (failedToMaintainBinaryEquality)
                 {
-                    MessageBox.Show("Failed to maintain binary equality! UAssetAPI may not be able to parse this particular asset correctly, and you may not be able to load this file in-game if modified.", "Uh oh!");
+                    MessageBox.Show(UAGConfig.GetString("Notice.BinaryEquality"), DisplayVersion);
                 }
 
                 if (!tableEditor.asset.IsUnversioned)
@@ -889,22 +928,22 @@ namespace UAssetGUI
                 switch (ex)
                 {
                     case IOException _:
-                        MessageBox.Show("Failed to open this file! Please make sure the specified engine version is correct.", "Uh oh!");
+                        MessageBox.Show(UAGConfig.GetString("Error.BadEngineVersion"), DisplayVersion);
                         break;
                     case FormatException formatEx:
-                        MessageBox.Show("Failed to parse this file!\n" + formatEx.GetType() + ": " + formatEx.Message, "Uh oh!");
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Error.Generic"), "\n" + formatEx.GetType() + ": " + formatEx.Message), DisplayVersion);
                         break;
                     case UnknownEngineVersionException _:
-                        MessageBox.Show("Please specify an engine version using the dropdown at the upper-right corner of this window before opening an unversioned asset.", "Uh oh!");
+                        MessageBox.Show(UAGConfig.GetString("Error.NoEngineVersion"), DisplayVersion);
                         break;
                     default:
-                        MessageBox.Show("Encountered an unknown error when trying to open this file!\n" + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Error.Generic"), "\n" + ex.GetType() + ": " + ex.Message), DisplayVersion);
                         break;
                 }
 
                 if (formattedListOfFailedToAccessAssets != null)
                 {
-                    MessageBox.Show("UAssetAPI attempted to access the following assets, but failed to do so. It's possible that this error could be resolved by giving it access to these assets. You can either include them in the same directory, or reconstruct the game's Content directory tree.\n\n" + formattedListOfFailedToAccessAssets, "Notice");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Notice.FailedToAccessOtherAssets"), formattedListOfFailedToAccessAssets), DisplayVersion);
                 }
             }
             finally
@@ -1002,7 +1041,7 @@ namespace UAssetGUI
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Failed to save JSON backup! " + ex.Message, "Uh oh!");
+                            MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSaveJSONBackup"), ex.Message), DisplayVersion);
                         }
 
                         tableEditor.asset.Write(path);
@@ -1020,18 +1059,18 @@ namespace UAssetGUI
                         }
                         catch (Exception ex2)
                         {
-                            MessageBox.Show("Failed to save! " + ex2.Message, "Uh oh!");
+                            MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSave"), ex2.Message), DisplayVersion);
                         }
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Failed to save! " + ex.Message, "Uh oh!");
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSave"), ex.Message), DisplayVersion);
                     }
                 }
             }
             else
             {
-                MessageBox.Show("Failed to save!", "Uh oh!");
+                MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSave"), string.Empty), DisplayVersion);
             }
             return false;
         }
@@ -1063,7 +1102,7 @@ namespace UAssetGUI
                 }
                 else if (res != DialogResult.Cancel)
                 {
-                    MessageBox.Show("Failed to save!", "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToSave"), string.Empty), DisplayVersion);
                 }
             }
         }
@@ -1456,7 +1495,7 @@ namespace UAssetGUI
                                 case PointingTreeNodeType.Normal:
                                     if (treeView1.Focused)
                                     {
-                                        DialogResult res = MessageBox.Show("Are you sure you want to delete this export?\nTHIS OPERATION CANNOT BE UNDONE!", DisplayVersion, MessageBoxButtons.OKCancel);
+                                        DialogResult res = MessageBox.Show(UAGConfig.GetString("Prompt.DeleteExport"), DisplayVersion, MessageBoxButtons.OKCancel);
                                         if (res != DialogResult.OK) break;
 
                                         tableEditor.asset.Exports.RemoveAt(pointerNode.ExportNum);
@@ -1544,7 +1583,7 @@ namespace UAssetGUI
                         int jumpingIndex = dataGridView1.CurrentCell.RowIndex;
                         if (jumpingIndex < 0 || jumpingIndex >= treeView1.SelectedNode.Nodes.Count)
                         {
-                            MessageBox.Show("Please select View -> Recalculate Nodes before attempting to jump to this node.", "Notice");
+                            MessageBox.Show(UAGConfig.GetString("Notice.ChildJumpFailed"), DisplayVersion);
                         }
                         else
                         {
@@ -1747,7 +1786,7 @@ namespace UAssetGUI
 
             if (existsUnsavedChanges && !IsReadOnly())
             {
-                DialogResult res = MessageBox.Show("Do you want to save your changes?", DisplayVersion, MessageBoxButtons.YesNoCancel);
+                DialogResult res = MessageBox.Show(UAGConfig.GetString("Prompt.Save"), DisplayVersion, MessageBoxButtons.YesNoCancel);
                 switch (res)
                 {
                     case DialogResult.Yes:
@@ -1943,6 +1982,7 @@ namespace UAssetGUI
             e.Control.ContextMenuStrip = UAGUtils.MergeContextMenus(e.Control.ContextMenuStrip, _currentDataGridViewStrip);
         }
 
+        // TODO remove this
         private void replaceAllReferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DataGridViewTextBoxEditingControl dadControl = dataGridView1.EditingControl as DataGridViewTextBoxEditingControl;
@@ -2079,7 +2119,7 @@ namespace UAssetGUI
         {
             TextPrompt replacementPrompt = new TextPrompt()
             {
-                DisplayText = "How many null bytes?"
+                DisplayText = UAGConfig.GetString("Prompt.SetToNull")
             };
 
             replacementPrompt.StartPosition = FormStartPosition.CenterParent;
@@ -2144,7 +2184,7 @@ namespace UAssetGUI
         public string GetProjectName()
         {
             if (tableEditor?.asset == null) return null;
-            if (UAGConfig.Data.PreferredMappings != "No mappings" && UAGConfig.Data.PreferredMappings != "Mappings") return UAGConfig.Data.PreferredMappings;
+            if (UAGConfig.Data.PreferredMappings != UAGConfig.GetString("Generic.NoMappings") && UAGConfig.Data.PreferredMappings != "Mappings") return UAGConfig.Data.PreferredMappings;
 
             // use PackageName if available
             string pName = tableEditor.asset.FolderName?.Value;
@@ -2281,13 +2321,13 @@ namespace UAssetGUI
             {
                 if (ParsingMappings == null)
                 {
-                    MessageBox.Show("No mappings found. " + UsmapInstructionsNotice, Text);
+                    MessageBox.Show(UAGConfig.GetString("Error.NoMappings"), DisplayVersion);
                     return;
                 }
 
                 if (TryDumpParticular()) return;
 
-                DialogResult res = MessageBox.Show("This operation will dump ALL classes in the mappings file to text. This may take a while. Proceed?", DisplayVersion, MessageBoxButtons.OKCancel);
+                DialogResult res = MessageBox.Show(UAGConfig.GetString("Prompt.DumpProperties"), DisplayVersion, MessageBoxButtons.OKCancel);
                 switch (res)
                 {
                     case DialogResult.OK:
@@ -2302,57 +2342,12 @@ namespace UAssetGUI
                         }
                         timer.Stop();
                         if (outputPath != null) UAGUtils.OpenDirectory(Path.GetDirectoryName(outputPath));
-                        MessageBox.Show(numDumped + " " + (numDumped == 1 ? "class" : "classes") + " successfully dumped in " + timer.Elapsed.TotalMilliseconds + " ms.", Name);
+
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Prompt.DumpProperties.Result"), numDumped, timer.Elapsed.TotalMilliseconds), DisplayVersion);
                         break;
                 }
             });
         }
-
-        /*private int ExtractIOStore(string inPath, string outPath)
-        {
-            var test = new IOStoreContainer(inPath);
-            test.BeginRead();
-            int numExtracted = test.Extract(outPath);
-            test.EndRead();
-            return numExtracted;
-        }
-
-        private void extractIOStoreToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string inPath = null;
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "IO Store Container (*.utoc)|*.utoc|All files (*.*)|*.*";
-                openFileDialog.FilterIndex = 1;
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    inPath = openFileDialog.FileName;
-                }
-            }
-
-            if (inPath == null) return;
-
-            string outPath = null;
-            FolderBrowserEx.FolderBrowserDialog outputFolderDialog = new FolderBrowserEx.FolderBrowserDialog();
-            outputFolderDialog.Title = "Select a folder to extract to";
-
-            if (outputFolderDialog.ShowDialog() == DialogResult.OK)
-            {
-                outPath = outputFolderDialog.SelectedFolder;
-            }
-            outputFolderDialog.Dispose();
-
-            if (outPath == null) return;
-
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
-            int numExtracted = ExtractIOStore(inPath, outPath);
-            timer.Stop();
-
-            MessageBox.Show("Extracted " + numExtracted + " files in " + timer.ElapsedMilliseconds + " ms.", this.Text);
-        }*/
 
         private string SelectMappings()
         {
@@ -2378,7 +2373,7 @@ namespace UAssetGUI
                 string patchPath = SelectMappings();
                 if (patchPath == null) return; // no mappings selected, end method
 
-                DialogResult res = MessageBox.Show($"Are you sure you would like to continue?\nThis operation will permanently modify the selected .usmap file and cannot be undone.\n{Path.GetFileName(patchPath)} will be set to version {ParsingVersion.ToString()}.", DisplayVersion, MessageBoxButtons.YesNo);
+                DialogResult res = MessageBox.Show(string.Format(UAGConfig.GetString("Prompt.PatchUsmap"), Path.GetFileName(patchPath), ParsingVersion.ToString()), DisplayVersion, MessageBoxButtons.YesNo);
                 switch (res)
                 {
                     case DialogResult.Yes:
@@ -2399,7 +2394,7 @@ namespace UAssetGUI
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Failed to patch mappings! " + ex.GetType() + ": " + ex.Message, "Uh oh!");
+                    MessageBox.Show("Failed to patch mappings! " + ex.GetType() + ": " + ex.Message, DisplayVersion);
                     success = false;
                 }
                 finally
@@ -2422,7 +2417,7 @@ namespace UAssetGUI
                 {
                     TextPrompt replacementPrompt = new TextPrompt()
                     {
-                        DisplayText = "What is the name of the game these mappings are for?"
+                        DisplayText = UAGConfig.GetString("Prompt.NewMappingsName")
                     };
 
                     replacementPrompt.StartPosition = FormStartPosition.CenterParent;
@@ -2445,7 +2440,7 @@ namespace UAssetGUI
                 }
                 catch
                 {
-                    MessageBox.Show("Failed to import mappings!", "Uh oh!");
+                    MessageBox.Show(UAGConfig.GetString("Error.FailedToImportMappings"), DisplayVersion);
                 }
             });
         }
@@ -2486,7 +2481,7 @@ namespace UAssetGUI
                     }
                 }
 
-                MessageBox.Show("Please open a .pak file first to stage assets.", "Notice");
+                MessageBox.Show(UAGConfig.GetString("Error.OpenContainerToStage"), DisplayVersion);
             }
             else
             {
@@ -2598,7 +2593,7 @@ namespace UAssetGUI
 
                 if (!result.Success)
                 {
-                    string errorText = "Errors occurred during compilation\n\n";
+                    string errorText = string.Format(UAGConfig.GetString("Error.ScriptCompileError"), string.Empty) + "\n\n";
                     foreach (var exception in result.Diagnostics)
                     {
                         errorText += exception.ToString() + "\n";
@@ -2638,7 +2633,7 @@ namespace UAssetGUI
             {
                 UAGUtils.InvokeUI(() =>
                 {
-                    MessageBox.Show("Failed to read script", "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToReadScript"), string.Empty), DisplayVersion);
                     UAGConfig.RefreshAllScriptIDs();
                 });
                 return;
@@ -2660,7 +2655,7 @@ namespace UAssetGUI
 
                     UAGUtils.InvokeUI(() =>
                     {
-                        MessageBox.Show("Script threw an exception" + errText, "Uh oh!");
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Error.ScriptRuntimeException"), errText), DisplayVersion);
                         UAGConfig.RefreshAllScriptIDs();
                     });
                 }
@@ -2670,7 +2665,7 @@ namespace UAssetGUI
 
                     UAGUtils.InvokeUI(() =>
                     {
-                        MessageBox.Show("Failed to execute script" + errText, "Uh oh!");
+                        MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToExecuteScript"), errText), DisplayVersion);
                         UAGConfig.RefreshAllScriptIDs();
                     });
                 }
@@ -2684,7 +2679,7 @@ namespace UAssetGUI
             {
                 UAGUtils.InvokeUI(() =>
                 {
-                    MessageBox.Show("Failed to get script ID", "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToGetScriptID"), string.Empty), DisplayVersion);
                     UAGConfig.RefreshAllScriptIDs();
                 });
                 return;
@@ -2693,7 +2688,7 @@ namespace UAssetGUI
             string newScriptPath = UAGConfig.CreateAndReturnPathToScript(scriptId);
             if (newScriptPath == null)
             {
-                MessageBox.Show("Failed to find script on disk", "Uh oh!");
+                MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToFindScript"), string.Empty), DisplayVersion);
                 UAGConfig.RefreshAllScriptIDs();
             }
             else
@@ -2713,7 +2708,7 @@ namespace UAssetGUI
         {
             TextPrompt replacementPrompt = new TextPrompt()
             {
-                DisplayText = "What would you like to name your new script?"
+                DisplayText = UAGConfig.GetString("Prompt.NewScriptName")
             };
 
             replacementPrompt.StartPosition = FormStartPosition.CenterParent;
@@ -2724,7 +2719,7 @@ namespace UAssetGUI
                 string newScriptPath = UAGConfig.CreateAndReturnPathToScript(newScriptName);
                 if (newScriptPath == null)
                 {
-                    MessageBox.Show("Failed to create new script", "Uh oh!");
+                    MessageBox.Show(string.Format(UAGConfig.GetString("Error.FailedToCreateNewScript"), string.Empty), DisplayVersion);
                 }
                 else
                 {
@@ -2771,7 +2766,7 @@ namespace UAssetGUI
                 }
                 else
                 {
-                    MessageBox.Show("Failed to parse the input as an integer.\nInterpreting this as a request to remove breakpoint.", "Uh oh!");
+                    MessageBox.Show("Failed to parse the input as an integer.\nInterpreting this as a request to remove breakpoint.", DisplayVersion);
                     MonitoringStream.Enabled = false;
                     MonitoringStream.StopOffset = -1;
                     MonitoringStream.IsUexpOffset = false;
@@ -2786,7 +2781,7 @@ namespace UAssetGUI
         internal void toggleTracing_Click(object sender, EventArgs e)
         {
             TracingEnabled = !TracingEnabled;
-            MessageBox.Show(TracingEnabled ? "Tracing is now enabled." : "Tracing is now disabled.", "Notice");
+            MessageBox.Show(TracingEnabled ? "Tracing is now enabled." : "Tracing is now disabled.", DisplayVersion);
         }
 #endif
 

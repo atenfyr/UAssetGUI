@@ -60,6 +60,7 @@ namespace UAssetGUI
             UAGUtils.InvokeUI(() =>
             {
                 RefreshThemeInternal(frm);
+                if (frm is ILocalizable localizable) localizable.Localize();
             });
         }
 

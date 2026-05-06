@@ -58,9 +58,7 @@ namespace UAssetGUI
             if (string.IsNullOrEmpty(UAGConfig.Data.GameSpecificOverride)) UAGConfig.Data.GameSpecificOverride = GameSpecificOverride.None.ToString();
             Enum.TryParse(UAGConfig.Data.GameSpecificOverride.ToString(), out GameSpecificOverride currentOverride);
 
-            string lang = UAGConfig.Data.Language;
-            languageComboBox.DataSource = UAGConfig.GetLanguageNames();
-            languageComboBox.SelectedIndex = UAGConfig.GetLanguageCodes().ToList().IndexOf(lang);
+            UpdateLanguageComboBoxList();
 
             gameOverrideBox.DataSource = Enum.GetValues(typeof(GameSpecificOverride));
             gameOverrideBox.SelectedIndex = (int)currentOverride;
@@ -69,6 +67,18 @@ namespace UAssetGUI
             this.AdjustFormPosition();
 
             _readyToUpdateTheme = true;
+        }
+
+        private void UpdateLanguageComboBoxList()
+        {
+            bool needToDisableThemeUpdate = _readyToUpdateTheme;
+            if (needToDisableThemeUpdate) _readyToUpdateTheme = false;
+
+            string lang = UAGConfig.Data.Language;
+            languageComboBox.DataSource = UAGConfig.GetLanguageNames();
+            languageComboBox.SelectedIndex = UAGConfig.GetLanguageCodes().ToList().IndexOf(lang);
+
+            if (needToDisableThemeUpdate) _readyToUpdateTheme = true;
         }
 
         public void Localize()
@@ -342,13 +352,8 @@ namespace UAssetGUI
             UAGConfig.Data.GameSpecificOverride = gameOverrideBox.SelectedValue.ToString();
         }
 
-        private void languageComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void ForceLocalizeAll()
         {
-            if (!_readyToUpdateTheme) return;
-
-            bool wasSuccessful = UAGConfig.SetLanguage(UAGConfig.GetLanguageCodes()[UAGConfig.GetLanguageNames().ToList().IndexOf(languageComboBox.SelectedValue.ToString())]);
-            if (!wasSuccessful) return;
-
             UAGUtils.InvokeUI(() =>
             {
                 foreach (var form in Application.OpenForms)
@@ -359,6 +364,32 @@ namespace UAssetGUI
                     }
                 }
             });
+        }
+
+        private void languageComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!_readyToUpdateTheme) return;
+
+            bool wasSuccessful = UAGConfig.SetLanguage(UAGConfig.GetLanguageCodes()[UAGConfig.GetLanguageNames().ToList().IndexOf(languageComboBox.SelectedValue.ToString())]);
+            if (!wasSuccessful) return;
+            ForceLocalizeAll();
+        }
+
+        private void languageLabel_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "UAssetGUI Localization JSON (*.json)|*.json|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    UAGConfig.AddCustomLanguageFromJSON(File.ReadAllText(openFileDialog.FileName));
+                    UpdateLanguageComboBoxList();
+                    ForceLocalizeAll();
+                }
+            }
         }
     }
 }

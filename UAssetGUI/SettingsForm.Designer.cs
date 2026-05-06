@@ -358,6 +358,7 @@
             languageLabel.Size = new System.Drawing.Size(71, 16);
             languageLabel.TabIndex = 28;
             languageLabel.Text = "Language:";
+            languageLabel.MouseDoubleClick += languageLabel_MouseDoubleClick;
             // 
             // SettingsForm
             // 

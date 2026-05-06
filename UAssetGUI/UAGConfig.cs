@@ -359,14 +359,22 @@ namespace UAssetGUI
             }
         }
 
-        private static Dictionary<string, string> _LocalizedStringsCache;
+        private static Dictionary<string, Dictionary<string, string>> _LocalizedStringsCacheCache = null;
+        private static Dictionary<string, string> _LocalizedStringsCache = null;
         private static Dictionary<string, string> LocalizedStrings
         {
             get
             {
                 if (_LocalizedStringsCache == null)
                 {
-                    _LocalizedStringsCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString((byte[])Properties.Resources.ResourceManager.GetObject(UAGConfig.Data.Language)));
+                    if (_LocalizedStringsCacheCache != null && _LocalizedStringsCacheCache.ContainsKey(UAGConfig.Data.Language))
+                    {
+                        _LocalizedStringsCache = _LocalizedStringsCacheCache[UAGConfig.Data.Language];
+                    }
+                    else
+                    {
+                        _LocalizedStringsCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString((byte[])Properties.Resources.ResourceManager.GetObject(UAGConfig.Data.Language)));
+                    }
                 }
                 return _LocalizedStringsCache;
             }
@@ -410,6 +418,18 @@ namespace UAssetGUI
                 }
                 return _LanguageNamesCache;
             }
+        }
+
+        public static void AddCustomLanguageFromJSON(string jsonText)
+        {
+            if (_LocalizedStringsCacheCache == null) _LocalizedStringsCacheCache = new Dictionary<string, Dictionary<string, string>>();
+            _LocalizedStringsCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonText);
+            _LocalizedStringsCacheCache[_LocalizedStringsCache["Code"]] = _LocalizedStringsCache;
+            LanguageNames.Remove(_LocalizedStringsCache["Language"]);
+            LanguageCodes.Remove(_LocalizedStringsCache["Code"]);
+            LanguageNames.Add(_LocalizedStringsCache["Language"]);
+            LanguageCodes.Add(_LocalizedStringsCache["Code"]);
+            UAGConfig.Data.Language = _LocalizedStringsCache["Code"];
         }
 
         public static bool SetLanguage(string code)

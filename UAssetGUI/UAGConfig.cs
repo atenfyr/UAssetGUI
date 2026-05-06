@@ -380,6 +380,13 @@ namespace UAssetGUI
                 if (_LanguageCodesCache == null)
                 {
                     _LanguageCodesCache = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(Properties.Resources.language_codes));
+#if DEBUG || DEBUGVERBOSE || DEBUGTRACING
+                    try
+                    {
+                        if (Properties.Resources.ResourceManager.GetObject("DEBUG") != null) _LanguageCodesCache.Add("DEBUG");
+                    }
+                    catch { }
+#endif
                 }
                 return _LanguageCodesCache;
             }
@@ -393,6 +400,13 @@ namespace UAssetGUI
                 if (_LanguageNamesCache == null)
                 {
                     _LanguageNamesCache = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(Properties.Resources.language_names));
+#if DEBUG || DEBUGVERBOSE || DEBUGTRACING
+                    try
+                    {
+                        if (Properties.Resources.ResourceManager.GetObject("DEBUG") != null) _LanguageNamesCache.Add("DEBUG");
+                    }
+                    catch { }
+#endif
                 }
                 return _LanguageNamesCache;
             }

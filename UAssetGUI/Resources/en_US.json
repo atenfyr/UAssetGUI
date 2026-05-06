@@ -1,0 +1,31 @@
+{
+  "Code": "en_US",
+  "Language": "English (United States of America)",
+  "Generic.Button.Close": "Close",
+  "Settings.Theme.Light": "Light",
+  "Settings.Theme.Dark": "Dark",
+  "Settings.Button.About": "About...",
+  "Settings.Theme": "Theme:",
+  "Settings.FavoriteThing": "Favorite Thing:",
+  "Settings.Zoom": "Zoom:",
+  "Settings.Flags": "Flags:",
+  "Settings.GameOverride": "Game Override:",
+  "Settings.EnableDiscordRPC": "Enable Discord RPC",
+  "Settings.ChangeValuesOnScroll": "Change values on scroll",
+  "Settings.DoubleClickToEdit": "Double click to edit",
+  "Settings.EnablePrettyBytecode": "Enable pretty bytecode",
+  "Settings.EnableDynamicTree": "Enable dynamic tree",
+  "Settings.RestoreGUISizeOnOpen": "Restore GUI size on open",
+  "Settings.EnableUpdateNotice": "Enable update notice",
+  "Settings.EnableBakFilesUASSET": "Enable .bak files (.uasset)",
+  "Settings.EnableBakFilesJSON": "Enable .bak files (.json)",
+  "Settings.AllowUntrustedScripts": "Allow untrusted scripts",
+  "Settings.OnAllowUntrustedScripts": "Scripts in UAssetGUI can potentially execute malicious code and cause damage to your computer. Never execute any scripts that you do not fully trust.\n\nWould you like to continue?",
+  "About.ViewLicense": "View license...",
+  "About.ViewThirdPartySoftware": "View 3rd-party software...",
+  "About.License": "License",
+  "About.ThirdPartySoftware": "List of 3rd-party software",
+  "About.Text": "{0}\nBy atenfyr\n\nThank you to trumank, LongerWarrior, Kaiheilos, and others for all your generous contributions to this software\n\nThank you to the love of my life for listening to me and supporting me despite not caring at all about any of this\n\nThank you for using this thing even after {1} years\n"
+
+
+}

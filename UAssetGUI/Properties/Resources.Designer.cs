@@ -19,7 +19,7 @@ namespace UAssetGUI.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -71,10 +71,20 @@ namespace UAssetGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to // this example script displays a simple message to the user
-        ///UAGUtils.InvokeUI(() =&gt;
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] en_US {
+            get {
+                object obj = ResourceManager.GetObject("en_US", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UAGUtils.InvokeUI(() =&gt;
         ///{
-        ///    MessageBox.Show(&quot;Welcome to scripting with C# in UAssetGUI!\n\n&quot; + Interface.GetBaseForm().GetProjectName() + &quot;\n&quot; + Interface.GetDisplayVersion(), &quot;Hello, world!&quot;);
+        ///    // Your code goes here
+        ///    MessageBox.Show(&quot;Welcome to scripting with C# in UAssetGUI!\n\n&quot; + Interface.GetBaseForm().GetProjectName() + &quot;\n&quot; + Interface.GetDisplayVersion() + &quot;\n&quot; + UAPUtils.DisplayVersion, &quot;Hello, world!&quot;);
         ///});
         ///.
         /// </summary>
@@ -95,28 +105,73 @@ namespace UAssetGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to // this example script changes the value of all float entries in the currently selected node to 100
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] language_codes {
+            get {
+                object obj = ResourceManager.GetObject("language_codes", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] language_names {
+            get {
+                object obj = ResourceManager.GetObject("language_names", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to // This script outputs a textual representation of the currently visible nodes to node_structure.txt
+        ///
+        ///using System.IO;
+        ///
         ///UAGUtils.InvokeUI(() =&gt;
         ///{
-        ///    // get currently selected node
-        ///    int numChanged = 0;
-        ///    var pointingTreeNode = Interface.GetTreeView().SelectedNode as PointingTreeNode;
-        ///    if (pointingTreeNode.Type == PointingTreeNodeType.Normal &amp;&amp; pointingTreeNode.Pointer is NormalExport normalExport)
+        ///    List&lt;string&gt; nodeLabels = new List&lt;string&gt;();
+        ///    TreeNode node = Interface.GetTreeView().TopNode;
+        ///    while (node != null &amp;&amp; node.IsVisible)
         ///    {
-        ///        // update all FloatProperty and DoubleProperty entries in normalExport
-        ///        foreach (PropertyData [rest of string was truncated]&quot;;.
+        ///        int numAncestors = 0;
+        ///        TreeNode parent = node.Parent;
+        ///        while (parent != null)
+        ///        {
+        ///            numAncestors++;
+        ///            parent = parent.Parent;
+        ///        }
+        ///        nodeL [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Print_visible_nodes {
+            get {
+                return ResourceManager.GetString("Print_visible_nodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to // this example script changes the value of all float entries in the currently selected node to 100
+        ///int numChanged = 0;
+        ///
+        ///void DoSwaps(List&lt;PropertyData&gt; props)
+        ///{
+        ///    foreach (PropertyData propData in props)
+        ///    {
+        ///        if (propData is FloatPropertyData floatPropData)
+        ///        {
+        ///            floatPropData.Value = 100;
+        ///            numChanged++;
+        ///        }
+        ///        if (propData is DoublePropertyData doublePropData)
+        ///        {
+        ///            doublePropData.Value = 100;
+        ///            numChanged++;
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Set_all_visible_floats_to_100 {
             get {
                 return ResourceManager.GetString("Set_all_visible_floats_to_100", resourceCulture);
-            }
-        }
-
-        internal static string Print_visible_nodes
-        {
-            get
-            {
-                return ResourceManager.GetString("Print_visible_nodes", resourceCulture);
             }
         }
     }

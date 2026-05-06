@@ -133,4 +133,13 @@
   <data name="Print_visible_nodes" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ExampleScripts\Print_visible_nodes.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="en_US" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\en_US.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="language_codes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\language_codes.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="language_names" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\language_names.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

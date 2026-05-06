@@ -30,14 +30,14 @@
         {
             infoLabel = new System.Windows.Forms.Label();
             closeButton = new System.Windows.Forms.Button();
-            label1 = new System.Windows.Forms.Label();
-            label2 = new System.Windows.Forms.Label();
+            themeLabel = new System.Windows.Forms.Label();
+            favoriteThingLabel = new System.Windows.Forms.Label();
             aboutButton = new System.Windows.Forms.Button();
             themeComboBox = new System.Windows.Forms.ComboBox();
             favoriteThingBox = new System.Windows.Forms.TextBox();
             valuesOnScroll = new System.Windows.Forms.CheckBox();
             numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            label3 = new System.Windows.Forms.Label();
+            zoomLabel = new System.Windows.Forms.Label();
             enableDiscordRpc = new System.Windows.Forms.CheckBox();
             enableDynamicTree = new System.Windows.Forms.CheckBox();
             doubleClickToEdit = new System.Windows.Forms.CheckBox();
@@ -45,13 +45,13 @@
             restoreSize = new System.Windows.Forms.CheckBox();
             enableUpdateNotice = new System.Windows.Forms.CheckBox();
             enablePrettyBytecode = new System.Windows.Forms.CheckBox();
-            label4 = new System.Windows.Forms.Label();
+            flagsLabel = new System.Windows.Forms.Label();
             customSerializationFlagsBox = new System.Windows.Forms.CheckedListBox();
             pictureBox1 = new System.Windows.Forms.PictureBox();
             enableBakJson = new System.Windows.Forms.CheckBox();
             allowUntrustedScriptsBox = new System.Windows.Forms.CheckBox();
             gameOverrideBox = new System.Windows.Forms.ComboBox();
-            label5 = new System.Windows.Forms.Label();
+            gameOverrideLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
@@ -83,27 +83,27 @@
             closeButton.UseVisualStyleBackColor = true;
             closeButton.Click += closeButton_Click;
             // 
-            // label1
+            // themeLabel
             // 
-            label1.AutoSize = true;
-            label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label1.Location = new System.Drawing.Point(72, 72);
-            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(53, 16);
-            label1.TabIndex = 15;
-            label1.Text = "Theme:";
+            themeLabel.AutoSize = true;
+            themeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            themeLabel.Location = new System.Drawing.Point(72, 72);
+            themeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            themeLabel.Name = "themeLabel";
+            themeLabel.Size = new System.Drawing.Size(53, 16);
+            themeLabel.TabIndex = 15;
+            themeLabel.Text = "Theme:";
             // 
-            // label2
+            // favoriteThingLabel
             // 
-            label2.AutoSize = true;
-            label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label2.Location = new System.Drawing.Point(22, 102);
-            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(96, 16);
-            label2.TabIndex = 16;
-            label2.Text = "Favorite Thing:";
+            favoriteThingLabel.AutoSize = true;
+            favoriteThingLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            favoriteThingLabel.Location = new System.Drawing.Point(22, 102);
+            favoriteThingLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            favoriteThingLabel.Name = "favoriteThingLabel";
+            favoriteThingLabel.Size = new System.Drawing.Size(96, 16);
+            favoriteThingLabel.TabIndex = 16;
+            favoriteThingLabel.Text = "Favorite Thing:";
             // 
             // aboutButton
             // 
@@ -161,16 +161,16 @@
             numericUpDown1.TabIndex = 4;
             numericUpDown1.ValueChanged += numericUpDown1_ValueChanged;
             // 
-            // label3
+            // zoomLabel
             // 
-            label3.AutoSize = true;
-            label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label3.Location = new System.Drawing.Point(82, 130);
-            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(45, 16);
-            label3.TabIndex = 17;
-            label3.Text = "Zoom:";
+            zoomLabel.AutoSize = true;
+            zoomLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            zoomLabel.Location = new System.Drawing.Point(82, 130);
+            zoomLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            zoomLabel.Name = "zoomLabel";
+            zoomLabel.Size = new System.Drawing.Size(45, 16);
+            zoomLabel.TabIndex = 17;
+            zoomLabel.Text = "Zoom:";
             // 
             // enableDiscordRpc
             // 
@@ -256,16 +256,16 @@
             enablePrettyBytecode.UseVisualStyleBackColor = true;
             enablePrettyBytecode.CheckedChanged += enablePrettyBytecode_CheckedChanged;
             // 
-            // label4
+            // flagsLabel
             // 
-            label4.AutoSize = true;
-            label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label4.Location = new System.Drawing.Point(82, 161);
-            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(44, 16);
-            label4.TabIndex = 18;
-            label4.Text = "Flags:";
+            flagsLabel.AutoSize = true;
+            flagsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            flagsLabel.Location = new System.Drawing.Point(82, 161);
+            flagsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            flagsLabel.Name = "flagsLabel";
+            flagsLabel.Size = new System.Drawing.Size(44, 16);
+            flagsLabel.TabIndex = 18;
+            flagsLabel.Text = "Flags:";
             // 
             // customSerializationFlagsBox
             // 
@@ -324,16 +324,16 @@
             gameOverrideBox.TabIndex = 6;
             gameOverrideBox.SelectedIndexChanged += gameOverrideBox_SelectedIndexChanged;
             // 
-            // label5
+            // gameOverrideLabel
             // 
-            label5.AutoSize = true;
-            label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
-            label5.Location = new System.Drawing.Point(15, 191);
-            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(102, 16);
-            label5.TabIndex = 26;
-            label5.Text = "Game Override:";
+            gameOverrideLabel.AutoSize = true;
+            gameOverrideLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.25F);
+            gameOverrideLabel.Location = new System.Drawing.Point(15, 191);
+            gameOverrideLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            gameOverrideLabel.Name = "gameOverrideLabel";
+            gameOverrideLabel.Size = new System.Drawing.Size(102, 16);
+            gameOverrideLabel.TabIndex = 26;
+            gameOverrideLabel.Text = "Game Override:";
             // 
             // SettingsForm
             // 
@@ -341,12 +341,12 @@
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(421, 421);
             Controls.Add(gameOverrideBox);
-            Controls.Add(label5);
+            Controls.Add(gameOverrideLabel);
             Controls.Add(allowUntrustedScriptsBox);
             Controls.Add(enableBakJson);
             Controls.Add(pictureBox1);
             Controls.Add(customSerializationFlagsBox);
-            Controls.Add(label4);
+            Controls.Add(flagsLabel);
             Controls.Add(enablePrettyBytecode);
             Controls.Add(enableUpdateNotice);
             Controls.Add(restoreSize);
@@ -354,14 +354,14 @@
             Controls.Add(doubleClickToEdit);
             Controls.Add(enableDynamicTree);
             Controls.Add(enableDiscordRpc);
-            Controls.Add(label3);
+            Controls.Add(zoomLabel);
             Controls.Add(numericUpDown1);
             Controls.Add(valuesOnScroll);
             Controls.Add(favoriteThingBox);
             Controls.Add(themeComboBox);
             Controls.Add(aboutButton);
-            Controls.Add(label2);
-            Controls.Add(label1);
+            Controls.Add(favoriteThingLabel);
+            Controls.Add(themeLabel);
             Controls.Add(closeButton);
             Controls.Add(infoLabel);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -380,8 +380,8 @@
 
         private System.Windows.Forms.Label infoLabel;
         private System.Windows.Forms.Button closeButton;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label themeLabel;
+        private System.Windows.Forms.Label favoriteThingLabel;
         private System.Windows.Forms.Button aboutButton;
         private System.Windows.Forms.ComboBox themeComboBox;
         private System.Windows.Forms.CheckBox valuesOnScroll;
@@ -393,14 +393,14 @@
         private System.Windows.Forms.CheckBox enableUpdateNotice;
         private System.Windows.Forms.CheckBox enablePrettyBytecode;
         internal System.Windows.Forms.NumericUpDown numericUpDown1;
-        internal System.Windows.Forms.Label label3;
+        internal System.Windows.Forms.Label zoomLabel;
         internal System.Windows.Forms.TextBox favoriteThingBox;
         internal System.Windows.Forms.CheckedListBox customSerializationFlagsBox;
-        internal System.Windows.Forms.Label label4;
+        internal System.Windows.Forms.Label flagsLabel;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.CheckBox enableBakJson;
         private System.Windows.Forms.CheckBox allowUntrustedScriptsBox;
         private System.Windows.Forms.ComboBox gameOverrideBox;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label gameOverrideLabel;
     }
 }

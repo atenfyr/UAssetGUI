@@ -259,9 +259,9 @@ namespace UAssetGUI
             // (not actually that big a deal if the comic sans easter egg breaks something, but a big deal if we break something else just to fix the easter egg...)
             if (frm is SettingsForm frm4 && needRefreshForComicSans)
             {
-                frm4.numericUpDown1.Location = new Point(frm4.favoriteThingBox.Location.X, frm4.label3.Location.Y);
+                frm4.numericUpDown1.Location = new Point(frm4.favoriteThingBox.Location.X, frm4.zoomLabel.Location.Y);
                 frm4.numericUpDown1.Size = frm4.favoriteThingBox.Size;
-                frm4.customSerializationFlagsBox.Location = new Point(frm4.favoriteThingBox.Location.X, frm4.label4.Location.Y);
+                frm4.customSerializationFlagsBox.Location = new Point(frm4.favoriteThingBox.Location.X, frm4.flagsLabel.Location.Y);
                 frm4.customSerializationFlagsBox.Size = frm4.favoriteThingBox.Size;
             }
         }

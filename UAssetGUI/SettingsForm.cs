@@ -37,7 +37,7 @@ namespace UAssetGUI
             }
             customSerializationFlagsBox.EndUpdate();
 
-            themeComboBox.DataSource = Enum.GetValues(typeof(UAGTheme));
+            themeComboBox.DataSource = new string[2] { UAGConfig.GetString("Settings.Theme.Light"), UAGConfig.GetString("Settings.Theme.Dark") };
             themeComboBox.SelectedIndex = (int)UAGPalette.GetCurrentTheme();
             valuesOnScroll.Checked = UAGConfig.Data.ChangeValuesOnScroll;
             doubleClickToEdit.Checked = UAGConfig.Data.DoubleClickToEdit;
@@ -59,8 +59,31 @@ namespace UAssetGUI
             gameOverrideBox.SelectedIndex = (int)currentOverride;
 
             UAGPalette.RefreshTheme(this);
+            Localize();
             this.AdjustFormPosition();
             _readyToUpdateTheme = true;
+        }
+
+        private void Localize()
+        {
+            themeLabel.Text = UAGConfig.GetString("Settings.Theme");
+            favoriteThingLabel.Text = UAGConfig.GetString("Settings.FavoriteThing");
+            zoomLabel.Text = UAGConfig.GetString("Settings.Zoom");
+            flagsLabel.Text = UAGConfig.GetString("Settings.Flags");
+            gameOverrideLabel.Text = UAGConfig.GetString("Settings.GameOverride");
+            enableDiscordRpc.Text = UAGConfig.GetString("Settings.EnableDiscordRPC");
+            valuesOnScroll.Text = UAGConfig.GetString("Settings.ChangeValuesOnScroll");
+            doubleClickToEdit.Text = UAGConfig.GetString("Settings.DoubleClickToEdit");
+            enablePrettyBytecode.Text = UAGConfig.GetString("Settings.EnablePrettyBytecode");
+            enableDynamicTree.Text = UAGConfig.GetString("Settings.EnableDynamicTree");
+            restoreSize.Text = UAGConfig.GetString("Settings.RestoreGUISizeOnOpen");
+            enableUpdateNotice.Text = UAGConfig.GetString("Settings.EnableUpdateNotice");
+            enableBak.Text = UAGConfig.GetString("Settings.EnableBakFilesUASSET");
+            enableBakJson.Text = UAGConfig.GetString("Settings.EnableBakFilesJSON");
+            allowUntrustedScriptsBox.Text = UAGConfig.GetString("Settings.AllowUntrustedScripts");
+            aboutButton.Text = UAGConfig.GetString("Settings.Button.About");
+            closeButton.Text = UAGConfig.GetString("Generic.Button.Close");
+            // TODO move labels as needed for text length!
         }
 
         private void closeButton_Click(object sender, EventArgs e)
@@ -90,7 +113,7 @@ namespace UAssetGUI
         private void themeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (!_readyToUpdateTheme) return;
-            Enum.TryParse(themeComboBox.SelectedValue.ToString(), out UAGTheme nextTheme);
+            UAGTheme nextTheme = (UAGTheme)themeComboBox.SelectedIndex;
             UAGPalette.SetCurrentTheme(nextTheme);
             UAGPalette.RefreshTheme(BaseForm);
             UAGPalette.RefreshTheme(this);
@@ -141,7 +164,7 @@ namespace UAssetGUI
         {
             if (allowUntrustedScriptsBox.Checked && !UAGConfig.Data.AllowUntrustedScripts)
             {
-                DialogResult result = MessageBox.Show("Scripts in UAssetGUI can potentially execute malicious code and cause damage to your computer. Never execute any scripts that you do not fully trust.\n\nWould you like to continue?", BaseForm.DisplayVersion, MessageBoxButtons.OKCancel);
+                DialogResult result = MessageBox.Show(UAGConfig.GetString("Settings.OnAllowUntrustedScripts"), BaseForm.DisplayVersion, MessageBoxButtons.OKCancel);
                 if (result == DialogResult.OK)
                 {
                     UAGConfig.Data.AllowUntrustedScripts = allowUntrustedScriptsBox.Checked;

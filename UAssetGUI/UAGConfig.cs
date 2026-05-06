@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.UnrealTypes;
@@ -13,6 +14,7 @@ namespace UAssetGUI
     public struct UAGConfigData
     {
         public string Agent;
+        public string Language;
         public string PreferredVersion;
         public string PreferredMappings;
         public string Theme;
@@ -38,6 +40,7 @@ namespace UAssetGUI
         public UAGConfigData()
         {
             Agent = "UAssetGUI";
+            Language = "en_US";
             PreferredVersion = string.Empty;
             Theme = string.Empty;
             MapStructTypeOverride = string.Empty;
@@ -335,6 +338,66 @@ namespace UAssetGUI
             return Enum.TryParse(UAGConfig.Data.GameSpecificOverride, out GameSpecificOverride overr) ? overr : GameSpecificOverride.None;
         }
 
+        private static Dictionary<string, string> _LocalizedStringsCache;
+        private static Dictionary<string, string> LocalizedStrings
+        {
+            get
+            {
+                if (_LocalizedStringsCache == null)
+                {
+                    _LocalizedStringsCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(Encoding.UTF8.GetString((byte[])Properties.Resources.ResourceManager.GetObject(UAGConfig.Data.Language)));
+                }
+                return _LocalizedStringsCache;
+            }
+        }
+
+        private static List<string> _LanguageCodesCache;
+        private static List<string> LanguageCodes
+        {
+            get
+            {
+                if (_LanguageCodesCache == null)
+                {
+                    _LanguageCodesCache = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(Properties.Resources.language_codes));
+                }
+                return _LanguageCodesCache;
+            }
+        }
+
+        private static List<string> _LanguageNamesCache;
+        private static List<string> LanguageNames
+        {
+            get
+            {
+                if (_LanguageNamesCache == null)
+                {
+                    _LanguageNamesCache = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(Properties.Resources.language_names));
+                }
+                return _LanguageNamesCache;
+            }
+        }
+
+        public static void SetLanguage(string code)
+        {
+            UAGConfig.Data.Language = code;
+            _LocalizedStringsCache = null;
+        }
+
+        public static string GetString(string key)
+        {
+            return LocalizedStrings[key];
+        }
+
+        public static IReadOnlyList<string> GetLanguageCodes()
+        {
+            return LanguageCodes.AsReadOnly();
+        }
+
+        public static IReadOnlyList<string> GetLanguageNames()
+        {
+            return LanguageNames.AsReadOnly();
+        }
+
         public static void Save()
         {
             Data.Agent = UAGUtils.DisplayVersion;
@@ -363,6 +426,10 @@ namespace UAssetGUI
             {
                 Data = new UAGConfigData();
                 Save();
+            }
+            finally
+            {
+                if (string.IsNullOrEmpty(UAGConfig.Data.Language)) UAGConfig.Data.Language = GetLanguageCodes()[0];
             }
         }
     }

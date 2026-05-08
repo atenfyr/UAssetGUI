@@ -526,6 +526,25 @@ namespace UAssetGUI
             RecalculateNodes();
             UAGConfig.RefreshAllScriptIDs(false); // false to avoid infinite loop
 
+            // adjust button sizes
+            ForceResize();
+            using (Graphics g = setBinaryData.CreateGraphics())
+            {
+                {
+                    int textWidth = (int)g.MeasureString(importBinaryData.Text, importBinaryData.Font).Width;
+                    importBinaryData.Size = new Size((int)(textWidth + 30), importBinaryData.Size.Height);
+                }
+                {
+                    int textWidth = (int)g.MeasureString(exportBinaryData.Text, exportBinaryData.Font).Width;
+                    exportBinaryData.Size = new Size((int)(textWidth + 30), exportBinaryData.Size.Height);
+                }
+                {
+                    int textWidth = (int)g.MeasureString(setBinaryData.Text, setBinaryData.Font).Width;
+                    setBinaryData.Size = new Size((int)(textWidth + 30), setBinaryData.Size.Height);
+                }
+            }
+            ForceResize();
+
             _lastCode = UAGConfig.Data.Language;
         }
 
@@ -1759,48 +1778,56 @@ namespace UAssetGUI
             if (byteView1 != null) byteView1.Refresh();
             if (jsonView != null) jsonView.Refresh();
 
-            int comboSpecifyVersionX = this.splitContainer1.Location.X + this.splitContainer1.Size.Width - this.comboSpecifyVersion.Width;
-            int comboSpecifyVersionY = this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2;
-
-            int preferredWidth = -1;
-            if (!importBinaryData.Visible) // allow upsizing only if buttons are not visible to prevent overlap
+            this.SuspendLayout();
+            try
             {
-                using (Graphics g = comboSpecifyMappings.CreateGraphics())
+                int comboSpecifyVersionX = this.splitContainer1.Location.X + this.splitContainer1.Size.Width - this.comboSpecifyVersion.Width;
+                int comboSpecifyVersionY = this.menuStrip1.Size.Height - this.comboSpecifyVersion.Size.Height - 2;
+
+                int preferredWidth = -1;
+                if (!importBinaryData.Visible) // allow upsizing only if buttons are not visible to prevent overlap
                 {
-                    foreach (var obj in comboSpecifyMappings.Items)
+                    using (Graphics g = comboSpecifyMappings.CreateGraphics())
                     {
-                        string itemText = comboSpecifyMappings.GetItemText(obj);
-                        int temp = (int)g.MeasureString(itemText, comboSpecifyMappings.Font).Width;
-                        if (temp > preferredWidth)
+                        foreach (var obj in comboSpecifyMappings.Items)
                         {
-                            preferredWidth = temp;
+                            string itemText = comboSpecifyMappings.GetItemText(obj);
+                            int temp = (int)g.MeasureString(itemText, comboSpecifyMappings.Font).Width;
+                            if (temp > preferredWidth)
+                            {
+                                preferredWidth = temp;
+                            }
                         }
                     }
+                    preferredWidth += (int)(SystemInformation.VerticalScrollBarWidth * 1.2f);
                 }
-                preferredWidth += (int)(SystemInformation.VerticalScrollBarWidth * 1.2f);
+
+                // enforce minimum width
+                int minWidth = 108;
+                if (preferredWidth < minWidth) preferredWidth = minWidth;
+
+                // enforce maximum width
+                int minPosX = Math.Max(menuStrip1.Left + menuStrip1.GetPreferredSize(Size.Empty).Width, splitContainer1.Location.X + splitContainer1.SplitterDistance + splitContainer1.SplitterWidth);
+                int maxWidth = comboSpecifyVersionX - 5 - minPosX;
+                if (minWidth > maxWidth) maxWidth = minWidth;
+                if (preferredWidth > maxWidth) preferredWidth = maxWidth;
+
+                comboSpecifyMappings.Size = new Size(preferredWidth, comboSpecifyMappings.Height);
+
+                comboSpecifyVersion.Location = new Point(comboSpecifyVersionX, comboSpecifyVersionY);
+                comboSpecifyMappings.Location = new Point(comboSpecifyVersionX - 5 - preferredWidth, comboSpecifyVersionY);
+
+                importBinaryData.Location = new Point(minPosX, comboSpecifyVersion.Location.Y);
+                exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
+                setBinaryData.Location = new Point(exportBinaryData.Location.X + exportBinaryData.Size.Width + 5, importBinaryData.Location.Y);
+                importBinaryData.Size = new Size(importBinaryData.Width, comboSpecifyVersion.Height); importBinaryData.Font = new Font(importBinaryData.Font.FontFamily, 6.75f, importBinaryData.Font.Style);
+                exportBinaryData.Size = new Size(exportBinaryData.Width, comboSpecifyVersion.Height); exportBinaryData.Font = importBinaryData.Font;
+                setBinaryData.Size = new Size(setBinaryData.Width, comboSpecifyVersion.Height); setBinaryData.Font = importBinaryData.Font;
             }
-
-            // enforce minimum width
-            int minWidth = 108;
-            if (preferredWidth < minWidth) preferredWidth = minWidth;
-
-            // enforce maximum width
-            int minPosX = Math.Max(menuStrip1.Left + menuStrip1.GetPreferredSize(Size.Empty).Width, splitContainer1.Location.X + splitContainer1.SplitterDistance + splitContainer1.SplitterWidth);
-            int maxWidth = comboSpecifyVersionX - 5 - minPosX;
-            if (minWidth > maxWidth) maxWidth = minWidth;
-            if (preferredWidth > maxWidth) preferredWidth = maxWidth;
-
-            comboSpecifyMappings.Size = new Size(preferredWidth, comboSpecifyMappings.Height);
-
-            comboSpecifyVersion.Location = new Point(comboSpecifyVersionX, comboSpecifyVersionY);
-            comboSpecifyMappings.Location = new Point(comboSpecifyVersionX - 5 - preferredWidth, comboSpecifyVersionY);
-
-            importBinaryData.Location = new Point(minPosX, comboSpecifyVersion.Location.Y);
-            exportBinaryData.Location = new Point(importBinaryData.Location.X + importBinaryData.Size.Width + 5, importBinaryData.Location.Y);
-            setBinaryData.Location = new Point(exportBinaryData.Location.X + exportBinaryData.Size.Width + 5, importBinaryData.Location.Y);
-            importBinaryData.Size = new Size(importBinaryData.Width, comboSpecifyVersion.Height); importBinaryData.Font = new Font(importBinaryData.Font.FontFamily, 6.75f, importBinaryData.Font.Style);
-            exportBinaryData.Size = new Size(exportBinaryData.Width, comboSpecifyVersion.Height); exportBinaryData.Font = importBinaryData.Font;
-            setBinaryData.Size = new Size(setBinaryData.Width, comboSpecifyVersion.Height); setBinaryData.Font = importBinaryData.Font;
+            finally
+            {
+                this.ResumeLayout();
+            }
         }
 
         private void frm_sizeChanged(object sender, EventArgs e)

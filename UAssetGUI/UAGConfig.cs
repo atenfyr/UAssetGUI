@@ -92,7 +92,7 @@ namespace UAssetGUI
         public static string StagingFolder => Path.Combine(ConfigFolder, "Staging");
         public static string ExtractedFolder => Path.Combine(ConfigFolder, "Extracted");
         public static string ScriptsFolder => Path.Combine(ConfigFolder, "Scripts");
-        public static string TempFolder => Path.Combine(Path.GetTempPath(), "UAssetGUI");
+        public static string TempFolder => Path.Combine(Path.GetTempPath(), "UAssetGUI", Environment.ProcessId.ToString());
 
         internal static bool DifferentStagingPerPak = false;
 
@@ -460,19 +460,33 @@ namespace UAssetGUI
             return LanguageNames.AsReadOnly();
         }
 
-        public static void Save()
+        public static bool ReadyToSave = true; // only accessed on UI thread
+
+        public static void Save(bool canSilentlyFail = false)
         {
-            Data.Agent = UAGUtils.DisplayVersion;
-            SaveCustomFile("config.json", JsonConvert.SerializeObject(Data, Formatting.Indented));
+            UAGUtils.InvokeUI(() =>
+            {
+                if (!ReadyToSave) return;
+                Data.Agent = UAGUtils.DisplayVersion;
+                SaveCustomFile("config.json", JsonConvert.SerializeObject(Data, Formatting.Indented), null, canSilentlyFail);
+            });
         }
 
-        public static string SaveCustomFile(string name, string text, string subFolder = null)
+        public static string SaveCustomFile(string name, string text, string subFolder = null, bool canSilentlyFail = false)
         {
             string outPath = Path.Combine(ConfigFolder, name);
             if (!string.IsNullOrEmpty(subFolder)) outPath = Path.Combine(ConfigFolder, subFolder, name);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(outPath));
-            File.WriteAllText(outPath, text);
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(outPath));
+                File.WriteAllText(outPath, text);
+            }
+            catch (IOException)
+            {
+                // throw exception only if canSilentlyFail false, else absorb this exception
+                if (!canSilentlyFail) throw;
+            }
 
             return outPath;
         }

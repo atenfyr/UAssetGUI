@@ -383,6 +383,8 @@ namespace UAssetGUI
         {
             UAGUtils.InvokeUI(() =>
             {
+                UAGConfig.ReadyToSave = false;
+
                 // sync size from config
                 if (UAGConfig.Data.RestoreSize)
                 {
@@ -457,6 +459,9 @@ namespace UAssetGUI
                 }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 UpdateVersionFromMappings();
+
+                UAGConfig.ReadyToSave = true;
+                UAGConfig.Save(true); // allow silent failure for if multiple processes opening at the exact same time
 
                 // Command line parameter support
                 if (Program.args.Count > 1)
@@ -1841,7 +1846,7 @@ namespace UAssetGUI
             {
                 UAGConfig.Data.StartupWidth = this.Size.Width;
                 UAGConfig.Data.StartupHeight = this.Size.Height;
-                UAGConfig.Save();
+                UAGConfig.Save(true); // allow silent fail if multiple instances are closing at once
             }
 
             if (existsUnsavedChanges && !IsReadOnly())

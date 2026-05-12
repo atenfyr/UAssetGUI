@@ -1032,7 +1032,7 @@ namespace UAssetGUI
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Unreal Assets (*.uasset, *.umap, *.json)|*.uasset;*.umap;*.json|All files (*.*)|*.*";
+                openFileDialog.Filter = "Unreal File Types (*.uasset, *.umap, *.json, *.pak, *.utoc, *.usmap)|*.uasset;*.umap;*.json;*.pak;*.utoc;*.usmap|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 

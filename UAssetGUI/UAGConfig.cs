@@ -440,11 +440,15 @@ namespace UAssetGUI
             return true;
         }
 
-        public static string GetString(string key)
+        public static string GetString(string key, bool returnNullIfFail = false)
         {
             if (!LocalizedStrings.ContainsKey(key))
             {
-                if (!LocalizedStringsFallback.ContainsKey(key)) throw new InvalidOperationException($"Attempt to load unknown localized string with key {key}");
+                if (!LocalizedStringsFallback.ContainsKey(key))
+                {
+                    if (returnNullIfFail) return null;
+                    throw new InvalidOperationException($"Attempt to load unknown localized string with key {key}");
+                }
                 return LocalizedStringsFallback[key];
             }
             return LocalizedStrings[key];

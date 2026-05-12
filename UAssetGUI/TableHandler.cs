@@ -1329,10 +1329,17 @@ namespace UAssetGUI
                     break;
                 case TableHandlerMode.ExportInformation:
                     string[] allExportDetailsFields = Export.GetAllFieldNames(asset);
-                    string[] allExportDetailsFields2 = new string[allExportDetailsFields.Length + 1];
-                    allExportDetailsFields.CopyTo(allExportDetailsFields2, 0);
-                    allExportDetailsFields2[allExportDetailsFields2.Length - 1] = "";
-                    AddColumns(allExportDetailsFields2);
+
+                    // replace all column names with localized string if available
+                    string[] allExportDetailsFieldsLocalized = new string[allExportDetailsFields.Length + 1];
+                    for (int i = 0; i < allExportDetailsFields.Length; i++)
+                    {
+                        allExportDetailsFieldsLocalized[i] = UAGConfig.GetString("Table.ExportInformation." + allExportDetailsFields[i], true) ?? allExportDetailsFields[i]; 
+                    }
+
+                    // add empty column
+                    allExportDetailsFieldsLocalized[allExportDetailsFieldsLocalized.Length - 1] = string.Empty;
+                    AddColumns(allExportDetailsFieldsLocalized);
 
                     for (int num = 0; num < asset.Exports.Count; num++)
                     {
@@ -2230,7 +2237,7 @@ namespace UAssetGUI
                         if (asset.Exports.Count <= rowNum)
                         {
                             // If we add a new category, we'll make a new NormalExport (None-terminated UProperty list). If you want to make some other kind of export, you'll need to do it manually with UAssetAPI
-                            var newCat = new NormalExport(asset, Array.Empty<Byte>());
+                            var newCat = new NormalExport(asset, Array.Empty<byte>());
                             newCat.Data = new List<PropertyData>();
                             asset.Exports.Add(newCat);
                             isNewExport = true;

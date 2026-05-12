@@ -164,7 +164,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NOTICE.md" />
     <EmbeddedResource Include="retoc.exe.gz" />
-    <Content Include="next_patch_notes.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UAssetAPI\UAssetAPI\UAssetAPI.csproj" />

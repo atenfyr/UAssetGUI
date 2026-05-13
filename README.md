@@ -72,7 +72,7 @@ Usage: `UAssetGUI portable`
 If you'd like to compile UAssetGUI for yourself, read on:
 
 ### Prerequisites
-* Visual Studio 2022 or later
+* Visual Studio 2026 or later, with .NET 10.0 SDK
 * Git
 
 ### Initial Setup

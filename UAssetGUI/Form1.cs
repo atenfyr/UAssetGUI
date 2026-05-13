@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
@@ -613,7 +614,7 @@ namespace UAssetGUI
             using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
                 if (fs.Read(buffer, 0, buffer.Length) == buffer.Length) res = BitConverter.ToUInt32(buffer, 0);
-                fs.Read(nextBytes, 0, nextBytes.Length);
+                fs.ReadExactly(nextBytes, 0, nextBytes.Length);
             }
 
             return res;
@@ -2018,6 +2019,7 @@ namespace UAssetGUI
         }
 
         private ContextMenuStrip _currentDataGridViewStrip;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ContextMenuStrip CurrentDataGridViewStrip
         {
             get

@@ -2,11 +2,13 @@
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace UAssetGUI
 {
     public partial class AboutForm : Form, ILocalizable
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string AboutText
         {
             get

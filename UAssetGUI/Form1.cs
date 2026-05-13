@@ -702,7 +702,7 @@ namespace UAssetGUI
                         else if (sig != UAsset.UASSET_MAGIC)
                         {
                             // check if opened .usmap
-                            if (Path.GetExtension(filePath) == ".usmap")
+                            if (Path.GetExtension(filePath) == ".usmap" || Path.GetExtension(filePath) == ".jmap")
                             {
                                 ImportMappingsFromPathInteractive(filePath);
                             }
@@ -2499,7 +2499,7 @@ namespace UAssetGUI
 
                 try
                 {
-                    File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + ".usmap"), true);
+                    File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + Path.GetExtension(importPath)), true);
                     if (UAGConfig.AllMappings.ContainsKey(newFileName)) UAGConfig.AllMappings.Remove(newFileName);
                     UpdateMappings(newFileName);
 

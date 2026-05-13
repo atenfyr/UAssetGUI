@@ -102,7 +102,11 @@ namespace UAssetGUI
             Directory.CreateDirectory(MappingsFolder);
 
             AllMappings.Clear();
-            string[] allMappingFiles = Directory.GetFiles(MappingsFolder, "*.usmap", SearchOption.TopDirectoryOnly);
+            List<string> allMappingFiles =
+            [
+                .. Directory.GetFiles(MappingsFolder, "*.usmap", SearchOption.TopDirectoryOnly),
+                .. Directory.GetFiles(MappingsFolder, "*.jmap", SearchOption.TopDirectoryOnly),
+            ];
             foreach (string mappingPath in allMappingFiles)
             {
                 AllMappings.Add(Path.GetFileNameWithoutExtension(mappingPath), mappingPath);

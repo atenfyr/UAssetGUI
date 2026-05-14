@@ -1290,43 +1290,48 @@ namespace UAssetGUI
                             using (FileStream stream = new FileStream(ParentForm.CurrentContainerPath, FileMode.Open))
                             {
                                 var reader = new PakBuilder().Reader(stream);
+                                string basePath = FullPath.Substring(Prefix?.Length ?? 0);
 
-                                byte[] res = reader.Get(stream, FullPath.Substring(Prefix?.Length ?? 0));
-                                if (res != null)
-                                {
-                                    UAGUtils.DeleteFileQuick(outputPath1);
-                                    File.WriteAllBytes(outputPath1, res);
-                                }
-                                else
-                                {
-                                    return null;
-                                }
+                                byte[] res = reader.Get(stream, basePath);
+                                if (res == null) return null;
+                                UAGUtils.DeleteFileQuick(outputPath1);
+                                File.WriteAllBytes(outputPath1, res);
+                                res = null;
 
-                                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
+                                res = reader.Get(stream, Path.ChangeExtension(basePath, ".uexp"));
                                 UAGUtils.DeleteFileQuick(outputPath2);
-                                if (res != null) File.WriteAllBytes(outputPath2, res);
+                                if (res != null) { File.WriteAllBytes(outputPath2, res); res = null; }
 
-                                res = reader.Get(stream, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
+                                res = reader.Get(stream, Path.ChangeExtension(basePath, ".ubulk"));
                                 UAGUtils.DeleteFileQuick(outputPath3);
-                                if (res != null) File.WriteAllBytes(outputPath3, res);
+                                if (res != null) { File.WriteAllBytes(outputPath3, res); res = null; }
                             }
                         }
                         else
                         {
-                            byte[] res = reader2.Get(stream2, FullPath.Substring(Prefix?.Length ?? 0));
-                            if (res != null)
-                            {
-                                File.WriteAllBytes(outputPath1, res);
-                            }
-                            else
-                            {
+                            string basePath = FullPath.Substring(Prefix?.Length ?? 0);
+                            byte[] res = reader2.Get(stream2, basePath);
+
+                            if (res == null) 
                                 return null;
+
+                            UAGUtils.DeleteFileQuick(outputPath1);
+                            File.WriteAllBytes(outputPath1, res);
+                            res = null;
+
+                            res = reader2.Get(stream2, Path.ChangeExtension(basePath, ".uexp"));
+                            UAGUtils.DeleteFileQuick(outputPath2);
+                            if (res != null) {
+                                File.WriteAllBytes(outputPath2, res); 
+                                res = null; 
                             }
 
-                            res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".uexp"));
-                            if (res != null) File.WriteAllBytes(outputPath2, res);
-                            res = reader2.Get(stream2, Path.ChangeExtension(FullPath.Substring(Prefix?.Length ?? 0), ".ubulk"));
-                            if (res != null) File.WriteAllBytes(outputPath3, res);
+                            res = reader2.Get(stream2, Path.ChangeExtension(basePath, ".ubulk"));
+                            UAGUtils.DeleteFileQuick(outputPath3);
+                            if (res != null) { 
+                                File.WriteAllBytes(outputPath3, res); 
+                                res = null; 
+                            }
                         }
                     }
                     break;

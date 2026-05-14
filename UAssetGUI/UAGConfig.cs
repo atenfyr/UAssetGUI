@@ -96,20 +96,33 @@ namespace UAssetGUI
 
         internal static bool DifferentStagingPerPak = false;
 
+        public static readonly string[] ValidMappingsExtensions = [".usmap", ".jmap", ".jmap.gz"]; // must include dot prefix
+
         public static void LoadMappings()
         {
             Directory.CreateDirectory(ConfigFolder);
             Directory.CreateDirectory(MappingsFolder);
 
             AllMappings.Clear();
-            List<string> allMappingFiles =
-            [
-                .. Directory.GetFiles(MappingsFolder, "*.usmap", SearchOption.TopDirectoryOnly),
-                .. Directory.GetFiles(MappingsFolder, "*.jmap", SearchOption.TopDirectoryOnly),
-            ];
+            List<string> allMappingFiles = new List<string>();
+            foreach (string ext in ValidMappingsExtensions)
+            {
+                allMappingFiles.AddRange(Directory.GetFiles(MappingsFolder, "*" + ext, SearchOption.TopDirectoryOnly));
+            }
             foreach (string mappingPath in allMappingFiles)
             {
-                AllMappings.Add(Path.GetFileNameWithoutExtension(mappingPath), mappingPath);
+                // can't use Path.GetFileNameWithoutExtension because it doesn't properly handle extensions with multiple dots
+                string mappingPathNoExtension = Path.GetFileName(mappingPath);
+                foreach (string ext in UAGConfig.ValidMappingsExtensions)
+                {
+                    if (mappingPathNoExtension.EndsWith(ext))
+                    {
+                        mappingPathNoExtension = mappingPathNoExtension.Substring(0, mappingPathNoExtension.Length - ext.Length);
+                        break;
+                    }
+                }
+
+                AllMappings.Add(mappingPathNoExtension, mappingPath);
             }
         }
 

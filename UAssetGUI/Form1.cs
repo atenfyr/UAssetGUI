@@ -633,7 +633,10 @@ namespace UAssetGUI
             jsonView.Visible = false;
 
             bool didACE7Decrypt = false;
+
+#pragma warning disable CS0219
             string jsonTracingPath = null;
+#pragma warning restore CS0219
 
             try
             {
@@ -702,8 +705,18 @@ namespace UAssetGUI
                         }
                         else if (sig != UAsset.UASSET_MAGIC)
                         {
+                            bool isMappings = false;
+                            foreach (string ext in UAGConfig.ValidMappingsExtensions)
+                            {
+                                if (filePath.EndsWith(ext)) // can't use Path.GetExtension because extension could contain multiple dots (for example .jmap.gz)
+                                {
+                                    isMappings = true;
+                                    break;
+                                }
+                            }
+
                             // check if opened .usmap
-                            if (Path.GetExtension(filePath) == ".usmap" || Path.GetExtension(filePath) == ".jmap")
+                            if (isMappings)
                             {
                                 ImportMappingsFromPathInteractive(filePath);
                             }
@@ -1033,7 +1046,7 @@ namespace UAssetGUI
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Unreal File Types (*.uasset, *.umap, *.json, *.pak, *.utoc, *.usmap)|*.uasset;*.umap;*.json;*.pak;*.utoc;*.usmap|All files (*.*)|*.*";
+                openFileDialog.Filter = "Unreal File Types (*.uasset, *.umap, *.json, *.pak, *.utoc, *.usmap, *.jmap, *.jmap.gz)|*.uasset;*.umap;*.json;*.pak;*.utoc;*.usmap;*.jmap;*.jmap.gz|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 
@@ -2479,7 +2492,18 @@ namespace UAssetGUI
         {
             UAGUtils.InvokeUI(() =>
             {
-                string newFileName = Path.GetFileNameWithoutExtension(importPath);
+                // can't use Path.GetFileNameWithoutExtension because it doesn't properly handle extensions with multiple dots
+                string newFileName = Path.GetFileName(importPath);
+                string fileExtension = ".usmap";
+                foreach (string ext in UAGConfig.ValidMappingsExtensions)
+                {
+                    if (newFileName.EndsWith(ext))
+                    {
+                        newFileName = newFileName.Substring(0, newFileName.Length - ext.Length);
+                        fileExtension = ext;
+                        break;
+                    }
+                }
 
                 // special case if just "Mappings.usmap"
                 if (newFileName == "Mappings")
@@ -2501,7 +2525,7 @@ namespace UAssetGUI
 
                 try
                 {
-                    File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + Path.GetExtension(importPath)), true);
+                    File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + fileExtension), true);
                     if (UAGConfig.AllMappings.ContainsKey(newFileName)) UAGConfig.AllMappings.Remove(newFileName);
                     UpdateMappings(newFileName);
 

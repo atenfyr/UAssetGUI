@@ -2438,7 +2438,7 @@ namespace UAssetGUI
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Unreal mappings file (*.usmap)|*.usmap|All files (*.*)|*.*";
+                openFileDialog.Filter = "Unreal mappings file (*.usmap, *.jmap, *.jmap.gz)|*.usmap;*.jmap;*.jmap.gz|All files (*.*)|*.*";
                 openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 

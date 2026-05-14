@@ -259,11 +259,14 @@ namespace UAssetGUI
             test.Show();
         }
 
+        internal bool ReadyToUpdateMappings = true;
+
         internal void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
         {
             UAGConfig.LoadMappings();
             UAGUtils.InvokeUI(() =>
             {
+                ReadyToUpdateMappings = false;
                 allMappingsKeys.Clear();
                 allMappingsKeys.Add(UAGConfig.GetString("Generic.NoMappings"));
                 allMappingsKeys.AddRange(UAGConfig.AllMappings.Keys.OrderBy(s => s).ToArray());
@@ -288,6 +291,7 @@ namespace UAssetGUI
                     comboSpecifyMappings.SelectedIndex = 0;
                 }
 
+                ReadyToUpdateMappings = true;
                 UpdateComboSpecifyMappings(alsoCheckVersion);
             });
         }
@@ -1964,6 +1968,7 @@ namespace UAssetGUI
 
         private void UpdateComboSpecifyMappings(bool alsoCheckVersion = true)
         {
+            if (!ReadyToUpdateMappings) return;
             if (!UAGConfig.TryGetMappings(allMappingsKeys[comboSpecifyMappings.SelectedIndex], out ParsingMappings)) comboSpecifyMappings.SelectedIndex = 0;
             if (tableEditor?.asset != null) tableEditor.asset.Mappings = ParsingMappings;
             UAGConfig.Data.PreferredMappings = allMappingsKeys[comboSpecifyMappings.SelectedIndex];

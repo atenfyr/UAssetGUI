@@ -1014,6 +1014,7 @@ namespace UAssetGUI
 
         private void toggleFlatViewToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (SelectedTreeView == null || FlatViewEnabled == null) return;
             if (!FlatViewEnabled.ContainsKey(SelectedTreeView)) FlatViewEnabled[SelectedTreeView] = false;
             FlatViewEnabled[SelectedTreeView] = !FlatViewEnabled[SelectedTreeView];
             RefreshTreeView(SelectedTreeView);
@@ -1041,7 +1042,7 @@ namespace UAssetGUI
 
                 replacementPrompt.Dispose();
 
-                if (filter != null && loadTreeView != null)
+                if (filter != null && loadTreeView != null && this.Filter != null)
                 {
                     this.Filter[loadTreeView] = filter;
                     RefreshTreeView(loadTreeView);

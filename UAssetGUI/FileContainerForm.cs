@@ -1099,7 +1099,7 @@ namespace UAssetGUI
                 tsmItem = new ToolStripMenuItem(UAGConfig.GetString("FileContainerForm.ContextMenu.Extract"));
                 tsmItem.Click += (sender, args) =>
                 {
-                    string outPath = UAGConfig.ExtractFile(Pointer, item.ParentForm.InteropType);
+                    string outPath = UAGConfig.ExtractPakNode(Pointer, item.ParentForm.InteropType);
                     if (outPath == null) return;
                     if ((Path.GetExtension(outPath)?.Length ?? 0) > 0) outPath = Path.GetDirectoryName(outPath);
                     UAGUtils.OpenDirectory(outPath);

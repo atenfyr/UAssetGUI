@@ -22,6 +22,7 @@ If you would like to set up UAssetGUI for Linux (through Wine), perform the foll
 3. Install the latest version of winetricks. See this guide: https://github.com/Winetricks/winetricks?tab=readme-ov-file#installing. If you are on Debian/Ubuntu, you should perform the steps under "Manual Install" on the winetricks GitHub page to make sure that winetricks is up-to-date.
 4. To install necessary pre-requisites, execute `winetricks dotnetdesktop10 micross` on the command line and go through all prompts that appear.
     * For UAssetGUI v1.1.0 and lower, instead execute `winetricks dotnetdesktop8 micross`
+    * For UAssetGUI v1.0.0.0-alpha.8 and lower, instead execute `winetricks dotnet472 micross`
 5. Open UAssetGUI through Wine: `wine UAssetGUI.exe`
 
 ## Command line arguments

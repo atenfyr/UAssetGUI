@@ -203,6 +203,60 @@ namespace UAssetGUI
             return item.SaveFileToTemp(interopType, ExtractedFolder, stream2, reader2);
         }
 
+        public static string ExtractPakNode(DirectoryTreeItem item, InteropType interopType)
+        {
+            var finalPath = Path.Combine(ExtractedFolder, item.FullPath.Replace('/', Path.DirectorySeparatorChar));
+
+            List<DirectoryTreeItem> ItemsToExport = GetNodeItemList(item);
+
+            if (ItemsToExport.Count > 0)
+            {
+
+                using (FileStream stream = new FileStream(item.ParentForm.CurrentContainerPath, FileMode.Open))
+                {
+                    using (var reader = new PakBuilder().Reader(stream))
+                    {
+                        foreach (var child in ItemsToExport)
+                            child.SaveFileToTemp(interopType, ExtractedFolder, stream, reader);
+                    }
+                }
+            }
+
+            return finalPath;
+        }
+
+        public static List<DirectoryTreeItem> GetNodeItemList(DirectoryTreeItem rootNode)
+        {
+            var ExportFiles = new List<DirectoryTreeItem>();
+            var FolderStack = new Stack<DirectoryTreeItem>();
+
+            if (rootNode.IsFile)
+            {
+                ExportFiles.Add(rootNode);
+                return ExportFiles;
+            }
+
+            FolderStack.Push(rootNode);
+
+            while (FolderStack.Count > 0)
+            {
+                var iterItem = FolderStack.Pop();
+
+                foreach (var child in iterItem.Children.Values)
+                {
+                    if (child.IsFile)
+                    {
+                        ExportFiles.Add(child);
+                    } 
+                    else
+                    {
+                        FolderStack.Push(child);
+                    }
+                }
+            }
+
+            return ExportFiles;
+        }
         public static bool TryGetMappings(string name, out Usmap mappings)
         {
             if (AllMappings.TryGetValue(name, out string value))

@@ -531,7 +531,7 @@ namespace UAssetGUI
             if (path == null) return;
 
             string ext = Path.GetExtension(path);
-            switch(ext)
+            switch (ext)
             {
                 case ".pak":
                     LoadContainerPak(path);
@@ -925,7 +925,7 @@ namespace UAssetGUI
                 return;
             }
 
-            switch(InteropType)
+            switch (InteropType)
             {
                 case InteropType.Pak:
                     if (extractAllBackgroundWorker.IsBusy) return;
@@ -1267,7 +1267,7 @@ namespace UAssetGUI
         public string SaveFileToTemp(InteropType interopType, string outputPathDirectory = null, FileStream stream2 = null, PakReader reader2 = null)
         {
             outputPathDirectory = outputPathDirectory ?? Path.Combine(FileContainerForm.ReadOnlyTempPath, Path.GetFileNameWithoutExtension(ParentForm.CurrentContainerPath));
-            
+
             string outputPath1 = Path.Combine(outputPathDirectory, FullPath.Replace('/', Path.DirectorySeparatorChar));
             string outputPath2 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".uexp").Replace('/', Path.DirectorySeparatorChar));
             string outputPath3 = Path.Combine(outputPathDirectory, Path.ChangeExtension(FullPath, ".ubulk").Replace('/', Path.DirectorySeparatorChar));
@@ -1281,7 +1281,7 @@ namespace UAssetGUI
                 return outputPath1;
             }
 
-            switch(interopType)
+            switch (interopType)
             {
                 case InteropType.Pak:
                     {
@@ -1418,7 +1418,7 @@ namespace UAssetGUI
             bool success = UAGUtils.DeleteFileQuick(FixedPathOnDisk);
             UAGUtils.DeleteFileQuick(Path.ChangeExtension(FixedPathOnDisk, ".uexp"));
             UAGUtils.DeleteFileQuick(Path.ChangeExtension(FixedPathOnDisk, ".ubulk"));
-            
+
             if (!success)
             {
                 UAGUtils.DeleteDirectoryQuick(FixedPathOnDisk, true);

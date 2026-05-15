@@ -1,4 +1,4 @@
-﻿using Markdig;
+using Markdig;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

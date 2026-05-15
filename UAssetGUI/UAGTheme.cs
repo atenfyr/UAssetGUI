@@ -1,4 +1,4 @@
-﻿namespace UAssetGUI
+namespace UAssetGUI
 {
     public enum UAGTheme
     {

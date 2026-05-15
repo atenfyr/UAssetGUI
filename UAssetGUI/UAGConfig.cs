@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -212,7 +212,7 @@ namespace UAssetGUI
                     mappings = new Usmap(value);
                     return true;
                 }
-                catch 
+                catch
                 {
                     UAGUtils.InvokeUI(() =>
                     {
@@ -233,7 +233,7 @@ namespace UAssetGUI
             mappings = null;
             return false;
         }
-        
+
         public static void RefreshAllScriptIDs(bool refreshTheme = true)
         {
             Directory.CreateDirectory(ScriptsFolder);

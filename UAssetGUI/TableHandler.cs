@@ -131,7 +131,7 @@ namespace UAssetGUI
         public FileContainerForm ParentContainer;
 
         public bool readyToSave = true;
-        public bool dirtySinceLastLoad = false; 
+        public bool dirtySinceLastLoad = false;
 
         public static Color ARGBtoRGB(Color ARGB)
         {
@@ -1209,7 +1209,7 @@ namespace UAssetGUI
 
         public Form1 GetParentForm()
         {
-            return (Form1) dataGridView1.Parent.Parent.Parent;
+            return (Form1)dataGridView1.Parent.Parent.Parent;
         }
 
         private void SetHexButtonsVisible(bool newValue)
@@ -1334,7 +1334,7 @@ namespace UAssetGUI
                     string[] allExportDetailsFieldsLocalized = new string[allExportDetailsFields.Length + 1];
                     for (int i = 0; i < allExportDetailsFields.Length; i++)
                     {
-                        allExportDetailsFieldsLocalized[i] = UAGConfig.GetString("Table.ExportInformation." + allExportDetailsFields[i], true) ?? allExportDetailsFields[i]; 
+                        allExportDetailsFieldsLocalized[i] = UAGConfig.GetString("Table.ExportInformation." + allExportDetailsFields[i], true) ?? allExportDetailsFields[i];
                     }
 
                     // add empty column

@@ -941,7 +941,7 @@ namespace UAssetGUI
                     MessageBox.Show(UAGConfig.GetString("Notice.UnversionedButNoMappings"), DisplayVersion);
                 }
 
-                if (tableEditor.asset.HasUnversionedProperties && failedCategoryCount > 0 && (tableEditor.asset.OtherAssetsFailedToAccess?.Count ?? 0) > 0)
+                if (tableEditor.asset.HasUnversionedProperties && (failedCategoryCount > 0 || failedToMaintainBinaryEquality) && (tableEditor.asset.OtherAssetsFailedToAccess?.Count ?? 0) > 0)
                 {
                     string formattedListOfFailedToAccessAssets = string.Join("\n", tableEditor.asset.OtherAssetsFailedToAccess);
                     MessageBox.Show(string.Format(UAGConfig.GetString("Notice.FailedToAccessOtherAssets"), formattedListOfFailedToAccessAssets), DisplayVersion);

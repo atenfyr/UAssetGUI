@@ -261,9 +261,9 @@ namespace UAssetGUI
 
         internal bool ReadyToUpdateMappings = true;
 
-        internal void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true)
+        internal void UpdateMappings(string newSelection = null, bool alsoCheckVersion = true, bool alsoLoadMappingsAtStart = true)
         {
-            UAGConfig.LoadMappings();
+            if (alsoLoadMappingsAtStart) UAGConfig.LoadMappings();
             UAGUtils.InvokeUI(() =>
             {
                 ReadyToUpdateMappings = false;
@@ -1822,7 +1822,7 @@ namespace UAssetGUI
                             }
                         }
                     }
-                    preferredWidth += (int)(SystemInformation.VerticalScrollBarWidth * 1.2f);
+                    preferredWidth += (int)(SystemInformation.VerticalScrollBarWidth * 1.5f);
                 }
 
                 // enforce minimum width
@@ -2530,9 +2530,10 @@ namespace UAssetGUI
 
                 try
                 {
-                    File.Copy(importPath, Path.Combine(UAGConfig.MappingsFolder, newFileName + fileExtension), true);
-                    if (UAGConfig.AllMappings.ContainsKey(newFileName)) UAGConfig.AllMappings.Remove(newFileName);
-                    UpdateMappings(newFileName);
+                    string newPath = Path.Combine(UAGConfig.MappingsFolder, newFileName + fileExtension);
+                    File.Copy(importPath, newPath, true);
+                    string fetchedName = UAGConfig.LoadMappings(newPath);
+                    UpdateMappings(fetchedName ?? throw new InvalidOperationException(), true, false);
 
                     UAGUtils.InvokeUI(ForceResize);
                 }

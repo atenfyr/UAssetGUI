@@ -98,32 +98,50 @@ namespace UAssetGUI
 
         public static readonly string[] ValidMappingsExtensions = [".usmap", ".jmap", ".jmap.gz"]; // must include dot prefix
 
-        public static void LoadMappings()
+        /// <summary>
+        /// Load the list of mappings from disk.
+        /// </summary>
+        /// <param name="pathToFetchNameOf">Path to fetch mappings name.</param>
+        /// <returns>If pathToFetchNameOf is specified, the combo box name of the mappings located at the path pathToFetchNameOf, else null.</returns>
+        public static string LoadMappings(string pathToFetchNameOf = null)
         {
             Directory.CreateDirectory(ConfigFolder);
             Directory.CreateDirectory(MappingsFolder);
 
+            string fetchedName = null;
+
             AllMappings.Clear();
             List<string> allMappingFiles = new List<string>();
+            int numDifferentExtensions = 0;
             foreach (string ext in ValidMappingsExtensions)
             {
-                allMappingFiles.AddRange(Directory.GetFiles(MappingsFolder, "*" + ext, SearchOption.TopDirectoryOnly));
+                string[] filesWithExt = Directory.GetFiles(MappingsFolder, "*" + ext, SearchOption.TopDirectoryOnly);
+                if (filesWithExt.Length > 0) numDifferentExtensions++;
+                allMappingFiles.AddRange(filesWithExt);
             }
             foreach (string mappingPath in allMappingFiles)
             {
                 // can't use Path.GetFileNameWithoutExtension because it doesn't properly handle extensions with multiple dots
                 string mappingPathNoExtension = Path.GetFileName(mappingPath);
+                string fileExtension = ".usmap";
                 foreach (string ext in UAGConfig.ValidMappingsExtensions)
                 {
                     if (mappingPathNoExtension.EndsWith(ext))
                     {
                         mappingPathNoExtension = mappingPathNoExtension.Substring(0, mappingPathNoExtension.Length - ext.Length);
+                        fileExtension = ext;
                         break;
                     }
                 }
 
-                AllMappings.Add(mappingPathNoExtension, mappingPath);
+                string decidedMappingsName = mappingPathNoExtension;
+                if (numDifferentExtensions > 1) decidedMappingsName += string.Concat(" [", fileExtension.AsSpan(1), "]"); // append extension to name if multiple types of mappings are present
+
+                AllMappings[decidedMappingsName] = mappingPath;
+                if (pathToFetchNameOf != null && Path.GetRelativePath(pathToFetchNameOf, mappingPath) == ".") fetchedName = decidedMappingsName;
             }
+
+            return fetchedName;
         }
 
         public static string GetStagingDirectory(string pakPath)

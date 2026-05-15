@@ -941,15 +941,15 @@ namespace UAssetGUI
                     MessageBox.Show(UAGConfig.GetString("Notice.UnversionedButNoMappings"), DisplayVersion);
                 }
 
+                if (failedToMaintainBinaryEquality)
+                {
+                    MessageBox.Show(UAGConfig.GetString("Notice.BinaryEquality"), DisplayVersion);
+                }
+
                 if (tableEditor.asset.HasUnversionedProperties && (failedCategoryCount > 0 || failedToMaintainBinaryEquality) && (tableEditor.asset.OtherAssetsFailedToAccess?.Count ?? 0) > 0)
                 {
                     string formattedListOfFailedToAccessAssets = string.Join("\n", tableEditor.asset.OtherAssetsFailedToAccess);
                     MessageBox.Show(string.Format(UAGConfig.GetString("Notice.FailedToAccessOtherAssets"), formattedListOfFailedToAccessAssets), DisplayVersion);
-                }
-
-                if (failedToMaintainBinaryEquality)
-                {
-                    MessageBox.Show(UAGConfig.GetString("Notice.BinaryEquality"), DisplayVersion);
                 }
 
                 if (!tableEditor.asset.IsUnversioned)

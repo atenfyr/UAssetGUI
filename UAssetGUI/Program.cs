@@ -132,16 +132,39 @@ namespace UAssetGUI
                     switch (args[1].ToLowerInvariant())
                     {
                         // tojson <source> <destination> <engine version> [mappings name]
-                        // UAssetGUI tojson A.umap B.json 23 Outriders
+                        // UAssetGUI tojson A.umap B.json 4.23 C:\Outriders.usmap
                         case "tojson":
-                            UAGConfig.LoadMappings();
-
                             if (args.Count < 5) break;
-                            if (args.Count >= 6) UAGConfig.TryGetMappings(args[5], out selectedMappings);
+                            if (args.Count >= 6)
+                            {
+                                string mappingsTarget = args[5];
+
+                                UAGConfig.LoadMappings();
+                                bool loadedMappings = UAGConfig.TryGetMappings(args[5], out selectedMappings);
+
+                                if (!loadedMappings)
+                                {
+                                    try
+                                    {
+                                        selectedMappings = new Usmap(mappingsTarget);
+                                    }
+                                    catch { }
+                                }
+                            }
 
                             EngineVersion selectedVer = EngineVersion.UNKNOWN;
-                            if (int.TryParse(args[4], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
-                            else Enum.TryParse(args[4], out selectedVer);
+                            if (int.TryParse(args[4], out int selectedVerRaw))
+                            {
+                                selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
+                            }
+                            else if (args[4].Contains('.'))
+                            {
+                                Enum.TryParse("VER_UE" + args[4].Replace('.', '_'), out selectedVer);
+                            }
+                            else
+                            {
+                                Enum.TryParse(args[4], out selectedVer);
+                            }
 
                             string jsonSerializedAsset = new UAsset(args[2], selectedVer, selectedMappings).SerializeJson(Newtonsoft.Json.Formatting.Indented);
                             File.WriteAllText(args[3], jsonSerializedAsset);
@@ -152,7 +175,22 @@ namespace UAssetGUI
                             UAGConfig.LoadMappings();
 
                             if (args.Count < 4) break;
-                            if (args.Count >= 5) UAGConfig.TryGetMappings(args[4], out selectedMappings);
+                            if (args.Count >= 5)
+                            {
+                                string mappingsTarget = args[4];
+
+                                UAGConfig.LoadMappings();
+                                bool loadedMappings = UAGConfig.TryGetMappings(args[4], out selectedMappings);
+
+                                if (!loadedMappings)
+                                {
+                                    try
+                                    {
+                                        selectedMappings = new Usmap(mappingsTarget);
+                                    }
+                                    catch { }
+                                }
+                            }
 
                             UAsset jsonDeserializedAsset = null;
                             using (var sr = new FileStream(args[2], FileMode.Open))

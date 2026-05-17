@@ -28,16 +28,20 @@ If you would like to set up UAssetGUI for Linux (through Wine), perform the foll
 ## Command line arguments
 You can run the program with command line arguments to perform various tasks, such as exporting and importing from UAssetAPI JSON without opening the GUI.
 
-In the following cases, the engine version can either be specified as an EngineVersion enum entry (e.g. `VER_UE4_23` to refer to 4.23, `VER_UE5_0` to refer to 5.0, etc.) or as an integer (e.g. `23` to refer to 4.23, `29` to refer to 5.0, etc.). Specifying a set of mappings is optional, but if specified, must be the name of a file within the Mappings config directory (with no extension).
+In the following cases, the engine version can either be specified in `major.minor` string notation (e.g. `4.23` or `5.3`), an EngineVersion enum entry (e.g. `VER_UE4_23` to refer to 4.23, `VER_UE5_0` to refer to 5.0, etc.) or as an integer (e.g. `23` to refer to 4.23, `29` to refer to 5.0, etc.).
+
+Specifying a set of mappings is optional, but if specified, must be the path to a mappings file on disk or the name of a file within the UAssetGUI Mappings config directory (with no extension).
 
 ### Export to JSON
 ```
 UAssetGUI tojson <source> <destination> <engine version> [mappings name]
 ```
 
-Example 1: `UAssetGUI tojson A.uasset B.json VER_UE5_1`
+Example 1: `UAssetGUI tojson A.uasset B.json 5.1 "C:\Mappings.usmap"`
 
-Example 2: `UAssetGUI tojson A.uasset B.json 27 Astro`
+Example 2: `UAssetGUI tojson A.uasset B.json VER_UE5_1`
+
+Example 3: `UAssetGUI tojson A.uasset B.json 27 Astro`
 
 ### Import from JSON
 ```

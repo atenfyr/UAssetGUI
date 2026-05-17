@@ -50,7 +50,9 @@ UAssetGUI fromjson <source> <destination> [mappings name]
 
 Example 1: `UAssetGUI fromjson B.json A.umap`
 
-Example 2: `UAssetGUI fromjson B.json A.umap Outriders`
+Example 2: `UAssetGUI fromjson B.json A.umap ./Mappings.usmap`
+
+Example 3: `UAssetGUI fromjson B.json A.umap Outriders`
 
 ### Open a specific file in the GUI
 ```

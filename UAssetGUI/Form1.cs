@@ -475,8 +475,18 @@ namespace UAssetGUI
 
                     if (Program.args.Count > 2)
                     {
-                        if (int.TryParse(Program.args[2], out int selectedVerRaw)) selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
-                        else Enum.TryParse(Program.args[2], out selectedVer);
+                        if (int.TryParse(Program.args[2], out int selectedVerRaw))
+                        {
+                            selectedVer = EngineVersion.VER_UE4_0 + selectedVerRaw;
+                        }
+                        else if (Program.args[2].Contains('.'))
+                        {
+                            Enum.TryParse("VER_UE" + Program.args[2].Replace('.', '_'), out selectedVer);
+                        }
+                        else
+                        {
+                            Enum.TryParse(Program.args[2], out selectedVer);
+                        }
                     }
                     if (Program.args.Count > 3)
                     {

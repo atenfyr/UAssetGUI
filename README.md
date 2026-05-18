@@ -30,7 +30,7 @@ You can run the program with command line arguments to perform various tasks, su
 
 In the following cases, the engine version can either be specified in `major.minor` string notation (e.g. `4.23` or `5.3`), an EngineVersion enum entry (e.g. `VER_UE4_23` to refer to 4.23, `VER_UE5_0` to refer to 5.0, etc.) or as an integer (e.g. `23` to refer to 4.23, `29` to refer to 5.0, etc.).
 
-Specifying a set of mappings is optional, but if specified, must be the path to a mappings file on disk or the name of a file within the UAssetGUI Mappings config directory (with no extension).
+Specifying a set of mappings is optional, but if specified, must be the path to a mappings file on disk (with extension) or the name of a file within the UAssetGUI Mappings config directory (with no extension).
 
 ### Export to JSON
 ```

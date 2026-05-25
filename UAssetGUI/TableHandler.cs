@@ -193,6 +193,13 @@ namespace UAssetGUI
                     case "NiagaraVariableWithOffset":
                         InterpretThing(((NiagaraVariableBasePropertyData)me).TypeDef, topNode, topNode.ExportNum, fillAllSubNodes);
                         break;
+                    case "InstancedStruct":
+                        var instancedStruct = (InstancedStructPropertyData)me;
+                        for (int j = 0; j < instancedStruct.Value.Value.Count; j++)
+                        {
+                            InterpretThing(instancedStruct.Value.Value[j], topNode, topNode.ExportNum, fillAllSubNodes);
+                        }
+                        break;
                 }
             }
         }
@@ -377,7 +384,8 @@ namespace UAssetGUI
             "Box2f",
             "NiagaraVariableBase",
             "NiagaraVariable",
-            "NiagaraVariableWithOffset"
+            "NiagaraVariableWithOffset",
+            "InstancedStruct",
         };
 
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode, int exportNum, bool fillAllSubNodes)
@@ -504,6 +512,10 @@ namespace UAssetGUI
                 case "NiagaraVariable":
                 case "NiagaraVariableWithOffset":
                     InterpretThing(((NiagaraVariableBasePropertyData)me).TypeDef, ourNode, exportNum, fillAllSubNodes);
+                    break;
+                case "InstancedStruct":
+                    var instancedStruct = (InstancedStructPropertyData)me;
+                    ourNode.Nodes.Add(new PointingTreeNode("InstancedStruct", instancedStruct.Value, 0, exportNum));
                     break;
             }
         }
@@ -656,6 +668,7 @@ namespace UAssetGUI
                             case "Box":
                             case "Box2D":
                             case "Box2f":
+                            case "InstancedStruct":
                                 row.Cells[++columnIndexer].Value = string.Empty;
                                 break;
                             case "MulticastDelegateProperty":

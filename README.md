@@ -28,16 +28,16 @@ If you would like to set up UAssetGUI for Linux (through Wine), perform the foll
 ## Command line arguments
 You can run the program with command line arguments to perform various tasks, such as exporting and importing from UAssetAPI JSON without opening the GUI.
 
-In the following cases, the engine version can either be specified in `major.minor` string notation (e.g. `4.23` or `5.3`), an EngineVersion enum entry (e.g. `VER_UE4_23` to refer to 4.23, `VER_UE5_0` to refer to 5.0, etc.) or as an integer (e.g. `23` to refer to 4.23, `29` to refer to 5.0, etc.).
+In the following cases, the engine version can either be specified in `major.minor` string notation (e.g. `4.23` or `5.3`, only available in v1.1.1+), an EngineVersion enum entry (e.g. `VER_UE4_23` to refer to 4.23, `VER_UE5_0` to refer to 5.0, etc., available in all versions) or as an integer (e.g. `23` to refer to 4.23, `29` to refer to 5.0, etc., available in all versions).
 
-Specifying a set of mappings is optional, but if specified, must be the path to a mappings file on disk (with extension) or the name of a file within the UAssetGUI Mappings config directory (with no extension).
+Specifying a set of mappings is optional, but if specified, must be the path to a mappings file on disk with extension (only available in v1.1.1+) or the name of a file within the UAssetGUI Mappings config directory with no extension (available in all versions).
 
 ### Export to JSON
 ```
 UAssetGUI tojson <source> <destination> <engine version> [mappings name]
 ```
 
-Example 1: `UAssetGUI tojson A.uasset B.json 5.1 "C:\Mappings.usmap"`
+Example 1: `UAssetGUI tojson A.uasset B.json 5.1 "C:\Mappings.usmap"` (only in v1.1.1+)
 
 Example 2: `UAssetGUI tojson A.uasset B.json VER_UE5_1`
 
@@ -50,7 +50,7 @@ UAssetGUI fromjson <source> <destination> [mappings name]
 
 Example 1: `UAssetGUI fromjson B.json A.umap`
 
-Example 2: `UAssetGUI fromjson B.json A.umap ./Mappings.usmap`
+Example 2: `UAssetGUI fromjson B.json A.umap ./Mappings.usmap` (only in v1.1.1+)
 
 Example 3: `UAssetGUI fromjson B.json A.umap Outriders`
 

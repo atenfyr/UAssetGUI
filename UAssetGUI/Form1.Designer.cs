@@ -1,4 +1,4 @@
-﻿using System.Windows.Forms;
+using System.Windows.Forms;
 
 namespace UAssetGUI
 {
@@ -72,6 +72,7 @@ namespace UAssetGUI
             comboSpecifyMappings = new ComboBox();
             splitContainer1 = new SplitContainer();
             treeView1 = new ColorfulTreeView();
+            resetEverythingToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             nameMapContext.SuspendLayout();
@@ -224,7 +225,7 @@ namespace UAssetGUI
             // 
             // utilsToolStripMenuItem
             // 
-            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { executeScriptToolStripMenuItem, editScriptToolStripMenuItem, importMappingsToolStripMenuItem, patchusmapWithVersionInfoToolStripMenuItem, listValidPropertiesToolStripMenuItem });
+            utilsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { executeScriptToolStripMenuItem, editScriptToolStripMenuItem, importMappingsToolStripMenuItem, patchusmapWithVersionInfoToolStripMenuItem, listValidPropertiesToolStripMenuItem, resetEverythingToolStripMenuItem });
             utilsToolStripMenuItem.Name = "utilsToolStripMenuItem";
             utilsToolStripMenuItem.Size = new System.Drawing.Size(42, 20);
             utilsToolStripMenuItem.Text = "Utils";
@@ -235,7 +236,7 @@ namespace UAssetGUI
             executeScriptToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
             executeScriptToolStripMenuItem.Text = "Execute script...";
             // 
-            // executeScriptToolStripMenuItem
+            // editScriptToolStripMenuItem
             // 
             editScriptToolStripMenuItem.Name = "editScriptToolStripMenuItem";
             editScriptToolStripMenuItem.Size = new System.Drawing.Size(269, 22);
@@ -453,6 +454,13 @@ namespace UAssetGUI
             treeView1.AfterSelect += treeView1_AfterSelect;
             treeView1.KeyDown += treeView1_KeyDown;
             // 
+            // resetEverythingToolStripMenuItem
+            // 
+            resetEverythingToolStripMenuItem.Name = "resetEverythingToolStripMenuItem";
+            resetEverythingToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            resetEverythingToolStripMenuItem.Text = "Reset everything...";
+            resetEverythingToolStripMenuItem.Click += resetEverythingToolStripMenuItem_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -522,6 +530,7 @@ namespace UAssetGUI
         public ToolStripMenuItem executeScriptToolStripMenuItem;
         public ToolStripMenuItem editScriptToolStripMenuItem;
         private ToolStripMenuItem openContainersToolStripMenuItem;
+        private ToolStripMenuItem resetEverythingToolStripMenuItem;
     }
 }
 

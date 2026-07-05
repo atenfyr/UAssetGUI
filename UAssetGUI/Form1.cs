@@ -83,8 +83,6 @@ namespace UAssetGUI
             {
                 try
                 {
-                    UAGConfig.Load();
-
                     Assembly assembly = Assembly.GetExecutingAssembly();
                     UAGUtils._displayVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
@@ -134,6 +132,17 @@ namespace UAssetGUI
                     }
 
                     this.Text = DisplayVersion;
+
+                    if (Program.DidResetEverythingThisStartup)
+                    {
+                        UAGConfig.SetLanguage(Program.OverrideLangCode ?? UAGConfig.GetLanguageCodes()[0]);
+                        MessageBox.Show(Program.DidResetEverythingThisStartupErrorMessage == null ? UAGConfig.GetString("Settings.ResetDone") : string.Format(UAGConfig.GetString("Settings.ResetFail"), Program.DidResetEverythingThisStartupErrorMessage), UAGUtils.DisplayVersion);
+                        Environment.Exit(0);
+                    }
+
+                    UAGConfig.Load();
+                    if (!string.IsNullOrWhiteSpace(Program.OverrideLangCode)) UAGConfig.SetLanguage(Program.OverrideLangCode);
+
                     this.AllowDrop = true;
                     dataGridView1.Visible = true;
 
@@ -530,6 +539,7 @@ namespace UAssetGUI
             importMappingsToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.ImportMappings");
             patchusmapWithVersionInfoToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.PatchUsmap");
             listValidPropertiesToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.DumpSerializableProperties");
+            resetEverythingToolStripMenuItem.Text = UAGConfig.GetString("Menu.Utils.Reset");
             helpToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help");
             configDirToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help.OpenConfigDirectory");
             issuesToolStripMenuItem.Text = UAGConfig.GetString("Menu.Help.GiveFeedback");
@@ -1891,10 +1901,13 @@ namespace UAssetGUI
                 }
             }
 
-            if (!e.Cancel) DisposeDiscordRpc();
+            if (!e.Cancel)
+            {
+                DisposeDiscordRpc();
 
-            // delete temp folder
-            UAGUtils.DeleteDirectoryQuick(UAGConfig.TempFolder, true);
+                // delete temp folder
+                UAGUtils.DeleteDirectoryQuick(UAGConfig.TempFolder, true);
+            }
         }
 
         private void frm_DragEnter(object sender, DragEventArgs e)
@@ -2908,6 +2921,31 @@ namespace UAssetGUI
                     break;
                 }
             }
+        }
+
+        private void resetEverythingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!UAGConfig.SafeToAccessConfigFolder) return;
+
+            UAGUtils.InvokeUI(() =>
+            {
+                DialogResult res = MessageBox.Show(UAGConfig.GetString("Settings.ResetConfirm1"), UAGUtils.DisplayVersion, MessageBoxButtons.YesNo);
+                if (res != DialogResult.Yes) return;
+                DialogResult res2 = MessageBox.Show(UAGConfig.GetString("Settings.ResetConfirm2"), UAGUtils.DisplayVersion, MessageBoxButtons.YesNo);
+                if (res2 != DialogResult.Yes) return;
+
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = Environment.ProcessPath,
+                    Arguments = "--force_reset_absolutely_everything_permanently --lang " + (UAGConfig.Data.Language ?? UAGConfig.GetLanguageCodes()[0]),
+                    UseShellExecute = true
+                };
+                Process.Start(startInfo);
+
+                DisposeDiscordRpc();
+                UAGUtils.DeleteDirectoryQuick(UAGConfig.TempFolder, true);
+                Environment.Exit(0);
+            });
         }
     }
 }

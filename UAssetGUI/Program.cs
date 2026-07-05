@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Windows.Forms;
 using UAssetAPI;
 using UAssetAPI.UnrealTypes;
@@ -77,6 +78,9 @@ namespace UAssetGUI
 
         private static List<Type> strongRefs = new List<Type>();
         public static List<string> args;
+        internal static bool DidResetEverythingThisStartup = false;
+        internal static string DidResetEverythingThisStartupErrorMessage = null;
+        internal static string OverrideLangCode = null;
 
         /// <summary>
         /// The main entry point for the application.
@@ -102,6 +106,21 @@ namespace UAssetGUI
                         case "portable":
                         case "--portable":
                             UAGConfig.IsPortable = true;
+
+                            args.RemoveAt(i);
+                            i--;
+                            break;
+                        case "--force_reset_absolutely_everything_permanently":
+                            DidResetEverythingThisStartup = true;
+                            DidResetEverythingThisStartupErrorMessage = null; // to re-evaluate after SafeToAccessConfigFolder
+
+                            args.RemoveAt(i);
+                            i--;
+                            break;
+                        case "--lang":
+                            OverrideLangCode = args[i + 1];
+
+                            args.RemoveAt(i);
                             args.RemoveAt(i);
                             i--;
                             break;
@@ -124,6 +143,21 @@ namespace UAssetGUI
 
                 // only from here is it safe to reference ConfigFolder
                 UAGConfig.SafeToAccessConfigFolder = true;
+
+                // now attempt to reset everything if so instructed
+                if (DidResetEverythingThisStartup)
+                {
+                    Thread.Sleep(1000); // ensure that other instances of the software can close first
+                    try
+                    {
+                        UAGUtils.DeleteDirectoryQuick(UAGConfig.ConfigFolder, true);
+                        UAGUtils.DeleteDirectoryQuick(UAGConfig.TempFolder, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        DidResetEverythingThisStartupErrorMessage = ex.Message + "\n" + ex.StackTrace;
+                    }
+                }
 
                 if (args.Count >= 2)
                 {
@@ -209,26 +243,29 @@ namespace UAssetGUI
                 }
 
                 // set up assembly extracting (needs config folder to be set up)
-                try
+                if (!DidResetEverythingThisStartup)
                 {
-                    // extract .dll.gz resources and load them on demand
-                    AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
+                    try
                     {
-                        string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
-                        Directory.CreateDirectory(UAGConfig.ConfigFolder);
-                        Directory.CreateDirectory(libsPath);
+                        // extract .dll.gz resources and load them on demand
+                        AssemblyLoadContext.Default.Resolving += (context, assemblyName) =>
+                        {
+                            string libsPath = Path.Combine(UAGConfig.ConfigFolder, "Libraries");
+                            Directory.CreateDirectory(UAGConfig.ConfigFolder);
+                            Directory.CreateDirectory(libsPath);
 
-                        string outPath = ExtractCompressedResource("UAssetGUI." + assemblyName.Name + ".dll.gz", Path.Combine(libsPath, assemblyName.Name + ".dll"));
-                        if (outPath == null) return null; // if not found, fall back to default behavior
-                        return Assembly.LoadFrom(outPath);
-                    };
+                            string outPath = ExtractCompressedResource("UAssetGUI." + assemblyName.Name + ".dll.gz", Path.Combine(libsPath, assemblyName.Name + ".dll"));
+                            if (outPath == null) return null; // if not found, fall back to default behavior
+                            return Assembly.LoadFrom(outPath);
+                        };
 
-                    strongRefs.Add(typeof(System.Collections.Immutable.ImmutableArray));
-                    strongRefs.Add(typeof(System.Reflection.Metadata.MetadataReader));
-                }
-                catch (Exception ex)
-                {
-                    Clipboard.SetText(ex.ToString());
+                        strongRefs.Add(typeof(System.Collections.Immutable.ImmutableArray));
+                        strongRefs.Add(typeof(System.Reflection.Metadata.MetadataReader));
+                    }
+                    catch (Exception ex)
+                    {
+                        Clipboard.SetText(ex.ToString());
+                    }
                 }
 
                 Form1 f1 = new Form1

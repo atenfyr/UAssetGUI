@@ -470,6 +470,7 @@ namespace UAssetGUI
         public static bool SetLanguage(string code)
         {
             if (UAGConfig.Data.Language == code) return false;
+            if (!UAGConfig.GetLanguageCodes().Contains(code)) return false;
             UAGConfig.Data.Language = code;
             _LocalizedStringsCache = null;
             return true;

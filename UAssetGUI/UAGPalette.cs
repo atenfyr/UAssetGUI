@@ -36,7 +36,7 @@ namespace UAssetGUI
         public static Color InactiveColor = Color.FromArgb(211, 211, 211);
         public static Color DataGridViewActiveColor = Color.FromArgb(240, 240, 240);
         public static Color LinkColor = Color.Blue;
-        private static UAGTheme CurrentTheme = UAGTheme.Light;
+        private static UAGTheme CurrentTheme = UAGTheme.Dark;
 
         public static void InitializeTheme()
         {

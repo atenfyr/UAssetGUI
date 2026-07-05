@@ -660,6 +660,12 @@ namespace UAssetGUI
                             case "ArrayProperty":
                             case "SetProperty":
                                 row.Cells[++columnIndexer].Value = ((ArrayPropertyData)thisPD).ArrayType?.ToString() ?? FString.NullCase;
+                                row.Cells[columnIndexer].ToolTipText = "ArrayType";
+                                if ((((ArrayPropertyData)thisPD).Value?.Length ?? 0) == 0)
+                                {
+                                    row.Cells[++columnIndexer].Value = ((ArrayPropertyData)thisPD).DummyStruct?.StructType?.ToString() ?? FString.NullCase;
+                                    row.Cells[columnIndexer].ToolTipText = "DummyStruct.StructType";
+                                }
                                 break;
                             case "GameplayTagContainer":
                             case "MapProperty":

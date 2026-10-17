@@ -174,6 +174,10 @@ namespace UAssetGUI
                             InterpretThing(arr.Value[j], topNode, topNode.ExportNum, fillAllSubNodes);
                         }
                         break;
+                    case "OptionalProperty":
+                        var opt = (OptionalPropertyData)me;
+                        InterpretThing(opt.Value, topNode, topNode.ExportNum, fillAllSubNodes);
+                        break;
                     case "MapProperty":
                         var mapp = (MapPropertyData)me;
 
@@ -386,6 +390,7 @@ namespace UAssetGUI
             "NiagaraVariable",
             "NiagaraVariableWithOffset",
             "InstancedStruct",
+            "OptionalProperty",
         };
 
         private void InterpretThing(PropertyData me, PointingTreeNode ourNode, int exportNum, bool fillAllSubNodes)
@@ -457,6 +462,24 @@ namespace UAssetGUI
 
                     if (!hasChildren2) arrNode.ChildrenInitialized = true;
                     break;
+                case "OptionalProperty":
+                    {
+                        var opt = (OptionalPropertyData)me;
+                        
+                        var optNode = new PointingTreeNode(opt.Name.Value.Value + " (" + (opt.Value != null ? 1 : 0) + ")", opt, 0, exportNum);
+                        ourNode.Nodes.Add(optNode);
+
+                        if (fillAllSubNodes)
+                        {
+                            InterpretThing(opt.Value, optNode, exportNum, fillAllSubNodes);
+                        }
+                        else if (opt.Value == null || !hasChildrenProperties.Contains(opt.Value.PropertyType.Value))
+                        {
+                            optNode.ChildrenInitialized = true;
+                        }
+
+                        break;
+                    }
                 case "GameplayTagContainer":
                     var arr2 = (GameplayTagContainerPropertyData)me;
 
@@ -933,6 +956,16 @@ namespace UAssetGUI
                                     row.Cells[columnIndexer].ToolTipText = "AssetPath.AssetName";
                                     row.Cells[++columnIndexer].Value = sopPropData.Value.SubPathString == null ? FString.NullCase : sopPropData.Value.SubPathString.ToString();
                                     row.Cells[columnIndexer].ToolTipText = "SubPathString";
+                                }
+                                break;
+                            case "OptionalProperty":
+                                var optData = (OptionalPropertyData)thisPD;
+                                row.Cells[++columnIndexer].Value = optData.InnerType == null ? FString.NullCase : optData.InnerType.ToString();
+                                row.Cells[columnIndexer].ToolTipText = "InnerType";
+                                if (optData.InnerType?.ToString() == "StructProperty")
+                                {
+                                    row.Cells[++columnIndexer].Value = optData.InnerStructType == null ? FString.NullCase : optData.InnerStructType.ToString();
+                                    row.Cells[columnIndexer].ToolTipText = "InnerStructType";
                                 }
                                 break;
                             default:
@@ -1903,6 +1936,9 @@ namespace UAssetGUI
                                     usArr.Value = usArr.Value.StripNullsFromArray();
                                     renderingArr = usArr.Value;
                                     break;
+                                case OptionalPropertyData usOpt:
+                                    renderingArr = usOpt.Value != null ? [usOpt.Value] : [];
+                                    break;
                                 case GameplayTagContainerPropertyData usArr2:
                                     dataGridView1.Columns.Clear();
                                     AddColumns(new string[] { UAGConfig.GetString("Table.GameplayTagContainer.TagName"), "" });
@@ -2850,6 +2886,23 @@ namespace UAssetGUI
                             }
                             usArr.Value = newData.ToArray();
                             pointerNode.Text = usArr.Name.Value.Value + " (" + count + ")";
+                        }
+                        else if (pointerNode.Pointer is OptionalPropertyData usOpt)
+                        {
+                            PropertyData newVal = null;
+                            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                            {
+                                PropertyData val = RowToPD(i, usOpt.Value, true, asset.HasUnversionedProperties, PropertySerializationContext.Array);
+                                if (val == null)
+                                {
+                                    dirtySinceLastLoad = true;
+                                    continue;
+                                }
+                                newVal = val;
+                                break;
+                            }
+                            usOpt.Value = newVal;
+                            pointerNode.Text = usOpt.Name.Value.Value + " (" + (usOpt.Value != null ? 1 : 0) + ")";
                         }
                         else if (pointerNode.Pointer is GameplayTagContainerPropertyData usArr2)
                         {

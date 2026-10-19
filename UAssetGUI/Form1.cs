@@ -627,6 +627,10 @@ namespace UAssetGUI
                     GetUnknownProperties(entry.Value);
                 }
             }
+            else if (dat is OptionalPropertyData optDat)
+            {
+                GetUnknownProperties(optDat.Value);
+            }
         }
 
         public uint GetFileSignature(string path, out byte[] nextBytes)
@@ -1252,6 +1256,11 @@ namespace UAssetGUI
                             if (treeView1.Focused) objectToCopy = copyingDat2;
                             if (rowIndex >= 0 && !treeView1.Focused && copyingDat2.Value.Length > rowIndex) objectToCopy = copyingDat2.Value[rowIndex];
                         }
+                        else if (pointerNode.Pointer is OptionalPropertyData optDat)
+                        {
+                            if (treeView1.Focused) objectToCopy = optDat;
+                            if (rowIndex == 0 && !treeView1.Focused && optDat.Value != null) objectToCopy = optDat.Value;
+                        }
                         else if (pointerNode.Pointer is PointingDictionaryEntry copyingDat3)
                         {
                             // don't allow copying the dictionary entry itself
@@ -1433,6 +1442,18 @@ namespace UAssetGUI
                             }
                             return;
                         }
+                        else if (pointerNode.Pointer is OptionalPropertyData copyingOptDat && deserializedClipboard != null)
+                        {
+                            if (rowIndex < 0) return;
+                            copyingOptDat.Value = deserializedClipboard;
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
                         else if (pointerNode.Pointer is NormalExport copyingDat3 && deserializedClipboard != null)
                         {
                             if (rowIndex < 0) return;
@@ -1556,6 +1577,18 @@ namespace UAssetGUI
                             List<PropertyData> origArr = copyingDat2.Value.ToList();
                             origArr.RemoveAt(rowIndex);
                             copyingDat2.Value = origArr.ToArray();
+
+                            SetUnsavedChanges(true);
+                            if (tableEditor != null)
+                            {
+                                tableEditor.Load();
+                            }
+                            return;
+                        }
+                        else if (pointerNode.Pointer is OptionalPropertyData copyingOptDat)
+                        {
+                            if (rowIndex != 0 || copyingOptDat.Value == null) return;
+                            copyingOptDat.Value = null;
 
                             SetUnsavedChanges(true);
                             if (tableEditor != null)
